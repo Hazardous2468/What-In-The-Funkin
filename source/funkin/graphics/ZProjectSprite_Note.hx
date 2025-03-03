@@ -782,7 +782,44 @@ class ZProjectSprite_Note extends FlxSprite
     return point3D;
   }
 
-  // Future idea -> Make it so that you can change the order the rotations are applied in (so can be changed from Z,Y,X to X,Y,Z for example)
+  function applyRotX(pos:Vector3D, xPercent, yPercent, w:Float, h:Float, includeFlip:Bool = true):Vector3D
+  {
+    var rotateModPivotPoint:Vector2 = new Vector2(0, h / 2);
+    rotateModPivotPoint.x += pivotOffsetZ;
+    rotateModPivotPoint.y += pivotOffsetY;
+    var angleX_withFlip:Float = angleX + (includeFlip ? (flipY ? 180 : 0) : 0);
+    var thing:Vector2 = ModConstants.rotateAround(rotateModPivotPoint, new Vector2(pos.z, pos.y), angleX_withFlip);
+    pos.z = thing.x;
+    pos.y = thing.y;
+    return pos;
+  }
+
+  function applyRotY(pos:Vector3D, xPercent, yPercent, w:Float, h:Float, includeFlip:Bool = true):Vector3D
+  {
+    var rotateModPivotPoint:Vector2 = new Vector2(w / 2, 0);
+    rotateModPivotPoint.x += pivotOffsetX;
+    rotateModPivotPoint.y += pivotOffsetZ;
+    var angleY_withFlip:Float = angleY + (flipX ? 180 : 0);
+    var thing:Vector2 = ModConstants.rotateAround(rotateModPivotPoint, new Vector2(pos.x, pos.z), angleY_withFlip);
+    pos.x = thing.x;
+    pos.z = thing.y;
+    return pos;
+  }
+
+  function applyRotZ(pos:Vector3D, xPercent, yPercent, w:Float, h:Float, includeFlip:Bool = true):Vector3D
+  {
+    var rotateModPivotPoint:Vector2 = new Vector2(w / 2, h / 2);
+    rotateModPivotPoint.x += pivotOffsetX;
+    rotateModPivotPoint.y += pivotOffsetY;
+    var thing:Vector2 = ModConstants.rotateAround(rotateModPivotPoint, new Vector2(pos.x, pos.y), angleZ);
+    pos.x = thing.x;
+    pos.y = thing.y;
+    return pos;
+  }
+
+  // EDIT THIS ARRAY TO CHANGE HOW ROTATION IS APPLIED!
+  public var rotationOrder:Array<String> = ["z", "y", "x"];
+
   public function applyRotation(pos:Vector3D, xPercent:Float = 0, yPercent:Float = 0):Vector3D
   {
     var w:Float = spriteGraphic?.frameWidth ?? frameWidth;
@@ -796,28 +833,22 @@ class ZProjectSprite_Note extends FlxSprite
     pos_modified.y += preRotationMoveY;
     pos_modified.z += preRotationMoveZ;
 
-    var rotateModPivotPoint:Vector2 = new Vector2(w / 2, h / 2);
-    rotateModPivotPoint.x += pivotOffsetX;
-    rotateModPivotPoint.y += pivotOffsetY;
-    var thing:Vector2 = ModConstants.rotateAround(rotateModPivotPoint, new Vector2(pos_modified.x, pos_modified.y), angleZ);
-    pos_modified.x = thing.x;
-    pos_modified.y = thing.y;
+    for (i in 0...rotationOrder.length)
+    {
+      switch (rotationOrder[i])
+      {
+        case "x":
+          pos_modified = applyRotX(pos_modified, xPercent, yPercent, w, h);
+        case "y":
+          pos_modified = applyRotY(pos_modified, xPercent, yPercent, w, h);
+        case "z":
+          pos_modified = applyRotZ(pos_modified, xPercent, yPercent, w, h);
+      }
+    }
 
-    rotateModPivotPoint = new Vector2(w / 2, 0);
-    rotateModPivotPoint.x += pivotOffsetX;
-    rotateModPivotPoint.y += pivotOffsetZ;
-    var angleY_withFlip:Float = angleY + (flipX ? 180 : 0);
-    thing = ModConstants.rotateAround(rotateModPivotPoint, new Vector2(pos_modified.x, pos_modified.z), angleY_withFlip);
-    pos_modified.x = thing.x;
-    pos_modified.z = thing.y;
-
-    rotateModPivotPoint = new Vector2(0, h / 2);
-    rotateModPivotPoint.x += pivotOffsetZ;
-    rotateModPivotPoint.y += pivotOffsetY;
-    var angleX_withFlip:Float = angleX + (flipY ? 180 : 0);
-    thing = ModConstants.rotateAround(rotateModPivotPoint, new Vector2(pos_modified.z, pos_modified.y), angleX_withFlip);
-    pos_modified.z = thing.x;
-    pos_modified.y = thing.y;
+    //  pos_modified = applyRotZ(pos_modified, xPercent, yPercent, w, h);
+    // pos_modified = applyRotY(pos_modified, xPercent, yPercent, w, h);
+    // pos_modified = applyRotX(pos_modified, xPercent, yPercent, w, h);
 
     return pos_modified;
   }

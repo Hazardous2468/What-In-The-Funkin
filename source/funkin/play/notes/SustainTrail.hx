@@ -709,6 +709,7 @@ class SustainTrail extends ZSprite
 
   var spiralHoldOldMath:Bool = false;
   private var tinyOffsetForSpiral:Float = 0.01;
+  var lastOrientAngle:Float = 0; // same bandaid fix for orient.
 
   private var holdRootX:Float = 0.0;
   private var holdRootY:Float = 0.0;
@@ -999,9 +1000,18 @@ class SustainTrail extends ZSprite
       else if (spiralHolds)
       {
         var affectRoot:Bool = (k == 0);
+        var angle:Float = 0;
         var a:Float = (fakeNote.y - previousSampleY) * -1; // height
         var b:Float = (fakeNote.x - previousSampleX); // length
-        var angle:Float = Math.atan2(b, a);
+        if (!(a == 0 && b == 0)) // if we're in the same spot...
+        {
+          angle = Math.atan2(b, a);
+          lastOrientAngle = angle;
+        }
+        else
+        {
+          angle = lastOrientAngle; // alternatively, instead of previous sample we could try sampling forward instead of where we *would* be without any clipping being applied
+        }
         var calculateAngleDif:Float = angle * (180 / Math.PI);
 
         // rotate right point
