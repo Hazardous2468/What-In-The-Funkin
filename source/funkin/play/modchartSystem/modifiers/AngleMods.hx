@@ -101,3 +101,45 @@ class NotesAngleYOffsetMod extends Modifier
     data.angleY += currentValue;
   }
 }
+
+// Rotate the notes on the z axis
+class HoldsAngleZOffsetMod extends Modifier
+{
+  public function new(name:String)
+  {
+    super(name, 0);
+  }
+
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
+  {
+    if (isHoldNote) data.angleZ += currentValue;
+  }
+}
+
+// Rotate the notes on the x axis
+class HoldsAngleXOffsetMod extends Modifier
+{
+  public function new(name:String)
+  {
+    super(name, 0);
+  }
+
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
+  {
+    if (isHoldNote) data.angleX += currentValue;
+  }
+}
+
+// Rotate the notes on the y axis
+class HoldsAngleYOffsetMod extends Modifier
+{
+  public function new(name:String)
+  {
+    super(name, 0);
+  }
+
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
+  {
+    if (isHoldNote) data.angleY += currentValue;
+  }
+}

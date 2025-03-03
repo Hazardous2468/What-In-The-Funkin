@@ -326,34 +326,51 @@ class ModConstants
     modName = StringTools.replace(modName, "rotationy", "rotatey");
     modName = StringTools.replace(modName, "rotationz", "rotatez");
 
+    modName = StringTools.replace(modName, "holdsanglex", "holdanglex");
+    modName = StringTools.replace(modName, "holdsangley", "holdangley");
+    modName = StringTools.replace(modName, "holdsanglez", "holdanglez");
+
     modName = StringTools.replace(modName, "cosspiral", "spiralcos");
 
     modName = StringTools.replace(modName, "confusionzoffset", "confusionoffset");
 
-    if (modName == "anglez")
+    // this is stupid
+    var noLaneName:String = modName;
+    var noLaneName_2:String = "";
+    var subModArr = null;
+    if (StringTools.contains(modName, "--"))
     {
-      modName = "angle";
+      subModArr = modName.split('--');
+      noLaneName = subModArr[0];
+      noLaneName_2 = "--" + subModArr[1];
     }
-    else if (modName == "noteangle")
+
+    if (noLaneName == "anglez")
     {
-      modName = "notesangle";
+      noLaneName = "angle";
     }
-    else if (modName == "notesanglez")
+    else if (noLaneName == "noteangle")
     {
-      modName = "notesangle";
+      noLaneName = "notesangle";
     }
-    else if (modName == "noteanglez")
+    else if (noLaneName == "notesanglez")
     {
-      modName = "notesangle";
+      noLaneName = "notesangle";
     }
-    else if (modName == "noteangley")
+    else if (noLaneName == "noteanglez")
     {
-      modName = "notesangley";
+      noLaneName = "notesangle";
     }
-    else if (modName == "noteanglex")
+    else if (noLaneName == "noteangley")
     {
-      modName = "notesanglex";
+      noLaneName = "notesangley";
     }
+    else if (noLaneName == "noteanglex")
+    {
+      noLaneName = "notesanglex";
+    }
+    modName = noLaneName + noLaneName_2;
+
     modName = StringTools.replace(modName, "scaleholds", "scalehold");
     modName = StringTools.replace(modName, "scalestrums", "scalestrum");
     modName = StringTools.replace(modName, "scalenotes", "scalenote");
@@ -1161,6 +1178,13 @@ class ModConstants
         newMod = new NotesAngleYOffsetMod(tag);
       case "notesanglex":
         newMod = new NotesAngleXOffsetMod(tag);
+
+      case "holdanglex":
+        newMod = new HoldsAngleXOffsetMod(tag);
+      case "holdangley":
+        newMod = new HoldsAngleYOffsetMod(tag);
+      case "holdanglez":
+        newMod = new HoldsAngleZOffsetMod(tag);
 
       case "dizzy":
         newMod = new DizzyMod(tag);
