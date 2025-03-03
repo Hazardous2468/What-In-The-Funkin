@@ -369,6 +369,9 @@ class Strumline extends FlxSpriteGroup
     return KEY_COUNT * Strumline.NOTE_SPACING;
   }
 
+  // This can be changed to make the arrowpath segment into smaller chunks, making it less likely to memory leak when really long and detailed
+  public var pathPieces:Int = 3;
+
   public override function update(elapsed:Float):Void
   {
     super.update(elapsed);
@@ -382,31 +385,45 @@ class Strumline extends FlxSpriteGroup
         notitgPath = new HazardArrowpath(this);
         notitgPathSprite.loadGraphic(notitgPath.bitmap);
 
-        for (i in 0...KEY_COUNT)
+        // clear the old
+        arrowPaths.forEach(function(note:SustainTrail) {
+          arrowPaths.remove(note);
+          note.destroy();
+        });
+
+        for (p in 0...pathPieces)
         {
-          var holdNoteSprite:SustainTrail = new SustainTrail(0, 0, noteStyle, true, this);
-          // holdNoteSprite.makeGraphic(10, 20, FlxColor.WHITE);
-          this.arrowPaths.add(holdNoteSprite);
-          holdNoteSprite.weBelongTo = this;
-
-          if (PlayState.instance.allStrumSprites != null && PlayState.instance.noteRenderMode)
+          for (i in 0...KEY_COUNT)
           {
-            PlayState.instance.allStrumSprites.add(holdNoteSprite);
+            var holdNoteSprite:SustainTrail = new SustainTrail(0, 0, noteStyle, true, this);
+            // holdNoteSprite.makeGraphic(10, 20, FlxColor.WHITE);
+            this.arrowPaths.add(holdNoteSprite);
+            holdNoteSprite.weBelongTo = this;
+
+            if (PlayState.instance.allStrumSprites != null && PlayState.instance.noteRenderMode)
+            {
+              PlayState.instance.allStrumSprites.add(holdNoteSprite);
+            }
+
+            holdNoteSprite.piece = p;
+            holdNoteSprite.renderEnd = (p == (pathPieces - 1));
+            holdNoteSprite.parentStrumline = this;
+            holdNoteSprite.noteData = null;
+            holdNoteSprite.strumTime = 0;
+            holdNoteSprite.noteDirection = i;
+
+            @:privateAccess
+            holdNoteSprite.tinyOffsetForSpiral = 0; // shouldn't need this cuz there shouldn't be any clipping
+
+            var whichStrumNote:StrumlineNote = getByIndex(i);
+            holdNoteSprite.alpha = whichStrumNote?.strumExtraModData?.arrowPathAlpha ?? 0;
+            holdNoteSprite.fullSustainLength = holdNoteSprite.sustainLength = whichStrumNote.strumExtraModData.arrowpathLength
+              + whichStrumNote.strumExtraModData.arrowpathBackwardsLength;
+
+            holdNoteSprite.missedNote = false;
+            holdNoteSprite.hitNote = false;
+            holdNoteSprite.visible = true;
           }
-
-          holdNoteSprite.parentStrumline = this;
-          holdNoteSprite.noteData = null;
-          holdNoteSprite.strumTime = 0;
-          holdNoteSprite.noteDirection = i;
-
-          var whichStrumNote:StrumlineNote = getByIndex(i);
-          holdNoteSprite.alpha = whichStrumNote?.strumExtraModData?.arrowPathAlpha ?? 0;
-          holdNoteSprite.fullSustainLength = holdNoteSprite.sustainLength = whichStrumNote.strumExtraModData.arrowpathLength
-            + whichStrumNote.strumExtraModData.arrowpathBackwardsLength;
-
-          holdNoteSprite.missedNote = false;
-          holdNoteSprite.hitNote = false;
-          holdNoteSprite.visible = true;
         }
         generatedArrowPaths = true;
       }
@@ -497,15 +514,12 @@ class Strumline extends FlxSpriteGroup
       var whichStrumNote:StrumlineNote = getByIndex(note.noteDirection);
       note.alpha = whichStrumNote?.strumExtraModData?.arrowPathAlpha ?? 0;
       // ay -= whichStrumNote.strumExtraModData.alphaHoldCoverMod;
-
-      note.fullSustainLength = note.sustainLength = whichStrumNote.strumExtraModData.arrowpathLength
-        + whichStrumNote.strumExtraModData.arrowpathBackwardsLength;
-
-      // note.fullSustainLength = arrowpathLength[note.noteDirection % KEY_COUNT] + arrowpathBackwardsLength[note.noteDirection % KEY_COUNT];
-      // note.sustainLength = arrowpathLength[note.noteDirection % KEY_COUNT] + arrowpathBackwardsLength[note.noteDirection % KEY_COUNT];
+      var length:Float = (whichStrumNote.strumExtraModData.arrowpathLength + whichStrumNote.strumExtraModData.arrowpathBackwardsLength) / (pathPieces);
+      note.fullSustainLength = note.sustainLength = length;
 
       note.strumTime = Conductor.instance?.songPosition ?? 0;
       note.strumTime -= whichStrumNote?.strumExtraModData?.arrowpathBackwardsLength ?? 0;
+      note.strumTime += length * note.piece;
       note.updateClipping();
     });
   }

@@ -357,6 +357,9 @@ class SustainTrail extends ZSprite
 
   var noteModData:NoteData;
 
+  public var renderEnd:Bool = true; // test
+  public var piece:Int = 0; // test
+
   public var cullMode = TriangleCulling.NONE;
 
   public var hazCullMode:String = "none";
@@ -708,7 +711,7 @@ class SustainTrail extends ZSprite
   }
 
   var spiralHoldOldMath:Bool = false;
-  private var tinyOffsetForSpiral:Float = 0.01;
+  var tinyOffsetForSpiral:Float = 0.01;
   var lastOrientAngle:Float = 0; // same bandaid fix for orient.
 
   private var holdRootX:Float = 0.0;
@@ -1090,160 +1093,163 @@ class SustainTrail extends ZSprite
     }
 
     // === END CAP VERTICES ===
-
-    var endvertsoftrail:Int = (holdResolution * 2);
-    var highestNumSoFar:Int = endvertsoftrail + 2;
-
-    // TODO - FIX HOLD ENDS MOD SAMPLE TIME!
-    var sillyEndOffset = (graphic.height * (endOffset) * zoom);
-
-    // just some random magic number for now. Don't know how to convert the pixels / height into strumTime
-    sillyEndOffset = sillyEndOffset / (0.45 * parentStrumline?.scrollSpeed ?? 1.0);
-
-    sillyEndOffset *= 1.9; // MAGIC NUMBER IDFK
-
-    // sillyEndOffset = sustainHeight(sustainLength, getScrollSpeed());
-
-    // pixels = (susLength * 0.45 * getScrollSpeed());
-    // sillyEndOffset = (? * 0.45)
-    // ? = sillyEndOffset / (0.45 * getScrollSpeed());
-
-    holdPieceStrumTime = this.strumTime + (sussyLength * longHolds) + sillyEndOffset;
-    var tm_end:Float = holdPieceStrumTime;
-    if (spiralHolds && !spiralHoldOldMath)
+    if (renderEnd)
     {
-      tm_end += holdResolution * (grain * tinyOffsetForSpiral); // ever so slightly offset the time so that it never hits 0, 0 on the strum time so spiral hold can do its magic
-    }
-    susSample(tm_end + clipTimeThing(songTimmy, holdPieceStrumTime), true, false, sillyEndOffset);
+      var endvertsoftrail:Int = (holdResolution * 2);
+      var highestNumSoFar:Int = endvertsoftrail + 2;
 
-    scaleTest = fakeNote.scale.x;
-    widthScaled = holdWidth * scaleTest;
-    scaleChange = widthScaled - holdWidth;
-    holdLeftSide = 0 - (scaleChange / 2);
-    holdRightSide = widthScaled - (scaleChange / 2);
+      // TODO - FIX HOLD ENDS MOD SAMPLE TIME!
+      var sillyEndOffset = (graphic.height * (endOffset) * zoom);
 
-    // scaleTest = fakeNote.scale.x;
-    // holdLeftSide = (holdWidth * (scaleTest - 1)) * -1;
-    // holdRightSide = holdWidth * scaleTest;
+      // just some random magic number for now. Don't know how to convert the pixels / height into strumTime
+      sillyEndOffset = sillyEndOffset / (0.45 * parentStrumline?.scrollSpeed ?? 1.0);
 
-    // Top left
-    vertices[highestNumSoFar * 2] = vertices[endvertsoftrail * 2]; // Inline with bottom left vertex of hold
-    vertices[highestNumSoFar * 2 + 1] = vertices[endvertsoftrail * 2 + 1]; // Inline with bottom left vertex of hold
-    testCol[highestNumSoFar * 2] = testCol[endvertsoftrail * 2];
-    testCol[highestNumSoFar * 2 + 1] = testCol[endvertsoftrail * 2 + 1];
+      sillyEndOffset *= 1.9; // MAGIC NUMBER IDFK
 
-    // vertices[highestNumSoFar * 2] = holdNoteJankX * -1;
-    // vertices[highestNumSoFar * 2 + 1] = holdNoteJankY * -1;
+      // sillyEndOffset = sustainHeight(sustainLength, getScrollSpeed());
 
-    // Top right
-    highestNumSoFar += 1;
-    vertices[highestNumSoFar * 2] = vertices[(endvertsoftrail + 1) * 2]; // Inline with bottom right vertex of hold
-    vertices[highestNumSoFar * 2 + 1] = vertices[(endvertsoftrail + 1) * 2 + 1]; // Inline with bottom right vertex of hold
-    testCol[highestNumSoFar * 2] = testCol[(endvertsoftrail + 1) * 2]; // Inline with bottom right vertex of hold
-    testCol[highestNumSoFar * 2 + 1] = testCol[(endvertsoftrail + 1) * 2 + 1]; // Inline with bottom right vertex of hold
+      // pixels = (susLength * 0.45 * getScrollSpeed());
+      // sillyEndOffset = (? * 0.45)
+      // ? = sillyEndOffset / (0.45 * getScrollSpeed());
 
-    // vertices[highestNumSoFar * 2] = holdNoteJankX * -1;
-    // vertices[highestNumSoFar * 2 + 1] = holdNoteJankY * -1;
-
-    // Bottom left
-    highestNumSoFar += 1;
-
-    // grab left vert
-    var rotateOrigin:Vector2 = new Vector2(fakeNote.x + holdLeftSide, fakeNote.y);
-    // move rotateOrigin to be inbetween the left and right vert so it's centered
-    rotateOrigin.x += ((fakeNote.x + holdRightSide) - (fakeNote.x + holdLeftSide)) / 2;
-
-    vert = applyPerspective(new Vector3D(fakeNote.x + holdLeftSide, fakeNote.y, fakeNote.z), rotateOrigin);
-    vertices[highestNumSoFar * 2] = vert.x;
-    vertices[highestNumSoFar * 2 + 1] = vert.y;
-    testCol[highestNumSoFar * 2] = fakeNote.color;
-    testCol[highestNumSoFar * 2 + 1] = fakeNote.color;
-
-    // vertices[highestNumSoFar * 2] = holdNoteJankX * -1;
-    // vertices[highestNumSoFar * 2 + 1] = holdNoteJankY * -1;
-
-    // Bottom right
-    highestNumSoFar += 1;
-    vert = applyPerspective(new Vector3D(fakeNote.x + holdRightSide, fakeNote.y, fakeNote.z), rotateOrigin);
-    vertices[highestNumSoFar * 2] = vert.x;
-    vertices[highestNumSoFar * 2 + 1] = vert.y;
-    testCol[highestNumSoFar * 2] = fakeNote.color;
-    testCol[highestNumSoFar * 2 + 1] = fakeNote.color;
-    if (spiralHolds && !spiralHoldOldMath)
-    {
-      var a:Float = (fakeNote.y - previousSampleY) * -1; // height
-      var b:Float = (fakeNote.x - previousSampleX); // length
-      var angle:Float = Math.atan2(b, a);
-      var calculateAngleDif:Float = angle * (180 / Math.PI);
-
-      var ybeforerotate:Float = vertices[(highestNumSoFar - 1) * 2 + 1];
-
-      // grab left vert
-      var rotateOrigin:Vector2 = new Vector2(vertices[(highestNumSoFar - 1) * 2], vertices[(highestNumSoFar - 1) * 2 + 1]);
-      // move rotateOrigin to be inbetween the left and right vert so it's centered
-      rotateOrigin.x += (vertices[highestNumSoFar * 2] - rotateOrigin.x) / 2;
-
-      // rotate right point
-      // var rotatePoint:Vector2 = new Vector2(fakeNote.x + holdRightSide,vertices[i * 2+1]);
-      var rotatePoint:Vector2 = new Vector2(vertices[highestNumSoFar * 2], vertices[highestNumSoFar * 2 + 1]);
-
-      var thing:Vector2 = ModConstants.rotateAround(rotateOrigin, rotatePoint, calculateAngleDif);
-
-      vertices[highestNumSoFar * 2 + 1] = thing.y;
-      vertices[highestNumSoFar * 2] = thing.x;
-
-      rotatePoint = new Vector2(vertices[(highestNumSoFar - 1) * 2], ybeforerotate);
-      thing = ModConstants.rotateAround(rotateOrigin, rotatePoint, calculateAngleDif);
-      vertices[(highestNumSoFar - 1) * 2 + 1] = thing.y;
-      vertices[(highestNumSoFar - 1) * 2] = thing.x;
-    }
-    else if (spiralHolds && spiralHoldOldMath)
-    {
-      var calculateAngleDif:Float = 0;
-      var a:Float = (fakeNote.y - previousSampleY) * -1; // height
-      var b:Float = (fakeNote.x - previousSampleX); // length
-      var angle:Float = Math.atan(b / a);
-      angle *= (180 / Math.PI);
-      calculateAngleDif = angle;
-
-      var thing:Vector2 = ModConstants.rotateAround(new Vector2(vertices[(highestNumSoFar - 1) * 2], vertices[(highestNumSoFar - 1) * 2 + 1]),
-        new Vector2(vertices[highestNumSoFar * 2], vertices[highestNumSoFar * 2 + 1]), calculateAngleDif);
-      vertices[highestNumSoFar * 2 + 1] = thing.y;
-      vertices[highestNumSoFar * 2] = thing.x;
-    }
-
-    // vertices[highestNumSoFar * 2] = holdNoteJankX * -1;
-    // vertices[highestNumSoFar * 2 + 1] = holdNoteJankY * -1;
-
-    if (uvSetup)
-    {
-      highestNumSoFar = (holdResolution * 2) + 2;
-
-      // === END CAP UVs ===
-      // Top left
-      uvtData[highestNumSoFar * 2] = uvtData[2 * 2] + (1 / 8); // 12.5%/37.5%/62.5%/87.5% of the way through the image (1/8th past the top left of hold)
-      uvtData[highestNumSoFar * 2 + 1] = if (partHeight > 0)
+      holdPieceStrumTime = this.strumTime + (sussyLength * longHolds) + sillyEndOffset;
+      var tm_end:Float = holdPieceStrumTime;
+      if (spiralHolds && !spiralHoldOldMath)
       {
-        0;
+        tm_end += holdResolution * (grain * tinyOffsetForSpiral); // ever so slightly offset the time so that it never hits 0, 0 on the strum time so spiral hold can do its magic
       }
-      else
-      {
-        (bottomHeight - clipHeight) / zoom / graphic.height;
-      };
+      susSample(tm_end + clipTimeThing(songTimmy, holdPieceStrumTime), true, false, sillyEndOffset);
+
+      scaleTest = fakeNote.scale.x;
+      widthScaled = holdWidth * scaleTest;
+      scaleChange = widthScaled - holdWidth;
+      holdLeftSide = 0 - (scaleChange / 2);
+      holdRightSide = widthScaled - (scaleChange / 2);
+
+      // scaleTest = fakeNote.scale.x;
+      // holdLeftSide = (holdWidth * (scaleTest - 1)) * -1;
+      // holdRightSide = holdWidth * scaleTest;
+
+      // Top left
+      vertices[highestNumSoFar * 2] = vertices[endvertsoftrail * 2]; // Inline with bottom left vertex of hold
+      vertices[highestNumSoFar * 2 + 1] = vertices[endvertsoftrail * 2 + 1]; // Inline with bottom left vertex of hold
+      testCol[highestNumSoFar * 2] = testCol[endvertsoftrail * 2];
+      testCol[highestNumSoFar * 2 + 1] = testCol[endvertsoftrail * 2 + 1];
+
+      // vertices[highestNumSoFar * 2] = holdNoteJankX * -1;
+      // vertices[highestNumSoFar * 2 + 1] = holdNoteJankY * -1;
 
       // Top right
-      uvtData[(highestNumSoFar + 1) * 2] = uvtData[highestNumSoFar * 2] +
-        (1 / 8); // 25%/50%/75%/100% of the way through the image (1/8th past the top left of cap)
-      uvtData[(highestNumSoFar + 1) * 2 + 1] = uvtData[highestNumSoFar * 2 + 1]; // top bound
+      highestNumSoFar += 1;
+      vertices[highestNumSoFar * 2] = vertices[(endvertsoftrail + 1) * 2]; // Inline with bottom right vertex of hold
+      vertices[highestNumSoFar * 2 + 1] = vertices[(endvertsoftrail + 1) * 2 + 1]; // Inline with bottom right vertex of hold
+      testCol[highestNumSoFar * 2] = testCol[(endvertsoftrail + 1) * 2]; // Inline with bottom right vertex of hold
+      testCol[highestNumSoFar * 2 + 1] = testCol[(endvertsoftrail + 1) * 2 + 1]; // Inline with bottom right vertex of hold
+
+      // vertices[highestNumSoFar * 2] = holdNoteJankX * -1;
+      // vertices[highestNumSoFar * 2 + 1] = holdNoteJankY * -1;
 
       // Bottom left
-      uvtData[(highestNumSoFar +
-        2) * 2] = uvtData[highestNumSoFar * 2]; // 12.5%/37.5%/62.5%/87.5% of the way through the image (1/8th past the top left of hold)
-      uvtData[(highestNumSoFar + 2) * 2 + 1] = bottomClip; // bottom bound
+      highestNumSoFar += 1;
+
+      // grab left vert
+      var rotateOrigin:Vector2 = new Vector2(fakeNote.x + holdLeftSide, fakeNote.y);
+      // move rotateOrigin to be inbetween the left and right vert so it's centered
+      rotateOrigin.x += ((fakeNote.x + holdRightSide) - (fakeNote.x + holdLeftSide)) / 2;
+
+      vert = applyPerspective(new Vector3D(fakeNote.x + holdLeftSide, fakeNote.y, fakeNote.z), rotateOrigin);
+      vertices[highestNumSoFar * 2] = vert.x;
+      vertices[highestNumSoFar * 2 + 1] = vert.y;
+      testCol[highestNumSoFar * 2] = fakeNote.color;
+      testCol[highestNumSoFar * 2 + 1] = fakeNote.color;
+
+      // vertices[highestNumSoFar * 2] = holdNoteJankX * -1;
+      // vertices[highestNumSoFar * 2 + 1] = holdNoteJankY * -1;
 
       // Bottom right
-      uvtData[(highestNumSoFar + 3) * 2] = uvtData[(highestNumSoFar + 1) * 2]; // 25%/50%/75%/100% of the way through the image (1/8th past the top left of cap)
-      uvtData[(highestNumSoFar + 3) * 2 + 1] = uvtData[(highestNumSoFar + 2) * 2 + 1]; // bottom bound
+      highestNumSoFar += 1;
+      vert = applyPerspective(new Vector3D(fakeNote.x + holdRightSide, fakeNote.y, fakeNote.z), rotateOrigin);
+      vertices[highestNumSoFar * 2] = vert.x;
+      vertices[highestNumSoFar * 2 + 1] = vert.y;
+      testCol[highestNumSoFar * 2] = fakeNote.color;
+      testCol[highestNumSoFar * 2 + 1] = fakeNote.color;
+      if (spiralHolds && !spiralHoldOldMath)
+      {
+        var a:Float = (fakeNote.y - previousSampleY) * -1; // height
+        var b:Float = (fakeNote.x - previousSampleX); // length
+        var angle:Float = Math.atan2(b, a);
+        var calculateAngleDif:Float = angle * (180 / Math.PI);
+
+        var ybeforerotate:Float = vertices[(highestNumSoFar - 1) * 2 + 1];
+
+        // grab left vert
+        var rotateOrigin:Vector2 = new Vector2(vertices[(highestNumSoFar - 1) * 2], vertices[(highestNumSoFar - 1) * 2 + 1]);
+        // move rotateOrigin to be inbetween the left and right vert so it's centered
+        rotateOrigin.x += (vertices[highestNumSoFar * 2] - rotateOrigin.x) / 2;
+
+        // rotate right point
+        // var rotatePoint:Vector2 = new Vector2(fakeNote.x + holdRightSide,vertices[i * 2+1]);
+        var rotatePoint:Vector2 = new Vector2(vertices[highestNumSoFar * 2], vertices[highestNumSoFar * 2 + 1]);
+
+        var thing:Vector2 = ModConstants.rotateAround(rotateOrigin, rotatePoint, calculateAngleDif);
+
+        vertices[highestNumSoFar * 2 + 1] = thing.y;
+        vertices[highestNumSoFar * 2] = thing.x;
+
+        rotatePoint = new Vector2(vertices[(highestNumSoFar - 1) * 2], ybeforerotate);
+        thing = ModConstants.rotateAround(rotateOrigin, rotatePoint, calculateAngleDif);
+        vertices[(highestNumSoFar - 1) * 2 + 1] = thing.y;
+        vertices[(highestNumSoFar - 1) * 2] = thing.x;
+      }
+      else if (spiralHolds && spiralHoldOldMath)
+      {
+        var calculateAngleDif:Float = 0;
+        var a:Float = (fakeNote.y - previousSampleY) * -1; // height
+        var b:Float = (fakeNote.x - previousSampleX); // length
+        var angle:Float = Math.atan(b / a);
+        angle *= (180 / Math.PI);
+        calculateAngleDif = angle;
+
+        var thing:Vector2 = ModConstants.rotateAround(new Vector2(vertices[(highestNumSoFar - 1) * 2], vertices[(highestNumSoFar - 1) * 2 + 1]),
+          new Vector2(vertices[highestNumSoFar * 2], vertices[highestNumSoFar * 2 + 1]), calculateAngleDif);
+        vertices[highestNumSoFar * 2 + 1] = thing.y;
+        vertices[highestNumSoFar * 2] = thing.x;
+      }
+
+      // vertices[highestNumSoFar * 2] = holdNoteJankX * -1;
+      // vertices[highestNumSoFar * 2 + 1] = holdNoteJankY * -1;
+
+      if (uvSetup)
+      {
+        highestNumSoFar = (holdResolution * 2) + 2;
+
+        // === END CAP UVs ===
+        // Top left
+        uvtData[highestNumSoFar * 2] = uvtData[2 * 2] + (1 / 8); // 12.5%/37.5%/62.5%/87.5% of the way through the image (1/8th past the top left of hold)
+        uvtData[highestNumSoFar * 2 + 1] = if (partHeight > 0)
+        {
+          0;
+        }
+        else
+        {
+          (bottomHeight - clipHeight) / zoom / graphic.height;
+        };
+
+        // Top right
+        uvtData[(highestNumSoFar + 1) * 2] = uvtData[highestNumSoFar * 2] +
+          (1 / 8); // 25%/50%/75%/100% of the way through the image (1/8th past the top left of cap)
+        uvtData[(highestNumSoFar + 1) * 2 + 1] = uvtData[highestNumSoFar * 2 + 1]; // top bound
+
+        // Bottom left
+        uvtData[(highestNumSoFar +
+          2) * 2] = uvtData[highestNumSoFar * 2]; // 12.5%/37.5%/62.5%/87.5% of the way through the image (1/8th past the top left of hold)
+        uvtData[(highestNumSoFar + 2) * 2 + 1] = bottomClip; // bottom bound
+
+        // Bottom right
+        uvtData[(highestNumSoFar + 3) * 2] = uvtData[(highestNumSoFar +
+          1) * 2]; // 25%/50%/75%/100% of the way through the image (1/8th past the top left of cap)
+        uvtData[(highestNumSoFar + 3) * 2 + 1] = uvtData[(highestNumSoFar + 2) * 2 + 1]; // bottom bound
+      }
     }
 
     for (k in 0...vertices.length)
