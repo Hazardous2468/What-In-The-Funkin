@@ -247,6 +247,7 @@ class ZProjectSprite_Note extends FlxSprite
   public var uvScaleOffset:Vector2 = new Vector2(0.5, 0.5); // scale from center
   public var uvOffset:Vector2 = new Vector2(0.0, 0.0);
 
+  // For checking if values have changed as to prevent constantly updating the tris constantly
   private var old_vertOffsetX:Array<Float> = [];
   private var old_vertOffsetY:Array<Float> = [];
   private var old_vertOffsetZ:Array<Float> = [];
@@ -387,9 +388,6 @@ class ZProjectSprite_Note extends FlxSprite
     // All the variables are the same, return false as we don't need to update!
     return false;
   }
-
-  public var skewOffsetFix:Float = 0.5;
-  public var skew3D:Bool = false; // Doesn't work with angle :(
 
   public function updateTris(forceUpdate:Bool = false, debugTrace:Bool = false):Void
   {
@@ -744,6 +742,8 @@ class ZProjectSprite_Note extends FlxSprite
   public var preRotationMoveY:Float = 0;
   public var preRotationMoveZ:Float = 0;
 
+  var skewOffsetFix:Float = 0.5;
+
   public function applySkew(pos:Vector3D, xPercent:Float, yPercent:Float, w:Float, h:Float):Vector3D
   {
     var point3D:Vector3D = new Vector3D(pos.x, pos.y, pos.z);
@@ -757,7 +757,7 @@ class ZProjectSprite_Note extends FlxSprite
     var rotateModPivotPoint:Vector2 = new Vector2(0.5, 0.5); // to skew from center
     var thing:Vector2 = ModConstants.rotateAround(rotateModPivotPoint, new Vector2(xPercent, yPercent), angleZ); // to fix incorrect skew when rotated
 
-    // For some reason, we need a 0.5 offset for this???????????????????
+    // For some reason, we need a 0.5 offset for this for it to be centered???????????????????
     var xPercent_SkewOffset:Float = thing.x - skewY_offset - skewOffsetFix;
     var yPercent_SkewOffset:Float = thing.y - skewX_offset - skewOffsetFix;
     // Keep math the same as skewedsprite for parity reasons.
@@ -773,9 +773,9 @@ class ZProjectSprite_Note extends FlxSprite
     if (skewX_playfield != 0) point3D.x += playfieldSkewOffset_X * Math.tan(skewX_playfield * FlxAngle.TO_RAD);
     if (skewY_playfield != 0) point3D.y += playfieldSkewOffset_Y * Math.tan(skewY_playfield * FlxAngle.TO_RAD);
 
-    // z SKEW
+    // z SKEW ?
 
-    if (skewX != 0) point3D.z += yPercent_SkewOffset * Math.tan(skewZ * FlxAngle.TO_RAD) * h * scaleY;
+    if (skewZ != 0) point3D.z += yPercent_SkewOffset * Math.tan(skewZ * FlxAngle.TO_RAD) * h * scaleY;
     var playfieldSkewOffset_Z:Float = ((thing.y - 0.5) * (w * scaleX)) + skewPosY - (playfieldSkewCenterY);
     if (skewZ_playfield != 0) point3D.z += playfieldSkewOffset_Z * Math.tan(skewZ_playfield * FlxAngle.TO_RAD);
 
