@@ -28,6 +28,7 @@ import funkin.play.modchartSystem.HazardArrowpath;
 import funkin.Paths;
 import funkin.play.modchartSystem.NoteData;
 import flixel.math.FlxAngle;
+import flixel.graphics.tile.FlxDrawTrianglesItem;
 
 /**
  * A group of sprites which handles the receptor, the note splashes, and the notes (with sustains) for a given player.
@@ -391,9 +392,10 @@ class Strumline extends FlxSpriteGroup
           note.destroy();
         });
 
-        for (p in 0...pathPieces)
+        for (i in 0...KEY_COUNT)
         {
-          for (i in 0...KEY_COUNT)
+          var prev:SustainTrail = null;
+          for (p in 0...pathPieces)
           {
             var holdNoteSprite:SustainTrail = new SustainTrail(0, 0, noteStyle, true, this);
             // holdNoteSprite.makeGraphic(10, 20, FlxColor.WHITE);
@@ -405,6 +407,10 @@ class Strumline extends FlxSpriteGroup
               PlayState.instance.allStrumSprites.add(holdNoteSprite);
             }
 
+            if (prev != null)
+            {
+              holdNoteSprite.previousPiece = prev;
+            }
             holdNoteSprite.piece = p;
             holdNoteSprite.renderEnd = (p == (pathPieces - 1));
             holdNoteSprite.parentStrumline = this;
@@ -423,6 +429,7 @@ class Strumline extends FlxSpriteGroup
             holdNoteSprite.missedNote = false;
             holdNoteSprite.hitNote = false;
             holdNoteSprite.visible = true;
+            prev = holdNoteSprite;
           }
         }
         generatedArrowPaths = true;
@@ -435,7 +442,7 @@ class Strumline extends FlxSpriteGroup
       #if FEATURE_GHOST_TAPPING
       updateGhostTapTimer(elapsed);
       #end
-      updateArrowPaths(elapsed);
+      updateArrowPaths();
       updateModDebug();
       updatePerspective();
 
@@ -483,7 +490,7 @@ class Strumline extends FlxSpriteGroup
   // if set to false, will skip arrowpath update logic
   public var drawArrowPaths:Bool = true;
 
-  function updateArrowPaths(elapsed:Float):Void
+  function updateArrowPaths():Void
   {
     if (!generatedArrowPaths) return;
     if (!drawArrowPaths) return;
@@ -521,6 +528,25 @@ class Strumline extends FlxSpriteGroup
       note.strumTime -= whichStrumNote?.strumExtraModData?.arrowpathBackwardsLength ?? 0;
       note.strumTime += length * note.piece;
       note.updateClipping();
+
+      // UH OH, SCUFFED CODE ALERT
+      // We sow the end of the arrowpath to the start of the new piece. This is so that we don't have any gaps. Mainly occurs with spiral holds lol
+      // MY NAME IS EDWIN
+      if (note.previousPiece != null)
+      {
+        // I made the mimic
+        var v_prev:Array<Float> = note.previousPiece.vertices_array;
+        var v:Array<Float> = note.vertices_array;
+
+        // it was difficult, to put the pieces together
+        v[3] = v_prev[v_prev.length - 1];
+        v[2] = v_prev[v_prev.length - 2];
+        v[1] = v_prev[v_prev.length - 3];
+        v[0] = v_prev[v_prev.length - 4];
+
+        // but unfortunately, something went so wrong.
+        note.vertices = new DrawData<Float>(v.length, true, v);
+      }
     });
   }
 

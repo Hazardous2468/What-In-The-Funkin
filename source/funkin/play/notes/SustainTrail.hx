@@ -73,6 +73,8 @@ class SustainTrail extends ZSprite
    */
   public var vertices:DrawData<Float> = new DrawData<Float>();
 
+  public var vertices_array:Array<Float> = [];
+
   /**
    * A `Vector` of integers or indexes, where every three indexes define a triangle.
    */
@@ -359,6 +361,7 @@ class SustainTrail extends ZSprite
 
   public var renderEnd:Bool = true; // test
   public var piece:Int = 0; // test
+  public var previousPiece:SustainTrail = null;
 
   public var cullMode = TriangleCulling.NONE;
 
@@ -494,6 +497,7 @@ class SustainTrail extends ZSprite
     var strumTimmy:Float = t - whichStrumNote?.strumExtraModData?.strumPos ?? 0;
 
     var notePos:Float = parentStrumline.calculateNoteYPos(strumTimmy, false);
+
     if (parentStrumline.mods.mathCutOffCheck(notePos, noteDirection % 4)
       || (!isRoot
         && whichStrumNote.strumExtraModData.noHoldMathShortcut < 0.5
@@ -837,7 +841,7 @@ class SustainTrail extends ZSprite
     // }
 
     var clipHeight:Float = FlxMath.bound(sustainHeight(sustainLength - (songTime - strumTime), parentStrumline?.scrollSpeed ?? 1.0), 0, graphicHeight);
-    if (clipHeight <= 0.1)
+    if (clipHeight <= 0.1 && !isArrowPath)
     {
       visible = false;
       return;
@@ -1267,6 +1271,7 @@ class SustainTrail extends ZSprite
       // holdStripVerts_.vertices.push(vertices[k]);
     }
 
+    this.vertices_array = vertices;
     this.vertices = new DrawData<Float>(vertices.length - 0, true, vertices);
     this.indices = new DrawData<Int>(noteIndices.length - 0, true, noteIndices);
     this.colors = new DrawData<Int>(testCol.length - 0, true, testCol);
