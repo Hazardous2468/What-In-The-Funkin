@@ -828,8 +828,8 @@ class Project extends HXProject {
 	}
 
 	public function allowTraces():Bool {
-		return isDebug();
 		//return true;
+		return isDebug();
 	}
 
 
