@@ -803,6 +803,7 @@ class SustainTrail extends ZSprite
     var uvtData:Array<Float> = [];
     var noteIndices:Array<Int> = [];
 
+    // to keep the face normal facing towards the camera for culling.
     var dumbAlt:Bool = true;
 
     for (i in 0...Std.int(holdResolution * 2))
