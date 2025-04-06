@@ -1,16 +1,12 @@
 package funkin.ui.debug.charting.components;
 
-import funkin.play.notes.Strumline;
-import funkin.data.notestyle.NoteStyleRegistry;
-import funkin.play.notes.notestyle.NoteStyle;
 import flixel.FlxObject;
-import flixel.FlxSprite;
-import flixel.graphics.frames.FlxFramesCollection;
-import flixel.graphics.frames.FlxTileFrames;
-import flixel.math.FlxPoint;
-import funkin.play.notes.SustainTrailVanilla;
-import funkin.data.song.SongData.SongNoteData;
 import flixel.math.FlxMath;
+import funkin.data.notestyle.NoteStyleRegistry;
+import funkin.data.song.SongData.SongNoteData;
+import funkin.play.notes.Strumline;
+import funkin.play.notes.SustainTrailVanilla;
+import funkin.play.notes.notestyle.NoteStyle;
 
 /**
  * A sprite that can be used to display the trail of a hold note in a chart.

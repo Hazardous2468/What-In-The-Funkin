@@ -124,7 +124,7 @@ class ScriptEventDispatcher
           t.onSongEnd(event);
           return;
         case SONG_RETRY:
-          t.onSongRetry(event);
+          t.onSongRetry(cast event);
           return;
         case GAME_OVER:
           t.onGameOver(event);
@@ -184,6 +184,12 @@ class ScriptEventDispatcher
           return;
         case SUBSTATE_CLOSE_END:
           t.onSubStateCloseEnd(cast event);
+          return;
+        case FOCUS_LOST:
+          t.onFocusLost(cast event);
+          return;
+        case FOCUS_GAINED:
+          t.onFocusGained(cast event);
           return;
         default: // Continue;
       }

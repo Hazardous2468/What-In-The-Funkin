@@ -13,14 +13,14 @@ class HSVShader extends FlxRuntimeShader
   public var stealthGlowGreen(default, set):Float;
   public var stealthGlowBlue(default, set):Float;
 
-  public function new()
+  public function new(h:Float = 1, s:Float = 1, v:Float = 1, g:Float = 0)
   {
     super(Assets.getText(Paths.frag('hsv')));
     FlxG.debugger.addTrackerProfile(new TrackerProfile(HSVShader, ['hue', 'saturation', 'value']));
-    hue = 1;
-    saturation = 1;
-    value = 1;
-    stealthGlow = 0;
+    hue = h;
+    saturation = s;
+    value = v;
+    stealthGlow = g;
 
     this.setBool('_isHold', false);
   }

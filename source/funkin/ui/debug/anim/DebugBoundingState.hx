@@ -1,10 +1,10 @@
 package funkin.ui.debug.anim;
 
-import flixel.addons.display.FlxBackdrop;
-import flixel.addons.display.FlxGridOverlay;
 import flixel.FlxCamera;
 import flixel.FlxSprite;
 import flixel.FlxState;
+import flixel.addons.display.FlxBackdrop;
+import flixel.addons.display.FlxGridOverlay;
 import flixel.graphics.frames.FlxFrame;
 import flixel.group.FlxGroup;
 import flixel.math.FlxPoint;
@@ -12,17 +12,17 @@ import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import funkin.input.Cursor;
 import funkin.play.character.BaseCharacter;
-import funkin.play.character.CharacterData;
 import funkin.play.character.CharacterData.CharacterDataParser;
+import funkin.play.character.CharacterData;
 import funkin.ui.mainmenu.MainMenuState;
 import funkin.util.MouseUtil;
 import funkin.util.SerializerUtil;
 import funkin.util.SortUtil;
+import haxe.ui.RuntimeComponentBuilder;
 import haxe.ui.components.DropDown;
 import haxe.ui.containers.dialogs.CollapsibleDialog;
 import haxe.ui.core.Screen;
 import haxe.ui.events.UIEvent;
-import haxe.ui.RuntimeComponentBuilder;
 import lime.utils.Assets as LimeAssets;
 import openfl.events.Event;
 import openfl.events.IOErrorEvent;
@@ -30,13 +30,6 @@ import openfl.geom.Rectangle;
 import openfl.net.FileReference;
 
 using flixel.util.FlxSpriteUtil;
-
-#if web
-import js.html.FileList;
-#end
-#if sys
-import sys.io.File;
-#end
 
 class DebugBoundingState extends FlxState
 {

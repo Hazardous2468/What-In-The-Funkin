@@ -1,34 +1,30 @@
 package funkin.play.notes;
 
-import flixel.util.FlxSignal.FlxTypedSignal;
 import flixel.FlxG;
-import funkin.play.notes.notestyle.NoteStyle;
-import flixel.group.FlxSpriteGroup;
+import flixel.graphics.tile.FlxDrawTrianglesItem;
 import flixel.group.FlxSpriteGroup.FlxTypedSpriteGroup;
+import flixel.group.FlxSpriteGroup;
+import flixel.math.FlxAngle;
+import flixel.math.FlxMath;
+import flixel.text.FlxText;
 import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
-import flixel.util.FlxSort;
-import funkin.play.notes.NoteHoldCover;
-import funkin.play.notes.NoteSplash;
-import funkin.play.notes.NoteSprite;
-import funkin.play.notes.SustainTrail;
-import funkin.data.song.SongData.SongNoteData;
-import funkin.ui.options.PreferencesMenu;
-import funkin.util.SortUtil;
-import funkin.modding.events.ScriptEvent;
-import funkin.play.notes.notekind.NoteKindManager;
-//
-import flixel.text.FlxText;
-import flixel.math.FlxMath;
 import flixel.util.FlxColor;
-import funkin.play.modchartSystem.ModHandler;
-import funkin.play.modchartSystem.ModConstants;
+import flixel.util.FlxSignal.FlxTypedSignal;
+import flixel.util.FlxSort;
+import funkin.Paths;
+import funkin.data.song.SongData.SongNoteData;
+import funkin.graphics.FunkinSprite;
 import funkin.graphics.ZSprite;
 import funkin.play.modchartSystem.HazardArrowpath;
-import funkin.Paths;
+import funkin.play.modchartSystem.ModConstants;
+import funkin.play.modchartSystem.ModHandler;
 import funkin.play.modchartSystem.NoteData;
-import flixel.math.FlxAngle;
-import flixel.graphics.tile.FlxDrawTrianglesItem;
+import funkin.play.notes.notekind.NoteKindManager;
+import funkin.play.notes.notestyle.NoteStyle;
+import funkin.util.SortUtil;
+
+//
 
 /**
  * A group of sprites which handles the receptor, the note splashes, and the notes (with sustains) for a given player.
@@ -48,8 +44,21 @@ class Strumline extends FlxSpriteGroup
 
   static var RENDER_DISTANCE_MS(get, never):Float;
 
+  /**
+   * The custom render distance for the strumline.
+   * This should be in miliseconds only! Not pixels.
+   */
+  public static var CUSTOM_RENDER_DISTANCE_MS:Float = 0.0;
+
+  /**
+   * Whether to use the custom render distance.
+   * If false, the render distance will be calculated based on the screen height.
+   */
+  public static var USE_CUSTOM_RENDER_DISTANCE:Bool = false;
+
   static function get_RENDER_DISTANCE_MS():Float
   {
+    if (USE_CUSTOM_RENDER_DISTANCE) return CUSTOM_RENDER_DISTANCE_MS;
     return FlxG.height / Constants.PIXELS_PER_MS;
   }
 
@@ -165,6 +174,12 @@ class Strumline extends FlxSpriteGroup
 
   var notitgPath:HazardArrowpath;
 
+  /* Whether to play note splashes or not
+   * TODO: Make this a setting!
+   * IE: Settings.noSplash
+   */
+  public var showNotesplash:Bool = true;
+
   /**
    * Whether this strumline is controlled by the player's inputs.
    * False means it's controlled by the opponent or Bot Play.
@@ -199,6 +214,11 @@ class Strumline extends FlxSpriteGroup
   }
 
   /**
+   * Whether the game should auto position notes.
+   */
+  public var customPositionData:Bool = false;
+
+  /**
    * The notes currently being rendered on the strumline.
    * This group iterates over this every frame to update note positions.
    * The PlayState also iterates over this to calculate user inputs.
@@ -209,9 +229,11 @@ class Strumline extends FlxSpriteGroup
 
   public var onNoteIncoming:FlxTypedSignal<NoteSprite->Void>;
 
-  public var strumlineNotes:FlxTypedSpriteGroup<StrumlineNote>;
-  public var noteSplashes:FlxTypedSpriteGroup<NoteSplash>;
-  public var noteHoldCovers:FlxTypedSpriteGroup<NoteHoldCover>;
+  var background:FunkinSprite;
+
+  var strumlineNotes:FlxTypedSpriteGroup<StrumlineNote>;
+  var noteSplashes:FlxTypedSpriteGroup<NoteSplash>;
+  var noteHoldCovers:FlxTypedSpriteGroup<NoteHoldCover>;
 
   public var notesVwoosh:FlxTypedSpriteGroup<NoteSprite>;
   public var holdNotesVwoosh:FlxTypedSpriteGroup<SustainTrail>;
@@ -233,6 +255,8 @@ class Strumline extends FlxSpriteGroup
   var heldKeys:Array<Bool> = [];
 
   var holdsBehindStrums:Bool = false;
+
+  static final BACKGROUND_PAD:Int = 16;
 
   public function new(noteStyle:NoteStyle, isPlayer:Bool, modchartSong:Bool = false)
   {
@@ -308,6 +332,15 @@ class Strumline extends FlxSpriteGroup
     {
       setupModStuff();
     }
+    else
+    { // Fuckin, background won't work when the notes go all over the screen!!! Wasn't expecting this to be a feature, but it won't be supported.
+      this.background = new FunkinSprite(0, 0).makeSolidColor(Std.int(this.width + BACKGROUND_PAD * 2), FlxG.height, 0xFF000000);
+      // Convert the percent to a number between 0 and 1.
+      this.background.alpha = Preferences.strumlineBackgroundOpacity / 100.0;
+      this.background.scrollFactor.set(0, 0);
+      this.background.x = -BACKGROUND_PAD;
+      this.add(this.background);
+    }
 
     this.refresh();
 
@@ -337,6 +370,25 @@ class Strumline extends FlxSpriteGroup
 
     // This MUST be true for children to update!
     this.active = true;
+  }
+
+  override function set_y(value:Float):Float
+  {
+    super.set_y(value);
+
+    // Keep the background on the screen.
+    if (this.background != null) this.background.y = 0;
+
+    return value;
+  }
+
+  override function set_alpha(value:Float):Float
+  {
+    super.set_alpha(value);
+
+    if (this.background != null) this.background.alpha = Preferences.strumlineBackgroundOpacity / 100.0 * alpha;
+
+    return value;
   }
 
   public function setupModStuff():Void
@@ -1197,7 +1249,7 @@ class Strumline extends FlxSpriteGroup
       }
       else
       {
-        note.y = this.y - INITIAL_OFFSET + calculateNoteYPos(note.strumTime, vwoosh);
+        if (!customPositionData) note.y = this.y - INITIAL_OFFSET + calculateNoteYPos(note.strumTime, vwoosh);
 
         // If the note is miss
         var isOffscreen = Preferences.downscroll ? note.y > FlxG.height : note.y < -note.height;
@@ -1274,6 +1326,7 @@ class Strumline extends FlxSpriteGroup
         var yOffset:Float = (holdNote.fullSustainLength - holdNote.sustainLength) * Constants.PIXELS_PER_MS;
 
         var vwoosh:Bool = false;
+
         if (mods != null)
         {
           holdNote.x = ModConstants.holdNoteJankX + (isPixel ? -dumbMagicNumberForX : 0);
@@ -1281,13 +1334,16 @@ class Strumline extends FlxSpriteGroup
         }
         else
         {
-          if (Preferences.downscroll)
+          if (!customPositionData)
           {
-            holdNote.y = this.y - INITIAL_OFFSET + calculateNoteYPos(holdNote.strumTime, vwoosh) - holdNote.height + STRUMLINE_SIZE / 2;
-          }
-          else
-          {
-            holdNote.y = this.y - INITIAL_OFFSET + calculateNoteYPos(holdNote.strumTime, vwoosh) + yOffset + STRUMLINE_SIZE / 2;
+            if (Preferences.downscroll)
+            {
+              holdNote.y = this.y - INITIAL_OFFSET + calculateNoteYPos(holdNote.strumTime, vwoosh) - holdNote.height + STRUMLINE_SIZE / 2;
+            }
+            else
+            {
+              holdNote.y = this.y - INITIAL_OFFSET + calculateNoteYPos(holdNote.strumTime, vwoosh) + yOffset + STRUMLINE_SIZE / 2;
+            }
           }
         }
 
@@ -1318,13 +1374,16 @@ class Strumline extends FlxSpriteGroup
         }
         else
         {
-          if (Preferences.downscroll)
+          if (!customPositionData)
           {
-            holdNote.y = this.y - INITIAL_OFFSET - holdNote.height + STRUMLINE_SIZE / 2;
-          }
-          else
-          {
-            holdNote.y = this.y - INITIAL_OFFSET + STRUMLINE_SIZE / 2;
+            if (Preferences.downscroll)
+            {
+              holdNote.y = this.y - INITIAL_OFFSET - holdNote.height + STRUMLINE_SIZE / 2;
+            }
+            else
+            {
+              holdNote.y = this.y - INITIAL_OFFSET + STRUMLINE_SIZE / 2;
+            }
           }
         }
       }
@@ -1340,13 +1399,16 @@ class Strumline extends FlxSpriteGroup
         }
         else
         {
-          if (Preferences.downscroll)
+          if (!customPositionData)
           {
-            holdNote.y = this.y - INITIAL_OFFSET + calculateNoteYPos(holdNote.strumTime, vwoosh) - holdNote.height + STRUMLINE_SIZE / 2;
-          }
-          else
-          {
-            holdNote.y = this.y - INITIAL_OFFSET + calculateNoteYPos(holdNote.strumTime, vwoosh) + STRUMLINE_SIZE / 2;
+            if (Preferences.downscroll)
+            {
+              holdNote.y = this.y - INITIAL_OFFSET + calculateNoteYPos(holdNote.strumTime, vwoosh) - holdNote.height + STRUMLINE_SIZE / 2;
+            }
+            else
+            {
+              holdNote.y = this.y - INITIAL_OFFSET + calculateNoteYPos(holdNote.strumTime, vwoosh) + STRUMLINE_SIZE / 2;
+            }
           }
         }
       }
@@ -1578,8 +1640,7 @@ class Strumline extends FlxSpriteGroup
 
   public function playNoteSplash(direction:NoteDirection):Void
   {
-    // TODO: Add a setting to disable note splashes.
-    // if (Settings.noSplash) return;
+    if (!showNotesplash) return;
     if (!noteStyle.isNoteSplashEnabled()) return;
 
     var splash:NoteSplash = this.constructNoteSplash();
@@ -1600,6 +1661,8 @@ class Strumline extends FlxSpriteGroup
         splash.y = this.y;
         splash.y -= INITIAL_OFFSET;
         splash.y += 0;
+        splash.x += noteStyle.getSplashOffsets()[0] * splash.scale.x;
+        splash.y += noteStyle.getSplashOffsets()[1] * splash.scale.y;
       }
     }
   }
@@ -1668,6 +1731,10 @@ class Strumline extends FlxSpriteGroup
     splash.x -= whichStrumNote.strumExtraModData.noteStyleOffsetX; // undo strum offset
     splash.y -= whichStrumNote.strumExtraModData.noteStyleOffsetY;
 
+    // MOVE THIS TO CALC Z's FUNC IF THIS BORKS
+    splash.x += noteStyle.getSplashOffsets()[0] * splash.scale.x;
+    splash.y += noteStyle.getSplashOffsets()[1] * splash.scale.y;
+
     var ay:Float = whichStrumNote.alpha;
     ay -= whichStrumNote.strumExtraModData.alphaSplashMod;
     // ay -= alphaSplashMod[direction % KEY_COUNT];
@@ -1689,8 +1756,7 @@ class Strumline extends FlxSpriteGroup
 
   public function playNoteHoldCover(holdNote:SustainTrail):Void
   {
-    // TODO: Add a setting to disable note splashes.
-    // if (Settings.noSplash) return;
+    if (!showNotesplash) return;
     if (!noteStyle.isHoldNoteCoverEnabled()) return;
 
     var cover:NoteHoldCover = this.constructNoteHoldCover();
@@ -1707,13 +1773,14 @@ class Strumline extends FlxSpriteGroup
       cover.x += getXPos(holdNote.noteDirection);
       cover.x += STRUMLINE_SIZE / 2;
       cover.x -= cover.width / 2;
-      cover.x += -12; // Manual tweaking because fuck.
+      cover.x += noteStyle.getHoldCoverOffsets()[0] * cover.scale.x;
+      cover.x += -12; // hardcoded adjustment, because we are evil.
 
       cover.y = this.y;
       cover.y += INITIAL_OFFSET;
       cover.y += STRUMLINE_SIZE / 2;
+      cover.y += noteStyle.getHoldCoverOffsets()[1] * cover.scale.y;
       cover.y += -96; // Manual tweaking because fuck.
-
       noteCoverSetPos(cover);
     }
   }
@@ -1756,7 +1823,10 @@ class Strumline extends FlxSpriteGroup
 
     if (holdNoteSprite != null)
     {
-      var noteKindStyle:NoteStyle = NoteKindManager.getNoteStyle(note.kind, this.noteStyle.id) ?? this.noteStyle;
+      var noteKindStyle:NoteStyle = NoteKindManager.getNoteStyle(note.kind, this.noteStyle.id);
+      if (noteKindStyle == null) noteKindStyle = NoteKindManager.getNoteStyle(note.kind, null);
+      if (noteKindStyle == null) noteKindStyle = this.noteStyle;
+
       holdNoteSprite.setupHoldNoteGraphic(noteKindStyle);
 
       holdNoteSprite.parentStrumline = this;
@@ -1832,7 +1902,7 @@ class Strumline extends FlxSpriteGroup
     if (noteHoldCovers.length < noteHoldCovers.maxSize)
     {
       // Create a new note hold cover.
-      result = new NoteHoldCover();
+      result = new NoteHoldCover(noteStyle);
       this.noteHoldCovers.add(result);
     }
     else
@@ -2013,5 +2083,43 @@ class Strumline extends FlxSpriteGroup
     {
       return FlxSort.byValues(order, a?.strumTime, b?.strumTime);
     }
+  }
+
+  override function findMinYHelper()
+  {
+    var value = Math.POSITIVE_INFINITY;
+    for (member in group.members)
+    {
+      if (member == null) continue;
+      // SKIP THE BACKGROUND
+      if (member == this.background) continue;
+
+      var minY:Float;
+      if (member.flixelType == SPRITEGROUP) minY = (cast member : FlxSpriteGroup).findMinY();
+      else
+        minY = member.y;
+
+      if (minY < value) value = minY;
+    }
+    return value;
+  }
+
+  override function findMaxYHelper()
+  {
+    var value = Math.NEGATIVE_INFINITY;
+    for (member in group.members)
+    {
+      if (member == null) continue;
+      // SKIP THE BACKGROUND
+      if (member == this.background) continue;
+
+      var maxY:Float;
+      if (member.flixelType == SPRITEGROUP) maxY = (cast member : FlxSpriteGroup).findMaxY();
+      else
+        maxY = member.y + member.height;
+
+      if (maxY > value) value = maxY;
+    }
+    return value;
   }
 }
