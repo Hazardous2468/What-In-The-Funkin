@@ -496,7 +496,6 @@ class Project extends HXProject {
 		// Should be false unless explicitly requested.
 		GITHUB_BUILD.apply(this, false);
 		FEATURE_STAGE_EDITOR.apply(this, false);
-		FEATURE_NEWGROUNDS.apply(this, false);
 		FEATURE_GHOST_TAPPING.apply(this, false);
 
 		// Should be true unless explicitly requested.
@@ -519,13 +518,14 @@ class Project extends HXProject {
 		//FEATURE_LOG_TRACE.apply(this, true);
 		FEATURE_LOG_TRACE.apply(this, allowTraces());
 
-
-
 		FEATURE_NEWGROUNDS.apply(this, true);
 		FEATURE_NEWGROUNDS_DEBUG.apply(this, false);
 		FEATURE_NEWGROUNDS_TESTING_MEDALS.apply(this, FEATURE_NEWGROUNDS.isEnabled(this) && FEATURE_DEBUG_FUNCTIONS.isEnabled(this));
 		FEATURE_NEWGROUNDS_AUTOLOGIN.apply(this, FEATURE_NEWGROUNDS.isEnabled(this) && isWeb());
 		FEATURE_NEWGROUNDS_EVENTS.apply(this, FEATURE_NEWGROUNDS.isEnabled(this));
+
+
+
 
 		// Should default to true on workspace builds and false on release builds.
 		REDIRECT_ASSETS_FOLDER.apply(this, isDebug() && isDesktop());
@@ -717,9 +717,10 @@ class Project extends HXProject {
 			addHaxelib('hxdiscord_rpc'); // Discord API
 		}
 
-		if (FEATURE_NEWGROUNDS.isEnabled(this)) {
+		//Needs to be enabled otherwise the newgrounds api will fail to compile. :/
+		//if (FEATURE_NEWGROUNDS.isEnabled(this)) {
 			addHaxelib('newgrounds'); // Newgrounds API
-		}
+		//}
 
 		if (FEATURE_FUNKVIS.isEnabled(this)) {
 			addHaxelib('funkin.vis'); // Audio visualization

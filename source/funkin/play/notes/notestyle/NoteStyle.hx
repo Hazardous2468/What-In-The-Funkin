@@ -974,11 +974,11 @@ class NoteStyle implements IRegistryEntry<NoteStyleData>
     if (splashFrames != null && !force) return splashFrames;
 
     splashFrames = Paths.getSparrowAtlas(splashAssetPath, getAssetLibrary(getSplashAssetPath(true)));
-    splashFrames.parent.persist = true;
     if (splashFrames == null)
     {
       throw 'Could not load notesplash frames for note style: $id';
     }
+    splashFrames.parent.persist = true;
     return splashFrames;
   }
 

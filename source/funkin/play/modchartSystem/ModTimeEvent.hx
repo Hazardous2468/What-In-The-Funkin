@@ -38,7 +38,7 @@ class ModTimeEvent
   // Function to trigger for func events.
   public var funcToCall:Void->Void = null;
 
-  public var funcTween = function(a) {
+  public var funcTween = function(a:Float) {
     return a;
   }
 
@@ -47,7 +47,7 @@ class ModTimeEvent
     // super("eventHandle");
   }
 
-  public function tweenFunky(val)
+  public function tweenFunky(val:Float)
   {
     if (funcTween == null) return;
 
