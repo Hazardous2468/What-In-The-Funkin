@@ -1573,5 +1573,6 @@ class SustainTrail extends ZSprite
   }
 
   var useShader:Bool = true;
-  var hsvShader:HSVShader = null;
+
+  public var hsvShader:HSVShader = null;
 }

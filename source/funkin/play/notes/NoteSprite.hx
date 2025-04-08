@@ -22,7 +22,7 @@ class NoteSprite extends ZSprite
 
   public var holdNoteSprite:SustainTrail;
 
-  var hsvShader:HSVShader;
+  public var hsvShader:HSVShader;
 
   /**
    * The strum time at which the note should be hit, in milliseconds.

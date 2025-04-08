@@ -397,6 +397,11 @@ class NoteStyle implements IRegistryEntry<NoteStyleData>
     return _data?.assets?.holdNoteCover?.data?.enabled ?? fallback?.isHoldNoteCoverEnabled() ?? false;
   }
 
+  public function shouldHoldNoteCoverCopyHSV():Bool
+  {
+    return _data?.assets?.holdNoteCover?.data?.copyHSV ?? fallback?.isHoldNoteCoverEnabled() ?? false;
+  }
+
   /**
    * Build a sprite for the given step of the countdown.
    * @param step
@@ -944,6 +949,7 @@ class NoteStyle implements IRegistryEntry<NoteStyleData>
     target.splashFramerateVariance = getSplashFramerateVariance();
     target.alpha = _data.assets.noteSplash?.alpha ?? 1.0;
     target.blend = _data.assets.noteSplash?.data?.blendMode ?? "normal";
+    target.copyHSV = _data.assets.noteSplash?.data?.copyHSV ?? false;
 
     var scale = getSplashScale();
     target.scale.set(scale, scale);

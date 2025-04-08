@@ -637,6 +637,8 @@ class Strumline extends FlxSpriteGroup
       if (splash.alive)
       {
         ModConstants.applyPerspective(splash, splash.width / 2.2, splash.height / 2.2);
+        splash.x += noteStyle.getSplashOffsets()[0] * splash.scale.x;
+        splash.y += noteStyle.getSplashOffsets()[1] * splash.scale.y;
       }
     }
   }
@@ -1638,7 +1640,7 @@ class Strumline extends FlxSpriteGroup
     return getByDirection(direction).isConfirm();
   }
 
-  public function playNoteSplash(direction:NoteDirection):Void
+  public function playNoteSplash(direction:NoteDirection, note:NoteSprite = null):Void
   {
     if (!showNotesplash) return;
     if (!noteStyle.isNoteSplashEnabled()) return;
@@ -1648,6 +1650,10 @@ class Strumline extends FlxSpriteGroup
     if (splash != null)
     {
       splash.play(direction);
+      if (note != null && splash.copyHSV)
+      {
+        splash.setHSV(note.hsvShader.hue, note.hsvShader.saturation, note.hsvShader.value);
+      }
 
       if (mods != null)
       {
@@ -1732,14 +1738,15 @@ class Strumline extends FlxSpriteGroup
     splash.y -= whichStrumNote.strumExtraModData.noteStyleOffsetY;
 
     // MOVE THIS TO CALC Z's FUNC IF THIS BORKS
-    splash.x += noteStyle.getSplashOffsets()[0] * splash.scale.x;
-    splash.y += noteStyle.getSplashOffsets()[1] * splash.scale.y;
+    // splash.x += noteStyle.getSplashOffsets()[0] * splash.scale.x;
+    // splash.y += noteStyle.getSplashOffsets()[1] * splash.scale.y;
 
     var ay:Float = whichStrumNote.alpha;
     ay -= whichStrumNote.strumExtraModData.alphaSplashMod;
     // ay -= alphaSplashMod[direction % KEY_COUNT];
 
-    splash.alpha = ay;
+    splash.alpha = ay * (noteStyle._data.assets.noteSplash?.alpha ?? 1.0);
+
     splash.skew.x = whichStrumNote.skew.x;
     splash.skew.y = whichStrumNote.skew.y;
 
@@ -1768,6 +1775,11 @@ class Strumline extends FlxSpriteGroup
       cover.visible = true;
 
       cover.playStart();
+
+      if (holdNote != null && noteStyle.shouldHoldNoteCoverCopyHSV())
+      {
+        cover.setHSV(holdNote.hsvShader.hue, holdNote.hsvShader.saturation, holdNote.hsvShader.value);
+      }
 
       cover.x = this.x;
       cover.x += getXPos(holdNote.noteDirection);

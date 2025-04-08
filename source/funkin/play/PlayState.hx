@@ -3373,7 +3373,7 @@ class PlayState extends MusicBeatSubState
     customStrummer.hitNote(targetNote, !event.isComboBreak);
     if (event.doesNotesplash)
     {
-      customStrummer.playNoteSplash(targetNote.noteData.getDirection());
+      customStrummer.playNoteSplash(targetNote.noteData.getDirection(), targetNote);
     }
 
     if (targetNote.isHoldNote && targetNote.holdNoteSprite != null)
@@ -3520,7 +3520,7 @@ class PlayState extends MusicBeatSubState
     Highscore.tallies.totalNotesHit++;
     // Display the hit on the strums
     playerStrumline.hitNote(note, !event.isComboBreak);
-    if (event.doesNotesplash) playerStrumline.playNoteSplash(note.noteData.getDirection());
+    if (event.doesNotesplash) playerStrumline.playNoteSplash(note.noteData.getDirection(), note);
     if (note.isHoldNote && note.holdNoteSprite != null) playerStrumline.playNoteHoldCover(note.holdNoteSprite);
     vocals.playerVolume = 1;
 

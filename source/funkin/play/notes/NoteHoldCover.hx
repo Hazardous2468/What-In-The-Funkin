@@ -7,6 +7,7 @@ import funkin.graphics.ZSprite;
 import funkin.play.modchartSystem.ModConstants;
 import funkin.play.notes.notestyle.NoteStyle;
 import funkin.util.assets.FlxAnimationUtil;
+import funkin.graphics.shaders.HSVShader;
 
 class NoteHoldCover extends FlxTypedSpriteGroup<ZSprite>
 {
@@ -19,11 +20,25 @@ class NoteHoldCover extends FlxTypedSpriteGroup<ZSprite>
 
   public var holdNoteDir:Int = 0;
 
+  var hsvShader:HSVShader;
+
   public function new(noteStyle:NoteStyle)
   {
     super(0, 0);
 
     setupHoldNoteCover(noteStyle);
+    this.hsvShader = new HSVShader();
+    this.shader = hsvShader;
+  }
+
+  public function setHSV(hue:Float, sat:Float, val:Float):Void
+  {
+    if (hsvShader != null)
+    {
+      this.hsvShader.hue = hue;
+      this.hsvShader.saturation = sat;
+      this.hsvShader.value = val;
+    }
   }
 
   /**
@@ -64,6 +79,7 @@ class NoteHoldCover extends FlxTypedSpriteGroup<ZSprite>
     var direction:NoteDirection = holdNote.noteDirection;
     holdNoteDir = holdNote.noteDirection;
     glow.animation.play('holdCoverStart${direction.colorName.toTitleCase()}');
+    glow.shader = hsvShader;
   }
 
   public function playContinue():Void
@@ -71,6 +87,7 @@ class NoteHoldCover extends FlxTypedSpriteGroup<ZSprite>
     var direction:NoteDirection = holdNote.noteDirection;
     holdNoteDir = holdNote.noteDirection;
     glow.animation.play('holdCover${direction.colorName.toTitleCase()}');
+    glow.shader = hsvShader;
   }
 
   public function playEnd():Void
@@ -78,6 +95,7 @@ class NoteHoldCover extends FlxTypedSpriteGroup<ZSprite>
     var direction:NoteDirection = holdNote.noteDirection;
     holdNoteDir = holdNote.noteDirection;
     glow.animation.play('holdCoverEnd${direction.colorName.toTitleCase()}');
+    glow.shader = hsvShader;
   }
 
   public override function kill():Void

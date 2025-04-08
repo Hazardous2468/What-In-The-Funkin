@@ -5,7 +5,7 @@ import flixel.FlxSprite;
 import flixel.graphics.frames.FlxFramesCollection;
 import funkin.graphics.ZSprite;
 import funkin.play.notes.notestyle.NoteStyle;
-import funkin.play.notes.notestyle.NoteStyle;
+import funkin.graphics.shaders.HSVShader;
 
 class NoteSplash extends ZSprite
 {
@@ -15,6 +15,11 @@ class NoteSplash extends ZSprite
   static var frameCollection:FlxFramesCollection;
 
   public var DIRECTION:Int = 0;
+
+  // If set to true, will copy the HSV values from the note that triggered this notesplash. Unique to v0.8.0 (WITF)
+  public var copyHSV:Bool = false;
+
+  var hsvShader:HSVShader;
 
   var noteStyle:NoteStyle = null;
 
@@ -26,6 +31,19 @@ class NoteSplash extends ZSprite
     setupSplashGraphic(noteStyle);
 
     this.animation.onFinish.add(this.onAnimationFinished);
+
+    this.hsvShader = new HSVShader();
+    this.shader = hsvShader;
+  }
+
+  public function setHSV(hue:Float, sat:Float, val:Float):Void
+  {
+    if (hsvShader != null)
+    {
+      this.hsvShader.hue = hue;
+      this.hsvShader.saturation = sat;
+      this.hsvShader.value = val;
+    }
   }
 
   /**

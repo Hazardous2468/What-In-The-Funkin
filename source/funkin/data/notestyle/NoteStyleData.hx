@@ -268,6 +268,14 @@ typedef NoteStyleData_NoteSplash =
   @:default(true)
   var enabled:Bool;
 
+  /**
+   * If true, note splashes will copy the HSV shader values from the note that triggered them (if possible).
+   * @default Default vanilla behaviour (in other words, doesn't copy the HSV values)
+   */
+  @:optional
+  @:default(false)
+  var copyHSV:Bool;
+
   @:optional
   @:default(24)
   var framerateDefault:Int;
@@ -302,6 +310,14 @@ typedef NoteStyleData_HoldNoteCover =
   @:optional
   @:default(true)
   var enabled:Bool;
+
+  /**
+   * If true, note splashes will copy the HSV shader values from the note that triggered them (if possible).
+   * @default Default vanilla behaviour (in other words, doesn't copy the HSV values)
+   */
+  @:optional
+  @:default(false)
+  var copyHSV:Bool;
 
   @:optional
   var left:NoteStyleData_HoldNoteCoverDirectionData;
