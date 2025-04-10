@@ -663,6 +663,27 @@ class ModConstants
     // spr.skew.y += skewY;
   }
 
+  /**
+   * Performs a modulo operation to calculate the remainder of `a` divided by `b`.
+   *
+   * The definition of "remainder" varies by implementation;
+   * this one is similar to GLSL or Python in that it uses Euclidean division, which always returns positive,
+   * while Haxe's `%` operator uses signed truncated division.
+   *
+   * For example, `-5 % 3` returns `-2` while `FlxMath.mod(-5, 3)` returns `1`.
+   *
+   * @param a The dividend.
+   * @param b The divisor.
+   * @return `a mod b`.
+   *
+   * SOURCE: https://github.com/HaxeFlixel/flixel/pull/3341/files
+   */
+  public static inline function mod(a:Float, b:Float):Float
+  {
+    b = Math.abs(b);
+    return a - b * Math.floor(a / b);
+  }
+
   public static function grabStrumModTarget(playerTarget:String = "bf"):ModHandler
   {
     var modsTarget:ModHandler = PlayState.instance.playerStrumline.mods;
@@ -1218,6 +1239,13 @@ class ModConstants
         newMod = new NotesRotateYMod(tag);
       case "notesrotatez":
         newMod = new NotesRotateZMod(tag);
+
+      case "rotatingx":
+        newMod = new RotatingXModifier(tag);
+      case "rotatingy":
+        newMod = new RotatingYModifier(tag);
+      case "rotatingz":
+        newMod = new RotatingZModifier(tag);
 
       // stealth mods
       case "oldstealthholds":

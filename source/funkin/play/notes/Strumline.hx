@@ -1703,6 +1703,10 @@ class Strumline extends FlxSpriteGroup
       {
         cover.glow.angle = cover.holdNote.baseAngle;
       }
+      else // Fix for if spiral holds get disabled, the covers stay rotated.
+      {
+        cover.glow.angle = 0;
+      }
 
       // cover.glow.skew.x = whichStrumNote.skew.x;
       // cover.glow.skew.y = whichStrumNote.skew.y;

@@ -21,7 +21,7 @@ class SawtoothXMod extends Modifier
   {
     if (currentValue == 0) return; // skip math if mod is 0
     var mult:Float = ModConstants.strumSize * getSubVal("mult");
-    data.x += (data.curPos % mult) * currentValue;
+    data.x += ModConstants.mod(data.curPos, mult) * currentValue;
   }
 }
 
@@ -37,7 +37,7 @@ class SawtoothYMod extends Modifier
   {
     if (currentValue == 0) return; // skip math if mod is 0
     var mult:Float = ModConstants.strumSize * getSubVal("mult");
-    data.y += (data.curPos % mult) * currentValue;
+    data.y += ModConstants.mod(data.curPos, mult) * currentValue;
   }
 }
 
@@ -53,7 +53,7 @@ class SawtoothZMod extends Modifier
   {
     if (currentValue == 0) return; // skip math if mod is 0
     var mult:Float = ModConstants.strumSize * getSubVal("mult");
-    data.z += (data.curPos % mult) * currentValue;
+    data.z += ModConstants.mod(data.curPos, mult) * currentValue;
   }
 }
 
@@ -69,7 +69,7 @@ class SawtoothAngleMod extends Modifier
   {
     if (currentValue == 0) return; // skip math if mod is 0
     var mult:Float = ModConstants.strumSize * getSubVal("mult");
-    data.angleZ += (data.curPos % mult) * currentValue;
+    data.angleZ += ModConstants.mod(data.curPos, mult) * currentValue;
   }
 }
 
@@ -85,7 +85,7 @@ class SawtoothAngleXMod extends Modifier
   {
     if (currentValue == 0) return; // skip math if mod is 0
     var mult:Float = ModConstants.strumSize * getSubVal("mult");
-    data.angleX += (data.curPos % mult) * currentValue;
+    data.angleX += ModConstants.mod(data.curPos, mult) * currentValue;
   }
 }
 
@@ -101,7 +101,7 @@ class SawtoothAngleYMod extends Modifier
   {
     if (currentValue == 0) return; // skip math if mod is 0
     var mult:Float = ModConstants.strumSize * getSubVal("mult");
-    data.angleY += (data.curPos % mult) * currentValue;
+    data.angleY += ModConstants.mod(data.curPos, mult) * currentValue;
   }
 }
 
@@ -117,7 +117,7 @@ class SawtoothScaleMod extends Modifier
   {
     if (currentValue == 0) return; // skip math if mod is 0
     var mult:Float = ModConstants.strumSize * getSubVal("mult");
-    var result:Float = (data.curPos % mult) * currentValue * -1;
+    var result:Float = ModConstants.mod(data.curPos, mult) * currentValue * -1;
     data.scaleX += (result * 0.01);
     data.scaleY += (result * 0.01);
     data.scaleZ += (result * 0.01);
@@ -136,7 +136,7 @@ class SawtoothScaleXMod extends Modifier
   {
     if (currentValue == 0) return; // skip math if mod is 0
     var mult:Float = ModConstants.strumSize * getSubVal("mult");
-    var result:Float = (data.curPos % mult) * currentValue * -1;
+    var result:Float = ModConstants.mod(data.curPos, mult) * currentValue * -1;
     data.scaleX += (result * 0.01);
   }
 }
@@ -153,7 +153,7 @@ class SawtoothScaleYMod extends Modifier
   {
     if (currentValue == 0) return; // skip math if mod is 0
     var mult:Float = ModConstants.strumSize * getSubVal("mult");
-    var result:Float = (data.curPos % mult) * currentValue * -1;
+    var result:Float = ModConstants.mod(data.curPos, mult) * currentValue * -1;
     data.scaleY += (result * 0.01);
   }
 }
@@ -170,7 +170,7 @@ class SawtoothSkewXMod extends Modifier
   {
     if (currentValue == 0) return; // skip math if mod is 0
     var mult:Float = ModConstants.strumSize * getSubVal("mult");
-    var result:Float = (data.curPos % mult) * currentValue * -1;
+    var result:Float = ModConstants.mod(data.curPos, mult) * currentValue * -1;
     data.skewX += (result);
   }
 }
@@ -187,7 +187,7 @@ class SawtoothSkewYMod extends Modifier
   {
     if (currentValue == 0) return; // skip math if mod is 0
     var mult:Float = ModConstants.strumSize * getSubVal("mult");
-    var result:Float = (data.curPos % mult) * currentValue * -1;
+    var result:Float = ModConstants.mod(data.curPos, mult) * currentValue * -1;
     data.skewY += (result);
   }
 }
