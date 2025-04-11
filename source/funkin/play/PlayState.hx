@@ -668,9 +668,6 @@ class PlayState extends MusicBeatSubState
     add(luaAFT_sprite);
   }
 
-  var modDebugNotifTween:FlxTween;
-  var modDebugNotifTimer:FlxTimer;
-
   function compareZSprites(order:Int, a:ZSprite, b:ZSprite):Int
   {
     // offset the z slightly so if zIndex plays a role in sorting. Useful for breaking ties if they are equal z value.
@@ -826,7 +823,23 @@ class PlayState extends MusicBeatSubState
     {
       for (pastNotif in debugNotifs.members)
       {
-        pastNotif.kill();
+        if (pastNotif != null) pastNotif.kill();
+      }
+    }
+  }
+
+  // Kills every active debug Notification. DOES destroy!
+  public function destroyDebugNotifications():Void
+  {
+    if (debugNotifs != null)
+    {
+      for (pastNotif in debugNotifs.members)
+      {
+        if (pastNotif != null)
+        {
+          pastNotif.kill();
+          pastNotif.destroy();
+        }
       }
     }
   }
@@ -2237,7 +2250,6 @@ class PlayState extends MusicBeatSubState
         lua.call('modsTimeline', []);
       }
       // check if displayNotif already displaying something in case of an error!
-      // if (modDebugNotifTimer == null && showNotif)
       if (showNotif)
       {
         modDebugNotif("Reloaded modchart...");
@@ -4147,10 +4159,7 @@ class PlayState extends MusicBeatSubState
 
     if (debugNotifs != null)
     {
-      for (pastNotif in debugNotifs.members)
-      {
-        pastNotif.destroy();
-      }
+      destroyDebugNotifications();
     }
 
     // clear graphicCache for 3D render mode

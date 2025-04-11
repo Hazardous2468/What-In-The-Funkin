@@ -724,7 +724,7 @@ class ModConstants
     {
       var timmy:Float = 0;
       timmy = beat / (conductor.bpm / 60);
-      timmy *= 1000;
+      timmy *= Constants.MS_PER_SEC;
       // trace(timmy);
       return timmy;
     }
@@ -742,11 +742,11 @@ class ModConstants
           if (totalTime >= conductor.timeChanges[j].timeStamp) curBpm = conductor.timeChanges[j].bpm;
         }
       }
-      totalTime += (60 / curBpm) * 1000;
+      totalTime += (60 / curBpm) * Constants.MS_PER_SEC;
     }
 
     var leftOverBeat = beat - Math.floor(beat);
-    totalTime += (60 / curBpm) * 1000 * leftOverBeat;
+    totalTime += (60 / curBpm) * Constants.MS_PER_SEC * leftOverBeat;
 
     // trace(totalTime);
     return totalTime;

@@ -111,7 +111,7 @@ class ModEventHandler
   public function update(elapsed:Float):Void
   {
     songTime = Conductor.instance.songPosition;
-    timeBetweenBeats = Conductor.instance.beatLengthMs / 1000;
+    timeBetweenBeats = Conductor.instance.beatLengthMs / Constants.MS_PER_SEC;
     timeBetweenBeats_ms = Conductor.instance.beatLengthMs;
     beatTime = Conductor.instance.currentBeatTime;
     // beatTime = (songTime / 1000) * (Conductor.instance.bpm / 60);
@@ -123,7 +123,7 @@ class ModEventHandler
       // trace("BACK IN TIME");
     }
 
-    var timeBetweenLastReport:Float = (songTime - lastReportedSongTime) / 1000; // Because the elapsed from flxg or the playstate doesn't account for lagspikes? okay, sure.
+    var timeBetweenLastReport:Float = (songTime - lastReportedSongTime) / Constants.MS_PER_SEC; // Because the elapsed from flxg or the playstate doesn't account for lagspikes? okay, sure.
     // trace("customElapsed: " + timeBetweenLastReport);
     tweenManager.update(timeBetweenLastReport); // should be automatically paused when you pause in game
 

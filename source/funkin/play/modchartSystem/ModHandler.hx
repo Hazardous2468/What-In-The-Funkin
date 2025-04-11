@@ -98,7 +98,7 @@ class ModHandler
   public function update(elapsed:Float):Void
   {
     songTime = Conductor.instance.songPosition;
-    timeBetweenBeats = Conductor.instance.beatLengthMs / 1000;
+    timeBetweenBeats = Conductor.instance.beatLengthMs / Constants.MS_PER_SEC;
     timeBetweenBeats_ms = Conductor.instance.beatLengthMs;
     beatTime = Conductor.instance.currentBeatTime;
     // beatTime = (songTime / 1000) * (Conductor.instance.bpm / 60);
