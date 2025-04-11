@@ -641,12 +641,19 @@ class PlayState extends MusicBeatSubState
     modchartTweenList.cameras = [camHUD];
   }
 
+  // The event handler
   public var modchartEventHandler:ModEventHandler;
+
+  // Array of lua files
   public var luaArray:Array<HazardModLuaTest> = [];
 
+  // If true, will enable the modchart logic. If false, the game should act identical to Vanilla.
   var isModchartSong:Bool = true;
 
+  // basic flxSprite that can be used by lua for AFT purposes.
   public var luaAFT_sprite:HazardAFTSpriteTest;
+
+  // basic AFT that can be used by lua for AFT purposes.
   public var luaAFT_Capture:HazardAFT;
 
   public function setUpLuaAft():Void
@@ -2173,8 +2180,11 @@ class PlayState extends MusicBeatSubState
     // cleanup
     for (lua in luaArray)
     {
-      // lua.call('onDestroy', []);
-      lua.stop();
+      if (lua != null) // crash preventation?
+      {
+        // lua.call('onDestroy', []);
+        lua.stop();
+      }
     }
     luaArray = [];
 
@@ -4148,8 +4158,11 @@ class PlayState extends MusicBeatSubState
 
     for (lua in luaArray)
     {
-      // lua.call('onDestroy', []);
-      lua.stop();
+      if (lua != null) // crash preventation?
+      {
+        // lua.call('onDestroy', []);
+        lua.stop();
+      }
     }
     luaArray = [];
 

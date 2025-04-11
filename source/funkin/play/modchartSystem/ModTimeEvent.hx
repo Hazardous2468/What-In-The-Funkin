@@ -23,7 +23,6 @@ class ModTimeEvent
   public var gotoValue:Float = 1.0; // val to tween or set val to!
 
   // Ease to use for tweens
-  // public var easeToUse:FlxEase;
   public var easeToUse:Null<Float->Float>;
 
   // How long the tween should be in beats
@@ -38,6 +37,7 @@ class ModTimeEvent
   // Function to trigger for func events.
   public var funcToCall:Void->Void = null;
 
+  // Function to trigger for funcTween events.
   public var funcTween = function(a:Float) {
     return a;
   }
