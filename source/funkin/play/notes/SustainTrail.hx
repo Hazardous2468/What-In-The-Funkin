@@ -121,6 +121,9 @@ class SustainTrail extends ZSprite
   // for identifying what noteStyle this notesprite is using in hxScript or even lua
   public var noteStyleName:String = "funkin";
 
+  // Makes the mesh all wobbly! Taken from ZProjectSprite_Note.hx
+  public var vibrateEffect:Float = 0.0;
+
   /**
    * Normally you would take strumTime:Float, noteData:Int, sustainLength:Float, parentNote:Note (?)
    * @param NoteData
@@ -709,6 +712,13 @@ class SustainTrail extends ZSprite
 
   function applyPerspective(pos:Vector3D, rotatePivot:Vector2):Vector2
   {
+    if (vibrateEffect != 0)
+    {
+      pos.x += FlxG.random.float(-1, 1) * vibrateEffect;
+      pos.y += FlxG.random.float(-1, 1) * vibrateEffect;
+      pos.z += FlxG.random.float(-1, 1) * vibrateEffect;
+    }
+
     if (!is3D || old3Dholds)
     {
       var rp = new Vector2(pos.x, pos.y);

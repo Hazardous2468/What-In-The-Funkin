@@ -12,6 +12,7 @@ import funkin.play.notes.Strumline;
 import funkin.Paths;
 import funkin.play.notes.NoteSprite;
 import funkin.play.notes.StrumlineNote;
+import funkin.data.song.SongData.SongTimeChange;
 // Math and utils
 import flixel.addons.effects.FlxSkewedSprite;
 import StringTools;
@@ -714,8 +715,47 @@ class ModConstants
     return modsTarget;
   }
 
+  public static function getTimeInBeats(ms:Float):Float
+  {
+    return getBeatFromTime(ms, null);
+  }
+
+  public static function getBeatFromTime(ms:Float, conductor:Conductor = null):Float
+  {
+    if (conductor == null) conductor = Conductor.instance;
+    if (conductor.timeChanges.length == 0)
+    {
+      // Assume a constant BPM equal to the forced value.
+      return Math.floor(ms / conductor.beatLengthMs);
+    }
+    else
+    {
+      var resultStep:Float = 0;
+
+      var lastTimeChange:SongTimeChange = conductor.timeChanges[0];
+      for (timeChange in conductor.timeChanges)
+      {
+        if (ms >= timeChange.timeStamp)
+        {
+          lastTimeChange = timeChange;
+          resultStep = lastTimeChange.beatTime;
+        }
+        else
+        {
+          // This time change is after the requested time.
+          break;
+        }
+      }
+
+      var lastStepLengthMs:Float = ((Constants.SECS_PER_MIN / lastTimeChange.bpm) * Constants.MS_PER_SEC);
+      var resultFractionalStep:Float = (ms - lastTimeChange.timeStamp) / lastStepLengthMs;
+      resultStep += resultFractionalStep;
+
+      return resultStep;
+    }
+  }
+
   // from Modcharting-Tools lol
-  // TO DO: FIX FOR DECIMALS MAYBE?
   public static function getTimeFromBeat(beat:Float, conductor:Conductor = null):Float
   {
     if (conductor == null) conductor = Conductor.instance;
