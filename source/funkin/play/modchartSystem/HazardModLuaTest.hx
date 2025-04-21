@@ -30,6 +30,7 @@ import flixel.group.FlxSpriteGroup.FlxTypedSpriteGroup;
 import funkin.graphics.ZSprite;
 import openfl.display.BlendMode;
 import openfl.display.TriangleCulling;
+import funkin.data.song.SongData.SongNoteData;
 
 using StringTools;
 
@@ -114,6 +115,77 @@ class HazardModLuaTest
     set('downscroll', Preferences.downscroll);
     set('downScroll', Preferences.downscroll);
     set('scrollSpeed', PlayState.instance.currentChart.scrollSpeed);
+
+    // v0.8.1a -> New function that allows you to get the beats of notes between two points in a song, similar to using GetNoteData() for NotITG mirin
+    // v[1] == the beats that the charted notes are on
+    // v[2] == the column that the charted notes are on, starting from 0
+    // v[3] == the hold length (0 means no hold) in ms
+    // v[4] == the type of note (such as "default", "hurt", "invisible", "dodge",etc)
+    Lua_helper.add_callback(lua, "getNoteBeats", function(startBeat:Float, endBeat:Float, playerTarget:String = "all") {
+      var arr:Array<Array<Dynamic>> = [];
+
+      // arr = [[0, 0], [1, 1], [2, 2], [3, 3], [4.5, 0], [5.5, 2], [6.5, 1]]; // TEST / PLACEHOLDER
+
+      // FNF only has Dad and Boyfriend notes. Until that changes, the target can only point to one or the other.
+
+      var bfTarget:Bool = false;
+      if (playerTarget == "bf" || playerTarget == "boyfriend" || playerTarget == "0" || playerTarget == "1")
+      {
+        bfTarget = true;
+      }
+
+      if (PlayState.instance?.currentChart != null)
+      {
+        for (songNote in PlayState.instance.currentChart.notes)
+        {
+          var strumTime:Float = songNote.time;
+          var noteBeat:Float = ModConstants.getTimeInBeats(strumTime);
+
+          // if outside of range, skip this note
+          if (!(startBeat <= noteBeat && endBeat > noteBeat))
+          {
+            continue;
+          }
+
+          var noteData:Int = songNote.getDirection();
+          var playerNote:Bool = true;
+          if (noteData > 3) playerNote = false;
+
+          var kind:String = "default";
+          if (songNote.kind != null)
+          {
+            kind = songNote.kind;
+          }
+
+          switch (songNote.getStrumlineIndex())
+          {
+            case 0:
+              if (bfTarget)
+              {
+                var a:Array<Dynamic> = [];
+                a.push(noteBeat);
+                a.push(noteData);
+                a.push(songNote.length);
+                a.push(kind);
+                arr.push(a);
+              }
+
+            case 1:
+              if (!bfTarget)
+              {
+                var a:Array<Dynamic> = [];
+                a.push(noteBeat);
+                a.push(noteData);
+                a.push(songNote.length);
+                a.push(kind);
+                arr.push(a);
+              }
+          }
+        }
+      }
+
+      return arr;
+    });
 
     // TODO:
     // FUNCS, FUNC_TWEEN, AND PERFRAME

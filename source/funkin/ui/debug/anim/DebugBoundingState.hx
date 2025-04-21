@@ -530,7 +530,7 @@ class DebugBoundingState extends FlxState
 
     offsetAnimationDropdown.onChange = function(event:UIEvent) {
       trace('Selected animation ${event?.data?.id}');
-      playCharacterAnimation(event.data.id, true);
+      playCharacterAnimation(event?.data?.id ?? "", true);
     }
 
     txtOffsetShit.text = 'Offset: ' + swagChar.animOffsets;
@@ -542,7 +542,7 @@ class DebugBoundingState extends FlxState
 
   function playCharacterAnimation(str:String, setOnionSkin:Bool = true)
   {
-    if (setOnionSkin)
+    if (setOnionSkin && onionSkinChar != null)
     {
       // clears the canvas
       onionSkinChar.pixels.fillRect(new Rectangle(0, 0, FlxG.width * 2, FlxG.height * 2), 0x00000000);

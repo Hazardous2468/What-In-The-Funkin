@@ -320,6 +320,9 @@ class ModConstants
 
     // trace("in goes: " + modName);
 
+    modName = StringTools.replace(modName, "autodriven", "jump");
+    modName = StringTools.replace(modName, "autodrive", "jump");
+
     modName = StringTools.replace(modName, "rotx", "rotatex");
     modName = StringTools.replace(modName, "roty", "rotatey");
     modName = StringTools.replace(modName, "rotz", "rotatez");
