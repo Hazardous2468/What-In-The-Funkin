@@ -5826,6 +5826,7 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
   {
     FlxG.watch.addQuick('songLengthInMs', audioInstTrack?.length ?? 0.0);
     FlxG.watch.addQuick('songLengthInSteps', Conductor.instance.getTimeInSteps(audioInstTrack?.length ?? 0.0));
+    FlxG.watch.addQuick('songLengthInPixels', songLengthInPixels);
     FlxG.watch.addQuick('gridHeight', gridTiledSprite?.height ?? 0.0);
 
     FlxG.watch.addQuick('musicTime', audioInstTrack?.time ?? 0.0);
