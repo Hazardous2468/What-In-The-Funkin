@@ -758,41 +758,40 @@ class ModConstants
     }
   }
 
-  // from Modcharting-Tools lol
   public static function getTimeFromBeat(beat:Float, conductor:Conductor = null):Float
   {
     if (conductor == null) conductor = Conductor.instance;
 
-    if (beat <= 0) // Update v0.7.3a -> Allows for tweens to function before the song has begun!
+    if (conductor.timeChanges.length == 0)
+    {
+      return conductor.beatLengthMs * beat;
+    }
+    else
     {
       var timmy:Float = 0;
-      timmy = beat / (conductor.bpm / 60);
-      timmy *= Constants.MS_PER_SEC;
-      // trace(timmy);
-      return timmy;
-    }
-
-    var totalTime:Float = 0;
-    var curBpm = conductor.bpm;
-    // if (PlayState.SONG != null)
-    //    curBpm = PlayState.SONG.bpm;
-    for (i in 0...Math.floor(beat))
-    {
-      if (conductor.timeChanges.length > 0)
+      var lastTimeChange:SongTimeChange = conductor.timeChanges[0];
+      var lastTimeChangeBeat:Float = 0;
+      for (timeChange in conductor.timeChanges)
       {
-        for (j in 0...conductor.timeChanges.length)
+        var beatStamp:Float = ModConstants.getBeatFromTime(timeChange.timeStamp);
+        if (beat >= lastTimeChangeBeat)
         {
-          if (totalTime >= conductor.timeChanges[j].timeStamp) curBpm = conductor.timeChanges[j].bpm;
+          lastTimeChange = timeChange;
+          timmy = lastTimeChange.timeStamp;
+          lastTimeChangeBeat = beatStamp;
+        }
+        else
+        {
+          // This time change is after the requested time.
+          break;
         }
       }
-      totalTime += (60 / curBpm) * Constants.MS_PER_SEC;
+      // timmy is now at the ms timestamp of the last bpm change
+      var leftOver:Float = beat - lastTimeChangeBeat;
+      leftOver = conductor.beatLengthMs * leftOver;
+      timmy += leftOver;
+      return timmy;
     }
-
-    var leftOverBeat = beat - Math.floor(beat);
-    totalTime += (60 / curBpm) * Constants.MS_PER_SEC * leftOverBeat;
-
-    // trace(totalTime);
-    return totalTime;
   }
 
   // Call this on a ZSprite to apply it's perspective! MAKE SURE IT'S SCALE AND X AND Y IS RESET BEFORE DOING THIS CUZ THIS OVERRIDES THOSE VALUES

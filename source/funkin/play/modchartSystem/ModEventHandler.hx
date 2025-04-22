@@ -111,10 +111,10 @@ class ModEventHandler
   public function update(elapsed:Float):Void
   {
     songTime = Conductor.instance.songPosition;
-    timeBetweenBeats = Conductor.instance.beatLengthMs / Constants.MS_PER_SEC;
     timeBetweenBeats_ms = Conductor.instance.beatLengthMs;
+    timeBetweenBeats = timeBetweenBeats_ms / Constants.MS_PER_SEC;
+
     beatTime = Conductor.instance.currentBeatTime;
-    // beatTime = (songTime / 1000) * (Conductor.instance.bpm / 60);
 
     // we went, BACK IN TIME?!
     if (songTime + ((PlayState.instance?.isGamePaused ?? false) ? 0 : backInTimeLeniency) < lastReportedSongTime)
