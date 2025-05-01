@@ -48,6 +48,11 @@ class SustainTrail extends ZSprite
   public var cover:NoteHoldCover = null;
 
   /**
+   * The Y Offset of the note.
+   */
+  public var yOffset:Float = 0.0;
+
+  /**
    * Set to `true` if the user hit the note and is currently holding the sustain.
    * Should display associated effects.
    */
@@ -446,28 +451,8 @@ class SustainTrail extends ZSprite
     if (this.hsvShader == null) return;
     var strumTimmy:Float = t - whichStrumNote?.strumExtraModData?.strumPos ?? 0.0;
 
-    var notePos:Float = parentStrumline.calculateNoteYPos(strumTimmy, false);
+    var notePos:Float = parentStrumline.calculateNoteYPos(strumTimmy);
     distanceFromReceptor_unscaledpos = notePos;
-    /*
-      noteModData.defaultValues();
-      noteModData.setValuesFromZSprite(fakeNote);
-      noteModData.strumTime = strumTimmy;
-      noteModData.direction = noteDirection % Strumline.KEY_COUNT;
-      noteModData.curPos_unscaled = notePos;
-      noteModData.whichStrumNote = whichStrumNote;
-
-      var scrollMult:Float = 1.0;
-      for (mod in parentStrumline.mods.mods_speed)
-      {
-        if (mod.targetLane != -1 && noteModData.direction != mod.targetLane) continue;
-        scrollMult *= mod.speedMath(noteModData.direction, noteModData.curPos_unscaled, parentStrumline, true);
-      }
-      noteModData.speedMod = scrollMult;
-
-      var sillyPos:Float = parentStrumline.calculateNoteYPos(noteModData.strumTime, true) * scrollMult;
-
-      distanceFromReceptor_pos = sillyPos;
-     */
     updateStealthGlowV2();
   }
 
@@ -561,7 +546,7 @@ class SustainTrail extends ZSprite
   {
     var strumTimmy:Float = t - whichStrumNote?.strumExtraModData?.strumPos ?? 0;
 
-    var notePos:Float = parentStrumline.calculateNoteYPos(strumTimmy, false);
+    var notePos:Float = parentStrumline.calculateNoteYPos(strumTimmy);
 
     if (parentStrumline.mods.mathCutOffCheck(notePos, noteDirection % 4)
       || (!isRoot
@@ -598,7 +583,7 @@ class SustainTrail extends ZSprite
     noteModData.speedMod = scrollMult;
 
     noteModData.x = noteModData.whichStrumNote.x + parentStrumline.mods.getHoldOffsetX(isArrowPath, graphicWidth);
-    var sillyPos:Float = parentStrumline.calculateNoteYPos(noteModData.strumTime, true) * scrollMult;
+    var sillyPos:Float = parentStrumline.calculateNoteYPos(noteModData.strumTime) * scrollMult;
     if (Preferences.downscroll)
     {
       noteModData.y = (noteModData.whichStrumNote.y + sillyPos + Strumline.STRUMLINE_SIZE / 2);

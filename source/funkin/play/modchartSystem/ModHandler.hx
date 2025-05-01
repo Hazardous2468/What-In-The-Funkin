@@ -31,12 +31,9 @@ import flixel.FlxSprite;
 import flixel.FlxStrip;
 import flixel.graphics.FlxGraphic;
 import flixel.graphics.tile.FlxDrawTrianglesItem;
-// import flixel.util.FlxSpriteUtil; //was for arrowpaths but had really bad lag and memory leak lmfao
 import openfl.display.Sprite;
 import flixel.text.FlxText;
-// import flixel.text.FlxTextBorderStyle;
 import funkin.audio.FunkinSound; // used for debugging stuff lol
-// import funkin.play.modchartSystem.Modifier;
 import funkin.play.modchartSystem.modifiers.BaseModifier;
 import funkin.graphics.ZSprite;
 import flixel.util.FlxColor;
@@ -72,10 +69,6 @@ class ModHandler
   var timeBetweenBeats_ms:Float = 0;
   var beatTime:Float = 0;
 
-  // public var arrowPaths:Array<FlxStrip> = [];
-  // public var arrowPaths_sprite:Array<FlxSprite> = [];
-  // public var arrowPaths_path:Array<Hazard_ArrowPath> = [];
-
   public function new(daddy:Bool = false)
   {
     // super("modsloaded");
@@ -107,8 +100,6 @@ class ModHandler
     {
       mod.updateTime(beatTime);
     }
-
-    // updateArrowPaths();
   }
 
   public function resortMods():Void
@@ -194,7 +185,6 @@ class ModHandler
     }
     else
     {
-      // trace(tagToUse + " didn't exist, adding it now!");
       PlayState.instance.modDebugNotif(tagToUse + " mod doesn't exist!\nTrying to add it now!", FlxColor.ORANGE);
       addMod(tagToUse, val, 0.0); // try and add the mod lol
       modifiers.get(tagToUse).setVal(val * mmm);
@@ -240,7 +230,6 @@ class ModHandler
 
   public function addMod(nameOfMod:String, startingValue:Float = 0.0, baseVal = null):Void
   {
-    // var mod = new Modifier(nameOfMod);
     var mod = ModConstants.createNewMod(nameOfMod);
 
     var mmm = 1.0;
@@ -605,34 +594,24 @@ class ModHandler
   public function makeHoldCopyStrum_sample(note:ZSprite, strumTime:Float, direction:Int, strumLine:Strumline, notePos:Float, isArrowPath:Bool = false,
       graphicWidth:Float = 0):Float
   {
-    // var notePos:Float = 0.0;
-
-    // var notePos:Float = strumLine.calculateNoteYPos(strumTime, true);
-
     var whichStrumNote = strumLine.getByIndex(direction % Strumline.KEY_COUNT);
-    // var whichStrumNote = strumLine.strumlineNotes.group.members[direction % Strumline.KEY_COUNT];
     var scrollMult:Float = 1.0;
-    // for (mod in modifiers){
     for (mod in mods_speed)
     {
       scrollMult *= mod.speedMath((direction) % Strumline.KEY_COUNT, notePos, strumLine, true);
     }
 
-    // note.x = FlxG.width /2;
     note.x = whichStrumNote.x + getHoldOffsetX(isArrowPath, graphicWidth);
-    var sillyPos:Float = strumLine.calculateNoteYPos(strumTime, true) * scrollMult;
+    var sillyPos:Float = strumLine.calculateNoteYPos(strumTime) * scrollMult;
 
     var note_heighht:Float = 0.0;
     if (Preferences.downscroll)
     {
       note.y = (whichStrumNote.y + sillyPos - note_heighht + Strumline.STRUMLINE_SIZE / 2);
-      // note.set_y(whichStrumNote.y + Strumline.STRUMLINE_SIZE / 2);
     }
     else
     {
-      // var yOffset = (note.fullSustainLength - note.sustainLength) * Constants.PIXELS_PER_MS;
       note.y = (whichStrumNote.y - Strumline.INITIAL_OFFSET + sillyPos + Strumline.STRUMLINE_SIZE / 2);
-      // note.set_y(whichStrumNote.y - Strumline.INITIAL_OFFSET + Strumline.STRUMLINE_SIZE / 2);
     }
     note.z = whichStrumNote.z;
     return sillyPos;
@@ -642,13 +621,12 @@ class ModHandler
   {
     var whichStrumNote:StrumlineNote = strum.getByIndex(lane % Strumline.KEY_COUNT);
     return (whichStrumNote.strumExtraModData.mathCutOff > 0 && !(whichStrumNote.strumExtraModData.mathCutOff >= Math.abs(notePos)));
-    // return (mathCutOff[lane] > 0 && !(mathCutOff[lane] >= Math.abs(notePos)));
   }
 
   public function sampleModMath(susFakeNote:ZSprite, strumTime:Float, lane:Int, strumLine:Strumline, hold:Bool = false, yJank:Bool = false,
       ?notePos:Float = -0.69, ?isArrowpath:Bool = false, ?fakeNoteWidth:Float, ?fakeNoteHeight:Float):Void
   {
-    var notePos2:Float = strumLine.calculateNoteYPos(strumTime, false);
+    var notePos2:Float = strumLine.calculateNoteYPos(strumTime);
     if (notePos == -0.69 || notePos == null)
     {
       notePos = notePos2;

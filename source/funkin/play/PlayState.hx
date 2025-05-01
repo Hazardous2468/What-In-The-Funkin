@@ -38,7 +38,6 @@ import funkin.modding.events.ScriptEvent;
 import funkin.modding.events.ScriptEventDispatcher;
 import funkin.play.character.BaseCharacter;
 import funkin.play.character.CharacterData.CharacterDataParser;
-import funkin.play.components.ComboMilestone;
 import funkin.play.components.HealthIcon;
 import funkin.play.components.PopUpStuff;
 import funkin.play.cutscene.VanillaCutscenes;
@@ -982,9 +981,6 @@ class PlayState extends MusicBeatSubState
       cameraFollowPoint = new FlxObject(0, 0);
     }
 
-    // Reduce physics accuracy (who cares!!!) to improve animation quality.
-    FlxG.fixedTimestep = false;
-
     // This state receives update() even when a substate is active.
     this.persistentUpdate = true;
     // This state receives draw calls even when a substate is active.
@@ -1166,8 +1162,6 @@ class PlayState extends MusicBeatSubState
       startingSong = true;
       isPlayerDying = false;
 
-      inputSpitter = [];
-
       // Reset music properly.
       if (FlxG.sound.music != null)
       {
@@ -1210,6 +1204,10 @@ class PlayState extends MusicBeatSubState
       // Delete all notes and reset the arrays.
       regenNoteData();
 
+      // so the song doesn't start too early :D
+      Conductor.instance.update(-5000, false);
+
+
       // Reset camera zooming
       cameraBopIntensity = Constants.DEFAULT_BOP_INTENSITY;
       hudCameraZoomIntensity = (cameraBopIntensity - 1.0) * 2.0;
@@ -1218,11 +1216,27 @@ class PlayState extends MusicBeatSubState
       health = Constants.HEALTH_STARTING;
       songScore = 0;
       Highscore.tallies.combo = 0;
-      Countdown.performCountdown();
+      // timer for vwoosh
+      var vwooshTimer = new FlxTimer();
+      vwooshTimer.start(0.5, function(t:FlxTimer) {
+        Conductor.instance.update(startTimestamp - Conductor.instance.combinedOffset, false);
+        if (playerStrumline.notes.length == 0) playerStrumline.updateNotes();
+        if (opponentStrumline.notes.length == 0) opponentStrumline.updateNotes();
+        playerStrumline.vwooshInNotes();
+        opponentStrumline.vwooshInNotes();
+        Countdown.performCountdown();
+      });
+
 
       // Reset the health icons.
+      if (currentStage.getBoyfriend() != null)
+      {
       currentStage.getBoyfriend().initHealthIcon(false);
+      }
+      if (currentStage.getDad() != null)
+      {
       currentStage.getDad().initHealthIcon(true);
+      }
 
       needsReset = false;
     }
@@ -1849,49 +1863,10 @@ class PlayState extends MusicBeatSubState
 
     // Break up into individual lines to aid debugging.
 
-    var shouldShowComboText:Bool = false;
-    // TODO: Re-enable combo text (how to do this without sections?).
-    // if (currentSong != null)
-    // {
-    //  shouldShowComboText = (Conductor.instance.currentBeat % 8 == 7);
-    //  var daSection = .getSong()[Std.int(Conductor.instance.currentBeat / 16)];
-    //  shouldShowComboText = shouldShowComboText && (daSection != null && daSection.mustHitSection);
-    //  shouldShowComboText = shouldShowComboText && (Highscore.tallies.combo > 5);
-    //
-    //  var daNextSection = .getSong()[Std.int(Conductor.instance.currentBeat / 16) + 1];
-    //  var isEndOfSong = .getSong().length < Std.int(Conductor.instance.currentBeat / 16);
-    //  shouldShowComboText = shouldShowComboText && (isEndOfSong || (daNextSection != null && !daNextSection.mustHitSection));
-    // }
-
-    if (shouldShowComboText)
-    {
-      var animShit:ComboMilestone = new ComboMilestone(-100, 300, Highscore.tallies.combo);
-      animShit.scrollFactor.set(0.6, 0.6);
-      animShit.zIndex = 1100;
-      animShit.cameras = [camHUD];
-      add(animShit);
-
-      var frameShit:Float = (1 / 24) * 2; // equals 2 frames in the animation
-
-      new FlxTimer().start(((Conductor.instance.beatLengthMs / 1000) * 1.25) - frameShit, function(tmr) {
-        animShit.forceFinish();
-      });
-    }
-
-    // if (playerStrumline != null) playerStrumline.onBeatHit();
-    // if (opponentStrumline != null) opponentStrumline.onBeatHit();
     for (strumLine in allStrumLines)
     {
       strumLine.onBeatHit();
     }
-
-    for (lua in luaArray)
-    {
-      lua.call('onBeatHit', []);
-    }
-
-    // Make the characters dance on the beat
-    // danceOnBeat();
 
     return true;
   }
@@ -3188,7 +3163,7 @@ class PlayState extends MusicBeatSubState
       {
         // Call an event to allow canceling the note miss.
         // NOTE: This is what handles the character animations!
-        var event:NoteScriptEvent = new NoteScriptEvent(NOTE_MISS, note, -Constants.HEALTH_MISS_PENALTY, 0, true);
+        var event:NoteScriptEvent = new NoteScriptEvent(NOTE_MISS, note, Constants.HEALTH_MISS_PENALTY, 0, true);
         dispatchEvent(event);
 
         // Calling event.cancelEvent() skips all the other logic! Neat!
@@ -3235,17 +3210,44 @@ class PlayState extends MusicBeatSubState
         // The player dropped a hold note.
         holdNote.handledMiss = true;
 
-        // Mute vocals and play miss animation, but don't penalize.
+        // Mute vocals and play miss animation.
         // vocals.playerVolume = 0;
         // if (currentStage != null && currentStage.getBoyfriend() != null) currentStage.getBoyfriend().playSingAnimation(holdNote.noteData.getDirection(), true);
+
+        if (!isBotPlayMode)
+        {
+          if (holdNote.sustainLength > Constants.HOLD_DROP_PENALTY_THRESHOLD_MS)
+          {
+            // Penalize the player for letting go of a hold note too early.
+            trace('Player dropped a hold note, penalizing... (has hit: ${holdNote.hitNote})');
+
+            // Different penalty based on whether the note itself was missed,
+            // or the note was hit and then the hold was dropped.
+            var remainingLengthSec = holdNote.sustainLength / Constants.MS_PER_SEC;
+            var healthChangeUncapped = remainingLengthSec * Constants.HEALTH_HOLD_DROP_PENALTY_PER_SECOND;
+            // If the base note of the hold was missed, don't penalize them more on top of that.
+            var healthChangeMax = Constants.HEALTH_HOLD_DROP_PENALTY_MAX - (holdNote.hitNote ? -Constants.HEALTH_MISS_PENALTY : 0);
+            var healthChange = healthChangeUncapped.clamp(healthChangeMax, 0);
+            var scoreChange = Std.int(Constants.SCORE_HOLD_DROP_PENALTY_PER_SECOND * remainingLengthSec);
+
+            var event:HoldNoteScriptEvent = new HoldNoteScriptEvent(NOTE_HOLD_DROP, holdNote, healthChange, scoreChange, true);
+            dispatchEvent(event);
+
+            trace('Penalizing score by ${event.score} and health by ${event.healthChange} for dropping hold note (is combo break: ${event.isComboBreak})!');
+            applyScore(event.score, 'miss', event.healthChange, event.isComboBreak);
+
+            // Play the miss sound.
+            vocals.playerVolume = 0;
+            FunkinSound.playOnce(Paths.soundRandom('missnote', 1, 3), FlxG.random.float(0.5, 0.6));
+          }
+          else
+          {
+            trace('Hold note too short, not penalizing...');
+          }
+        }
       }
     }
   }
-
-  /**
-     * Spitting out the input for ravy 🙇‍♂️!!
-     */
-  var inputSpitter:Array<ScoreInput> = [];
 
   function handleSkippedNotes():Void
   {
@@ -3574,31 +3576,10 @@ class PlayState extends MusicBeatSubState
       {
         if (pressArray[i]) indices.push(i);
       }
-      if (indices.length > 0)
-      {
-        for (i in 0...indices.length)
-        {
-          inputSpitter.push(
-            {
-              t: Std.int(Conductor.instance.songPosition),
-              d: indices[i],
-              l: 20
-            });
-        }
-      }
-      else
-      {
-        inputSpitter.push(
-          {
-            t: Std.int(Conductor.instance.songPosition),
-            d: -1,
-            l: 20
-          });
-      }
     }
     vocals.playerVolume = 0;
 
-    applyScore(-10, 'miss', healthChange, true);
+    applyScore(Scoring.getMissScore(), 'miss', healthChange, true);
 
     if (playSound)
     {
@@ -3619,7 +3600,7 @@ class PlayState extends MusicBeatSubState
   {
     var event:GhostMissNoteScriptEvent = new GhostMissNoteScriptEvent(direction, // Direction missed in.
       hasPossibleNotes, // Whether there was a note you could have hit.
-      - 1 * Constants.HEALTH_MISS_PENALTY, // How much health to add (negative).
+      Constants.HEALTH_GHOST_MISS_PENALTY, // How much health to add (negative).
       - 10 // Amount of score to add (negative).
     );
     dispatchEvent(event);
@@ -3643,15 +3624,6 @@ class PlayState extends MusicBeatSubState
       for (i in 0...pressArray.length)
       {
         if (pressArray[i]) indices.push(i);
-      }
-      for (i in 0...indices.length)
-      {
-        inputSpitter.push(
-          {
-            t: Std.int(Conductor.instance.songPosition),
-            d: indices[i],
-            l: 20
-          });
       }
     }
 
@@ -3729,8 +3701,6 @@ class PlayState extends MusicBeatSubState
     // SHIFT+PAGEDOWN: Skip backward twenty sections.
     if (FlxG.keys.justPressed.PAGEDOWN) changeSection(FlxG.keys.pressed.SHIFT ? -20 : -2);
     #end
-
-    if (FlxG.keys.justPressed.B) trace(inputSpitter.join('\n'));
   }
 
   /**
@@ -3795,27 +3765,6 @@ class PlayState extends MusicBeatSubState
       for (i in 0...pressArray.length)
       {
         if (pressArray[i]) indices.push(i);
-      }
-      if (indices.length > 0)
-      {
-        for (i in 0...indices.length)
-        {
-          inputSpitter.push(
-            {
-              t: Std.int(Conductor.instance.songPosition),
-              d: indices[i],
-              l: 20
-            });
-        }
-      }
-      else
-      {
-        inputSpitter.push(
-          {
-            t: Std.int(Conductor.instance.songPosition),
-            d: -1,
-            l: 20
-          });
       }
     }
     comboPopUps.displayRating(daRating);
@@ -3900,13 +3849,6 @@ class PlayState extends MusicBeatSubState
     dispatchEvent(event);
     if (event.eventCanceled) return;
 
-    #if sys
-    // spitter for ravy, teehee!!
-    var writer = new json2object.JsonWriter<Array<ScoreInput>>();
-    var output = writer.write(inputSpitter, '  ');
-    sys.io.File.saveContent("./scores.json", output);
-    #end
-
     deathCounter = 0;
 
     // TODO: This line of code makes me sad, but you can't really fix it without a breaking migration.
@@ -3939,6 +3881,10 @@ class PlayState extends MusicBeatSubState
 
       // adds current song data into the tallies for the level (story levels)
       Highscore.talliesLevel = Highscore.combineTallies(Highscore.tallies, Highscore.talliesLevel);
+
+      #if FEATURE_NEWGROUNDS
+      Leaderboards.submitSongScore(currentSong.id, suffixedDifficulty, songScore);
+      #end
 
       if (!isPracticeMode && !isBotPlayMode)
       {
@@ -3982,7 +3928,7 @@ class PlayState extends MusicBeatSubState
             }
         });
 
-      // Award various medals based on variation, difficulty, and scoring rank.
+      // Award various medals based on variation, difficulty, song ID, and scoring rank.
       if (scoreRank == ScoringRank.SHIT) Medals.award(LossRating);
       if (scoreRank >= ScoringRank.PERFECT && currentDifficulty == 'hard') Medals.award(PerfectRatingHard);
       if (scoreRank == ScoringRank.PERFECT_GOLD && currentDifficulty == 'hard') Medals.award(GoldPerfectRatingHard);
@@ -4027,19 +3973,18 @@ class PlayState extends MusicBeatSubState
                 },
             };
 
-          if (currentSong.validScore
-            && Save.instance.isLevelHighScore(PlayStatePlaylist.campaignId, PlayStatePlaylist.campaignDifficulty, data))
+          #if FEATURE_NEWGROUNDS
+          // Award a medal for beating a Story level.
+          Medals.awardStoryLevel(PlayStatePlaylist.campaignId);
+
+          // Submit the score for the Story level to Newgrounds.
+          Leaderboards.submitLevelScore(PlayStatePlaylist.campaignId, PlayStatePlaylist.campaignDifficulty, PlayStatePlaylist.campaignScore);
+
+          Events.logCompleteLevel(PlayStatePlaylist.campaignId);
+          #end
+
+          if (Save.instance.isLevelHighScore(PlayStatePlaylist.campaignId, PlayStatePlaylist.campaignDifficulty, data))
           {
-            #if FEATURE_NEWGROUNDS
-            // Award a medal for beating a Story level.
-            Medals.awardStoryLevel(PlayStatePlaylist.campaignId);
-
-            // Submit the score for the Story level to Newgrounds.
-            Leaderboards.submitLevelScore(PlayStatePlaylist.campaignId, PlayStatePlaylist.campaignDifficulty, PlayStatePlaylist.campaignScore);
-
-            Events.logCompleteLevel(PlayStatePlaylist.campaignId);
-            #end
-
             Save.instance.setLevelScore(PlayStatePlaylist.campaignId, PlayStatePlaylist.campaignDifficulty, data);
             isNewHighscore = true;
           }
@@ -4326,6 +4271,7 @@ class PlayState extends MusicBeatSubState
         storyMode: PlayStatePlaylist.isStoryMode,
         songId: currentChart.song.id,
         difficultyId: currentDifficulty,
+        variationId: currentVariation,
         characterId: currentChart.characters.player,
         title: PlayStatePlaylist.isStoryMode ? ('${PlayStatePlaylist.campaignTitle}') : ('${currentChart.songName} by ${currentChart.songArtist}'),
         prevScoreData: prevScoreData,

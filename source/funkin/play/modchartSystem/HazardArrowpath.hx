@@ -59,7 +59,7 @@ class HazardArrowpath
     // note.strumTime -= arrowpathBackwardsLength[note.noteDirection % KEY_COUNT] ?? 0;
 
     var scrollMult:Float = 1.0;
-    var notePosUnscaled:Float = strum.calculateNoteYPos(strumTime, false);
+    var notePosUnscaled:Float = strum.calculateNoteYPos(strumTime);
 
     // for (mod in modifiers){
     for (mod in strum.mods.mods_speed)
@@ -68,7 +68,7 @@ class HazardArrowpath
       scrollMult *= mod.speedMath(lane, notePosUnscaled, strum, true);
     }
 
-    var notePos:Float = strum.calculateNoteYPos(strumTime, false) * scrollMult;
+    var notePos:Float = strum.calculateNoteYPos(strumTime) * scrollMult;
     note.angle = whichStrumNote.angle;
     note.x = whichStrumNote.x + strum.getNoteXOffset();
     // note.set_y(whichStrumNote.y - INITIAL_OFFSET + notePos);

@@ -53,6 +53,11 @@ class StrumlineNote extends ZSprite
   public var noteStyleName:String = "funkin";
 
   /**
+   * The Y Offset of the note.
+   */
+  public var yOffset:Float = 0.0;
+
+  /**
    * Set this flag to `true` to disable performance optimizations that cause
    * the Strumline note sprite to ignore `velocity` and `acceleration`.
    */
@@ -79,8 +84,8 @@ class StrumlineNote extends ZSprite
     noteStyleName = noteStyle.id;
     setup(noteStyle);
 
-    this.animation.callback = onAnimationFrame;
-    this.animation.finishCallback = onAnimationFinished;
+    this.animation.onFrameChange.add(onAnimationFrame);
+    this.animation.onFinish.add(onAnimationFinished);
 
     // Must be true for animations to play.
     this.active = true;

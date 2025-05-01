@@ -1,5 +1,7 @@
 package funkin.play.notes;
 
+import flixel.math.FlxPoint;
+import flixel.util.FlxSignal.FlxTypedSignal;
 import flixel.FlxG;
 import flixel.graphics.tile.FlxDrawTrianglesItem;
 import flixel.group.FlxSpriteGroup.FlxTypedSpriteGroup;
@@ -31,35 +33,46 @@ import funkin.util.SortUtil;
  */
 class Strumline extends FlxSpriteGroup
 {
+  /**
+   * The directions of the notes on the strumline, in order.
+   */
   public static final DIRECTIONS:Array<NoteDirection> = [NoteDirection.LEFT, NoteDirection.DOWN, NoteDirection.UP, NoteDirection.RIGHT];
+
+  /**
+   * A magic number for the size of the strumline, in pixels.
+   */
   public static final STRUMLINE_SIZE:Int = 104;
+
+  /**
+   * The spacing between notes on the strumline, in pixels.
+   */
   public static final NOTE_SPACING:Int = STRUMLINE_SIZE + 8;
 
   // Positional fixes for new strumline graphics.
-  public static final INITIAL_OFFSET = -0.275 * STRUMLINE_SIZE;
+  public static final INITIAL_OFFSET:Float = -0.275 * STRUMLINE_SIZE;
   public static final NUDGE:Float = 2.0;
 
   public static final KEY_COUNT:Int = 4;
   static final NOTE_SPLASH_CAP:Int = 6;
 
-  static var RENDER_DISTANCE_MS(get, never):Float;
+  var renderDistanceMs(get, never):Float;
 
   /**
    * The custom render distance for the strumline.
    * This should be in miliseconds only! Not pixels.
    */
-  public static var CUSTOM_RENDER_DISTANCE_MS:Float = 0.0;
+  public var customRenderDistanceMs:Float = 0.0;
 
   /**
    * Whether to use the custom render distance.
    * If false, the render distance will be calculated based on the screen height.
    */
-  public static var USE_CUSTOM_RENDER_DISTANCE:Bool = false;
+  public var useCustomRenderDistance:Bool = false;
 
-  static function get_RENDER_DISTANCE_MS():Float
+  function get_renderDistanceMs():Float
   {
-    if (USE_CUSTOM_RENDER_DISTANCE) return CUSTOM_RENDER_DISTANCE_MS;
-    return FlxG.height / Constants.PIXELS_PER_MS;
+    if (useCustomRenderDistance) return customRenderDistanceMs;
+    return FlxG.height / Constants.PIXELS_PER_MS / scrollSpeed;
   }
 
   /**
@@ -195,6 +208,9 @@ class Strumline extends FlxSpriteGroup
   // Used in-game to control the scroll speed within a song
   public var scrollSpeed:Float = 1.0;
 
+  /**
+   * Reset the scroll speed to the current chart's scroll speed.
+   */
   public function resetScrollSpeed():Void
   {
     scrollSpeed = PlayState.instance?.currentChart?.scrollSpeed ?? 1.0;
@@ -225,8 +241,16 @@ class Strumline extends FlxSpriteGroup
    */
   public var notes:FlxTypedSpriteGroup<NoteSprite>;
 
+  /**
+   * The hold notes currently being rendered on the strumline.
+   * This group iterates over this every frame to update hold note positions.
+   * The PlayState also iterates over this to calculate user inputs.
+   */
   public var holdNotes:FlxTypedSpriteGroup<SustainTrail>;
 
+  /**
+   * A signal that is dispatched when a note is spawned and heading towards the strumline.
+   */
   public var onNoteIncoming:FlxTypedSignal<NoteSprite->Void>;
 
   var background:FunkinSprite;
@@ -412,6 +436,9 @@ class Strumline extends FlxSpriteGroup
     }
   }
 
+  /**
+   * Refresh the strumline, sorting its children by z-index.
+   */
   public function refresh():Void
   {
     sort(SortUtil.byZIndex, FlxSort.ASCENDING);
@@ -709,13 +736,13 @@ class Strumline extends FlxSpriteGroup
       note.noteModData.strumTime = Conductor.instance?.songPosition ?? 0;
       note.noteModData.strumTime += note.noteModData.strumPosition + timeOffset;
 
-      note.noteModData.curPos_unscaled = calculateNoteYPos(note.noteModData.strumTime, false) * -1;
+      note.noteModData.curPos_unscaled = calculateNoteYPos(note.noteModData.strumTime) * -1;
       for (mod in mods.mods_speed)
       {
         if (mod.targetLane != -1 && note.direction != mod.targetLane) continue;
         note.noteModData.speedMod *= mod.speedMath(note.noteModData.direction, note.noteModData.curPos_unscaled, this, false);
       }
-      note.noteModData.curPos = calculateNoteYPos(note.noteModData.strumTime, false) * note.noteModData.speedMod * -1;
+      note.noteModData.curPos = calculateNoteYPos(note.noteModData.strumTime) * note.noteModData.speedMod * -1;
       for (mod in mods.mods_strums)
       {
         if (mod.targetLane != -1 && note.noteModData.direction != mod.targetLane) continue;
@@ -920,7 +947,7 @@ class Strumline extends FlxSpriteGroup
 
   #if FEATURE_GHOST_TAPPING
   /**
-   * Returns `true` if no notes are in range of the strumline and the player can spam without penalty.
+   * @return `true` if no notes are in range of the strumline and the player can spam without penalty.
    */
   public function mayGhostTap():Bool
   {
@@ -965,31 +992,41 @@ class Strumline extends FlxSpriteGroup
     });
   }
 
-  public function getNoteSprite(noteData:SongNoteData):NoteSprite
+  /**
+   * Get a note sprite corresponding to the given note data.
+   * @param target The note data for the note sprite.
+   * @return The note sprite.
+   */
+  public function getNoteSprite(target:SongNoteData):NoteSprite
   {
-    if (noteData == null) return null;
+    if (target == null) return null;
 
     for (note in notes.members)
     {
       if (note == null) continue;
       if (note.alive) continue;
 
-      if (note.noteData == noteData) return note;
+      if (note.noteData == target) return note;
     }
 
     return null;
   }
 
-  public function getHoldNoteSprite(noteData:SongNoteData):SustainTrail
+  /**
+   * Get a hold note sprite corresponding to the given note data.
+   * @param target The note data for the hold note.
+   * @return The hold note sprite.
+   */
+  public function getHoldNoteSprite(target:SongNoteData):SustainTrail
   {
-    if (noteData == null || ((noteData.length ?? 0.0) <= 0.0)) return null;
+    if (target == null || ((target.length ?? 0.0) <= 0.0)) return null;
 
     for (holdNote in holdNotes.members)
     {
       if (holdNote == null) continue;
       if (holdNote.alive) continue;
 
-      if (holdNote.noteData == noteData) return holdNote;
+      if (holdNote.noteData == target) return holdNote;
     }
 
     return null;
@@ -1000,6 +1037,8 @@ class Strumline extends FlxSpriteGroup
    */
   public function vwooshNotes():Void
   {
+    var vwooshTime:Float = 0.5;
+
     for (note in notes.members)
     {
       if (note == null) continue;
@@ -1022,7 +1061,7 @@ class Strumline extends FlxSpriteGroup
           });
       }
 
-      FlxTween.tween(note, {y: targetY}, 0.5,
+      FlxTween.tween(note, {y: targetY}, vwooshTime,
         {
           ease: FlxEase.expoIn,
           onComplete: function(twn) {
@@ -1043,7 +1082,7 @@ class Strumline extends FlxSpriteGroup
 
       var targetY:Float = FlxG.height + holdNote.y;
       if (Preferences.downscroll) targetY = 0 - holdNote.height;
-      FlxTween.tween(holdNote, {y: targetY}, 0.5,
+      FlxTween.tween(holdNote, {y: targetY}, vwooshTime,
         {
           ease: FlxEase.expoIn,
           onComplete: function(twn) {
@@ -1056,20 +1095,49 @@ class Strumline extends FlxSpriteGroup
   }
 
   /**
-   * For a note's strumTime, calculate its Y position relative to the strumline.
-   * NOTE: Assumes Conductor and PlayState are both initialized.
-   * @param strumTime
-   * @return Float
+   * Reverse of vwooshNotes, we bring the notes IN (by their offsets)
    */
-  public function calculateNoteYPos(strumTime:Float, vwoosh:Bool = true):Float
+  public function vwooshInNotes():Void
   {
-    // Make the note move faster visually as it moves offscreen.
-    // var vwoosh:Float = (strumTime < Conductor.songPosition) && vwoosh ? 2.0 : 1.0;
-    // ^^^ commented this out... do NOT make it move faster as it moves offscreen!
-    var vwoosh:Float = 1.0;
+    var vwooshTime:Float = 0.5;
 
-    return
-      Constants.PIXELS_PER_MS * (conductorInUse.songPosition - strumTime - Conductor.instance.inputOffset) * scrollSpeed * vwoosh * (Preferences.downscroll ? 1 : -1);
+    for (note in notes.members)
+    {
+      if (note == null) continue;
+      if (!note.alive) continue;
+
+      note.yOffset = 200;
+      if (Preferences.downscroll)
+      {
+        note.yOffset = -200;
+      }
+      FlxTween.tween(note, {yOffset: 0}, vwooshTime,
+        {
+          ease: FlxEase.expoOut,
+          onComplete: function(twn) {
+            note.yOffset = 0;
+          }
+        });
+    }
+
+    for (holdNote in holdNotes.members)
+    {
+      if (holdNote == null) continue;
+      if (!holdNote.alive) continue;
+
+      holdNote.yOffset = 200;
+      if (Preferences.downscroll)
+      {
+        holdNote.yOffset = -200;
+      }
+      FlxTween.tween(holdNote, {yOffset: 0}, vwooshTime,
+        {
+          ease: FlxEase.expoOut,
+          onComplete: function(twn) {
+            holdNote.yOffset = 0;
+          }
+        });
+    }
   }
 
   // WAIT THIS GETS USED FOR MOD MATH? WHY? WHY PAST ME? WTF NOW THIS IS SPAGHETTI!!!
@@ -1106,13 +1174,13 @@ class Strumline extends FlxSpriteGroup
     note.noteModData.whichStrumNote = getByIndex(note.noteModData.direction);
     var timmy:Float = note.noteModData.strumTime - note.noteModData.whichStrumNote.strumExtraModData.strumPos;
 
-    note.noteModData.curPos_unscaled = calculateNoteYPos(timmy, vwoosh);
+    note.noteModData.curPos_unscaled = calculateNoteYPos(timmy);
     for (mod in mods.mods_speed)
     {
       if (mod.targetLane != -1 && note.direction != mod.targetLane) continue;
       note.noteModData.speedMod *= mod.speedMath(note.noteModData.direction, note.noteModData.curPos_unscaled, this, false);
     }
-    note.noteModData.curPos = calculateNoteYPos(timmy, vwoosh) * note.noteModData.speedMod;
+    note.noteModData.curPos = calculateNoteYPos(timmy) * note.noteModData.speedMod;
 
     if (this.dumbTempScaleTargetThing == 666) dumbTempScaleTargetThing = note.targetScale;
 
@@ -1177,7 +1245,19 @@ class Strumline extends FlxSpriteGroup
     // perspective applied in applyperspective part of update routine
   }
 
-  function updateNotes():Void
+  /**
+   * For a note's strumTime, calculate its Y position relative to the strumline.
+   * NOTE: Assumes Conductor and PlayState are both initialized.
+   * @param strumTime The strumtime of the note.
+   * @return The Y position of the note.
+   */
+  public function calculateNoteYPos(strumTime:Float):Float
+  {
+    return
+      Constants.PIXELS_PER_MS * (conductorInUse.songPosition - strumTime - Conductor.instance.inputOffset) * scrollSpeed * (Preferences.downscroll ? 1 : -1);
+  }
+
+  public function updateNotes():Void
   {
     if (noteData.length == 0) return;
 
@@ -1188,7 +1268,7 @@ class Strumline extends FlxSpriteGroup
 
     var songStart:Float = PlayState.instance?.startTimestamp ?? 0.0;
     var hitWindowStart:Float = conductorInUse.songPosition - Constants.HIT_WINDOW_MS;
-    var renderWindowStart:Float = conductorInUse.songPosition + RENDER_DISTANCE_MS;
+    var renderWindowStart:Float = conductorInUse.songPosition + renderDistanceMs;
 
     for (noteIndex in nextNoteIndex...noteData.length)
     {
@@ -1208,11 +1288,11 @@ class Strumline extends FlxSpriteGroup
         var whichStrumNote:StrumlineNote = getByIndex(note.getDirection() % KEY_COUNT);
         drawDistanceForward = 1 + (whichStrumNote?.strumExtraModData?.drawdistanceForward ?? 0);
       }
-      var renderWindowStart_EDITED:Float = conductorInUse.songPosition + (RENDER_DISTANCE_MS * drawDistanceForward);
+      var renderWindowStart_EDITED:Float = conductorInUse.songPosition + (renderDistanceMs * drawDistanceForward);
 
       if (note.time > renderWindowStart_EDITED) break; // Note is too far ahead to render
 
-      var noteSprite = buildNoteSprite(note);
+      var noteSprite:NoteSprite = buildNoteSprite(note);
 
       if (note.length > 0)
       {
@@ -1229,7 +1309,6 @@ class Strumline extends FlxSpriteGroup
     {
       if (note == null || !note.alive) continue;
 
-      var vwoosh:Bool = note.holdNoteSprite == null;
       // Set the note's position.
       if (mods != null)
       {
@@ -1241,7 +1320,7 @@ class Strumline extends FlxSpriteGroup
           drawDistanceBackkk = 1 + (note?.noteModData?.whichStrumNote?.strumExtraModData?.drawdistanceBack ?? 0);
         }
 
-        var renderWindowEnd = note.strumTime + Constants.HIT_WINDOW_MS + (RENDER_DISTANCE_MS / 8 * drawDistanceBackkk);
+        var renderWindowEnd = note.strumTime + Constants.HIT_WINDOW_MS + (renderDistanceMs / 8 * drawDistanceBackkk);
         // If the note is missed
         // if desaturated, ,eisofnoaunawdabwo
         if ((note.handledMiss || note.hasBeenHit) && conductorInUse.songPosition >= renderWindowEnd)
@@ -1251,7 +1330,7 @@ class Strumline extends FlxSpriteGroup
       }
       else
       {
-        if (!customPositionData) note.y = this.y - INITIAL_OFFSET + calculateNoteYPos(note.strumTime, vwoosh);
+        if (!customPositionData) note.y = this.y - INITIAL_OFFSET + calculateNoteYPos(note.strumTime);
 
         // If the note is miss
         var isOffscreen = Preferences.downscroll ? note.y > FlxG.height : note.y < -note.height;
@@ -1281,12 +1360,14 @@ class Strumline extends FlxSpriteGroup
         }
       }
 
+      final magicNumberIGuess:Float = 8;
       var drawDistanceBack:Float = 1;
       if (mods != null)
       {
         drawDistanceBack = 1.0 + (holdNote?.whichStrumNote?.strumExtraModData?.drawdistanceBack ?? 0.0);
       }
-      var renderWindowEnd = holdNote.strumTime + holdNote.fullSustainLength + Constants.HIT_WINDOW_MS + (RENDER_DISTANCE_MS / 8 * drawDistanceBack);
+      var renderWindowEnd = holdNote.strumTime + holdNote.fullSustainLength + Constants.HIT_WINDOW_MS
+        + (renderDistanceMs / magicNumberIGuess * drawDistanceBack);
 
       if (holdNote.missedNote && conductorInUse.songPosition >= renderWindowEnd)
       {
@@ -1327,8 +1408,6 @@ class Strumline extends FlxSpriteGroup
 
         var yOffset:Float = (holdNote.fullSustainLength - holdNote.sustainLength) * Constants.PIXELS_PER_MS;
 
-        var vwoosh:Bool = false;
-
         if (mods != null)
         {
           holdNote.x = ModConstants.holdNoteJankX + (isPixel ? -dumbMagicNumberForX : 0);
@@ -1340,11 +1419,16 @@ class Strumline extends FlxSpriteGroup
           {
             if (Preferences.downscroll)
             {
-              holdNote.y = this.y - INITIAL_OFFSET + calculateNoteYPos(holdNote.strumTime, vwoosh) - holdNote.height + STRUMLINE_SIZE / 2;
+              holdNote.y = this.y
+                - INITIAL_OFFSET
+                + calculateNoteYPos(holdNote.strumTime)
+                - holdNote.height
+                + STRUMLINE_SIZE / 2
+                + holdNote.yOffset;
             }
             else
             {
-              holdNote.y = this.y - INITIAL_OFFSET + calculateNoteYPos(holdNote.strumTime, vwoosh) + yOffset + STRUMLINE_SIZE / 2;
+              holdNote.y = this.y - INITIAL_OFFSET + calculateNoteYPos(holdNote.strumTime) + yOffset + STRUMLINE_SIZE / 2 + holdNote.yOffset;
             }
           }
         }
@@ -1393,7 +1477,6 @@ class Strumline extends FlxSpriteGroup
       {
         // Hold note is new, render it normally.
         holdNote.visible = true;
-        var vwoosh:Bool = false;
         if (mods != null)
         {
           holdNote.x = ModConstants.holdNoteJankX + (isPixel ? -dumbMagicNumberForX : 0);
@@ -1405,11 +1488,16 @@ class Strumline extends FlxSpriteGroup
           {
             if (Preferences.downscroll)
             {
-              holdNote.y = this.y - INITIAL_OFFSET + calculateNoteYPos(holdNote.strumTime, vwoosh) - holdNote.height + STRUMLINE_SIZE / 2;
+              holdNote.y = this.y
+                - INITIAL_OFFSET
+                + calculateNoteYPos(holdNote.strumTime)
+                - holdNote.height
+                + STRUMLINE_SIZE / 2
+                + holdNote.yOffset;
             }
             else
             {
-              holdNote.y = this.y - INITIAL_OFFSET + calculateNoteYPos(holdNote.strumTime, vwoosh) + STRUMLINE_SIZE / 2;
+              holdNote.y = this.y - INITIAL_OFFSET + calculateNoteYPos(holdNote.strumTime) + STRUMLINE_SIZE / 2 + holdNote.yOffset;
             }
           }
         }
@@ -1463,6 +1551,9 @@ class Strumline extends FlxSpriteGroup
     nextNoteIndex = 0;
   }
 
+  /**
+   * Called on each beat of the song.
+   */
   public function onBeatHit():Void
   {
     if (mods == null) sortNoteSprites(); // default sorting is done every beat for some reason lol
@@ -1479,16 +1570,29 @@ class Strumline extends FlxSpriteGroup
     // if (strumlineNotes_Visual.members.length > 1) strumlineNotes_Visual.members.insertionSort(compareNoteSprites.bind(FlxSort.ASCENDING));
   }
 
+  /**
+   * Called when a key is pressed.
+   * @param dir The direction of the key that was pressed.
+   */
   public function pressKey(dir:NoteDirection):Void
   {
     heldKeys[dir] = true;
   }
 
+  /**
+   * Called when a key is released.
+   * @param dir The direction of the key that was released.
+   */
   public function releaseKey(dir:NoteDirection):Void
   {
     heldKeys[dir] = false;
   }
 
+  /**
+   * Check if a key is held down.
+   * @param dir The direction of the key to check.
+   * @return `true` if the key is held down, `false` otherwise.
+   */
   public function isKeyHeld(dir:NoteDirection):Bool
   {
     return heldKeys[dir];
@@ -1538,6 +1642,11 @@ class Strumline extends FlxSpriteGroup
     #end
   }
 
+  /**
+   * Apply note data from a chart to this strumline.
+   * Note data should be valid and apply only to this strumline.
+   * @param data The note data to apply.
+   */
   public function applyNoteData(data:Array<SongNoteData>):Void
   {
     this.notes.clear();
@@ -1550,6 +1659,7 @@ class Strumline extends FlxSpriteGroup
   }
 
   /**
+   * Hit a note.
    * @param note The note to hit.
    * @param removeNote True to remove the note immediately, false to make it transparent and let it move offscreen.
    */
@@ -1581,6 +1691,10 @@ class Strumline extends FlxSpriteGroup
     #end
   }
 
+  /**
+   * Kill a note heading towards the strumline.
+   * @param note The note to kill. Gets recycled and reused for performance.
+   */
   public function killNote(note:NoteSprite):Void
   {
     if (note == null) return;
@@ -1595,6 +1709,11 @@ class Strumline extends FlxSpriteGroup
     }
   }
 
+  /**
+   * Get a strumline note sprite by its index.
+   * @param index The index of the note to get.
+   * @return The note.
+   */
   public function getByIndex(index:Int):StrumlineNote
   {
     var returnValue:StrumlineNote = this.strumlineNotes.members[index];
@@ -1610,36 +1729,67 @@ class Strumline extends FlxSpriteGroup
     return returnValue;
   }
 
+  /**
+   * Get a strumline note sprite by its direction.
+   * @param direction The direction of the note to get.
+   * @return The note.
+   */
   public function getByDirection(direction:NoteDirection):StrumlineNote
   {
     return getByIndex(DIRECTIONS.indexOf(direction));
   }
 
+  /**
+   * Play a static animation for a given direction.
+   * @param direction The direction of the note to play the static animation for.
+   */
   public function playStatic(direction:NoteDirection):Void
   {
     getByDirection(direction).playStatic();
   }
 
+  /**
+   * Play a press animation for a given direction.
+   * @param direction The direction of the note to play the press animation for.
+   */
   public function playPress(direction:NoteDirection):Void
   {
     getByDirection(direction).playPress();
   }
 
+  /**
+   * Play a confirm animation for a given direction.
+   * @param direction The direction of the note to play the confirm animation for.
+   */
   public function playConfirm(direction:NoteDirection):Void
   {
     getByDirection(direction).playConfirm();
   }
 
+  /**
+   * Play a confirm animation for a hold note.
+   * @param direction The direction of the note to play the confirm animation for.
+   */
   public function holdConfirm(direction:NoteDirection):Void
   {
     getByDirection(direction).holdConfirm();
   }
 
+  /**
+   * Check if a given direction is playing the confirm animation.
+   * @param direction The direction of the note to check.
+   * @return `true` if the note is playing the confirm animation, `false` otherwise.
+   */
   public function isConfirm(direction:NoteDirection):Bool
   {
     return getByDirection(direction).isConfirm();
   }
 
+  /**
+   * Play a note splash for a given direction.
+   * @param direction The direction of the note to play the splash animation for.
+   * @param note Optional NoteSprite graphic to use for copying the hsvShader (if enabled for this notestyle) -WITF Exclusive
+   */
   public function playNoteSplash(direction:NoteDirection, note:NoteSprite = null):Void
   {
     if (!showNotesplash) return;
@@ -1765,6 +1915,10 @@ class Strumline extends FlxSpriteGroup
     }
   }
 
+  /**
+   * Play a note hold cover for a given hold note.
+   * @param holdNote The hold note to play the cover animation for.
+   */
   public function playNoteHoldCover(holdNote:SustainTrail):Void
   {
     if (!showNotesplash) return;
@@ -1801,6 +1955,11 @@ class Strumline extends FlxSpriteGroup
     }
   }
 
+  /**
+   * Build a note sprite for a given note data.
+   * @param note The note data to build the note sprite for.
+   * @return The note sprite. Will recycle a note sprite from the pool if available for performance.
+   */
   public function buildNoteSprite(note:SongNoteData):NoteSprite
   {
     var noteSprite:NoteSprite = constructNoteSprite();
@@ -1819,7 +1978,6 @@ class Strumline extends FlxSpriteGroup
       noteSprite.x += getXPos(DIRECTIONS[note.getDirection() % KEY_COUNT]);
       noteSprite.x -= (noteSprite.width - Strumline.STRUMLINE_SIZE) / 2; // Center it
       noteSprite.x -= NUDGE;
-      // noteSprite.x += INITIAL_OFFSET;
       noteSprite.y = -9999;
 
       if (noteSprite.mesh == null && createdNoteMeshes) noteSprite.setupMesh();
@@ -1833,6 +1991,11 @@ class Strumline extends FlxSpriteGroup
     return noteSprite;
   }
 
+  /**
+   * Build a hold note sprite for a given note data.
+   * @param note The note data to build the hold note sprite for.
+   * @return The hold note sprite. Will recycle a hold note sprite from the pool if available for performance.
+   */
   public function buildHoldNoteSprite(note:SongNoteData):SustainTrail
   {
     var holdNoteSprite:SustainTrail = constructHoldNoteSprite();
@@ -1873,7 +2036,7 @@ class Strumline extends FlxSpriteGroup
   }
 
   /**
-   * Custom recycling behavior.
+   * Custom recycling behavior for note splashes.
    */
   function constructNoteSplash():NoteSplash
   {
@@ -1908,7 +2071,7 @@ class Strumline extends FlxSpriteGroup
   }
 
   /**
-   * Custom recycling behavior.
+   * Custom recycling behavior for note hold covers.
    */
   function constructNoteHoldCover():NoteHoldCover
   {
@@ -1942,7 +2105,7 @@ class Strumline extends FlxSpriteGroup
   }
 
   /**
-   * Custom recycling behavior.
+   * Custom recycling behavior for note sprites.
    */
   function constructNoteSprite():NoteSprite
   {
@@ -1977,7 +2140,7 @@ class Strumline extends FlxSpriteGroup
   }
 
   /**
-   * Custom recycling behavior.
+   * Custom recycling behavior for hold note sprites.
    */
   function constructHoldNoteSprite():SustainTrail
   {
@@ -2044,6 +2207,10 @@ class Strumline extends FlxSpriteGroup
     }
   }
 
+  /**
+   * Play a fade in animation on all arrows in the strumline.
+   * Used when starting a song in Freeplay mode.
+   */
   public function fadeInArrows():Void
   {
     for (index => arrow in this.strumlineNotes.members.keyValueIterator())
@@ -2052,6 +2219,13 @@ class Strumline extends FlxSpriteGroup
     }
   }
 
+  /**
+   * Compare two note data objects by their strumtime.
+   * @param order The order to sort the notes in.
+   * @param a The first note data object.
+   * @param b The second note data object.
+   * @return The comparison result, based on the time of the notes.
+   */
   function compareNoteData(order:Int, a:SongNoteData, b:SongNoteData):Int
   {
     return FlxSort.byValues(order, a.time, b.time);
@@ -2089,6 +2263,13 @@ class Strumline extends FlxSpriteGroup
     }
   }
 
+  /**
+   * Compare two hold note sprites by their strumtime.
+   * @param order The order to sort the notes in.
+   * @param a The first hold note sprite.
+   * @param b The second hold note sprite.
+   * @return The comparison result, based on the time of the notes.
+   */
   function compareHoldNoteSprites(order:Int, a:SustainTrail, b:SustainTrail):Int
   {
     if (mods != null && zSortMode)
@@ -2101,9 +2282,14 @@ class Strumline extends FlxSpriteGroup
     }
   }
 
-  override function findMinYHelper()
+  /**
+   * Find the minimum Y position of the strumline.
+   * Ignores the background to ensure the strumline is positioned correctly.
+   * @return The minimum Y position of the strumline.
+   */
+  override function findMinYHelper():Float
   {
-    var value = Math.POSITIVE_INFINITY;
+    var value:Float = Math.POSITIVE_INFINITY;
     for (member in group.members)
     {
       if (member == null) continue;
@@ -2111,18 +2297,28 @@ class Strumline extends FlxSpriteGroup
       if (member == this.background) continue;
 
       var minY:Float;
-      if (member.flixelType == SPRITEGROUP) minY = (cast member : FlxSpriteGroup).findMinY();
+      if (member.flixelType == SPRITEGROUP)
+      {
+        minY = (cast member : FlxSpriteGroup).findMinY();
+      }
       else
+      {
         minY = member.y;
+      }
 
       if (minY < value) value = minY;
     }
     return value;
   }
 
-  override function findMaxYHelper()
+  /**
+   * Find the maximum Y position of the strumline.
+   * Ignores the background to ensure the strumline is positioned correctly.
+   * @return The maximum Y position of the strumline.
+   */
+  override function findMaxYHelper():Float
   {
-    var value = Math.NEGATIVE_INFINITY;
+    var value:Float = Math.NEGATIVE_INFINITY;
     for (member in group.members)
     {
       if (member == null) continue;
@@ -2130,9 +2326,14 @@ class Strumline extends FlxSpriteGroup
       if (member == this.background) continue;
 
       var maxY:Float;
-      if (member.flixelType == SPRITEGROUP) maxY = (cast member : FlxSpriteGroup).findMaxY();
+      if (member.flixelType == SPRITEGROUP)
+      {
+        maxY = (cast member : FlxSpriteGroup).findMaxY();
+      }
       else
+      {
         maxY = member.y + member.height;
+      }
 
       if (maxY > value) value = maxY;
     }
