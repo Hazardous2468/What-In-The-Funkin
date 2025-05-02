@@ -282,6 +282,19 @@ class Strumline extends FlxSpriteGroup
 
   static final BACKGROUND_PAD:Int = 16;
 
+  function arrowPathSetup():Void
+  {
+    this.arrowPaths = new FlxTypedSpriteGroup<SustainTrail>();
+    this.arrowPaths.zIndex = 6;
+    this.add(this.arrowPaths);
+
+    notitgPathSprite = new ZSprite();
+    notitgPathSprite.x = 0;
+    notitgPathSprite.y = 0;
+    this.notitgPathSprite.zIndex = 6;
+    this.add(notitgPathSprite);
+  }
+
   public function new(noteStyle:NoteStyle, isPlayer:Bool, modchartSong:Bool = false)
   {
     super();
@@ -294,15 +307,7 @@ class Strumline extends FlxSpriteGroup
 
     if (modchartSong)
     {
-      this.arrowPaths = new FlxTypedSpriteGroup<SustainTrail>();
-      this.arrowPaths.zIndex = 6;
-      this.add(this.arrowPaths);
-
-      notitgPathSprite = new ZSprite();
-      notitgPathSprite.x = 0;
-      notitgPathSprite.y = 0;
-      this.notitgPathSprite.zIndex = 6;
-      this.add(notitgPathSprite);
+      arrowPathSetup();
     }
 
     if (holdsBehindStrums)
