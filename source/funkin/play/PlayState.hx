@@ -1227,14 +1227,8 @@ class PlayState extends MusicBeatSubState
       });
 
       // Reset the health icons.
-      if (currentStage.getBoyfriend() != null)
-      {
-        currentStage.getBoyfriend().initHealthIcon(false);
-      }
-      if (currentStage.getDad() != null)
-      {
-        currentStage.getDad().initHealthIcon(true);
-      }
+      currentStage?.getBoyfriend()?.initHealthIcon(false);
+      currentStage?.getDad()?.initHealthIcon(true);
 
       needsReset = false;
     }
@@ -1283,7 +1277,7 @@ class PlayState extends MusicBeatSubState
     // Attempt to pause the game.
     if ((controls.PAUSE || androidPause) && isInCountdown && mayPauseGame && !justUnpaused)
     {
-      var event = new PauseScriptEvent(FlxG.random.bool(1 / 1000));
+      var event = new PauseScriptEvent(FlxG.random.bool((1 / 1000) * 100));
 
       dispatchEvent(event);
 
@@ -1478,7 +1472,7 @@ class PlayState extends MusicBeatSubState
     if (!isMinimalMode)
     {
       if (iconP1 != null) iconP1.updatePosition();
-      if (iconP1 != null) iconP2.updatePosition();
+      if (iconP2 != null) iconP2.updatePosition();
     }
 
     // Transition to the game over substate.
@@ -1761,9 +1755,10 @@ class PlayState extends MusicBeatSubState
      */
   override function reloadAssets():Void
   {
+    performCleanup();
+
     funkin.modding.PolymodHandler.forceReloadAssets();
     lastParams.targetSong = SongRegistry.instance.fetchEntry(currentSong.id);
-    this.remove(currentStage);
     LoadingState.loadPlayState(lastParams);
   }
 
@@ -2347,7 +2342,7 @@ class PlayState extends MusicBeatSubState
     // playerStrumline.x = FlxG.width - playerStrumline.width - Constants.STRUMLINE_X_OFFSET; // Centered style
     playerStrumline.y = Preferences.downscroll ? FlxG.height
       - (useHeightForStrumY ? playerStrumline.height : heightOffset)
-      - Constants.STRUMLINE_Y_OFFSET : Constants.STRUMLINE_Y_OFFSET;
+      - Constants.STRUMLINE_Y_OFFSET - noteStyle.getStrumlineOffsets()[1] : Constants.STRUMLINE_Y_OFFSET;
     playerStrumline.zIndex = 1001;
     playerStrumline.cameras = [camHUD];
 
@@ -2355,7 +2350,7 @@ class PlayState extends MusicBeatSubState
     opponentStrumline.x = Constants.STRUMLINE_X_OFFSET;
     opponentStrumline.y = Preferences.downscroll ? FlxG.height
       - (useHeightForStrumY ? opponentStrumline.height : heightOffset)
-      - Constants.STRUMLINE_Y_OFFSET : Constants.STRUMLINE_Y_OFFSET;
+      - Constants.STRUMLINE_Y_OFFSET - noteStyle.getStrumlineOffsets()[1] : Constants.STRUMLINE_Y_OFFSET;
     opponentStrumline.zIndex = 1000;
     opponentStrumline.cameras = [camHUD];
 
@@ -3237,7 +3232,7 @@ class PlayState extends MusicBeatSubState
             dispatchEvent(event);
 
             trace('Penalizing score by ${event.score} and health by ${event.healthChange} for dropping hold note (is combo break: ${event.isComboBreak})!');
-            applyScore(event.score, 'miss', event.healthChange, event.isComboBreak);
+            applyScore(event.score, '', event.healthChange, event.isComboBreak);
 
             // Play the miss sound.
             vocals.playerVolume = 0;
@@ -3694,7 +3689,7 @@ class PlayState extends MusicBeatSubState
     if (FlxG.keys.justPressed.EIGHT) scanForModchart();
 
     // 9: Toggle the old icon.
-    if (FlxG.keys.justPressed.NINE) iconP1.toggleOldIcon();
+    if (FlxG.keys.justPressed.NINE && iconP1 != null) iconP1.toggleOldIcon();
 
     #if (debug || FORCE_DEBUG_VERSION)
     // PAGEUP: Skip forward two sections.
@@ -3723,6 +3718,8 @@ class PlayState extends MusicBeatSubState
         Highscore.tallies.shit += 1;
       case 'miss':
         Highscore.tallies.missed += 1;
+      default:
+        // Nothing!
     }
     health += healthChange;
     if (isComboBreak)
