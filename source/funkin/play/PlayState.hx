@@ -2301,9 +2301,10 @@ class PlayState extends MusicBeatSubState
     add(newStrummer);
 
     newStrummer.x = (FlxG.width / 2 - newStrummer.width / 2);
-    newStrummer.y = Preferences.downscroll ? FlxG.height - (useHeightForStrumY ? newStrummer.height : heightOffset) - Constants.STRUMLINE_Y_OFFSET : Constants.STRUMLINE_Y_OFFSET;
 
-    // newStrummer.y = Preferences.downscroll ? FlxG.height - newStrummer.height - Constants.STRUMLINE_Y_OFFSET : Constants.STRUMLINE_Y_OFFSET;
+    newStrummer.y = Preferences.downscroll ? FlxG.height - (useHeightForStrumY ? newStrummer.height : heightOffset) - Constants.STRUMLINE_Y_OFFSET
+      - noteStyle.getStrumlineOffsets()[1] : Constants.STRUMLINE_Y_OFFSET;
+
     newStrummer.zIndex = 1003 + allStrumLines.length + 1;
     newStrummer.cameras = playerStrumline.cameras;
 
@@ -2383,7 +2384,10 @@ class PlayState extends MusicBeatSubState
           add(newStrummer);
 
           newStrummer.x = (FlxG.width / 2 - newStrummer.width / 2);
-          newStrummer.y = Preferences.downscroll ? FlxG.height - (useHeightForStrumY ? newStrummer.height : heightOffset) - Constants.STRUMLINE_Y_OFFSET : Constants.STRUMLINE_Y_OFFSET;
+
+          newStrummer.y = Preferences.downscroll ? FlxG.height - (useHeightForStrumY ? newStrummer.height : heightOffset) - Constants.STRUMLINE_Y_OFFSET
+            - noteStyle.getStrumlineOffsets()[1] : Constants.STRUMLINE_Y_OFFSET;
+
           newStrummer.zIndex = 1003 + i;
           newStrummer.cameras = playerStrumline.cameras;
 
