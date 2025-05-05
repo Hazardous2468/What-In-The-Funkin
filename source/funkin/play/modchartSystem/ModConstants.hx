@@ -79,7 +79,7 @@ import funkin.play.modchartSystem.modifiers.*; // if only you worked ;_;
 
 class ModConstants
 {
-  public static var MODCHART_VERSION:String = "v0.8.1a";
+  public static var MODCHART_VERSION:String = "v0.9.0a";
 
   public static var tooCloseToCameraFix:Float = 0.975; // dumb fix for preventing freak out on z math or something
 
@@ -561,12 +561,13 @@ class ModConstants
       case "quintOut":
         return FlxEase.quintOut;
 
-      case "expoOut":
-        return FlxEase.expoOut;
-      case "expoIn":
-        return FlxEase.expoIn;
-      case "expoInOut":
-        return FlxEase.expoInOut;
+      // v0.9.0a -> No longer use the default expo eases as the math they use don't end on the intended target value, resulting in values ending on something like 0.975 instead of 1
+      // case "expoOut":
+      //  return FlxEase.expoOut;
+      // case "expoIn":
+      //  return FlxEase.expoIn;
+      // case "expoInOut":
+      //  return FlxEase.expoInOut;
 
       case "backOut":
         return FlxEase.backOut;
@@ -582,8 +583,8 @@ class ModConstants
       case "bounceInOut":
         return FlxEase.bounceInOut;
 
-      case "elasticOut":
-        return FlxEase.elasticOut;
+      // case "elasticOut":
+      //  return FlxEase.elasticOut;
       case "elasticIn":
         return FlxEase.elasticIn;
       case "elasticInOut":

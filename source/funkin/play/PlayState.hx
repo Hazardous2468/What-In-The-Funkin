@@ -2342,7 +2342,8 @@ class PlayState extends MusicBeatSubState
     // playerStrumline.x = FlxG.width - playerStrumline.width - Constants.STRUMLINE_X_OFFSET; // Centered style
     playerStrumline.y = Preferences.downscroll ? FlxG.height
       - (useHeightForStrumY ? playerStrumline.height : heightOffset)
-      - Constants.STRUMLINE_Y_OFFSET - noteStyle.getStrumlineOffsets()[1] : Constants.STRUMLINE_Y_OFFSET;
+      - Constants.STRUMLINE_Y_OFFSET
+      - noteStyle.getStrumlineOffsets()[1] : Constants.STRUMLINE_Y_OFFSET;
     playerStrumline.zIndex = 1001;
     playerStrumline.cameras = [camHUD];
 
@@ -2350,7 +2351,8 @@ class PlayState extends MusicBeatSubState
     opponentStrumline.x = Constants.STRUMLINE_X_OFFSET;
     opponentStrumline.y = Preferences.downscroll ? FlxG.height
       - (useHeightForStrumY ? opponentStrumline.height : heightOffset)
-      - Constants.STRUMLINE_Y_OFFSET - noteStyle.getStrumlineOffsets()[1] : Constants.STRUMLINE_Y_OFFSET;
+      - Constants.STRUMLINE_Y_OFFSET
+      - noteStyle.getStrumlineOffsets()[1] : Constants.STRUMLINE_Y_OFFSET;
     opponentStrumline.zIndex = 1000;
     opponentStrumline.cameras = [camHUD];
 
