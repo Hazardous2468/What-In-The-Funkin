@@ -39,6 +39,7 @@ class ModEventHandler
 
   public var modEvents:Array<ModTimeEvent> = [];
   public var tweenManager:FlxTweenManager;
+  public var customEases:Map<String, Null<Float->Float>> = new Map<String, Null<Float->Float>>();
 
   public var modchartTweens:Map<String, FlxTween> = new Map<String, FlxTween>();
 
@@ -68,6 +69,11 @@ class ModEventHandler
 
   public function clearEvents():Void
   {
+    for (key in customEases.keys())
+    {
+      customEases.remove(key);
+    }
+
     for (key in modchartTweens.keys())
     {
       modchartTweens.get(key).cancel();

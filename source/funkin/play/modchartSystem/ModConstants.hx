@@ -517,8 +517,31 @@ class ModConstants
 
   public static function getEaseFromString(str:String = "linear"):Null<Float->Float>
   {
-    // return Reflect.field(FlxEase, str);
-    // return Reflect.field(HazardEase, str);
+    // v0.9a
+    // ease flip check
+    if (StringTools.contains(str, "flip("))
+    {
+      var subModArr = str.split('flip(');
+      str = subModArr[1];
+      subModArr = str.split(')');
+      str = subModArr[0];
+      var ease = getEaseFromString(str);
+
+      return function(t):Float {
+        return 1.0 - ease(t);
+      }
+    }
+
+    // Custom eases stored in event handler
+    // check for custom ease:
+    if (PlayState.instance?.modchartEventHandler != null)
+    {
+      // if found, return that ease func, otherwise continue
+      if (PlayState.instance.modchartEventHandler.customEases.exists(str))
+      {
+        return PlayState.instance.modchartEventHandler.customEases.get(str);
+      }
+    }
 
     // dumb fix for reflect not seeing the default flxease stuff in the new hazardease class
     switch (str)
@@ -612,20 +635,6 @@ class ModConstants
         return FlxEase.smoothStepInOut;
 
       default:
-        /*
-          var tag_:String = str.toLowerCase();
-          var subModArr = null;
-          if (StringTools.contains(tag_, "flip("))
-          {
-            var subModArr_part1 = tag_.split('(');
-            var subModArr_part2 = subModArr_part1[1].split(')');
-            str = subModArr_part2[0];
-
-            tag_ = subModArr[0];
-            lane = Std.parseInt(subModArr[1]);
-          }
-         */
-
         return Reflect.field(HazardEase, str);
     }
   }

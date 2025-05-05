@@ -1404,6 +1404,13 @@ class HScript
       }
     });
 
+    interp.variables.set('createCustomEase', function(nameOfEase:String, func:Float->Float):Void {
+      if (PlayState.instance.modchartEventHandler != null)
+      {
+        PlayState.instance.modchartEventHandler.customEases.set(nameOfEase, func);
+      }
+    });
+
     interp.variables.set('createSprGroup', function(variableTag:String, addToGame:Bool = true) {
       var grp:FlxTypedSpriteGroup<FlxSprite> = null;
 
