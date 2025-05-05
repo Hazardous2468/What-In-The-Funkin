@@ -18,7 +18,6 @@ import funkin.util.SortUtil;
 import flixel.util.FlxSort;
 // tween
 import flixel.tweens.FlxTween;
-// import flixel.tweens.FlxTweenManager;
 import flixel.tweens.FlxEase;
 // mod lol
 import funkin.play.modchartSystem.ModConstants;
