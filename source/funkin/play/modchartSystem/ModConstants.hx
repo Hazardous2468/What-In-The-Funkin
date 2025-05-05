@@ -515,22 +515,121 @@ class ModConstants
     return (ModConstants.dadInvert.contains(tag) && invertValues) ? -1.0 : 1.0;
   }
 
+  // Input an ease and this function will return the same ease but flipped horizontally (meaning it'll start at 100% instead of 0%)
+  public static function easeFlip(ease:Float->Float):Float->Float
+  {
+    return function(t):Float {
+      return 1.0 - ease(t);
+    }
+  }
+
+  // Input two eases and this function will return the result of having the first ease be the first halve, and the second ease be the second halve.
+  public static function easeMerge(firstEase:Float->Float, secondEase:Float->Float):Float->Float
+  {
+    return function(t):Float {
+      return (t < 0.5 ? firstEase(t * 2) * 0.5 : secondEase(t * 2 - 1) * 0.5 + 0.5);
+    }
+  }
+
+  // Input two eases and this function will return the result of the two eases lerped together using t (%) as the ratio
+  public static function easeLerp(firstEase:Float->Float, secondEase:Float->Float):Float->Float
+  {
+    return function(t):Float {
+      return FlxMath.lerp(firstEase(t), secondEase(t), t);
+    }
+  }
+
+  // the default mixfactor math to use for the easeBlend function
+  public static function easeBlendMixFactor(x:Float):Float
+  {
+    return 3 * Math.pow(x, 2) - 2 * (Math.pow(x, 3));
+  }
+
+  // Uses the same math Mirin Template uses for it's blendease function.
+  // Can also input a custom mixFactor method (optional)
+  public static function easeBlend(firstEase:Float->Float, secondEase:Float->Float, mixFactorFunc:Null<Float->Float> = null):Float->Float
+  {
+    return function(x:Float):Float {
+      var mixFactor:Float = mixFactorFunc == null ? easeBlendMixFactor(x) : mixFactorFunc(x); // if mixFactorFunc is null, use the default method
+      return (1 - mixFactor) * firstEase(x) + mixFactor * secondEase(x);
+    }
+  }
+
+  // a function that returns [inputStr] but removes the first occurance of [whatToRemove]
+  public static function stringRemoveFirst(inputStr:String, whatToRemove:String):String
+  {
+    var iStart = inputStr.indexOf(whatToRemove);
+    if (iStart == -1) return inputStr;
+
+    var killme:Array<String> = inputStr.split('');
+    for (i in 0...whatToRemove.length)
+    {
+      var index = iStart + i;
+      killme[index] = "";
+    }
+    var result = "";
+    for (i in 0...killme.length)
+    {
+      result += killme[i];
+    }
+    return result;
+  }
+
   public static function getEaseFromString(str:String = "linear"):Null<Float->Float>
   {
     // v0.9a
-    // ease flip check
+    // Checking to see if the ease we are inputting needs to be modified in any way (like flip(inSine) or easeBlend(inBack, outQuad))
     if (StringTools.contains(str, "flip("))
     {
-      var subModArr = str.split('flip(');
-      str = subModArr[1];
-      subModArr = str.split(')');
-      str = subModArr[0];
+      var str = stringRemoveFirst(str, "flip(");
+      str = stringRemoveFirst(str, ")");
       var ease = getEaseFromString(str);
-
-      return function(t):Float {
-        return 1.0 - ease(t);
+      if (ease == null)
+      {
+        PlayState.instance.modDebugNotif("'" + str + "' ease not valid! Defaulting to linear.", FlxColor.RED);
+        return return FlxEase.linear;
       }
+
+      return easeFlip(ease);
     }
+
+    if (StringTools.contains(str, "easeBlend("))
+    {
+      var strSplit = str.split('easeBlend(');
+      str = strSplit[1];
+      strSplit = str.split(')');
+      str = strSplit[0];
+      strSplit = str.split(',');
+      var ease1 = getEaseFromString(strSplit[0]);
+      var ease2 = getEaseFromString(strSplit[1]);
+      return easeBlend(ease1, ease2);
+    }
+
+    if (StringTools.contains(str, "easeLerp("))
+    {
+      var strSplit = str.split('easeLerp(');
+      str = strSplit[1];
+      strSplit = str.split(')');
+      str = strSplit[0];
+      strSplit = str.split(',');
+      var ease1 = getEaseFromString(strSplit[0]);
+      var ease2 = getEaseFromString(strSplit[1]);
+      return easeLerp(ease1, ease2);
+    }
+
+    if (StringTools.contains(str, "easeMerge("))
+    {
+      var strSplit = str.split('easeMerge(');
+      str = strSplit[1];
+      strSplit = str.split(')');
+      str = strSplit[0];
+      strSplit = str.split(',');
+      var ease1 = getEaseFromString(strSplit[0]);
+      var ease2 = getEaseFromString(strSplit[1]);
+      return easeMerge(ease1, ease2);
+    }
+
+    //
 
     // Custom eases stored in event handler
     // check for custom ease:
