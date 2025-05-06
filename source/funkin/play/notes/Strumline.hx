@@ -519,7 +519,6 @@ class Strumline extends FlxSpriteGroup
         generatedArrowPaths = true;
       }
 
-      mods.update(elapsed);
       updateSpecialMods();
       updateStrums();
       updateNotes();

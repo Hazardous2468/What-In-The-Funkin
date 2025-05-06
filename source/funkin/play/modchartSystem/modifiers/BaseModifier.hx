@@ -157,19 +157,22 @@ class ModifierSubValue
 
 class Modifier
 {
-  var songTime:Float = 0;
-  var beatTime:Float = 0;
-  var bpm:Float = 0;
+  // Variable used for testing if a mod already exists or some shit.
+  public var fuck:Bool = false;
 
-  public function updateTime(bbbb:Float = 0.0):Void
+  var beatTime(get, never):Float;
+
+  function get_beatTime():Float
   {
-    bpm = Conductor.instance.bpm;
-    songTime = Conductor.instance.songPosition;
-    beatTime = bbbb;
-    // beatTime = strumOwner?.mods.beatTime ?? Conductor.instance.songPosition;
+    return Conductor.instance?.currentBeatTime ?? 0.0;
   }
 
-  public var fuck:Bool = false;
+  var songTime(get, never):Float;
+
+  function get_songTime():Float
+  {
+    return Conductor.instance?.songPosition ?? 0.0;
+  }
 
   // Variables for defining which array this mod should be added to for performance reasons!
   public var unknown:Bool = true; // If true, will probe the mod to try and figure out what it does

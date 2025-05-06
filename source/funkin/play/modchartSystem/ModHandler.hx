@@ -64,11 +64,6 @@ class ModHandler
   // The strumline this modHandler is tied to
   public var strum:Strumline;
 
-  var songTime:Float = 0;
-  var timeBetweenBeats:Float = 0;
-  var timeBetweenBeats_ms:Float = 0;
-  var beatTime:Float = 0;
-
   public function new(daddy:Bool = false)
   {
     // super("modsloaded");
@@ -80,26 +75,12 @@ class ModHandler
     if (daddy)
     {
       isDad = daddy;
-      this.invertValues = daddy;
+      // this.invertValues = daddy;
     }
 
     addMod('speedmod', 1, 1);
 
     // addModsFromEventList();
-  }
-
-  public function update(elapsed:Float):Void
-  {
-    songTime = Conductor.instance.songPosition;
-    timeBetweenBeats = Conductor.instance.beatLengthMs / Constants.MS_PER_SEC;
-    timeBetweenBeats_ms = Conductor.instance.beatLengthMs;
-    beatTime = Conductor.instance.currentBeatTime;
-    // beatTime = (songTime / 1000) * (Conductor.instance.bpm / 60);
-
-    for (mod in mods_all)
-    {
-      mod.updateTime(beatTime);
-    }
   }
 
   public function resortMods():Void
@@ -232,8 +213,7 @@ class ModHandler
   {
     var mod = ModConstants.createNewMod(nameOfMod);
 
-    var mmm = 1.0;
-    if (ModConstants.dadInvert.contains(nameOfMod) && invertValues) mmm = -1;
+    var mmm = ModConstants.invertValueCheck(nameOfMod, invertValues);
 
     startingValue *= mmm;
     mod.baseValue = baseVal == null ? startingValue : baseVal;

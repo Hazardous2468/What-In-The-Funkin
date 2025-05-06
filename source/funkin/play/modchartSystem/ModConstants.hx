@@ -450,7 +450,6 @@ class ModConstants
 
     modName = StringTools.replace(modName, "arrowpathsize", "arrowpathwidth");
     modName = StringTools.replace(modName, "arrowpathstraightholds", "arrowpathstraighthold");
-    modName = StringTools.replace(modName, "arrowpathstraight", "arrowpathstraighthold");
     modName = StringTools.replace(modName, "arrowpathfrontlength", "arrowpathlength");
 
     modName = StringTools.replace(modName, "centered", "center");

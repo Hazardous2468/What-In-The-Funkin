@@ -400,23 +400,8 @@ class SustainTrail extends ZSprite
 
   function resetFakeNote():Void
   {
-    fakeNote.x = 0;
-    fakeNote.y = 0;
-    fakeNote.z = 0;
-    fakeNote.angle = 0;
-    fakeNote.color = FlxColor.WHITE;
-
-    fakeNote.stealthGlow = 0.0;
-    fakeNote.stealthGlowBlue = 1.0;
-    fakeNote.stealthGlowGreen = 1.0;
-    fakeNote.stealthGlowRed = 1.0;
-
-    fakeNote.skew.x = 0;
-    fakeNote.skew.y = 0;
-
     if (isArrowPath)
     {
-      // straightHoldsModAmount = parentStrumline.mods.arrowpathStraightHold[noteDirection % 4];
       fakeNote.alpha = 0;
       fakeNote.scale.set(ModConstants.arrowPathScale, ModConstants.arrowPathScale);
     }
@@ -425,6 +410,22 @@ class SustainTrail extends ZSprite
       fakeNote.alpha = 1;
       fakeNote.scale.set(ModConstants.noteScale, ModConstants.noteScale);
     }
+    return; // don't care for the rest of this, gets set to zero in noteModData default values anyway
+    /*
+      fakeNote.x = 0;
+      fakeNote.y = 0;
+      fakeNote.z = 0;
+      fakeNote.angle = 0;
+      fakeNote.color = FlxColor.WHITE;
+
+      fakeNote.stealthGlow = 0.0;
+      fakeNote.stealthGlowBlue = 1.0;
+      fakeNote.stealthGlowGreen = 1.0;
+      fakeNote.stealthGlowRed = 1.0;
+
+      fakeNote.skew.x = 0;
+      fakeNote.skew.y = 0;
+     */
   }
 
   var noteModData:NoteData;
@@ -434,8 +435,6 @@ class SustainTrail extends ZSprite
   public var previousPiece:SustainTrail = null;
 
   public var cullMode = TriangleCulling.NONE;
-
-  public var hazCullMode:String = "none";
 
   public var whichStrumNote:StrumlineNote;
 
@@ -542,10 +541,15 @@ class SustainTrail extends ZSprite
     this.hsvShader.setFloat('_stealthSustainVanish_HiddenEnd', test2);
   }
 
-  function susSample(t:Float, yJank:Bool = false, isRoot:Bool = false, dumbHeight:Float = 0):Void
-  {
-    var strumTimmy:Float = t - whichStrumNote?.strumExtraModData?.strumPos ?? 0;
+  // reuse this vector2 and vector3 variable instead of creating a bunch of new ones all the time
+  var tempVec2:Vector2 = new Vector2(0, 0);
+  var tempVec3:Vector3D = new Vector3D(0, 0, 0);
 
+  // 953.27ms with tracy. Ouch.
+  // OPTIMISE ME!
+  function susSample(strumTimmy:Float, isRoot:Bool = false, dumbHeight:Float = 0):Void
+  {
+    strumTimmy = strumTimmy - whichStrumNote?.strumExtraModData?.strumPos ?? 0;
     var notePos:Float = parentStrumline.calculateNoteYPos(strumTimmy);
 
     if (parentStrumline.mods.mathCutOffCheck(notePos, noteDirection % 4)
@@ -559,22 +563,18 @@ class SustainTrail extends ZSprite
       return;
     }
 
-    // resetFakeNote(straightHoldsModAmount);
     resetFakeNote();
-    dumbHeight = 8; // lol, lmao, fuck you, fix this later
-
     noteModData.defaultValues();
-    noteModData.setValuesFromZSprite(fakeNote);
+    noteModData.alpha = fakeNote.alpha;
+    noteModData.scaleX = fakeNote.scale.x;
+    noteModData.scaleY = fakeNote.scale.y;
     noteModData.strumTime = strumTimmy;
     noteModData.direction = noteDirection % Strumline.KEY_COUNT;
     noteModData.curPos_unscaled = notePos;
     noteModData.whichStrumNote = whichStrumNote;
     noteModData.noteType = isArrowPath ? "path" : "hold";
-
     var straightHoldsModAmount:Float = isArrowPath ? whichStrumNote.strumExtraModData.arrowpathStraightHold : whichStrumNote.strumExtraModData.straightHolds;
-
     var scrollMult:Float = 1.0;
-    // for (mod in modifiers){
     for (mod in parentStrumline.mods.mods_speed)
     {
       if (mod.targetLane != -1 && noteModData.direction != mod.targetLane) continue;
@@ -593,11 +593,11 @@ class SustainTrail extends ZSprite
       noteModData.y = (noteModData.whichStrumNote.y - Strumline.INITIAL_OFFSET + sillyPos + Strumline.STRUMLINE_SIZE / 2);
     }
 
-    noteModData.z = noteModData.whichStrumNote.z;
-    noteModData.curPos = sillyPos;
-
     noteModData.x -= noteModData.whichStrumNote.strumExtraModData.noteStyleOffsetX; // undo strum offset
     noteModData.y -= noteModData.whichStrumNote.strumExtraModData.noteStyleOffsetY;
+
+    noteModData.z = noteModData.whichStrumNote.z;
+    noteModData.curPos = sillyPos;
 
     for (mod in (isArrowPath ? parentStrumline.mods.mods_arrowpath : parentStrumline.mods.mods_notes))
     {
@@ -615,7 +615,6 @@ class SustainTrail extends ZSprite
 
     is3D = (noteModData.whichStrumNote?.strumExtraModData?.threeD ?? false);
     old3Dholds = (noteModData.whichStrumNote?.strumExtraModData?.old3Dholds ?? false);
-    // is3D = false;
 
     noteModData.x -= noteStyleOffsets[0]; // apply notestyle offset here for z math reasons lol
     noteModData.y -= noteStyleOffsets[1];
@@ -623,54 +622,52 @@ class SustainTrail extends ZSprite
     fakeNote.applyNoteData(noteModData, !is3D);
     if (Preferences.downscroll) fakeNote.y += 27; // fix gap for downscroll lol Moved from verts so it is applied before perspective fucks it up!
 
-    var rememberMe:Vector2 = new Vector2(fakeNote.x, fakeNote.y);
+    tempVec2.x = fakeNote.x;
+    tempVec2.y = fakeNote.y;
 
-    if (old3Dholds || !is3D) perspectiveShift.z = ModConstants.applyPerspective_returnScale(fakeNote, graphicWidth, dumbHeight);
+    if (old3Dholds || !is3D) perspectiveShift.z = ModConstants.applyPerspective_returnScale(fakeNote, graphicWidth, 8 /*dumbHeight*/);
 
     // caluclate diff
-    perspectiveShift.x = fakeNote.x - rememberMe.x;
-    perspectiveShift.y = fakeNote.y - rememberMe.y;
-
-    // var notePosModified:Float = parentStrumline.mods.makeHoldCopyStrum_sample(fakeNote, strumTimmy, noteDirection, parentStrumline, notePos, isArrowPath);
-    // parentStrumline.mods.sampleModMath(fakeNote, strumTimmy, noteDirection, parentStrumline, true, yJank, notePosModified, isArrowPath, graphicWidth,
-    //  dumbHeight);
+    perspectiveShift.x = fakeNote.x - tempVec2.x;
+    perspectiveShift.y = fakeNote.y - tempVec2.y;
 
     var scaleX = FlxMath.remapToRange(fakeNote.scale.x, 0, isArrowPath ? ModConstants.arrowPathScale : ModConstants.noteScale, 0, 1);
     var scaleY = FlxMath.remapToRange(fakeNote.scale.y, 0, isArrowPath ? ModConstants.arrowPathScale : ModConstants.noteScale, 0, 1);
 
-    switch (hazCullMode)
+    if (isRoot)
     {
-      case "positive" | "back":
-        if (scaleX < 0) scaleX = 0;
-        if (scaleY < 0) scaleY = 0;
-      case "negative" | "front":
-        if (scaleX > 0) scaleX = 0;
-        if (scaleY > 0) scaleY = 0;
-    }
-
-    // fakeNote.scale.set(scaleX, scaleY);
-
-    if (!isRoot || straightHoldsModAmount == 0)
-    {
-      fakeNote.x = FlxMath.lerp(fakeNote.x, holdRootX, straightHoldsModAmount);
-      // fakeNote.y = FlxMath.lerp(fakeNote.y, holdRootY, straightHoldsModAmount);
-      fakeNote.z = FlxMath.lerp(fakeNote.z, holdRootZ, straightHoldsModAmount);
-      fakeNote.angle = FlxMath.lerp(fakeNote.x, holdRootAngle, straightHoldsModAmount);
-      scaleX = FlxMath.lerp(scaleX, holdRootScaleX, straightHoldsModAmount);
-      scaleY = FlxMath.lerp(scaleY, holdRootScaleY, straightHoldsModAmount);
-      fakeNote.scale.set(scaleX, scaleY);
+      if (previousPiece != null)
+      {
+        holdRootX = previousPiece.holdRootX;
+        holdRootY = previousPiece.holdRootY;
+        holdRootZ = previousPiece.holdRootZ;
+        holdRootAngle = previousPiece.holdRootAngle;
+        holdRootScaleX = previousPiece.holdRootScaleX;
+        holdRootScaleY = previousPiece.holdRootScaleY;
+      }
+      else
+      {
+        holdRootX = fakeNote.x;
+        holdRootY = fakeNote.y;
+        holdRootZ = fakeNote.z;
+        holdRootAngle = fakeNote.angle;
+        holdRootScaleX = scaleX;
+        holdRootScaleY = scaleY;
+      }
     }
     else
     {
-      holdRootX = fakeNote.x;
-      holdRootY = fakeNote.y;
-      holdRootZ = fakeNote.z;
-      holdRootAngle = fakeNote.angle;
-      // holdRootAlpha = fakeNote.alpha
-      holdRootScaleX = scaleX;
-      holdRootScaleY = scaleY;
-      fakeNote.scale.set(scaleX, scaleY);
+      if (straightHoldsModAmount != 0)
+      {
+        fakeNote.x = FlxMath.lerp(fakeNote.x, holdRootX, straightHoldsModAmount);
+        // fakeNote.y = FlxMath.lerp(fakeNote.y, holdRootY, straightHoldsModAmount);
+        fakeNote.z = FlxMath.lerp(fakeNote.z, holdRootZ, straightHoldsModAmount);
+        fakeNote.angle = FlxMath.lerp(fakeNote.x, holdRootAngle, straightHoldsModAmount);
+        scaleX = FlxMath.lerp(scaleX, holdRootScaleX, straightHoldsModAmount);
+        scaleY = FlxMath.lerp(scaleY, holdRootScaleY, straightHoldsModAmount);
+      }
     }
+    fakeNote.scale.set(scaleX, scaleY);
 
     if (!is3D || old3Dholds)
     {
@@ -706,67 +703,44 @@ class SustainTrail extends ZSprite
 
     if (!is3D || old3Dholds)
     {
-      var rp = new Vector2(pos.x, pos.y);
+      tempVec2.setTo(pos.x, pos.y);
 
       // apply skew
       // Currently doesn't work when the sustain moves on the z axis!
-      var xPercent_SkewOffset:Float = rp.x - fakeNote.x - (graphicWidth / 2 * (perspectiveShift.z)); // this is dumb but at least for the time being, it makes the disconnect less bad.
-      if (fakeNote.skew.y != 0) rp.y += xPercent_SkewOffset * Math.tan(fakeNote.skew.y * FlxAngle.TO_RAD);
+      var xPercent_SkewOffset:Float = tempVec2.x - fakeNote.x - (graphicWidth / 2 * (perspectiveShift.z)); // this is dumb but at least for the time being, it makes the disconnect less bad.
+      if (fakeNote.skew.y != 0) tempVec2.y += xPercent_SkewOffset * Math.tan(fakeNote.skew.y * FlxAngle.TO_RAD);
 
-      // if (noteModData.skewY_playfield != 0) rp.y += xPercent_SkewOffset * Math.tan(noteModData.skewY_playfield * FlxAngle.TO_RAD);
-      return rp;
+      return tempVec2;
     }
     else
     {
-      var pos_modified:Vector3D = new Vector3D(pos.x, pos.y, pos.z);
+      tempVec3.setTo(pos.x, pos.y, pos.z);
 
       // apply skew
-      var xPercent_SkewOffset:Float = pos_modified.x - fakeNote.x - (graphicWidth / 2);
-      // var xPercent_SkewOffset:Float = (xPercent - 0.5)*graphic_width;
-      if (fakeNote.skew.y != 0) pos_modified.y += xPercent_SkewOffset * Math.tan(fakeNote.skew.y * FlxAngle.TO_RAD);
+      var xPercent_SkewOffset:Float = tempVec3.x - fakeNote.x - (graphicWidth / 2);
+      if (fakeNote.skew.y != 0) tempVec3.y += xPercent_SkewOffset * Math.tan(fakeNote.skew.y * FlxAngle.TO_RAD);
 
       // Rotate
       var angleY:Float = noteModData.angleY;
-      // var angleX:Float = 0;
 
-      // Already done with spiral holds lol
-      // var rotateModPivotPoint:Vector2 = new Vector2(rotatePivot.x, rotatePivot.y);
-      // var thing:Vector2 = ModConstants.rotateAround(rotateModPivotPoint, new Vector2(pos_modified.x, pos_modified.y), angleZ);
-      // pos_modified.x = thing.x;
-      // pos_modified.y = thing.y;
-
-      var rotateModPivotPoint:Vector2 = new Vector2(rotatePivot.x, pos_modified.z); // x, z
-      var thing:Vector2 = ModConstants.rotateAround(rotateModPivotPoint, new Vector2(pos_modified.x, pos_modified.z), angleY);
-      pos_modified.x = thing.x;
-      pos_modified.z = thing.y;
-      // pos_modified.x += thing.x - pos_modified.x;
-      // pos_modified.z += thing.y - pos_modified.y;
-
-      /*
-        if (angleX == 0 && false)
-        {
-          var rotateModPivotPoint:Vector2 = new Vector2(rotatePivot.x, rotatePivot.y);
-          var thing:Vector2 = ModConstants.rotateAround(rotateModPivotPoint, new Vector2(pos_modified.z, pos_modified.y), angleX);
-          pos_modified.z = thing.x;
-          pos_modified.y = thing.y;
-        }
-       */
-
-      // pos_modified.x -= offset.x;
-      // pos_modified.y -= offset.y;
+      tempVec2.setTo(tempVec3.x, tempVec3.z);
+      var rotateModPivotPoint:Vector2 = new Vector2(rotatePivot.x, tempVec3.z);
+      var thing:Vector2 = ModConstants.rotateAround(rotateModPivotPoint, tempVec2, angleY);
+      tempVec3.x = thing.x;
+      tempVec3.z = thing.y;
 
       // v0.8.0a -> playfield skewing
       var playfieldSkewOffset_Y:Float = pos.x - (whichStrumNote?.strumExtraModData?.playfieldX ?? FlxG.width / 2);
       var playfieldSkewOffset_X:Float = pos.y - (whichStrumNote?.strumExtraModData?.playfieldY ?? FlxG.height / 2);
 
-      if (noteModData.skewX_playfield != 0) pos_modified.x += playfieldSkewOffset_X * Math.tan(noteModData.skewX_playfield * FlxAngle.TO_RAD);
-      if (noteModData.skewY_playfield != 0) pos_modified.y += playfieldSkewOffset_Y * Math.tan(noteModData.skewY_playfield * FlxAngle.TO_RAD);
+      if (noteModData.skewX_playfield != 0) tempVec3.x += playfieldSkewOffset_X * Math.tan(noteModData.skewX_playfield * FlxAngle.TO_RAD);
+      if (noteModData.skewY_playfield != 0) tempVec3.y += playfieldSkewOffset_Y * Math.tan(noteModData.skewY_playfield * FlxAngle.TO_RAD);
 
       var playfieldSkewOffset_Z:Float = pos.y - (whichStrumNote?.strumExtraModData?.playfieldY ?? FlxG.height / 2);
-      if (noteModData.skewZ_playfield != 0) pos_modified.z += playfieldSkewOffset_Z * Math.tan(noteModData.skewZ_playfield * FlxAngle.TO_RAD);
+      if (noteModData.skewZ_playfield != 0) tempVec3.z += playfieldSkewOffset_Z * Math.tan(noteModData.skewZ_playfield * FlxAngle.TO_RAD);
 
-      pos_modified.z *= 0.001;
-      var thisNotePos:Vector3D = ModConstants.perspectiveMath_OLD(pos_modified, 0, 0);
+      tempVec3.z *= 0.001;
+      var thisNotePos:Vector3D = ModConstants.perspectiveMath_OLD(tempVec3, 0, 0);
       return new Vector2(thisNotePos.x, thisNotePos.y);
     }
   }
@@ -928,7 +902,7 @@ class SustainTrail extends ZSprite
     var partHeight:Float = clipHeight - bottomHeight;
 
     extraHoldRootInfo(this.strumTime);
-    susSample(this.strumTime + clippingTimeOffset, false, true, 0);
+    susSample(this.strumTime + clippingTimeOffset, true, 0);
     var scaleTest = fakeNote.scale.x;
     var widthScaled = holdWidth * scaleTest;
     var scaleChange = widthScaled - holdWidth;
@@ -996,9 +970,6 @@ class SustainTrail extends ZSprite
     var rightSideOffX:Float = 0;
     var rightSideOffY:Float = 0;
 
-    // var rememberMeX:Float = 0;
-    // var rememberMeY:Float = 0;
-
     // THE REST, HOWEVER...
     for (k in 0...holdResolution)
     {
@@ -1011,7 +982,7 @@ class SustainTrail extends ZSprite
         tm += (k +
           1) * (grain * tinyOffsetForSpiral); // ever so slightly offset the time so that it never hits 0, 0 on the strum time so spiral hold can do its magic
       }
-      susSample(tm + clipTimeThing(songTimmy, holdPieceStrumTime), true, false, sussyLength / holdResolution);
+      susSample(tm + clipTimeThing(songTimmy, holdPieceStrumTime), false, sussyLength / holdResolution);
 
       // susSample(this.strumTime + clippingTimeOffset + ((sussyLength / holdResolution) * (k + 1)), true);
       // scaleTest = fakeNote.scale.x;
@@ -1043,8 +1014,8 @@ class SustainTrail extends ZSprite
         var angle:Float = Math.atan(b / a);
         angle *= (180 / Math.PI);
         calculateAngleDif = angle;
-        var thing:Vector2 = ModConstants.rotateAround(new Vector2(vertices[i * 2], vertices[i * 2 + 1]),
-          new Vector2(fakeNote.x + holdRightSide, vertices[i * 2 + 1]), calculateAngleDif);
+        tempVec2.setTo(vertices[i * 2], vertices[i * 2 + 1]);
+        var thing:Vector2 = ModConstants.rotateAround(tempVec2, new Vector2(fakeNote.x + holdRightSide, vertices[i * 2 + 1]), calculateAngleDif);
         rightSideOffX = thing.x;
         rightSideOffY = thing.y;
         previousSampleX = fakeNote.x;
@@ -1055,8 +1026,6 @@ class SustainTrail extends ZSprite
           var scuffedDifferenceY:Float = vertices[i * 2 + 1] - rightSideOffY;
           vertices[(i + 1 - 2) * 2] -= scuffedDifferenceX;
           vertices[(i + 1 - 2) * 2 + 1] -= scuffedDifferenceY;
-          // rememberMeX = scuffedDifferenceX;
-          // rememberMeY = scuffedDifferenceY;
         }
         // Bottom right
         vertices[(i + 1) * 2] = rightSideOffX;
@@ -1092,7 +1061,7 @@ class SustainTrail extends ZSprite
         vertices[(i + 1) * 2 + 1] = rightSideOffY;
 
         // left
-        rotatePoint = new Vector2(fakeNote.x + holdLeftSide, fakeNote.y);
+        rotatePoint.setTo(fakeNote.x + holdLeftSide, fakeNote.y);
         thing = ModConstants.rotateAround(rotateOrigin, rotatePoint, calculateAngleDif);
         thing = applyPerspective(new Vector3D(thing.x, thing.y, fakeNote.z), rotateOrigin);
         rightSideOffX = thing.x;
@@ -1180,7 +1149,7 @@ class SustainTrail extends ZSprite
       {
         tm_end += holdResolution * (grain * tinyOffsetForSpiral); // ever so slightly offset the time so that it never hits 0, 0 on the strum time so spiral hold can do its magic
       }
-      susSample(tm_end + clipTimeThing(songTimmy, holdPieceStrumTime), true, false, sillyEndOffset);
+      susSample(tm_end + clipTimeThing(songTimmy, holdPieceStrumTime), false, sillyEndOffset);
 
       scaleTest = fakeNote.scale.x;
       widthScaled = holdWidth * scaleTest;
@@ -1245,7 +1214,7 @@ class SustainTrail extends ZSprite
         var ybeforerotate:Float = vertices[(highestNumSoFar - 1) * 2 + 1];
 
         // grab left vert
-        var rotateOrigin:Vector2 = new Vector2(vertices[(highestNumSoFar - 1) * 2], vertices[(highestNumSoFar - 1) * 2 + 1]);
+        rotateOrigin.setTo(vertices[(highestNumSoFar - 1) * 2], vertices[(highestNumSoFar - 1) * 2 + 1]);
         // move rotateOrigin to be inbetween the left and right vert so it's centered
         rotateOrigin.x += (vertices[highestNumSoFar * 2] - rotateOrigin.x) / 2;
 
@@ -1253,13 +1222,13 @@ class SustainTrail extends ZSprite
         // var rotatePoint:Vector2 = new Vector2(fakeNote.x + holdRightSide,vertices[i * 2+1]);
         var rotatePoint:Vector2 = new Vector2(vertices[highestNumSoFar * 2], vertices[highestNumSoFar * 2 + 1]);
 
-        var thing:Vector2 = ModConstants.rotateAround(rotateOrigin, rotatePoint, calculateAngleDif);
+        var thing = ModConstants.rotateAround(rotateOrigin, rotatePoint, calculateAngleDif);
 
         vertices[highestNumSoFar * 2 + 1] = thing.y;
         vertices[highestNumSoFar * 2] = thing.x;
 
         rotatePoint = new Vector2(vertices[(highestNumSoFar - 1) * 2], ybeforerotate);
-        thing = ModConstants.rotateAround(rotateOrigin, rotatePoint, calculateAngleDif);
+        var thing = ModConstants.rotateAround(rotateOrigin, rotatePoint, calculateAngleDif);
         vertices[(highestNumSoFar - 1) * 2 + 1] = thing.y;
         vertices[(highestNumSoFar - 1) * 2] = thing.x;
       }
@@ -1272,14 +1241,11 @@ class SustainTrail extends ZSprite
         angle *= (180 / Math.PI);
         calculateAngleDif = angle;
 
-        var thing:Vector2 = ModConstants.rotateAround(new Vector2(vertices[(highestNumSoFar - 1) * 2], vertices[(highestNumSoFar - 1) * 2 + 1]),
-          new Vector2(vertices[highestNumSoFar * 2], vertices[highestNumSoFar * 2 + 1]), calculateAngleDif);
+        tempVec2.setTo(vertices[(highestNumSoFar - 1) * 2], vertices[(highestNumSoFar - 1) * 2 + 1]);
+        var thing = ModConstants.rotateAround(tempVec2, new Vector2(vertices[highestNumSoFar * 2], vertices[highestNumSoFar * 2 + 1]), calculateAngleDif);
         vertices[highestNumSoFar * 2 + 1] = thing.y;
         vertices[highestNumSoFar * 2] = thing.x;
       }
-
-      // vertices[highestNumSoFar * 2] = holdNoteJankX * -1;
-      // vertices[highestNumSoFar * 2 + 1] = holdNoteJankY * -1;
 
       if (uvSetup)
       {
@@ -1319,14 +1285,11 @@ class SustainTrail extends ZSprite
       if (k % 2 == 1)
       { // all y verts
         vertices[k] += holdNoteJankY;
-        // if (Preferences.downscroll) vertices[k] += 23; // fix gap for downscroll lol
       }
       else
       {
         vertices[k] += holdNoteJankX;
       }
-
-      // holdStripVerts_.vertices.push(vertices[k]);
     }
 
     this.vertices_array = vertices;

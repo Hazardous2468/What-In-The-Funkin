@@ -118,7 +118,6 @@ class ModEventHandler
     songTime = Conductor.instance.songPosition;
     timeBetweenBeats_ms = Conductor.instance.beatLengthMs;
     timeBetweenBeats = timeBetweenBeats_ms / Constants.MS_PER_SEC;
-
     beatTime = Conductor.instance.currentBeatTime;
 
     // we went, BACK IN TIME?!
