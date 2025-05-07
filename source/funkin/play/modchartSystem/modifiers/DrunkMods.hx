@@ -28,12 +28,8 @@ class DrunkModBase extends Modifier
     time *= getSubVal("speed");
     time += getSubVal("time_add");
 
-    var screenHeight:Float = FlxG.height;
-    var drunk_desync:Float = getSubVal("desync");
-    var returnValue:Float = 0.0;
-    var mult:Float = getSubVal("mult");
-    returnValue = currentValue * (Math.tan((time) + (((noteDir) % Strumline.KEY_COUNT) * drunk_desync) +
-      (curPos * 0.45) * (10.0 / screenHeight) * mult) /* * (subValues.get('speed').value*0.2) */) * (ModConstants.strumSize * 0.5);
+    var returnValue:Float = currentValue * (Math.tan((time) + (noteDir * getSubVal("desync")) +
+      (curPos * 0.45) * (10.0 / FlxG.height) * getSubVal("mult"))) * (ModConstants.strumSize * 0.5);
 
     return returnValue;
   }
@@ -44,21 +40,17 @@ class DrunkModBase extends Modifier
     time *= getSubVal("speed");
     time += getSubVal("time_add");
 
-    var useSin:Bool = (getSubVal("sine") >= 0.5);
-    var screenHeight:Float = FlxG.height;
-    var drunk_desync:Float = getSubVal("desync");
     var returnValue:Float = 0.0;
-    var mult:Float = getSubVal("mult");
 
-    if (useSin)
+    if (getSubVal("sine") >= 0.5) // Should use sine variant?
     {
-      returnValue = currentValue * (FlxMath.fastSin((time) + (((noteDir) % Strumline.KEY_COUNT) * drunk_desync)
-        + (curPos * 0.45) * (10.0 / screenHeight) * mult) /* * (subValues.get('speed').value*0.2) */) * (ModConstants.strumSize * 0.5);
+      returnValue = currentValue * (FlxMath.fastSin((time) + (noteDir * getSubVal("desync")) +
+        (curPos * 0.45) * (10.0 / FlxG.height) * getSubVal("mult"))) * (ModConstants.strumSize * 0.5);
     }
     else
     {
-      returnValue = currentValue * (FlxMath.fastCos((time) + (((noteDir) % Strumline.KEY_COUNT) * drunk_desync)
-        + (curPos * 0.45) * (10.0 / screenHeight) * mult) /* * (subValues.get('speed').value*0.2) */) * (ModConstants.strumSize * 0.5);
+      returnValue = currentValue * (FlxMath.fastCos((time) + (noteDir * getSubVal("desync")) +
+        (curPos * 0.45) * (10.0 / FlxG.height) * getSubVal("mult"))) * (ModConstants.strumSize * 0.5);
     }
 
     return returnValue;
@@ -304,8 +296,6 @@ class DrunkSpeedMod extends DrunkModBase
   override function speedMath(lane:Int, curPos:Float, strumLine, isHoldNote = false):Float
   {
     if (currentValue == 0) return 1; // skip math if mod is 0
-    var bumpyx_Mult:Float = getSubVal("mult");
-
     var modWouldBe:Float = drunkMath(lane, curPos);
     return (modWouldBe + 1);
   }
