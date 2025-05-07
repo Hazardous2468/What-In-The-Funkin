@@ -582,21 +582,21 @@ class SustainTrail extends ZSprite
     }
     noteModData.speedMod = scrollMult;
 
-    noteModData.x = noteModData.whichStrumNote.x + parentStrumline.mods.getHoldOffsetX(isArrowPath, graphicWidth);
+    noteModData.x = whichStrumNote.x + parentStrumline.mods.getHoldOffsetX(isArrowPath, graphicWidth);
     var sillyPos:Float = parentStrumline.calculateNoteYPos(noteModData.strumTime) * scrollMult;
     if (Preferences.downscroll)
     {
-      noteModData.y = (noteModData.whichStrumNote.y + sillyPos + Strumline.STRUMLINE_SIZE / 2);
+      noteModData.y = (whichStrumNote.y + sillyPos + Strumline.STRUMLINE_SIZE / 2);
     }
     else
     {
-      noteModData.y = (noteModData.whichStrumNote.y - Strumline.INITIAL_OFFSET + sillyPos + Strumline.STRUMLINE_SIZE / 2);
+      noteModData.y = (whichStrumNote.y - Strumline.INITIAL_OFFSET + sillyPos + Strumline.STRUMLINE_SIZE / 2);
     }
 
-    noteModData.x -= noteModData.whichStrumNote.strumExtraModData.noteStyleOffsetX; // undo strum offset
-    noteModData.y -= noteModData.whichStrumNote.strumExtraModData.noteStyleOffsetY;
+    noteModData.x -= whichStrumNote.strumExtraModData.noteStyleOffsetX; // undo strum offset
+    noteModData.y -= whichStrumNote.strumExtraModData.noteStyleOffsetY;
 
-    noteModData.z = noteModData.whichStrumNote.z;
+    noteModData.z = whichStrumNote.z;
     noteModData.curPos = sillyPos;
 
     for (mod in (isArrowPath ? parentStrumline.mods.mods_arrowpath : parentStrumline.mods.mods_notes))
@@ -613,8 +613,8 @@ class SustainTrail extends ZSprite
 
     noteModData.funnyOffMyself();
 
-    is3D = (noteModData.whichStrumNote?.strumExtraModData?.threeD ?? false);
-    old3Dholds = (noteModData.whichStrumNote?.strumExtraModData?.old3Dholds ?? false);
+    is3D = (whichStrumNote.strumExtraModData?.threeD ?? false);
+    old3Dholds = (whichStrumNote.strumExtraModData?.old3Dholds ?? false);
 
     noteModData.x -= noteStyleOffsets[0]; // apply notestyle offset here for z math reasons lol
     noteModData.y -= noteStyleOffsets[1];
@@ -671,24 +671,24 @@ class SustainTrail extends ZSprite
 
     if (!is3D || old3Dholds)
     {
-      ModConstants.playfieldSkew(fakeNote, noteModData.skewX_playfield, noteModData.skewY_playfield, noteModData.whichStrumNote.strumExtraModData.playfieldX,
-        noteModData.whichStrumNote.strumExtraModData.playfieldY, (graphicWidth / 2), 0);
+      ModConstants.playfieldSkew(fakeNote, noteModData.skewX_playfield, noteModData.skewY_playfield, whichStrumNote.strumExtraModData.playfieldX,
+        whichStrumNote.strumExtraModData.playfieldY, (graphicWidth / 2), 0);
       // undo the strum skew
-      fakeNote.x -= noteModData.whichStrumNote.strumExtraModData.skewMovedX;
-      fakeNote.y -= noteModData.whichStrumNote.strumExtraModData.skewMovedY;
+      fakeNote.x -= whichStrumNote.strumExtraModData.skewMovedX;
+      fakeNote.y -= whichStrumNote.strumExtraModData.skewMovedY;
       fakeNote.skew.x += noteModData.skewX_playfield;
       fakeNote.skew.y += noteModData.skewY_playfield;
     }
 
     // temp fix for sus notes covering the entire fucking screen
-    if (fakeNote.z > 825)
+    if (fakeNote.z > zCutOff)
     {
-      // fakeNote.x = 0;
-      // fakeNote.y = 0;
       fakeNote.alpha = 0;
       fakeNote.scale.set(0.0, 0.0);
     }
   }
+
+  var zCutOff:Float = 835;
 
   var is3D:Bool = false;
 

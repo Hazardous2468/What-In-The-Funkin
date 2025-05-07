@@ -656,13 +656,17 @@ class HazardModLuaTest
       PlayState.instance.constructNewStrumLine(playerControlled, noteStyle);
     });
 
-    // todo -> make custom playstate console
-    Lua_helper.add_callback(lua, "trace", function(text:String, startBeat:Float = -64) {
-      PlayState.instance.modchartEventHandler.funcModEvent(ModConstants.grabStrumModTarget("bf"), startBeat, function() {
+    Lua_helper.add_callback(lua, "trace", function(text:String, startBeat:Null<Float> = null) {
+      if (startBeat != null)
+      {
+        PlayState.instance.modchartEventHandler.funcModEvent(ModConstants.grabStrumModTarget("bf"), startBeat, function() {
+          PlayState.instance.modDebugNotif(text);
+        }, false);
+      }
+      else
+      {
         PlayState.instance.modDebugNotif(text);
-        // luaTrace(text);
-        // trace(text);
-      });
+      }
     });
 
     Lua_helper.add_callback(lua, "aftSetup", function(startBeat:Float = -95) {
