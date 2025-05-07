@@ -4574,13 +4574,16 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
 
               dragLengthCurrent = dragLengthSteps;
             }
-
-            gridGhostHoldNote.visible = true;
-            gridGhostHoldNote.noteData = currentPlaceNoteData;
-            gridGhostHoldNote.noteDirection = currentPlaceNoteData.getDirection();
+            // https://github.com/FunkinCrew/Funkin/pull/5026/commits/20551db224ca48bfcc856eff8b5649a67d94fd58
+            if (!gridGhostHoldNote.visible)
+            {
+              gridGhostHoldNote.visible = true;
+              gridGhostHoldNote.noteData = currentPlaceNoteData;
+              gridGhostHoldNote.noteDirection = currentPlaceNoteData.getDirection();
+              gridGhostHoldNote.noteStyle = NoteKindManager.getNoteStyleId(currentPlaceNoteData.kind, currentSongNoteStyle) ?? currentSongNoteStyle;
+              gridGhostHoldNote.updateHoldNotePosition(renderedHoldNotes);
+            }
             gridGhostHoldNote.setHeightDirectly(dragLengthPixels, true);
-            gridGhostHoldNote.noteStyle = NoteKindManager.getNoteStyleId(currentPlaceNoteData.kind, currentSongNoteStyle) ?? currentSongNoteStyle;
-            gridGhostHoldNote.updateHoldNotePosition(renderedHoldNotes);
           }
           else
           {

@@ -279,7 +279,8 @@ class Conductor
 
   function get_combinedOffset():Float
   {
-    return instrumentalOffset + audioVisualOffset + inputOffset + offsetTest;
+    // return instrumentalOffset + audioVisualOffset + inputOffset + offsetTest;
+    return instrumentalOffset + audioVisualOffset + formatOffset; // Experimental change? From: https://github.com/FunkinCrew/Funkin/pull/4952/files
   }
 
   public var offsetTest:Float = 0;

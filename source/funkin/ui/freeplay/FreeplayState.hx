@@ -93,6 +93,12 @@ class FreeplayState extends MusicBeatSubState
    */
   public static final FADE_OUT_END_VOLUME:Float = 0.0;
 
+  /**
+   * For the audio preview, the time to wait before attempting to load a song preview.
+   * From: https://github.com/FunkinCrew/Funkin/pull/4851
+   */
+  public static final FADE_IN_DELAY:Float = 0.25;
+
   var songs:Array<Null<FreeplaySongData>> = [];
 
   var curSelected:Int = 0;
@@ -1765,8 +1771,8 @@ class FreeplayState extends MusicBeatSubState
 
       var songScore:Null<SaveScoreData> = Save.instance.getSongScore(daSong.data.id, currentDifficulty, currentVariation);
       intendedScore = songScore?.score ?? 0;
-      intendedCompletion = songScore == null ? 0.0 : Math.max(0, ((songScore.tallies.sick +
-        songScore.tallies.good - songScore.tallies.missed) / songScore.tallies.totalNotes));
+      intendedCompletion = songScore == null ? 0.0 : Math.max(0,
+        ((songScore.tallies.sick + songScore.tallies.good - songScore.tallies.missed) / songScore.tallies.totalNotes));
       rememberedDifficulty = currentDifficulty;
       grpCapsules.members[curSelected].refreshDisplay((prepForNewRank == true) ? false : true);
     }
@@ -2100,7 +2106,8 @@ class FreeplayState extends MusicBeatSubState
 
     if (grpCapsules.countLiving() > 0 && !prepForNewRank)
     {
-      playCurSongPreview(daSongCapsule);
+      FlxG.sound.music?.pause();
+      FlxTimer.wait(FADE_IN_DELAY, playCurSongPreview.bind(daSongCapsule));
       grpCapsules.members[curSelected].selected = true;
 
       // switchBackingImage(daSongCapsule.freeplayData);
@@ -2122,6 +2129,7 @@ class FreeplayState extends MusicBeatSubState
     }
     else
     {
+      if (!daSongCapsule.selected) return;
       var previewSong:Null<Song> = daSongCapsule?.freeplayData?.data;
       if (previewSong == null) return;
 
