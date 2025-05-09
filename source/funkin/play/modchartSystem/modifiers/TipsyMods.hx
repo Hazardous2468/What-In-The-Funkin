@@ -27,10 +27,7 @@ class TipsyModBase extends Modifier
     time *= getSubVal("speed");
     time += getSubVal("time_add");
 
-    return currentValue * (Math.tan((time + (lane) * getSubVal("desync")) * (5) * 1 * 0.2) * ModConstants.strumSize * 0.4);
-
-    // return currentValue * (Math.tan(time * 1.2 + lane * getSubVal("desync")) * ModConstants.strumSize * 0.4);
-    // return currentValue * (Math.tan(time * tipsyTimeMult * 0.001 * (1.2) + (lane) * (2.0) + tipsyTimeAdd * (0.2)) * (ModConstants.strumSize / 2));
+    return currentValue * (ModConstants.fastTan((time + (lane) * getSubVal("desync")) * (5) * 1 * 0.2) * ModConstants.strumSize * 0.4);
   }
 
   function tipsyMath(lane:Int, curPos:Float = 0):Float

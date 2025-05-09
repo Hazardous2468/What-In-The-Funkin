@@ -262,7 +262,7 @@ class Strumline extends FlxSpriteGroup
   public var notesVwoosh:FlxTypedSpriteGroup<NoteSprite>;
   public var holdNotesVwoosh:FlxTypedSpriteGroup<SustainTrail>;
 
-  final noteStyle:NoteStyle;
+  public final noteStyle:NoteStyle;
 
   #if FEATURE_GHOST_TAPPING
   var ghostTapTimer:Float = 0.0;

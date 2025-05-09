@@ -740,7 +740,7 @@ class SustainTrail extends ZSprite
       if (noteModData.skewZ_playfield != 0) tempVec3.z += playfieldSkewOffset_Z * Math.tan(noteModData.skewZ_playfield * FlxAngle.TO_RAD);
 
       tempVec3.z *= 0.001;
-      var thisNotePos:Vector3D = ModConstants.perspectiveMath_OLD(tempVec3, 0, 0);
+      var thisNotePos:Vector3D = ModConstants.perspectiveMath(tempVec3, 0, 0);
       return new Vector2(thisNotePos.x, thisNotePos.y);
     }
   }

@@ -2329,7 +2329,8 @@ class PlayState extends MusicBeatSubState
   }
 
   var useHeightForStrumY:Bool = false;
-  var heightOffset:Float = 162;
+
+  public static final heightOffset:Float = 162;
 
   /**
      * Constructs the strumlines for each player.

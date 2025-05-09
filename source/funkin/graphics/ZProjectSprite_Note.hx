@@ -870,7 +870,7 @@ class ZProjectSprite_Note extends FlxSprite
       pos_modified.y += fovOffsetY;
       pos_modified.z *= 0.001;
 
-      pos_modified = perspectiveMath_OLD(pos_modified, 0, 0);
+      pos_modified = ModConstants.perspectiveMath(pos_modified, 0, 0);
 
       pos_modified.x -= this.x;
       pos_modified.y -= this.y;
@@ -880,65 +880,5 @@ class ZProjectSprite_Note extends FlxSprite
       pos_modified.y -= fovOffsetY;
     }
     return new Vector2(pos_modified.x, pos_modified.y);
-  }
-
-  public var zNear:Float = 0.0;
-  public var zFar:Float = 100.0;
-
-  // https://github.com/TheZoroForce240/FNF-Modcharting-Tools/blob/main/source/modcharting/ModchartUtil.hx
-  public function perspectiveMath_OLD(pos:Vector3D, offsetX:Float = 0, offsetY:Float = 0):Vector3D
-  {
-    try
-    {
-      var _FOV:Float = this.fov;
-
-      _FOV *= (Math.PI / 180.0);
-
-      var newz:Float = pos.z;
-      // Too close to camera!
-      if (newz > zNear + ModConstants.tooCloseToCameraFix)
-      {
-        newz = zNear + ModConstants.tooCloseToCameraFix;
-      }
-      else if (newz < (zFar * -1)) // To far from camera!
-      {
-        culled = true;
-      }
-
-      newz = newz - 1;
-      var zRange:Float = zNear - zFar;
-      var tanHalfFOV:Float = 1;
-      tanHalfFOV = FlxMath.fastSin(_FOV * 0.5) / FlxMath.fastCos(_FOV * 0.5);
-
-      var xOffsetToCenter:Float = pos.x - (FlxG.width * 0.5);
-      var yOffsetToCenter:Float = pos.y - (FlxG.height * 0.5);
-
-      var zPerspectiveOffset:Float = (newz + (2 * zFar * zNear / zRange));
-
-      // divide by zero check
-      if (zPerspectiveOffset == 0) zPerspectiveOffset = 0.001;
-
-      xOffsetToCenter += (offsetX * -zPerspectiveOffset);
-      yOffsetToCenter += (offsetY * -zPerspectiveOffset);
-
-      xOffsetToCenter += (0 * -zPerspectiveOffset);
-      yOffsetToCenter += (0 * -zPerspectiveOffset);
-
-      var xPerspective:Float = xOffsetToCenter * (1 / tanHalfFOV);
-      var yPerspective:Float = yOffsetToCenter * tanHalfFOV;
-      xPerspective /= -zPerspectiveOffset;
-      yPerspective /= -zPerspectiveOffset;
-
-      pos.x = xPerspective + (FlxG.width * 0.5);
-      pos.y = yPerspective + (FlxG.height * 0.5);
-      pos.z = zPerspectiveOffset;
-      return pos;
-    }
-    catch (e)
-    {
-      trace("OH GOD OH FUCK IT NEARLY DIED CUZ OF: \n" + e.toString());
-      culled = true;
-      return pos;
-    }
   }
 }

@@ -902,42 +902,24 @@ class ModConstants
     }
   }
 
+  // reuse this vector3D instead of creating a new one each function call -Haz
+  static var pos:Vector3D = new Vector3D();
+
   // Call this on a ZSprite to apply it's perspective! MAKE SURE IT'S SCALE AND X AND Y IS RESET BEFORE DOING THIS CUZ THIS OVERRIDES THOSE VALUES
   public static function applyPerspective(note:ZSprite, ?noteWidth:Float, ?noteHeight:Float):Void
   {
-    // try
-    // {
+    if (note.z == 0 || Math.isNaN(note.z)) return; // do fuck all if no z
     if (noteWidth == null) noteWidth = note.width;
     if (noteHeight == null) noteHeight = note.height;
-
-    var pos:Vector3D = new Vector3D(note.x + (noteWidth / 2), note.y + (noteHeight / 2), note.z * 0.001);
-
-    var thisNotePos:Vector3D = perspectiveMath_OLD(pos, -(noteWidth * 0.5), -(noteHeight * 0.5));
-
-    // var pos:Vector4 = new Vector4(note.x + (noteWidth / 2), note.y + (noteHeight / 2), note.z * 0.001, 0.0);
-    // var thisNotePos:Vector4 = perspectiveMath(pos);
-
+    pos.setTo(note.x + (noteWidth / 2), note.y + (noteHeight / 2), note.z * 0.001);
+    var thisNotePos:Vector3D = perspectiveMath(pos, -(noteWidth * 0.5), -(noteHeight * 0.5));
     note.x = thisNotePos.x;
     note.y = thisNotePos.y;
-
-    var noteScaleX = note.scale.x;
-    var noteScaleY = note.scale.y;
-    // if (thisNotePos.z * -1 != 0)
     if (thisNotePos.z != 0)
     {
-      noteScaleY *= (1 / -thisNotePos.z);
-      noteScaleX *= (1 / -thisNotePos.z);
+      note.scale.x *= (1 / -thisNotePos.z);
+      note.scale.y *= (1 / -thisNotePos.z);
     }
-
-    note.scale.set(noteScaleX, noteScaleY);
-
-    // for z sorting lol
-    // note.zIndex = note.z * -1;
-    // }
-    // catch (e)
-    // {
-    //  trace("OH GOD OH FUCK IT NEARLY DIED CUZ OF: " + e.toString());
-    // }
   }
 
   // Same as applyPerspective but returns the scale modifier thingy?
@@ -948,9 +930,9 @@ class ModConstants
     if (noteWidth == null) noteWidth = note.width;
     if (noteHeight == null) noteHeight = note.height;
 
-    var pos:Vector3D = new Vector3D(note.x + (noteWidth / 2), note.y + (noteHeight / 2), note.z * 0.001);
+    pos.setTo(note.x + (noteWidth / 2), note.y + (noteHeight / 2), note.z * 0.001);
 
-    var thisNotePos:Vector3D = perspectiveMath_OLD(pos, -(noteWidth * 0.5), -(noteHeight * 0.5));
+    var thisNotePos:Vector3D = perspectiveMath(pos, -(noteWidth * 0.5), -(noteHeight * 0.5));
 
     note.x = thisNotePos.x;
     note.y = thisNotePos.y;
@@ -968,6 +950,7 @@ class ModConstants
     return r;
   }
 
+  // Math.TAN but faster (using FlxMath fastSin and fastCos)
   public static function fastTan(rad:Float):Float
   {
     return FlxMath.fastSin(rad) / FlxMath.fastCos(rad);
@@ -975,98 +958,47 @@ class ModConstants
 
   public static var zNear:Float = 0.0;
   public static var zFar:Float = 100.0;
-  public static var FOV:Float = 90.0; // FOR SOME REASON, MATH BREAK IF NOT 90. WTF?
-
-  // lol? https://github.com/4mbr0s3-2/Schmovin/blob/main/note_mods/NoteModPerspective.hx
-  public static function perspectiveMath(pos:Vector4):Vector4
-  {
-    try
-    {
-      var fov:Float = FOV;
-      fov *= (Math.PI / 180.0);
-      var screenRatio = 1;
-      var near = zNear;
-      var far = zFar;
-
-      var screenRatio = 1;
-
-      var outPos = pos.clone();
-      var halfScreenOffset = new Vector4(FlxG.width / 2, FlxG.height / 2);
-
-      var perspectiveZ = outPos.z - 1;
-      if (perspectiveZ > 0) perspectiveZ = 0; // To prevent coordinate overflow :/
-
-      var x = outPos.x / fastTan(fov / 2);
-      var y = outPos.y * screenRatio / fastTan(fov / 2);
-
-      var a = (near + far) / (near - far);
-      var b = 2 * near * far / (near - far);
-      var z = a * perspectiveZ + b;
-
-      return new Vector4(x / z, y / z, z, outPos.w).add(halfScreenOffset);
-    }
-    catch (e)
-    {
-      trace("OH GOD OH FUCK IT NEARLY DIED CUZ OF: \n" + e.toString());
-      return pos;
-    }
-  }
+  public static var FOV:Float = 90;
 
   // https://github.com/TheZoroForce240/FNF-Modcharting-Tools/blob/main/source/modcharting/ModchartUtil.hx
-  public static function perspectiveMath_OLD(pos:Vector3D, offsetX:Float = 0, offsetY:Float = 0):Vector3D
+  public static function perspectiveMath(pos:Vector3D, offsetX:Float = 0, offsetY:Float = 0):Vector3D
   {
-    // TODO - REDO THIS MATH! CRASHES FOR SUSTAINS FOR SOME REASON AND ALSO DOESN'T WORK IF ANY OF THE VARIABLES CHANGE (LIKE FOV, ZNEAR, ZFAR, ETC)
+    // Math isn't perfect (mainly with lack of FOV support), but it's good enough. -Haz
     try
     {
-      var _FOV:Float = ModConstants.FOV;
+      var _FOV = Math.PI / 2;
 
-      _FOV *= (Math.PI / 180.0);
-
-      /* math from opengl lol
+      /*
+        math from opengl lol
         found from this website https://ogldev.org/www/tutorial12/tutorial12.html
        */
 
       var newz:Float = pos.z;
+      newz *= FlxMath.lerp(0, 1, FOV / 90); // very very fucking stupid work-around for no proper FOV support  -Haz
       // Too close to camera!
       if (newz > zNear + ModConstants.tooCloseToCameraFix)
       {
         newz = zNear + ModConstants.tooCloseToCameraFix;
       }
-      // else if (newz < (zFar * -1)) // Too far from camera!
+      // else if (newz < (zFar * -1)) // To far from camera!
       // {
-      //  culled = true;
+      // culled = true;
       // }
+
       newz = newz - 1;
 
       var zRange:Float = zNear - zFar;
-      // var tanHalfFOV:Float = Math.tan(_FOV * 0.5 * (Math.PI / 180.0));
-
-      var tanHalfFOV:Float = FlxMath.fastSin(_FOV * 0.5) / FlxMath.fastCos(_FOV * 0.5);
-
-      // if (pos.z > 1) // if above 1000 z basically
-      //  newz = 0; // should stop weird mirroring with high z values
-
-      // var m00 = 1/(tanHalfFOV);
-      // var m11 = 1/tanHalfFOV;
-      // var m22 = (-zNear - zFar) / zRange; //isnt this just 1 lol
-      // var m23 = 2 * zFar * zNear / zRange;
-      // var m32 = 1;
+      var tanHalfFOV:Float = fastTan(_FOV * 0.5);
 
       var xOffsetToCenter:Float = pos.x - (FlxG.width * 0.5); // so the perspective focuses on the center of the screen
       var yOffsetToCenter:Float = pos.y - (FlxG.height * 0.5);
 
       var zPerspectiveOffset:Float = (newz + (2 * zFar * zNear / zRange));
 
-      // divide by zero check
-      if (zPerspectiveOffset == 0) zPerspectiveOffset = 0.001;
+      if (zPerspectiveOffset == 0) zPerspectiveOffset = 0.001; // divide by zero check  -Haz
 
-      // xOffsetToCenter += (offsetX / (1/-zPerspectiveOffset));
-      // yOffsetToCenter += (offsetY / (1/-zPerspectiveOffset));
       xOffsetToCenter += (offsetX * -zPerspectiveOffset);
       yOffsetToCenter += (offsetY * -zPerspectiveOffset);
-
-      xOffsetToCenter += (0 * -zPerspectiveOffset);
-      yOffsetToCenter += (0 * -zPerspectiveOffset);
 
       var xPerspective:Float = xOffsetToCenter * (1 / tanHalfFOV);
       var yPerspective:Float = yOffsetToCenter * tanHalfFOV;
@@ -1077,14 +1009,11 @@ class ModConstants
       pos.y = yPerspective + (FlxG.height * 0.5);
       pos.z = zPerspectiveOffset;
 
-      // pos.z -= 1;
-      // pos = perspectiveMatrix.transformVector(pos);
-
       return pos;
     }
     catch (e)
     {
-      trace("OH GOD OH FUCK IT NEARLY DIED CUZ OF: \n" + e.toString());
+      trace("FUCK. NEARLY DIED CUZ OF: \n" + e.toString());
       return pos;
     }
   }

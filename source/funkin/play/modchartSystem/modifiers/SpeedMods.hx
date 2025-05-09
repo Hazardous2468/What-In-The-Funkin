@@ -45,6 +45,8 @@ class ReverseMod extends Modifier
     return (1 - (currentValue * 2));
   }
 
+  var dif:Null<Float> = null;
+
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
     if (targetLane == -1)
@@ -57,17 +59,22 @@ class ReverseMod extends Modifier
     }
 
     if (currentValue == 0) return; // skip math if mod is 0
-    // close enough XD
-    var height:Float = 112.0;
-    height -= 2.4; // magic number ~
-    if (Preferences.downscroll)
+
+    // Compute this only once!
+    if (dif == null)
     {
-      data.y -= currentValue * ((FlxG.height - height) - (Constants.STRUMLINE_Y_OFFSET * 4));
+      var baseY:Float = Preferences.downscroll ? FlxG.height - (PlayState.heightOffset) - Constants.STRUMLINE_Y_OFFSET
+        - strumLine.noteStyle.getStrumlineOffsets()[1] : Constants.STRUMLINE_Y_OFFSET;
+
+      var targetY:Float = Preferences.downscroll ? Constants.STRUMLINE_Y_OFFSET : FlxG.height
+        - (PlayState.heightOffset)
+        - Constants.STRUMLINE_Y_OFFSET
+        - strumLine.noteStyle.getStrumlineOffsets()[1];
+
+      dif = targetY - baseY;
     }
-    else
-    {
-      data.y += currentValue * ((FlxG.height - height) - (Constants.STRUMLINE_Y_OFFSET * 4));
-    }
+
+    data.y += dif * currentValue;
   }
 }
 

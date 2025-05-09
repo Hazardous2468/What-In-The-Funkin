@@ -38,7 +38,7 @@ class PlayFieldSkewXMod extends Modifier
       offsetY = 0;
     }
     var skewMagicX:Float = (data.y + offsetY) - skewCenterPoint;
-    data.x += skewMagicX * Math.tan(currentValue * FlxAngle.TO_RAD);
+    data.x += skewMagicX * ModConstants.fastTan(currentValue * FlxAngle.TO_RAD);
     data.x -= strumSkew;
     data.skewX += currentValue;
   }
@@ -56,7 +56,7 @@ class PlayFieldSkewXMod extends Modifier
 
     var offsetY:Float = ModConstants.strumSize / 2;
     var skewMagicX:Float = (data.y + offsetY) - skewCenterPoint;
-    strumSkew = skewMagicX * Math.tan(currentValue * FlxAngle.TO_RAD);
+    strumSkew = skewMagicX * ModConstants.fastTan(currentValue * FlxAngle.TO_RAD);
     data.x += strumSkew;
     data.skewX += currentValue;
   }

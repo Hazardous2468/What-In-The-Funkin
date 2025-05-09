@@ -4581,9 +4581,9 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
               gridGhostHoldNote.noteData = currentPlaceNoteData;
               gridGhostHoldNote.noteDirection = currentPlaceNoteData.getDirection();
               gridGhostHoldNote.noteStyle = NoteKindManager.getNoteStyleId(currentPlaceNoteData.kind, currentSongNoteStyle) ?? currentSongNoteStyle;
-              gridGhostHoldNote.updateHoldNotePosition(renderedHoldNotes);
             }
             gridGhostHoldNote.setHeightDirectly(dragLengthPixels, true);
+            gridGhostHoldNote.updateHoldNotePosition(renderedHoldNotes);
           }
           else
           {

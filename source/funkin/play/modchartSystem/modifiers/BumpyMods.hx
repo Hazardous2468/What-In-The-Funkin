@@ -35,7 +35,7 @@ class BumpyModBase extends Modifier
   {
     if (currentValue == 0) return 0.0; // skip math if mod is 0
     var scrollSpeed = PlayState.instance?.currentChart?.scrollSpeed ?? 1.0;
-    return currentValue * Math.tan(curPos / (Strumline.STRUMLINE_SIZE / 3.0) / scrollSpeed * getSubVal("mult")) * (Strumline.STRUMLINE_SIZE / 2.0);
+    return currentValue * ModConstants.fastTan(curPos / (Strumline.STRUMLINE_SIZE / 3.0) / scrollSpeed * getSubVal("mult")) * (Strumline.STRUMLINE_SIZE / 2.0);
   }
 }
 

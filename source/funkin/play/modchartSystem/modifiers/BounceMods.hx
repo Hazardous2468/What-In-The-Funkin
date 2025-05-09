@@ -38,7 +38,7 @@ class BounceModBase extends Modifier
     if (currentValue == 0) return 0;
     var speed:Float = getSubVal("mult");
     // var scrollSpeed = PlayState.instance?.currentChart?.scrollSpeed ?? 1.0;
-    return currentValue * ModConstants.strumSize * Math.abs(Math.tan(curPos * 0.005 * (speed * 2)));
+    return currentValue * ModConstants.strumSize * Math.abs(ModConstants.fastTan(curPos * 0.005 * (speed * 2)));
   }
 }
 

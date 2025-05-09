@@ -28,8 +28,8 @@ class DrunkModBase extends Modifier
     time *= getSubVal("speed");
     time += getSubVal("time_add");
 
-    var returnValue:Float = currentValue * (Math.tan((time) + (noteDir * getSubVal("desync")) +
-      (curPos * 0.45) * (10.0 / FlxG.height) * getSubVal("mult"))) * (ModConstants.strumSize * 0.5);
+    var returnValue:Float = currentValue * (ModConstants.fastTan((time) + (noteDir * getSubVal("desync"))
+      + (curPos * 0.45) * (10.0 / FlxG.height) * getSubVal("mult"))) * (ModConstants.strumSize * 0.5);
 
     return returnValue;
   }

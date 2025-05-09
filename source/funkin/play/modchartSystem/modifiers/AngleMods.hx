@@ -2,7 +2,6 @@ package funkin.play.modchartSystem.modifiers;
 
 import funkin.play.modchartSystem.modifiers.BaseModifier;
 import funkin.play.notes.Strumline;
-import flixel.math.FlxAngle;
 import funkin.play.modchartSystem.NoteData;
 
 // Contains all the mods related to rotating the nots / strums!
