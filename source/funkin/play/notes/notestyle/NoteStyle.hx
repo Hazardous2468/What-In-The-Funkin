@@ -306,6 +306,19 @@ class NoteStyle implements IRegistryEntry<NoteStyleData>
     return filteredResult;
   }
 
+  // WITF exclusive offsets for moving the strumline around on it's initial creation.
+  // Added to counter the new FNF change where strumline offsets are used in the initial creation of the strumline (strumline.y in PlayState)
+  public function getInitialStrumlineOffsets():Array<Float>
+  {
+    return _data?.assets?.noteStrumline?.data?.initialOffsets ?? fallback?.getInitialStrumlineOffsets() ?? [0.0, 0.0];
+  }
+
+  // WITF exclusive bool which disables the new strumlineOffset behaviour introduced in v0.6.3 where the strumline Offset is applied to the whole strumline (in PlayState)
+  public function getStrumlineOffsetForInitialCreation():Bool
+  {
+    return _data?.assets?.noteStrumline?.data?.useOffsetYForStrumlineDownscroll ?? fallback?.getStrumlineOffsetForInitialCreation() ?? true;
+  }
+
   public function getStrumlineOffsets():Array<Float>
   {
     return _data?.assets?.noteStrumline?.offsets ?? fallback?.getStrumlineOffsets() ?? [0.0, 0.0];

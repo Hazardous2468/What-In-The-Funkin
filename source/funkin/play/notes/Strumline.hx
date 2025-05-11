@@ -879,6 +879,7 @@ class Strumline extends FlxSpriteGroup
 
   function updateModDebug():Void
   {
+    if (PlayState.instance == null) return;
     if (txtActiveMods.visible == false || txtActiveMods.alpha < 0) return;
     if (!debugNeedsUpdate) return;
     var newString = "-:Mods:-\n";
