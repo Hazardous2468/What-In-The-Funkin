@@ -1137,14 +1137,16 @@ class ModConstants
       case "movez":
         newMod = new MoveZMod(tag);
 
-      case "strumx":
-        newMod = new StrumXMod(tag);
-      case "strumy":
-        newMod = new StrumYMod(tag);
-      // case "strumyd":
-      //  newMod = new StrumYDMod(tag);
-      case "strumz":
-        newMod = new StrumZMod(tag);
+      /*
+        case "strumx":
+          newMod = new StrumXMod(tag);
+        case "strumy":
+          newMod = new StrumYMod(tag);
+        // case "strumyd":
+        //  newMod = new StrumYDMod(tag);
+        case "strumz":
+          newMod = new StrumZMod(tag);
+       */
 
       case "x":
         newMod = new MoveXMod_true(tag);
@@ -1193,8 +1195,9 @@ class ModConstants
         newMod = new HoldsSkewYMod(tag);
 
       // scale mods
-      // case "zoom":
-      //  newMod = new ZoomModifier(tag);
+      case "zoom":
+        if (PlayState.instance != null) PlayState.instance.modDebugNotif("Zoom mod math is not finished!", FlxColor.ORANGE);
+        newMod = new ZoomModifier(tag);
 
       case "scale":
         newMod = new ScaleModifier(tag);
@@ -1791,6 +1794,7 @@ class ModConstants
       case "linearskewy":
         newMod = new LinearSkewYMod(tag);
       case "scalelinear":
+        if (PlayState.instance != null) PlayState.instance.modDebugNotif("'scalelinear' is outdated! Use 'linearScale' instead!", FlxColor.ORANGE);
         newMod = new ScaleLinearLegacyMod(tag);
 
       // circ mods
