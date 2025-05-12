@@ -246,14 +246,6 @@ typedef NoteStyleData_NoteStrumline =
   @:optional
   var initialOffsets:Null<Array<Float>>;
 
-  /**
-   * If true, the strumLineOffset y value is used for downscroll when creating the strumLine in PlayState
-   * @default Enabled by default for parity with the base game.
-   */
-  @:optional
-  @:default(true)
-  var useOffsetYForStrumlineDownscroll:Bool;
-
   var leftStatic:UnnamedAnimationData;
   var leftPress:UnnamedAnimationData;
   var leftConfirm:UnnamedAnimationData;

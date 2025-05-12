@@ -63,18 +63,8 @@ class ReverseMod extends Modifier
     // Compute this only once!
     if (dif == null)
     {
-      var baseY:Float = strumLine.noteStyle.getInitialStrumlineOffsets()[1]
-        + (Preferences.downscroll ? FlxG.height
-          - (PlayState.heightOffset)
-          - Constants.STRUMLINE_Y_OFFSET
-          - (strumLine.noteStyle.getStrumlineOffsetForInitialCreation() ? strumLine.noteStyle.getStrumlineOffsets()[1] : 0.0) : Constants.STRUMLINE_Y_OFFSET);
-
-      var targetY:Float = strumLine.noteStyle.getInitialStrumlineOffsets()[1]
-        + (Preferences.downscroll ? Constants.STRUMLINE_Y_OFFSET : FlxG.height
-          - (PlayState.heightOffset)
-          - Constants.STRUMLINE_Y_OFFSET
-          - (strumLine.noteStyle.getStrumlineOffsetForInitialCreation() ? strumLine.noteStyle.getStrumlineOffsets()[1] : 0.0));
-
+      var baseY:Float = PlayState.getStrumlineY(strumLine, false);
+      var targetY:Float = PlayState.getStrumlineY(strumLine, true);
       dif = targetY - baseY;
     }
 

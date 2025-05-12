@@ -313,12 +313,6 @@ class NoteStyle implements IRegistryEntry<NoteStyleData>
     return _data?.assets?.noteStrumline?.data?.initialOffsets ?? fallback?.getInitialStrumlineOffsets() ?? [0.0, 0.0];
   }
 
-  // WITF exclusive bool which disables the new strumlineOffset behaviour introduced in v0.6.3 where the strumline Offset is applied to the whole strumline (in PlayState)
-  public function getStrumlineOffsetForInitialCreation():Bool
-  {
-    return _data?.assets?.noteStrumline?.data?.useOffsetYForStrumlineDownscroll ?? fallback?.getStrumlineOffsetForInitialCreation() ?? true;
-  }
-
   public function getStrumlineOffsets():Array<Float>
   {
     return _data?.assets?.noteStrumline?.offsets ?? fallback?.getStrumlineOffsets() ?? [0.0, 0.0];
@@ -1078,11 +1072,16 @@ class NoteStyle implements IRegistryEntry<NoteStyleData>
 
     target.antialiasing = !(_data.assets.holdNoteCover?.isPixel ?? false);
     target.glow.antialiasing = !(_data.assets.holdNoteCover?.isPixel ?? false);
-    target.scale.set(_data.assets.holdNoteCover?.scale ?? 1.0, _data.assets.holdNoteCover?.scale ?? 1.0);
+    target.scale.set(getHoldCoverScale(), getHoldCoverScale());
     target.updateHitbox();
     target.glow.updateHitbox();
 
     buildHoldCoverAnimations(target);
+  }
+
+  public function getHoldCoverScale():Float
+  {
+    return _data.assets?.holdNoteCover?.scale ?? fallback?.getHoldCoverScale() ?? 1.0;
   }
 
   // we use FlxFramesCollection here so we can combine em into one atlas later

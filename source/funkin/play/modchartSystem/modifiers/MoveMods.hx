@@ -189,24 +189,21 @@ class CenteredMod extends Modifier
     strumsMod = true;
   }
 
-  var lastBeat = 0;
+  var dif:Null<Float> = null;
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
-    // close enough XD
-    var height:Float = 112.0;
-    height -= 2.4; // magic number ~
 
-    var mult:Float = Preferences.downscroll ? -1 : 1;
+    // Compute this only once!
+    if (dif == null)
+    {
+      var baseY:Float = PlayState.getStrumlineY(strumLine, false);
+      var targetY:Float = PlayState.getStrumlineY(strumLine, true);
+      dif = targetY - baseY;
+    }
 
-    // multiply by the reverse amount for this movement?
-    var reverseModAmount:Float = data.whichStrumNote.strumExtraModData.reverseMod + data.whichStrumNote.strumExtraModData.reverseModLane; // 0 to 1
-    // var reverseMult:Float = (-2 * reverseModAmount) + 1; // 1 to -1
-    var reverseMult:Float = FlxMath.remapToRange(reverseModAmount, 0, 1, 1, -1);
-    mult *= reverseMult;
-
-    data.y += (currentValue * 0.5) * ((FlxG.height - height) - (Constants.STRUMLINE_Y_OFFSET * 4)) * mult;
+    data.y += dif * (currentValue * 0.5);
   }
 }
 

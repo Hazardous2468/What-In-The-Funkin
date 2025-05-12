@@ -304,6 +304,10 @@ class Strumline extends FlxSpriteGroup
     this.noteStyle = noteStyle;
 
     holdsBehindStrums = noteStyle.holdsBehindStrums();
+    if (noteStyle.id.toLowerCase() == "pixel")
+    {
+      holdCoverRotate = false; // Because pixel hold covers are fucked
+    }
 
     if (modchartSong)
     {
@@ -527,9 +531,6 @@ class Strumline extends FlxSpriteGroup
       #end
       updateArrowPaths();
       updateModDebug();
-      updatePerspective();
-
-      // Do this after perspective so covers and splashes match strum scale and position (no need for z calcs for these since they just copy strum pos)
       for (cover in noteHoldCovers)
       {
         if (cover.alive)
@@ -537,6 +538,14 @@ class Strumline extends FlxSpriteGroup
           noteCoverSetPos(cover);
         }
       }
+      for (splash in noteSplashes)
+      {
+        if (splash.alive)
+        {
+          noteSplashSetPos(splash, splash.DIRECTION);
+        }
+      }
+      updatePerspective();
     }
     else
     {
@@ -567,6 +576,10 @@ class Strumline extends FlxSpriteGroup
       }
     }
   }
+
+  // used for the reverse math (or any other math which needs to know the strumline position from PlayState).
+  // Saved as a variable because accessing height mid-song will result in arrowpath and other stuff being included.
+  public var heightWas:Float = 116;
 
   var generatedArrowPaths:Bool = false;
 
@@ -646,8 +659,6 @@ class Strumline extends FlxSpriteGroup
     }
 
     strumlineNotes.forEach(function(note:StrumlineNote) {
-      // if (!(note.noteModData?.whichStrumNote?.strumExtraModData?.threeD ?? false)) ModConstants.applyPerspective(note);
-      // we still need to apply the perspective for the hold covers to be positioned correctly.
       ModConstants.applyPerspective(note);
     });
 
@@ -656,20 +667,19 @@ class Strumline extends FlxSpriteGroup
       if (!(note.noteModData?.whichStrumNote?.strumExtraModData?.threeD ?? false)) ModConstants.applyPerspective(note);
       // ModConstants.applyPerspective(note);
     }
-    // for (cover in noteHoldCovers)
-    // {
-    //  if (cover.alive)
-    //  {
-    //    cover.applyPerspective();
-    //  }
-    // }
+    for (cover in noteHoldCovers)
+    {
+      if (cover.alive)
+      {
+        ModConstants.applyPerspective(cover.glow);
+      }
+    }
     for (splash in noteSplashes)
     {
       if (splash.alive)
       {
+        // ModConstants.applyPerspective(splash);
         ModConstants.applyPerspective(splash, splash.width / 2.2, splash.height / 2.2);
-        splash.x += noteStyle.getSplashOffsets()[0] * splash.scale.x;
-        splash.y += noteStyle.getSplashOffsets()[1] * splash.scale.y;
       }
     }
   }
@@ -855,14 +865,6 @@ class Strumline extends FlxSpriteGroup
       updateStrums_single(note);
       // i++;
     });
-
-    for (splash in noteSplashes)
-    {
-      if (splash.alive)
-      {
-        noteSplashSetPos(splash, splash.DIRECTION);
-      }
-    }
   }
 
   /**
@@ -1147,15 +1149,18 @@ class Strumline extends FlxSpriteGroup
 
   // WAIT THIS GETS USED FOR MOD MATH? WHY? WHY PAST ME? WTF NOW THIS IS SPAGHETTI!!!
   // TODO - FIX THIS!
-  var dumbMagicNumberForX:Float = 24;
-  var dumbTempScaleTargetThing:Float = 666;
+  // var dumbMagicNumberForX:Float = 24;
+  // This value popped up again but as 24.6 when doing (-INITIAL_OFFSET + (STRUMLINE_SIZE / 2) - (ModConstants.strumSize/2.0)) while trying to figure out some offset stuff... coincidence? no idea
+  var dumbMagicNumberForX:Float = 24.6;
+  var dumbTempScaleTargetThing:Null<Float> = null;
 
   public function getNoteXOffset():Float
   {
+    return dumbMagicNumberForX;
     // so errr, noteScale (0.697blahblah...) = 28?
-    var idk:Float = dumbMagicNumberForX / ModConstants.noteScale;
-    idk *= dumbTempScaleTargetThing;
-    return idk;
+    // var idk:Float = dumbMagicNumberForX / ModConstants.noteScale;
+    // idk *= dumbTempScaleTargetThing ?? 1.0;
+    // return idk;
   }
 
   public function getNoteYOffset():Float
@@ -1187,7 +1192,7 @@ class Strumline extends FlxSpriteGroup
     }
     note.noteModData.curPos = calculateNoteYPos(timmy) * note.noteModData.speedMod;
 
-    if (this.dumbTempScaleTargetThing == 666) dumbTempScaleTargetThing = note.targetScale;
+    if (this.dumbTempScaleTargetThing == null) dumbTempScaleTargetThing = note.targetScale;
 
     note.scale.set(note.targetScale, note.targetScale);
     note.noteModData.scaleX = note.scale.x;
@@ -1345,8 +1350,6 @@ class Strumline extends FlxSpriteGroup
         }
       }
     }
-    var isPixel:Bool = noteStyle.id.toLowerCase() == "pixel"; // dumb fucking fix lmfao
-    isPixel = false;
 
     // Update rendering of hold notes.
     for (holdNote in holdNotes.members)
@@ -1415,8 +1418,8 @@ class Strumline extends FlxSpriteGroup
 
         if (mods != null)
         {
-          holdNote.x = ModConstants.holdNoteJankX + (isPixel ? -dumbMagicNumberForX : 0);
-          holdNote.y = ModConstants.holdNoteJankY + (isPixel ? -12 : 0);
+          holdNote.x = ModConstants.holdNoteJankX;
+          holdNote.y = ModConstants.holdNoteJankY;
         }
         else
         {
@@ -1460,8 +1463,8 @@ class Strumline extends FlxSpriteGroup
 
         if (mods != null)
         {
-          holdNote.x = ModConstants.holdNoteJankX + (isPixel ? -dumbMagicNumberForX : 0);
-          holdNote.y = ModConstants.holdNoteJankY + (isPixel ? -12 : 0);
+          holdNote.x = ModConstants.holdNoteJankX;
+          holdNote.y = ModConstants.holdNoteJankY;
         }
         else
         {
@@ -1484,8 +1487,8 @@ class Strumline extends FlxSpriteGroup
         holdNote.visible = true;
         if (mods != null)
         {
-          holdNote.x = ModConstants.holdNoteJankX + (isPixel ? -dumbMagicNumberForX : 0);
-          holdNote.y = ModConstants.holdNoteJankY + (isPixel ? -12 : 0);
+          holdNote.x = ModConstants.holdNoteJankX;
+          holdNote.y = ModConstants.holdNoteJankY;
         }
         else
         {
@@ -1819,42 +1822,55 @@ class Strumline extends FlxSpriteGroup
         splash.x = this.x;
         splash.x += getXPos(direction);
         splash.x += INITIAL_OFFSET;
+        splash.x += noteStyle.getSplashOffsets()[0] * splash.scale.x;
+
         splash.y = this.y;
         splash.y -= INITIAL_OFFSET;
-        splash.y += 0;
-        splash.x += noteStyle.getSplashOffsets()[0] * splash.scale.x;
         splash.y += noteStyle.getSplashOffsets()[1] * splash.scale.y;
       }
     }
   }
 
+  var holdCoverSkew:Bool = false; // makes hold covers skew if true
+  var holdCoverRotate:Bool = true; // requires the origin to be properly set to the center
+
   function noteCoverSetPos(cover:NoteHoldCover):Void
   {
     var whichStrumNote:StrumlineNote = getByIndex(cover.holdNoteDir % KEY_COUNT);
-    var scaleX:Float = FlxMath.remapToRange(whichStrumNote.scale.x, 0.0, whichStrumNote.targetScale ?? 0.7, 0, 1.0);
-    var scaleY:Float = FlxMath.remapToRange(whichStrumNote.scale.y, 0.0, whichStrumNote.targetScale ?? 0.7, 0, 1.0);
+
+    var noteStyleScale:Float = noteStyle.getHoldCoverScale();
+
     var ay:Float = whichStrumNote.alpha;
     ay -= whichStrumNote.strumExtraModData.alphaHoldCoverMod;
 
     if (cover.glow != null)
     {
-      cover.glow.scale.set(scaleX, scaleY);
+      cover.glow.scale.set(noteStyleScale, noteStyleScale);
+      // default holdCover positioning
+      cover.x = this.x;
+      cover.x += getXPos(cover.holdNoteDir);
+      cover.x += STRUMLINE_SIZE / 2;
+      cover.x -= cover.width / 2;
+      cover.x += noteStyle.getHoldCoverOffsets()[0] * cover.scale.x;
+      cover.x += -12; // hardcoded adjustment, because we are evil.
+      cover.y = this.y;
+      cover.y += INITIAL_OFFSET;
+      cover.y += STRUMLINE_SIZE / 2;
+      cover.y += noteStyle.getHoldCoverOffsets()[1] * cover.scale.y;
+      cover.y += -96; // hardcoded adjustment, because we are evil.
 
-      cover.x = whichStrumNote.x;
-      cover.x += whichStrumNote.width / 2;
-      cover.x -= cover.glow.width / 2;
-      cover.y = whichStrumNote.y;
-      cover.y += whichStrumNote.height / 2;
-      cover.y -= cover.glow.height / 2;
+      // Move the cover to where the strum is
+      var strumStartX:Float = INITIAL_OFFSET + this.x + getXPos(cover.holdNoteDir) + noteStyle.getStrumlineOffsets()[0];
+      var strumStartY:Float = this.y + noteStyle.getStrumlineOffsets()[1];
+      cover.x += (whichStrumNote.x - strumStartX);
+      cover.y += (whichStrumNote.y - strumStartY);
 
       cover.glow.x = cover.x;
       cover.glow.y = cover.y;
-
       cover.glow.z = whichStrumNote.z;
       cover.glow.alpha = ay;
-
       var spiralHolds:Bool = whichStrumNote.strumExtraModData?.spiralHolds ?? false;
-      if (spiralHolds)
+      if (spiralHolds && holdCoverRotate)
       {
         cover.glow.angle = cover.holdNote.baseAngle;
       }
@@ -1863,52 +1879,56 @@ class Strumline extends FlxSpriteGroup
         cover.glow.angle = 0;
       }
 
-      // cover.glow.skew.x = whichStrumNote.skew.x;
-      // cover.glow.skew.y = whichStrumNote.skew.y;
+      if (holdCoverSkew)
+      {
+        cover.glow.skew.x = whichStrumNote.skew.x;
+        cover.glow.skew.y = whichStrumNote.skew.y;
+      }
+
       // attempt to position when skewing in 3D
       if (whichStrumNote.strumExtraModData.threeD)
       {
         ModConstants.playfieldSkew(cover.glow, whichStrumNote.noteModData.skewX_playfield, whichStrumNote.noteModData.skewY_playfield,
           whichStrumNote.strumExtraModData.playfieldX, whichStrumNote.strumExtraModData.playfieldY, cover.glow.frameWidth * 0.5, cover.glow.frameHeight * 0.5);
-        // cover.glow.skew.y += whichStrumNote.noteModData.skewY_playfield;
-        // cover.glow.skew.x += whichStrumNote.noteModData.skewX_playfield;
-
-        // Apply perspective... in the end we have to do this anyway for 3D mode :pensive:
-        // ModConstants.applyPerspective(cover.glow, cover.glow.width / 2, cover.glow.height / 2);
+        if (holdCoverSkew)
+        {
+          cover.glow.skew.x += whichStrumNote.noteModData.skewX_playfield;
+          cover.glow.skew.y += whichStrumNote.noteModData.skewY_playfield;
+        }
       }
     }
   }
 
   function noteSplashSetPos(splash:NoteSplash, direction:Int):Void
   {
-    // var funny:Float = (FlxMath.fastSin(conductorInUse.songPosition / 1000) + 1) * 0.5;
+    splash.scale.set(noteStyle.getSplashScale(), noteStyle.getSplashScale());
+    // default notesplash positioning
+    splash.x = this.x;
+    splash.x += getXPos(direction);
+    splash.x += INITIAL_OFFSET;
 
-    // var whichStrumNote = strumlineNotes.group.members[direction % KEY_COUNT];
+    splash.y = this.y;
+    splash.y -= INITIAL_OFFSET;
+
+    splash.x += noteStyle.getSplashOffsets()[0] * splash.scale.x;
+    splash.y += noteStyle.getSplashOffsets()[1] * splash.scale.y;
+
     var whichStrumNote:StrumlineNote = getByIndex(direction % KEY_COUNT);
-    splash.x = whichStrumNote.x;
-    splash.y = whichStrumNote.y;
-    splash.x += 26;
-    splash.y += 17;
+
+    // Move the splash to where the strum is
+    var strumStartX:Float = INITIAL_OFFSET + this.x + getXPos(direction) + noteStyle.getStrumlineOffsets()[0];
+    var strumStartY:Float = this.y + noteStyle.getStrumlineOffsets()[1];
+    splash.x += (whichStrumNote.x - strumStartX);
+    splash.y += (whichStrumNote.y - strumStartY);
+
     splash.z = whichStrumNote.z; // copy Z!
-    // splash.scale.set(funny, funny);
-    splash.scale.set(1, 1);
-
-    splash.x -= whichStrumNote.strumExtraModData.noteStyleOffsetX; // undo strum offset
-    splash.y -= whichStrumNote.strumExtraModData.noteStyleOffsetY;
-
-    // MOVE THIS TO CALC Z's FUNC IF THIS BORKS
-    // splash.x += noteStyle.getSplashOffsets()[0] * splash.scale.x;
-    // splash.y += noteStyle.getSplashOffsets()[1] * splash.scale.y;
 
     var ay:Float = whichStrumNote.alpha;
     ay -= whichStrumNote.strumExtraModData.alphaSplashMod;
-    // ay -= alphaSplashMod[direction % KEY_COUNT];
-
     splash.alpha = ay * (noteStyle._data.assets.noteSplash?.alpha ?? 1.0);
 
     splash.skew.x = whichStrumNote.skew.x;
     splash.skew.y = whichStrumNote.skew.y;
-
     // attempt to position when skewing in 3D
     if (whichStrumNote.strumExtraModData.threeD)
     {
@@ -1944,19 +1964,25 @@ class Strumline extends FlxSpriteGroup
         cover.setHSV(holdNote.hsvShader.hue, holdNote.hsvShader.saturation, holdNote.hsvShader.value);
       }
 
-      cover.x = this.x;
-      cover.x += getXPos(holdNote.noteDirection);
-      cover.x += STRUMLINE_SIZE / 2;
-      cover.x -= cover.width / 2;
-      cover.x += noteStyle.getHoldCoverOffsets()[0] * cover.scale.x;
-      cover.x += -12; // hardcoded adjustment, because we are evil.
+      if (mods != null)
+      {
+        noteCoverSetPos(cover);
+      }
+      else
+      {
+        cover.x = this.x;
+        cover.x += getXPos(holdNote.noteDirection);
+        cover.x += STRUMLINE_SIZE / 2;
+        cover.x -= cover.width / 2;
+        cover.x += noteStyle.getHoldCoverOffsets()[0] * cover.scale.x;
+        cover.x += -12; // hardcoded adjustment, because we are evil.
 
-      cover.y = this.y;
-      cover.y += INITIAL_OFFSET;
-      cover.y += STRUMLINE_SIZE / 2;
-      cover.y += noteStyle.getHoldCoverOffsets()[1] * cover.scale.y;
-      cover.y += -96; // Manual tweaking because fuck.
-      noteCoverSetPos(cover);
+        cover.y = this.y;
+        cover.y += INITIAL_OFFSET;
+        cover.y += STRUMLINE_SIZE / 2;
+        cover.y += noteStyle.getHoldCoverOffsets()[1] * cover.scale.y;
+        cover.y += -96; // hardcoded adjustment, because we are evil.
+      }
     }
   }
 

@@ -59,8 +59,14 @@ class NoteHoldCover extends FlxTypedSpriteGroup<ZSprite>
       trace('WARNING: NoteHoldCover failed to initialize all animations.');
     }
 
-    glow.origin.set(160.5, 150); // Magic numbers which make it rotate from the center properly!
-    glow.offset.set(13.375, -47.575); // Offset correction
+    // TODO -> MAKE THIS WORK PROPERLY FOR DIFFERENT HOLD COVERS!
+
+    @:privateAccess
+    var assetPath:String = noteStyle.getHoldCoverDirectionAssetPath(holdNoteDir, true);
+    if (!StringTools.contains(assetPath, "pixelNoteHoldCover"))
+    {
+      glow.origin.set(160.5, 150); // Magic numbers which make it rotate from the center properly!
+    }
   }
 
   public override function update(elapsed):Void

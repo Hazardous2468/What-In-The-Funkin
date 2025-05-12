@@ -911,7 +911,7 @@ class ModConstants
     if (note.z == 0 || Math.isNaN(note.z)) return; // do fuck all if no z
     if (noteWidth == null) noteWidth = note.width;
     if (noteHeight == null) noteHeight = note.height;
-    pos.setTo(note.x + (noteWidth / 2), note.y + (noteHeight / 2), note.z * 0.001);
+    pos.setTo(note.x + (noteWidth * 0.5), note.y + (noteHeight * 0.5), note.z * 0.001);
     var thisNotePos:Vector3D = perspectiveMath(pos, -(noteWidth * 0.5), -(noteHeight * 0.5));
     note.x = thisNotePos.x;
     note.y = thisNotePos.y;

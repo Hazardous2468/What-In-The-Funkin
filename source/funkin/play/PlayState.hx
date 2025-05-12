@@ -2285,7 +2285,7 @@ class PlayState extends MusicBeatSubState
   /**
      * Call this to construct a newStrumLine!
      * @param playerControlled If true, then the player can control this strumLine
-     * @param noteStyle Do funny
+     * @param noteStyle The notestyle this new strumline should use.
      */
   public function constructNewStrumLine(playerControlled:Bool, ?noteStyleName:String):Strumline
   {
@@ -2314,12 +2314,8 @@ class PlayState extends MusicBeatSubState
 
     // Create in center of the screen
     newStrummer.x = (FlxG.width / 2 - newStrummer.width / 2) + noteStyle.getInitialStrumlineOffsets()[0];
-
-    newStrummer.y = noteStyle.getInitialStrumlineOffsets()[1]
-      + (Preferences.downscroll ? FlxG.height
-        - (useHeightForStrumY ? newStrummer.height : heightOffset)
-        - Constants.STRUMLINE_Y_OFFSET
-        - (noteStyle.getStrumlineOffsetForInitialCreation() ? noteStyle.getStrumlineOffsets()[1] : 0.0) : Constants.STRUMLINE_Y_OFFSET);
+    newStrummer.heightWas = newStrummer.height;
+    newStrummer.y = getStrumlineY(newStrummer);
 
     newStrummer.zIndex = 1003 + allStrumLines.length + 1;
     newStrummer.cameras = playerStrumline.cameras;
@@ -2332,9 +2328,18 @@ class PlayState extends MusicBeatSubState
     return newStrummer;
   }
 
-  var useHeightForStrumY:Bool = false;
-
-  public static final heightOffset:Float = 162;
+  // Tired of constantly changing the 'strumline.y' everywhere so it can now just be changed here. Awesome. -Haz
+  public static function getStrumlineY(strummy:Strumline, invertDownscrollCheck:Bool = false):Float
+  {
+    var isDownscroll:Bool = Preferences.downscroll;
+    if (invertDownscrollCheck)
+    {
+      isDownscroll = !Preferences.downscroll;
+    }
+    return strummy.noteStyle.getInitialStrumlineOffsets()[1]
+      +
+      (isDownscroll ? FlxG.height - strummy.heightWas - Constants.STRUMLINE_Y_OFFSET - strummy.noteStyle.getStrumlineOffsets()[1] : Constants.STRUMLINE_Y_OFFSET);
+  }
 
   /**
      * Constructs the strumlines for each player.
@@ -2358,21 +2363,17 @@ class PlayState extends MusicBeatSubState
     // Position the player strumline on the right half of the screen
     playerStrumline.x = FlxG.width / 2 + Constants.STRUMLINE_X_OFFSET + noteStyle.getInitialStrumlineOffsets()[0]; // Classic style
     // playerStrumline.x = FlxG.width - playerStrumline.width - Constants.STRUMLINE_X_OFFSET; // Centered style
-    playerStrumline.y = noteStyle.getInitialStrumlineOffsets()[1]
-      + (Preferences.downscroll ? FlxG.height
-        - (useHeightForStrumY ? playerStrumline.height : heightOffset)
-        - Constants.STRUMLINE_Y_OFFSET
-        - (noteStyle.getStrumlineOffsetForInitialCreation() ? noteStyle.getStrumlineOffsets()[1] : 0.0) : Constants.STRUMLINE_Y_OFFSET);
+    playerStrumline.heightWas = playerStrumline.height;
+    playerStrumline.y = getStrumlineY(playerStrumline);
+
     playerStrumline.zIndex = 1001;
     playerStrumline.cameras = [camHUD];
 
     // Position the opponent strumline on the left half of the screen
     opponentStrumline.x = Constants.STRUMLINE_X_OFFSET + noteStyle.getInitialStrumlineOffsets()[0];
-    opponentStrumline.y = noteStyle.getInitialStrumlineOffsets()[1]
-      + (Preferences.downscroll ? FlxG.height
-        - (useHeightForStrumY ? opponentStrumline.height : heightOffset)
-        - Constants.STRUMLINE_Y_OFFSET
-        - (noteStyle.getStrumlineOffsetForInitialCreation() ? noteStyle.getStrumlineOffsets()[1] : 0.0) : Constants.STRUMLINE_Y_OFFSET);
+    opponentStrumline.heightWas = opponentStrumline.height;
+    opponentStrumline.y = getStrumlineY(opponentStrumline);
+
     opponentStrumline.zIndex = 1000;
     opponentStrumline.cameras = [camHUD];
 
@@ -2404,12 +2405,8 @@ class PlayState extends MusicBeatSubState
 
           // Create in center of the screen
           newStrummer.x = (FlxG.width / 2 - newStrummer.width / 2) + noteStyle.getInitialStrumlineOffsets()[0];
-
-          newStrummer.y = noteStyle.getInitialStrumlineOffsets()[1]
-            + (Preferences.downscroll ? FlxG.height
-              - (useHeightForStrumY ? newStrummer.height : heightOffset)
-              - Constants.STRUMLINE_Y_OFFSET
-              - (noteStyle.getStrumlineOffsetForInitialCreation() ? noteStyle.getStrumlineOffsets()[1] : 0.0) : Constants.STRUMLINE_Y_OFFSET);
+          newStrummer.heightWas = newStrummer.height;
+          newStrummer.y = getStrumlineY(newStrummer);
 
           newStrummer.zIndex = 1003 + i;
           newStrummer.cameras = playerStrumline.cameras;

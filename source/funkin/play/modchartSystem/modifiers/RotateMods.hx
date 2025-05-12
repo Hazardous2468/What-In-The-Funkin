@@ -81,19 +81,23 @@ class RotateXModifier extends Modifier
     data.z = strumZ + lolz - lolz_2;
   }
 
+  var pivotPoint:Vector2 = new Vector2(0, 0);
+  var point:Vector2 = new Vector2(0, 0);
+
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
     if (currentValue % 360 == 0) return; // skip math if mod is 0
-    var rotateModPivotPoint:Vector2 = new Vector2(0, 0);
-    rotateModPivotPoint.x = 0;
-    rotateModPivotPoint.x += getSubVal("offset_x");
-    // rotateModPivotPoint.y = (FlxG.height / 2) - (ModConstants.strumSize / 2);
-    rotateModPivotPoint.y = (FlxG.height / 2) - (data.whichStrumNote.height / 2);
-    rotateModPivotPoint.y += getSubVal("offset_y");
 
-    var thing:Vector2 = ModConstants.rotateAround(rotateModPivotPoint, new Vector2(data.z, data.y), currentValue);
-    data.y = thing.y;
-    data.z = thing.x;
+    pivotPoint.x = 0;
+    pivotPoint.y = (FlxG.height / 2) - (data.whichStrumNote.height / 2);
+    pivotPoint.x += getSubVal("offset_x");
+    pivotPoint.y += getSubVal("offset_y");
+
+    point.setTo(data.z, data.y);
+
+    var output:Vector2 = ModConstants.rotateAround(pivotPoint, point, currentValue);
+    data.y = output.y;
+    data.z = output.x;
   }
 }
 
@@ -157,21 +161,24 @@ class RotateYMod extends Modifier
     data.z = strumZ + lolz + lolz_2;
   }
 
+  var pivotPoint:Vector2 = new Vector2(0, 0);
+  var point:Vector2 = new Vector2(0, 0);
+
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
     if (currentValue % 360 == 0) return; // skip math if mod is 0
 
-    var rotateModPivotPoint:Vector2 = new Vector2(0, 0);
-    rotateModPivotPoint.x = strumLine.x + Strumline.INITIAL_OFFSET + (Strumline.NOTE_SPACING * 1.5);
-    rotateModPivotPoint.x += getSubVal("offset_x");
-    rotateModPivotPoint.y = data.z;
-    rotateModPivotPoint.y += getSubVal("offset_y");
+    pivotPoint.x = strumLine.x + Strumline.INITIAL_OFFSET + (Strumline.NOTE_SPACING * 1.5);
+    pivotPoint.y = data.z;
+    pivotPoint.x += getSubVal("offset_x");
+    pivotPoint.y += getSubVal("offset_y");
+    pivotPoint.x += strumLine.getByIndex(data.direction % Strumline.KEY_COUNT).strumExtraModData.noteStyleOffsetX;
 
-    rotateModPivotPoint.x += strumLine.getByIndex(data.direction % Strumline.KEY_COUNT).strumExtraModData.noteStyleOffsetX;
+    point.setTo(data.x, data.z);
 
-    var thing:Vector2 = ModConstants.rotateAround(rotateModPivotPoint, new Vector2(data.x, data.z), currentValue);
-    data.x = thing.x;
-    data.z = thing.y;
+    var output:Vector2 = ModConstants.rotateAround(pivotPoint, point, currentValue);
+    data.x = output.x;
+    data.z = output.y;
   }
 }
 
@@ -195,7 +202,6 @@ class RotateZMod extends Modifier
   {
     if (currentValue % 360 == 0) return; // skip math if mod is 0
     // this is dumb lmfao
-    // var xrot = currentValue ;// *(Math.PI / 180);
     var xrot:Float = (FlxMath.fastSin(currentValue * Math.PI / 180.0));
     var yrot:Float = (FlxMath.fastCos(currentValue * Math.PI / 180.0));
 
@@ -225,8 +231,6 @@ class RotateZMod extends Modifier
       }
       else
       {
-        // strumX += data.getNoteXOffset();
-        // strumX += data.getNoteXOffset();
         strumX += strumLine.getNoteXOffset();
         strumY += strumLine.getNoteYOffset();
       }
@@ -241,8 +245,6 @@ class RotateZMod extends Modifier
     var lolx:Float = beforeShit_x - strumX;
     var loly:Float = beforeShit_y - strumY;
 
-    // if (lane == 0) trace("xdif " + lolx);
-
     var lolx_2:Float = loly;
     var loly_2:Float = lolx;
 
@@ -256,22 +258,24 @@ class RotateZMod extends Modifier
     data.y = strumY + loly + loly_2;
   }
 
+  var pivotPoint:Vector2 = new Vector2(0, 0);
+  var point:Vector2 = new Vector2(0, 0);
+
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
     if (currentValue % 360 == 0) return; // skip math if mod is 0
-    var rotateModPivotPoint:Vector2 = new Vector2(0, 0);
-    rotateModPivotPoint.x = strumLine.x + Strumline.INITIAL_OFFSET + (Strumline.NOTE_SPACING * 1.5);
-    rotateModPivotPoint.x += getSubVal("offset_x");
-    // rotateModPivotPoint.y = strumLine.y;
-    // rotateModPivotPoint.y = (FlxG.height / 2) - (ModConstants.strumSize / 2);
-    rotateModPivotPoint.y = (FlxG.height / 2) - (data.whichStrumNote.height / 2);
-    rotateModPivotPoint.y += getSubVal("offset_y");
 
-    rotateModPivotPoint.x += strumLine.getByIndex(data.direction % Strumline.KEY_COUNT).strumExtraModData.noteStyleOffsetX;
+    pivotPoint.x = strumLine.x + Strumline.INITIAL_OFFSET + (Strumline.NOTE_SPACING * 1.5);
+    pivotPoint.y = (FlxG.height / 2) - (data.whichStrumNote.height / 2);
+    pivotPoint.x += getSubVal("offset_x");
+    pivotPoint.y += getSubVal("offset_y");
+    pivotPoint.x += strumLine.getByIndex(data.direction % Strumline.KEY_COUNT).strumExtraModData.noteStyleOffsetX;
 
-    var thing:Vector2 = ModConstants.rotateAround(rotateModPivotPoint, new Vector2(data.x, data.y), currentValue);
-    data.x = thing.x;
-    data.y = thing.y;
+    point.setTo(data.x, data.y);
+
+    var output:Vector2 = ModConstants.rotateAround(pivotPoint, point, currentValue);
+    data.x = output.x;
+    data.y = output.y;
   }
 }
 
@@ -288,17 +292,20 @@ class StrumRotateXMod extends Modifier
     strumsMod = true;
   }
 
+  var pivotPoint:Vector2 = new Vector2(0, 0);
+  var point:Vector2 = new Vector2(0, 0);
+
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
     if (currentValue % 360 == 0) return; // skip math if mod is 0
-    var rotateModPivotPoint:Vector2 = new Vector2(0, 0);
-    rotateModPivotPoint.x = 0;
-    rotateModPivotPoint.x += getSubVal("offset_x");
-    // rotateModPivotPoint.y = (FlxG.height / 2) - (ModConstants.strumSize / 2);
-    rotateModPivotPoint.y = (FlxG.height / 2) - (data.whichStrumNote.height / 2);
-    rotateModPivotPoint.y += getSubVal("offset_y");
+    pivotPoint.x = 0;
+    pivotPoint.x += getSubVal("offset_x");
+    pivotPoint.y = (FlxG.height / 2) - (data.whichStrumNote.height / 2);
+    pivotPoint.y += getSubVal("offset_y");
 
-    var thing:Vector2 = ModConstants.rotateAround(rotateModPivotPoint, new Vector2(data.z, data.y), currentValue);
+    point.setTo(data.z, data.y);
+
+    var thing:Vector2 = ModConstants.rotateAround(pivotPoint, point, currentValue);
     data.y = thing.y;
     data.z = thing.x;
   }
@@ -317,18 +324,22 @@ class StrumRotateYMod extends Modifier
     strumsMod = true;
   }
 
+  var pivotPoint:Vector2 = new Vector2(0, 0);
+  var point:Vector2 = new Vector2(0, 0);
+
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
     if (currentValue % 360 == 0) return; // skip math if mod is 0
 
-    var rotateModPivotPoint:Vector2 = new Vector2(0, 0);
-    rotateModPivotPoint.x = strumLine.x + Strumline.INITIAL_OFFSET + (Strumline.NOTE_SPACING * 1.5);
-    rotateModPivotPoint.x += getSubVal("offset_x");
-    rotateModPivotPoint.y = data.z;
-    rotateModPivotPoint.y += getSubVal("offset_y");
-    rotateModPivotPoint.x += strumLine.getByIndex(data.direction % Strumline.KEY_COUNT).strumExtraModData.noteStyleOffsetX;
+    pivotPoint.x = strumLine.x + Strumline.INITIAL_OFFSET + (Strumline.NOTE_SPACING * 1.5);
+    pivotPoint.x += getSubVal("offset_x");
+    pivotPoint.y = data.z;
+    pivotPoint.y += getSubVal("offset_y");
+    pivotPoint.x += strumLine.getByIndex(data.direction % Strumline.KEY_COUNT).strumExtraModData.noteStyleOffsetX;
 
-    var thing:Vector2 = ModConstants.rotateAround(rotateModPivotPoint, new Vector2(data.x, data.z), currentValue);
+    point.setTo(data.x, data.z);
+
+    var thing:Vector2 = ModConstants.rotateAround(pivotPoint, point, currentValue);
     data.x = thing.x;
     data.z = thing.y;
   }
@@ -347,18 +358,19 @@ class StrumRotateZMod extends Modifier
     strumsMod = true;
   }
 
+  var pivotPoint:Vector2 = new Vector2(0, 0);
+  var point:Vector2 = new Vector2(0, 0);
+
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
     if (currentValue % 360 == 0) return; // skip math if mod is 0
-    var rotateModPivotPoint:Vector2 = new Vector2(0, 0);
-    rotateModPivotPoint.x = strumLine.x + Strumline.INITIAL_OFFSET + (Strumline.NOTE_SPACING * 1.5);
-    rotateModPivotPoint.x += getSubVal("offset_x");
-    // rotateModPivotPoint.y = strumLine.y;
-    // rotateModPivotPoint.y = (FlxG.height / 2) - (ModConstants.strumSize / 2);
-    rotateModPivotPoint.y = (FlxG.height / 2) - (data.whichStrumNote.height / 2);
-    rotateModPivotPoint.y += getSubVal("offset_y");
-    rotateModPivotPoint.x += strumLine.getByIndex(data.direction % Strumline.KEY_COUNT).strumExtraModData.noteStyleOffsetX;
-    var thing:Vector2 = ModConstants.rotateAround(rotateModPivotPoint, new Vector2(data.x, data.y), currentValue);
+    pivotPoint.x = strumLine.x + Strumline.INITIAL_OFFSET + (Strumline.NOTE_SPACING * 1.5);
+    pivotPoint.x += getSubVal("offset_x");
+    pivotPoint.y = (FlxG.height / 2) - (data.whichStrumNote.height / 2);
+    pivotPoint.y += getSubVal("offset_y");
+    pivotPoint.x += strumLine.getByIndex(data.direction % Strumline.KEY_COUNT).strumExtraModData.noteStyleOffsetX;
+    point.setTo(data.x, data.y);
+    var thing:Vector2 = ModConstants.rotateAround(pivotPoint, point, currentValue);
     data.x = thing.x;
     data.y = thing.y;
   }
