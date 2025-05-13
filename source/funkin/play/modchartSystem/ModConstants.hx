@@ -558,9 +558,9 @@ class ModConstants
       return easeFlip(ease);
     }
 
-    if (StringTools.contains(str, "easeBlend("))
+    if (StringTools.contains(str, "blend("))
     {
-      var strSplit = str.split('easeBlend(');
+      var strSplit = str.split('blend(');
       str = strSplit[1];
       strSplit = str.split(')');
       str = strSplit[0];
@@ -570,9 +570,9 @@ class ModConstants
       return easeBlend(ease1, ease2);
     }
 
-    if (StringTools.contains(str, "easeLerp("))
+    if (StringTools.contains(str, "lerp("))
     {
-      var strSplit = str.split('easeLerp(');
+      var strSplit = str.split('lerp(');
       str = strSplit[1];
       strSplit = str.split(')');
       str = strSplit[0];
@@ -582,9 +582,9 @@ class ModConstants
       return easeLerp(ease1, ease2);
     }
 
-    if (StringTools.contains(str, "easeMerge("))
+    if (StringTools.contains(str, "merge("))
     {
-      var strSplit = str.split('easeMerge(');
+      var strSplit = str.split('merge(');
       str = strSplit[1];
       strSplit = str.split(')');
       str = strSplit[0];
@@ -697,8 +697,12 @@ class ModConstants
         return FlxEase.smoothStepOut;
       case "smoothStepInOut":
         return FlxEase.smoothStepInOut;
-
       default:
+        var a:Null<Float->Float> = Reflect.field(HazardEase, str);
+        if (a == null)
+        {
+          PlayState.instance.modDebugNotif("ease '" + str + "' not valid. Defaulting to linear.", FlxColor.ORANGE);
+        }
         return Reflect.field(HazardEase, str);
     }
   }
