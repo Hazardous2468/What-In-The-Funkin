@@ -23,9 +23,6 @@ class ZSprite extends FlxSkewedSprite // class ZSprite extends FlxSprite
   // public var lastKnownPosition:Vector2;
   public var lastKnownPosition:Vector3D;
 
-  // Sometimes orient mod just has a heart attack and dies. This should make the notes spazz out less in the event that happens. just a bandaid fix for the NaN problem from orient.
-  public var lastKnownOrientAngle:Float;
-
   // Was a test so that when Z-Sort mod gets disabled, everything can get returned to their proper strums.
   public var weBelongTo:Strumline = null;
 
@@ -87,7 +84,6 @@ class ZSprite extends FlxSkewedSprite // class ZSprite extends FlxSprite
     this.hueShift = data.hueShift;
 
     this.lastKnownPosition = data.lastKnownPosition;
-    this.lastKnownOrientAngle = data.lastKnownOrientAngle;
   }
 
   // Call this to update last known position... lol?

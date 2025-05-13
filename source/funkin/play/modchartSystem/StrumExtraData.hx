@@ -116,9 +116,10 @@ class StrumExtraData
   // If set to higher then 0, then disables a small hold optimisation.
   public var noHoldMathShortcut:Float = 0;
 
+  // If not zero, will make the strums do the orient math pass. orient, orientx, orienty, orient2, orientx2, orienty2
+  public var orientExtraMath:Array<Float> = [0, 0, 0, 0, 0, 0];
   // so the angle can get undone for regular notes
-  public var orientStrumAngle:Float = 0;
-  public var orientExtraMath:Float = 0;
+  public var orientStrumAngle:Array<Float> = [0, 0, 0, 0, 0, 0];
 
   // Goes from 0 -> 1 during the arrow fade in tween
   public var introTweenPercentage:Float = 0;
@@ -210,8 +211,8 @@ class StrumExtraData
     arrowpathBackwardsLength = 400;
     arrowpathStraightHold = 0;
 
-    orientStrumAngle = 0;
-    orientExtraMath = 0;
+    orientStrumAngle = [0, 0, 0, 0, 0, 0];
+    orientExtraMath = [0, 0, 0, 0, 0, 0];
 
     strumPos = 0;
 

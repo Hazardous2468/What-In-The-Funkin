@@ -75,11 +75,14 @@ import funkin.play.modchartSystem.modifiers.GridFloorMods;
 import funkin.play.modchartSystem.modifiers.CustomPathModifier;
 import funkin.play.modchartSystem.modifiers.HourGlassMods;
 import funkin.play.modchartSystem.modifiers.AngleMods;
+import funkin.play.modchartSystem.modifiers.OrientMods;
 import funkin.play.modchartSystem.modifiers.*; // if only you worked ;_;
 
 class ModConstants
 {
-  public static var MODCHART_VERSION:String = "v0.9.0a";
+  public static var orientTimeOffset:Float = 4.0; // in ms
+
+  public static final MODCHART_VERSION:String = "v0.9.0a";
 
   public static var tooCloseToCameraFix:Float = 0.975; // dumb fix for preventing freak out on z math or something
 
@@ -180,43 +183,6 @@ class ModConstants
     "strumy",
     "strumz"
   ];
-
-  // Was going to use this for sorting out the new mod arrays (from mods_sorted to the new method).
-  // Ended up just making them get dynamically added by testing if the mod math does anything cuz I was too lazy to make sure this is correct XD
-  /*
-    public static var noteMods:Array<String> = [
-      "speedmod", "alphahold", "alphanote", "alpha", "stealth", "sudden", "hidden", "vanish", "blink", "tinyx", "tinyy", "tiny", "dizzy", "drunky", "drunk",
-      "drunkz", "drunkangle", "drunkscale", "square", "squarey", "squarez", "squareangle", "squarescale", "saw", "sawy", "sawz", "sawspeed", "reverse",
-      "spiralx", "spiraly", "spiralz", "tantornadoz", "tantornado", "tandrunk", "tandrunky", "tandrunkz", "tandrunkangle", "tandrunkscale", "beaty", "beatz",
-      "beatangle", "beatscale", "beat", "confusionoffset", "confusion", "blacksphereflip", "blacksphere", "noteskewx", "tanbumpy", "tanbumpyy", "tanbumpyx",
-      "tanbumpyangle", "tanbumpyscale", "bumpyx", "bumpyy", "bumpyz", "bumpy", "bumpyangle","bumpyangle", "bouncex", "bouncey", "bouncez", "bouncescale", "bounceangle",
-      "digital", "digitaly", "digitalz", "digitalangle", "digitalscale"
-    ];
-
-    public static var strumMods:Array<String> = [
-      "speedmod", "strumx", "strumy", "strumz", "x", "y", "z", "movex", "movey", "movez", "showsubmods", "showzerovalue", "drawdistance", "drawdistanceback",
-      "debugx", "debugy", "grain", "spiralholds", "longholds", "straightholds", "alpha", "alphastrum", "dark", "drunk", "tinyx", "tinyy", "tiny", "tinystrum",
-      "tinystrumy", "tinystrumx", "mini", "reverse", "drive", "centered", "square", "squarey", "squarez", "squarescale", "squareangle", "tantornadoz",
-      "tantornado", "tandrunk", "tandrunky", "tandrunkz", "tandrunkangle", "tandrunkscale", "beaty", "beatz", "beatangle", "beatscale", "beat", "tantipsy",
-      "tipsy", "tipsyx", "tipsyz", "tantipsyx", "tantipsyz", "tipsyangle", "tipsyscale", "confusionoffset", "confusion", "flip", "invert", "videogames",
-      "blacksphereflip", "blacksphere", "waveyangle", "waveyx", "waveyscale", "waveyy", "waveyz", "strumrotatex", "strumrotatey", "strumrotatez", "noteskewx"
-    ];
-
-    public static var arrowPathMods:Array<String> = [
-      "speedmod",
-      "arrowpathgrain",
-      "arrowpathstraighthold",
-      "arrowpathred",
-      "arrowpathgreen",
-      "arrowpathblue",
-      "arrowpathwidth",
-      "arrowpath", "noteskewx"
-    ];
-   */
-  // keep same as strumline, dumb fix for mfweanfwaionfwayuodwao
-  public static final STRUMLINE_SIZE:Int = 104;
-  public static final NOTE_SPACING:Int = STRUMLINE_SIZE + 8;
-  public static final INITIAL_OFFSET = -0.275 * STRUMLINE_SIZE;
 
   // Sets the REAL hold note to this position - X.
   public static var holdNoteJankX:Float = 0;
@@ -1059,8 +1025,16 @@ class ModConstants
         newMod = new CustomPathMod(tag);
       case "orient":
         newMod = new OrientMod(tag);
+      case "orientx":
+        newMod = new OrientXMod(tag);
+      case "orienty":
+        newMod = new OrientYMod(tag);
       case "orient2":
         newMod = new Orient2Mod(tag);
+      case "orientx2":
+        newMod = new OrientX2Mod(tag);
+      case "orienty2":
+        newMod = new OrientY2Mod(tag);
       case "zsort":
         newMod = new ZSortMod(tag);
       case "3d":

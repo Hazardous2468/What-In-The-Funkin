@@ -746,8 +746,6 @@ class Strumline extends FlxSpriteGroup
     note.strumExtraModData.playfieldZ = 0;
   }
 
-  // public var orientExtraMath:Array<Float> = [0, 0, 0, 0];
-
   function updateStrums_single(note:StrumlineNote, timeOffset:Float = 0):Void
   {
     if (note.strumDistance != 0 || timeOffset != 0)
@@ -862,9 +860,19 @@ class Strumline extends FlxSpriteGroup
       note.updateLastKnownPos();
       note.noteModData.lastKnownPosition = note.lastKnownPosition;
 
-      if (note.strumExtraModData.orientExtraMath != 0)
+      var doOrientPass:Bool = false;
+      for (o in 0...note.strumExtraModData.orientExtraMath.length)
       {
-        updateStrums_single(note, note.strumExtraModData.orientExtraMath);
+        if (note.strumExtraModData.orientExtraMath[o] != 0)
+        {
+          doOrientPass = true;
+          break;
+        }
+      }
+
+      if (doOrientPass)
+      {
+        updateStrums_single(note, ModConstants.orientTimeOffset);
         setStrumPos(note);
       }
       updateStrums_single(note);
@@ -1175,13 +1183,13 @@ class Strumline extends FlxSpriteGroup
 
   function setNotePos(note:NoteSprite, vwoosh:Bool = false, orientPass:Bool = false):Void
   {
-    if (!orientPass && note.noteModData.orient2 != 0)
+    if (!orientPass && (note.noteModData.orient2[0] != 0 || note.noteModData.orient2[1] != 0 || note.noteModData.orient2[2] != 0))
     {
       setNotePos(note, vwoosh, true);
     }
 
     note.noteModData.defaultValues();
-    note.noteModData.strumTime = note.strumTime + (orientPass ? 5 : 0);
+    note.noteModData.strumTime = note.strumTime + (orientPass ? ModConstants.orientTimeOffset : 0);
     note.noteModData.noteType = note.kind;
     note.noteModData.direction = note.direction;
     note.color = FlxColor.WHITE;
