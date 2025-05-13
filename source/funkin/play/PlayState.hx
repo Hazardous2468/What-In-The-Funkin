@@ -2188,7 +2188,8 @@ class PlayState extends MusicBeatSubState
 
     // scan for lua file for modchart!
     var filesPushed:Array<String> = [];
-    var songna:String = (currentSong?.id ?? '').toLowerCase();
+    var vari:String = (currentVariation == Constants.DEFAULT_VARIATION ? "" : '-${currentVariation.toLowerCase()}');
+    var songna:String = (currentSong?.id ?? '').toLowerCase() + vari;
     var firstCheckTest:String = 'assets/data/modchart/' + currentChart.songName.toLowerCase() + "/";
     var secondCheckTest:String = 'assets/data/modchart/' + songna + "/";
     var foldersToCheck:Array<String> = [firstCheckTest, secondCheckTest];
@@ -2198,7 +2199,7 @@ class PlayState extends MusicBeatSubState
     {
       var lmfao:String = 'mods/' + modid + '/data/modchart/' + songna + "/";
       foldersToCheck.insert(0, lmfao);
-      lmfao = 'mods/' + modid + '/data/modchart/' + currentChart.songName.toLowerCase() + "/";
+      lmfao = 'mods/${modid}/data/modchart/${currentChart.songName.toLowerCase() + vari}/';
       foldersToCheck.insert(0, lmfao);
     }
 
