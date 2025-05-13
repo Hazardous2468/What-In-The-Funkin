@@ -224,6 +224,51 @@ class HazardModLuaTest
       }
     });
 
+    Lua_helper.add_callback(lua, "setStrumControl", function(playerTarget:String, isPlayerControlled:Bool, time:Float) {
+      if (playerTarget == "both" || playerTarget == "all")
+      {
+        for (customStrummer in PlayState.instance.allStrumLines)
+        {
+          // DO NOT ASLEEP BF!
+          if (!(customStrummer == PlayState.instance.playerStrumline || customStrummer == PlayState.instance.opponentStrumline))
+          {
+            PlayState.instance.modchartEventHandler.funcModEvent(customStrummer.mods, time, function() {
+              customStrummer.isPlayerControlled = isPlayerControlled;
+            });
+          }
+        }
+      }
+      else
+      {
+        var modsTarget = ModConstants.grabStrumModTarget(playerTarget);
+
+        if (modsTarget.strum == PlayState.instance.opponentStrumline || modsTarget.strum == PlayState.instance.playerStrumline)
+        {
+          PlayState.instance.modDebugNotif("Changing player control only works for custom strumlines!", FlxColor.ORANGE);
+        }
+        else
+        {
+          PlayState.instance.modchartEventHandler.funcModEvent(modsTarget, time, function() {
+            modsTarget.strum.isPlayerControlled = isPlayerControlled;
+          });
+        }
+      }
+    });
+
+    // LMAO
+    Lua_helper.add_callback(lua, "flip", function(ease1:String):String {
+      return 'flip(${ease1})';
+    });
+    Lua_helper.add_callback(lua, "blend", function(ease1:String, ease2:String):String {
+      return 'blend(${ease1},${ease2})';
+    });
+    Lua_helper.add_callback(lua, "merge", function(ease1:String, ease2:String):String {
+      return 'merge(${ease1},${ease2})';
+    });
+    Lua_helper.add_callback(lua, "lerp", function(ease1:String, ease2:String):String {
+      return 'lerp(${ease1},${ease2})';
+    });
+
     Lua_helper.add_callback(lua, "tween", tweenFunc);
     Lua_helper.add_callback(lua, "ease", tweenFunc);
     Lua_helper.add_callback(lua, "value", valueFunc);
@@ -647,9 +692,7 @@ class HazardModLuaTest
 
     // legacy function, use createNewPlayer
     Lua_helper.add_callback(lua, "customStrumAmount", function(newval:Int = 0) {
-      PlayState.instance.modchartEventHandler.customPlayfieldsOLD = true;
-      PlayState.instance.modchartEventHandler.customPlayfields = newval;
-      trace("set customplayfields to: " + PlayState.instance.modchartEventHandler.customPlayfields);
+      luaTrace("'customStrumAmount' is obsolete! Use 'createNewPlayer()' instead!", FlxColor.RED);
     });
 
     Lua_helper.add_callback(lua, "createNewPlayer", function(playerControlled:Bool, ?noteStyle:String) {

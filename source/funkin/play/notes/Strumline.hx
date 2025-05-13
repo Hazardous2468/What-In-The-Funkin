@@ -83,11 +83,6 @@ class Strumline extends FlxSpriteGroup
   // The name of the arrowPath file name to use in shared.
   public var arrowPathFileName:String = "NOTE_ArrowPath";
 
-  // Set to true for opponent and player strumline cuz they already have their inputs set properly.
-  // public var skipmeforcontrolslol:Bool = false;
-  // made public so scripts can easily refer to this lol
-  public var isActuallyPlayerStrum:Bool = false;
-
   // If set to true, this strumline will just be set to do the bare minimum work for performance.
   public var asleep(default, set):Bool = false;
 
@@ -195,9 +190,19 @@ class Strumline extends FlxSpriteGroup
 
   /**
    * Whether this strumline is controlled by the player's inputs.
-   * False means it's controlled by the opponent or Bot Play.
+   * False means it's controlled by the opponent.
    */
-  public var isPlayer:Bool;
+  public var isPlayerControlled(default, set):Bool;
+
+  function set_isPlayerControlled(value:Bool):Bool
+  {
+    debugNeedsUpdate = true;
+    isPlayerControlled = value;
+    return isPlayerControlled;
+  }
+
+  // isPlayedControlled is set back to this value when reseting
+  public var defaultPlayerControl:Bool = false;
 
   /**
    * Usually you want to keep this as is, but if you are using a Strumline and
@@ -299,8 +304,8 @@ class Strumline extends FlxSpriteGroup
   {
     super();
 
-    this.isPlayer = isPlayer;
-    isActuallyPlayerStrum = isPlayer;
+    this.isPlayerControlled = isPlayer;
+    this.defaultPlayerControl = isPlayer;
     this.noteStyle = noteStyle;
 
     holdsBehindStrums = noteStyle.holdsBehindStrums();
@@ -382,7 +387,7 @@ class Strumline extends FlxSpriteGroup
 
     for (i in 0...KEY_COUNT)
     {
-      var child:StrumlineNote = new StrumlineNote(noteStyle, isPlayer, DIRECTIONS[i]);
+      var child:StrumlineNote = new StrumlineNote(noteStyle, defaultPlayerControl, DIRECTIONS[i]);
       child.x = getXPos(DIRECTIONS[i]);
       child.x += INITIAL_OFFSET;
       child.y = 0;
@@ -428,7 +433,7 @@ class Strumline extends FlxSpriteGroup
   {
     if (mods == null)
     {
-      this.mods = new ModHandler(!isPlayer);
+      this.mods = new ModHandler(!defaultPlayerControl);
       this.mods.strum = this;
     }
 
@@ -885,9 +890,9 @@ class Strumline extends FlxSpriteGroup
     if (txtActiveMods.visible == false || txtActiveMods.alpha < 0) return;
     if (!debugNeedsUpdate) return;
     var newString = "-:Mods:-\n";
-    if (isActuallyPlayerStrum)
+    if (isPlayerControlled)
     {
-      if (!isPlayer) // if isPlayer is set to false, even though it was created to be a player strum, then display it as using botplay!
+      if (PlayState.instance.isBotPlayMode)
       {
         newString += "\n";
         newString += "-BOTPLAY-";
@@ -1358,7 +1363,7 @@ class Strumline extends FlxSpriteGroup
 
       if (conductorInUse.songPosition > holdNote.strumTime && holdNote.hitNote && !holdNote.missedNote)
       {
-        if (isPlayer && !isKeyHeld(holdNote.noteDirection))
+        if ((isPlayerControlled && !PlayState.instance?.isBotPlayMode ?? false) && !isKeyHeld(holdNote.noteDirection))
         {
           // Stopped pressing the hold note.
           playStatic(holdNote.noteDirection);
@@ -1395,7 +1400,7 @@ class Strumline extends FlxSpriteGroup
           playStatic(holdNote.noteDirection);
         }
 
-        if (holdNote.cover != null && isPlayer)
+        if (holdNote.cover != null && isPlayerControlled)
         {
           holdNote.cover.playEnd();
         }

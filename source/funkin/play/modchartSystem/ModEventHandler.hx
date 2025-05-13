@@ -33,7 +33,6 @@ import funkin.audio.FunkinSound;
 
 class ModEventHandler
 {
-  // public var modResetFuncs:Map<String, Void> = new Map<String, Void>();
   public var modResetFuncs:Array<Void->Void> = [];
 
   public var modEvents:Array<ModTimeEvent> = [];
@@ -41,10 +40,6 @@ class ModEventHandler
   public var customEases:Map<String, Null<Float->Float>> = new Map<String, Null<Float->Float>>();
 
   public var modchartTweens:Map<String, FlxTween> = new Map<String, FlxTween>();
-
-  // how many custom playfields are there? TODO: Make this split between player and opponent controlled?
-  public var customPlayfields:Int = 0;
-  public var customPlayfieldsOLD:Bool = false;
 
   // If set to true, then MOST mods will be divided by 100% when being added into the timeline. This is so you can treat it like NotITG lmao
   public var percentageMods:Bool = false;
@@ -54,8 +49,6 @@ class ModEventHandler
 
   public function new()
   {
-    // modchartTweens = ["testtween" => null];
-    // modchartTweens.remove("testtween");
     modEvents = new Array();
     tweenManager = new FlxTweenManager();
   }
@@ -463,6 +456,9 @@ class ModEventHandler
     for (strum in PlayState.instance.allStrumLines)
     {
       strum.asleep = false;
+
+      strum.isPlayerControlled = strum.defaultPlayerControl;
+
       strum.mods.resetModValues();
       if (modChartHasResort)
       {

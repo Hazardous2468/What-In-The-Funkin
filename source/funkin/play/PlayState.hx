@@ -2245,7 +2245,7 @@ class PlayState extends MusicBeatSubState
 
       for (strumLine in allStrumLines)
       {
-        if (!strumLine.isActuallyPlayerStrum)
+        if (!strumLine.defaultPlayerControl)
         {
           strumLine.mods.invertValues = modchartEventHandler.invertForOpponent;
         }
@@ -2291,12 +2291,6 @@ class PlayState extends MusicBeatSubState
   {
     var noteStyle:NoteStyle = null;
 
-    if (modchartEventHandler.customPlayfieldsOLD)
-    {
-      trace("CANNOT USE LEGACY CUSTOM STRUMMERS WITH NEW CUSTOM STRUMMERS");
-      return null;
-    }
-
     if (noteStyleName != null)
     {
       noteStyle = NoteStyleRegistry.instance.fetchEntry(noteStyleName);
@@ -2310,6 +2304,7 @@ class PlayState extends MusicBeatSubState
     }
     var newStrummer:Strumline = new Strumline(noteStyle, playerControlled ? !isBotPlayMode : false, isModchartSong);
     newStrummer.onNoteIncoming.add(onStrumlineNoteIncoming);
+    newStrummer.defaultPlayerControl = playerControlled;
     add(newStrummer);
 
     // Create in center of the screen
@@ -2352,9 +2347,10 @@ class PlayState extends MusicBeatSubState
 
     playerStrumline = new Strumline(noteStyle, !isBotPlayMode, isModchartSong);
     playerStrumline.onNoteIncoming.add(onStrumlineNoteIncoming);
-    playerStrumline.isActuallyPlayerStrum = true;
+    playerStrumline.defaultPlayerControl = true;
     opponentStrumline = new Strumline(noteStyle, false, isModchartSong);
     opponentStrumline.onNoteIncoming.add(onStrumlineNoteIncoming);
+    opponentStrumline.defaultPlayerControl = false;
     add(playerStrumline);
     add(opponentStrumline);
 
@@ -2392,37 +2388,6 @@ class PlayState extends MusicBeatSubState
 
       dispatchEvent(new ScriptEvent(MODCHART_SETUP));
 
-      // For now, they all act like opponent strums lol
-      if (modchartEventHandler.customPlayfieldsOLD)
-      {
-        for (i in 0...modchartEventHandler.customPlayfields)
-        {
-          var isPlayer:Bool = !isBotPlayMode;
-          isPlayer = false;
-          var newStrummer:Strumline = new Strumline(noteStyle, isPlayer, isModchartSong);
-          newStrummer.onNoteIncoming.add(onStrumlineNoteIncoming);
-          add(newStrummer);
-
-          // Create in center of the screen
-          newStrummer.x = (FlxG.width / 2 - newStrummer.width / 2) + noteStyle.getInitialStrumlineOffsets()[0];
-          newStrummer.heightWas = newStrummer.height;
-          newStrummer.y = getStrumlineY(newStrummer);
-
-          newStrummer.zIndex = 1003 + i;
-          newStrummer.cameras = playerStrumline.cameras;
-
-          newStrummer.mods.customTweenerName = Std.string(i);
-
-          if (!modchartEventHandler.invertForOpponent)
-          {
-            newStrummer.mods.invertValues = false;
-          }
-
-          customStrumLines.push(newStrummer);
-          allStrumLines.push(newStrummer);
-        }
-      }
-
       for (lua in luaArray)
       {
         lua.call('modsTimeline', []);
@@ -2432,7 +2397,7 @@ class PlayState extends MusicBeatSubState
 
       for (strumLine in allStrumLines)
       {
-        if (!strumLine.isActuallyPlayerStrum)
+        if (!strumLine.defaultPlayerControl)
         {
           strumLine.mods.invertValues = modchartEventHandler.invertForOpponent;
         }
@@ -2623,7 +2588,7 @@ class PlayState extends MusicBeatSubState
     opponentStrumline.applyNoteData(opponentNoteData);
     for (customStrummer in customStrumLines)
     {
-      customStrummer.applyNoteData(customStrummer.isActuallyPlayerStrum ? playerNoteData : opponentNoteData);
+      customStrummer.applyNoteData(customStrummer.defaultPlayerControl ? playerNoteData : opponentNoteData);
     }
   }
 
@@ -2843,17 +2808,16 @@ class PlayState extends MusicBeatSubState
   }
 
   /**
-     * Copy and paste from process notes, for custom strum lines!
+     * A copy of the processNotes() function but for custom strumlines.
      */
   function processNotesCUSTOM(elapsed:Float):Void
   {
     for (strummer in customStrumLines)
     {
-      // if (strummer?.notes?.members == null || strummer?.skipmeforcontrolslol) continue;
       if (strummer?.notes?.members == null) continue;
 
-      // IS OPPONENT-IFIED
-      if (!strummer.isActuallyPlayerStrum)
+      // if NOT player controlled...
+      if (!strummer.isPlayerControlled)
       {
         for (note in strummer.notes.members)
         {
@@ -2926,7 +2890,7 @@ class PlayState extends MusicBeatSubState
           }
         }
       }
-      else
+      else // if IS player controlled...
       {
         // Process notes on the player's side.
         for (note in strummer.notes.members)
@@ -2991,8 +2955,7 @@ class PlayState extends MusicBeatSubState
             if (note.holdNoteSprite != null) note.holdNoteSprite.missedNote = false;
           }
 
-          // This becomes true when the note leaves the hit window.
-          // It might still be on screen.
+          // Miss handling
           if (note.hasMissed && !note.handledMiss)
           {
             note.handledMiss = true;
@@ -3006,6 +2969,7 @@ class PlayState extends MusicBeatSubState
 
           if (holdNote.missedNote && !holdNote.handledMiss)
           {
+            // The player dropped a hold note.
             holdNote.handledMiss = true;
           }
         }
@@ -3293,33 +3257,38 @@ class PlayState extends MusicBeatSubState
     // Respawns notes that were b
     playerStrumline.handleSkippedNotes();
     opponentStrumline.handleSkippedNotes();
-
     for (customStrummer in customStrumLines)
     {
-      for (note in customStrummer.notes.members)
-      {
-        if (note == null || note.hasBeenHit) continue;
-        var hitWindowEnd = note.strumTime + Constants.HIT_WINDOW_MS;
-
-        if (Conductor.instance.songPosition > hitWindowEnd)
-        {
-          // We have passed this note.
-          // Flag the note for deletion without actually penalizing the player.
-          note.handledMiss = true;
-        }
-      }
       customStrummer.handleSkippedNotes();
     }
+
+    /*
+            for (customStrummer in customStrumLines)
+            {
+              for (note in customStrummer.notes.members)
+              {
+                if (note == null || note.hasBeenHit) continue;
+                var hitWindowEnd = note.strumTime + Constants.HIT_WINDOW_MS;
+  
+                if (Conductor.instance.songPosition > hitWindowEnd)
+                {
+                  // We have passed this note.
+                  // Flag the note for deletion without actually penalizing the player.
+                  note.handledMiss = true;
+                }
+              }
+  
+        customStrummer.handleSkippedNotes();
+        }
+       */
   }
 
-  // same as processInputQueue but for custom strummers
+  // same as processInputQueue but for custom strummers. Main difference is that it this version doesn't remove the inputs from the input array.
   function processInputQueueCustom():Void
   {
     for (customStrummer in customStrumLines)
     {
-      if (!customStrummer.isPlayer) continue; // is bot controlled... NEXT!
-      // Generate a list of notes within range.
-      // var notesInRange:Array<NoteSprite> = customStrummer.getNotesMayHit();
+      if (!customStrummer.isPlayerControlled) continue; // is bot controlled... NEXT!
 
       // Shoutouts to https://gamebanana.com/mods/519072 (burgerballs9's funny inputs mod) for the input system fix!
       // All it does is orders the array to prioritise notes based on their strum time so early notes get priority.
@@ -3386,7 +3355,10 @@ class PlayState extends MusicBeatSubState
     return result;
   }
 
-  // It's goodNoteHit function but for custom strums!
+  /**
+     * A copy of goodNote() function...
+     * but instead has no scoring functionality as custom strums should not contribute towards the final score!
+     */
   public function goodNoteCustom(targetNote:NoteSprite, customStrummer:Strumline, input:PreciseInputEvent):Void
   {
     // all this shit, just to figure out if the note was a combo break note (to be removed or to be desaturated?)
@@ -3452,7 +3424,6 @@ class PlayState extends MusicBeatSubState
     }
 
     // Generate a list of notes within range.
-    // var notesInRange:Array<NoteSprite> = playerStrumline.getNotesMayHit();
     var notesInRange:Array<NoteSprite> = Arrays.order(playerStrumline.getNotesMayHit(), (a, b) -> return byValues(-1, a.strumTime, b.strumTime));
     var holdNotesInRange:Array<SustainTrail> = playerStrumline.getHoldNotesHitOrMissed();
 
