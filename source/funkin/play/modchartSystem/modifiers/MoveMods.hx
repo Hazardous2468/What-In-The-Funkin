@@ -195,6 +195,10 @@ class CenteredMod extends Modifier
   {
     if (currentValue == 0) return; // skip math if mod is 0
 
+    // multiply by the reverse amount for this movement
+    var reverseModAmount:Float = data.whichStrumNote.strumExtraModData.reverseMod + data.whichStrumNote.strumExtraModData.reverseModLane; // 0 to 1
+    var reverseMult:Float = FlxMath.remapToRange(reverseModAmount, 0, 1, 1, -1);
+
     // Compute this only once!
     if (dif == null)
     {
@@ -203,7 +207,7 @@ class CenteredMod extends Modifier
       dif = targetY - baseY;
     }
 
-    data.y += dif * (currentValue * 0.5);
+    data.y += dif * (currentValue * 0.5) * reverseMult;
   }
 }
 
