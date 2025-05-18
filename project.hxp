@@ -79,7 +79,7 @@ class Project extends HXProject {
 	/**
 	 * Asset path globs to always exclude from asset libraries.
 	 */
-	static final EXCLUDE_ASSETS:Array<String> = [".*", "cvs", "thumbs.db", "desktop.ini", "*.hash", "*.md"];
+	static final EXCLUDE_ASSETS:Array<String> = [".*", "cvs", "thumbs.db", "desktop.ini", "*.hash", "*.md", "*.fla"];
 
 	/**
 	 * Asset path globs to exclude on web platforms.
