@@ -287,7 +287,7 @@ class Modifier
     subValues.set(name, newSubMod);
   }
 
-  public dynamic function speedMath(lane:Int, curPos:Float, strumLine, isHoldNote = false):Float
+  public dynamic function speedMath(lane:Int, curPos:Float, strumLine:Strumline, isHoldNote:Bool = false):Float
   {
     return 1.0;
   }

@@ -1,0 +1,503 @@
+
+
+!!   https://github.com/Hazardous2468/What-In-The-Funkin/wiki   !!
+!!   PLEASE USE THIS INSTEAD FOR HELP, THIS TXT IS OUTDATED     !!
+
+
+
+
+
+Add a lua file in assets -> data -> modchart -> [songname]
+This lua file will allow you to modify the mods timeline.
+See mirin template's modchart for example of use.
+
+Lua template functions:
+
+Will make this value the default for the specified mod. This is useful for when you call reset() as it'll remember the value.
+setdefault(modValue, modName)
+
+Sets a mod to the specified value at the beat.
+set(startBeat, modValue, modName, target(optional))
+
+Sets a mod's default state. If reset is called, will reset back to this value.
+setDefault(modValue, modName, target(optional))
+
+Tween's a mod's value to the new value.
+tween(startBeat, lengthInBeats, easeToUse, modValue, modName, target(optional))
+
+Same as a tween but adds to the value instead of overriding it. Useful for doing multiple tween stuff.
+add(startBeat, lengthInBeats, easeToUse, modValue, modName, target(optional))
+
+Resets all mods back to their default state at this beat.
+reset(startBeat)
+
+
+
+For example
+add(4, 2, "bounceOut", 1, "drunk", "bf")
+will make it so that on beat 4, it'll add 1 to the drunk value but only for Boyfriend!
+
+To change a submod of a modifier, add '__' at the end of the modname! For example, 'drunk__speed'.
+To make a mod lane specific, just add '--' at the end of the modname! For example, 'drunk--2' will control the drunk mod on lane 2 (up arrow).
+
+0 = Left
+1 = Down
+2 = Up
+3 = Right
+
+
+If you want access to func and func_ease / func_tween, you'll need to swap to hscript instead.
+You can also use AFT's in hxscript too, alongside more advanced stuff.
+Update V0.7.1A:
+Hxscript is now accessible in Lua! Check Cat and Credits for example of usage!
+
+
+UPDATE V0.6.5a:
+You can now have multiple playfields/strumlines!
+Simply call createNewPlayer(isPlayerControlled:Bool) in lua during the modsetup function and it'll create a new player for you to use!
+You can easily reference this player by using a number instead!
+Boyfriend is player 1!
+Dad is player 2!
+For example: 
+setdefault(0.5, "flip", 3) will make player 3 start at 50% flip by default.
+setdefault(-1, "tipsy", 1) will make player 1 (Boyfriend!) start at -100% tipsy by default.
+
+
+Feel free to use Mirin Template as a place to test your mod ideas (that's what it's there for!)
+
+
+WARNING:
+Notestyles with custom sizes and offsets that differ from the original funkin' note style may have slight visual errors. While v0.9.0a tried to fix most of these occurances, it may still occur.
+
+
+Some useful knowledge!
+
+By default, botplay and practice mode is enabled by default every time a song is loaded / restarted!
+This is so you don't have to constantly play the song every time you wanna make a change or worry about dying.
+Though if you don't want this, on the pause screen you can press 5 to disable practice, and 4 to disable botplay. You'll hear a sound confirming the action.
+Pressing CTRL+H will toggle visiblity for all debug stuff (which is enabled by default for debugging purposes)
+Pressing CTRL+M will only toggle mods visiblity
+Pressing CTRL+T will only toggle tweens visiblity
+Pressing CTRL+P will only toggle songpos visiblity. Note that song pos also should display in chart editor too!
+
+Pressing 2 will skip forward a beat. Holding shift will make it skip forward by 4 beats.
+Holding CTRL while pressing 2 will invert the value, making you go backwards.
+Note that it only works when the song has started (not during countdown)
+Alternatively you can use the timebar with your mouse when pausing to seek through a song.
+
+Pressing 8 will reload the modchart file, allowing you to quickly preview changes you've made.
+
+
+Remember, in V-Slice, pressing F5 will refresh all hxscripts. This will also reload playstate so it'll also reload the lua file too!
+Though be warned that the game may sometimes crash when doing this action.
+Also FlxText seems to have a memory leak so please hide the text when you don't need it to save performance!
+
+
+
+List of all current modifiers and what they do:
+
+TODO:
+mini, cubic, parabola, asymptote, orientX, orientY
+
+
+
+Speedmod 				-> Multiplier for the current scroll speed.
+
+drawdistance			-> Controls the distance from the receptors the notes will spawn. Uses NotITG logic (means 0 = normal, 1 = double, 0 = no render distance)
+drawdistanceBack		-> same as draw distance but for when notes go past receptors.
+
+alpha					-> controls the opacity of the notes and receptors
+alphanote
+alphahold
+alphastrum
+alphaSplash
+alphaHoldCover
+
+stealth 				-> controls the opacity of incoming notes/holds, NotITG styled! (with the stealth glow)
+hidden					-> Notes will disappear as they approach the receptors! NotITG styled! (with the stealth glow)
+sudden					-> Notes start invisible but suddenly appear before the receptors! NotITG styled! (with the stealth glow)
+vanish					-> Notes will start visible, but then disappear, only to reappear right before the receptors!
+blink
+holdStealth
+dark
+strumStealth
+stealthGlowRed
+stealthGlowGreen
+stealthGlowBlue
+
+drunk					-> make notes wavey! Submods: speed, mult, desync, time_add
+drunkY
+drunkZ
+drunkAngle
+drunkScale
+drunkScaleX
+drunkScaleY
+drunkSkewX
+drunkSkewY
+tanDrunk
+tanDrunkY
+tanDrunkZ
+tanDrunkAngle
+
+cosecantX				-> Same as tanDrunk but alternates from side to side. MAY BE REPLACED IN FUTURE!
+cosecantY
+cosecantZ
+cosecantAngle 	
+cosecantScale
+cosecantScaleX
+cosecantScaleY
+
+
+tipsy					-> Makes strums a bit tipsy (like drunk but only for strums on y axis, idk lol)
+tipsyX
+tipsyZ
+tipsyAngle
+tipsyScale
+tipsySkewX
+tipsySkewY
+tanTipsy
+tanTipsyX
+tanTipsyZ
+tanTipsyAngle
+tanTipsyScale
+
+waveyX					-> Makes the strums wavey. Similar to drunk but doesn't apply the effect to notes. Submods: speed, desync, time_add
+waveyY
+waveyZ
+waveyAngle
+waveyScale
+waveySkewX
+waveySkewY
+tanWaveyX
+tanWaveyY
+tanWaveyZ
+tanWaveyAngle
+tanWaveyScale
+tanWaveySkewX
+tanWaveySkewY
+
+
+
+
+beat					-> notes shuffle on every beat. Submods: speed, mult, offset
+beatY
+beatZ
+beatAngle
+beatScale
+beatScaleX
+beatScaleY
+beatSpeed
+beatSkewX
+beatSkewY
+
+bumpy					->	Notepath becomes bumpy on the z axis! (sine wave). Submods: mult
+bumpyX
+bumpyY
+bumpyAngle
+bumpyScale
+bumpySkewX
+bumpySkewY
+bumpySpeed
+cosBumpyX
+cosBumpyY
+cosBumpy
+cosBumpyAngle
+cosBumpyScale
+cosBumpySkewX
+cosBumpySkewY
+tanBumpy					
+tanBumpyX
+tanBumpyY
+tanBumpyAngle
+tanBumpyScale
+tanBumpySkewX
+tanBumpySkewY
+
+bounceX					-> Notes bounce towards the receptors! (half sine lol). Submods: mult
+bounceY
+bounceZ
+bounceAngle
+bounceScale
+bounceSkewX
+bounceSkewY
+bounceSpeed
+cosBounceX
+cosBounceY
+cosBounceZ
+cosBounceAngle
+cosBounceScale
+tanBounceX
+tanBounceY
+tanBounceZ
+tanBounceAngle
+tanBounceScale
+tanBounceSkewX
+tanBounceSkewY
+
+saw						-> Makes notes take a sawtooth wave shaped approach (what?). Submods: mult
+sawY
+sawZ
+sawAngle
+sawScale
+sawScaleX
+sawScaleY
+sawSkewX
+sawSkewY
+sawSpeed
+
+zigzag					-> Makes notes zigzag towards the receptors. Submods: Mult
+zigzagY
+zigzagZ
+zigzagAngle
+zigzagScale
+zigzagScaleX
+zigzagScaleY
+zigzagSkewX
+zigzagSkewY
+zigzagSpeed
+zigzag_hitmans			-> old version of zigzag. Submods: amplitude, longitude. NOT IMPLEMENTED IN V0.7.1a!
+zigzagz_hitmans
+
+square					-> Notes approach in the shape of a square wave. Submods: mult, xoffset, yoffset
+squareY
+squareZ
+squareAngle
+squareScale
+squareSkewX
+squareSkewY
+squareSpeed
+
+
+digital					-> bumpy mod but, with extra funk? Submods: mult, steps
+digitalY
+digitalZ
+digitalAngle
+digitalScale
+digitalSkewX
+digitalSkewY
+digitalSpeed
+
+tornado					-> does some arrow path shufflin'. Submods: speed
+tornadoY
+tornadoZ
+tornadoScale
+tornadoAngle
+tanTornado
+tanTornadoY
+tanTornadoZ
+tanTornadoScale
+tanTornadoAngle
+
+spiralX					-> Makes notes spiral towards receptors. Recommend you use small values for this! Submods: mult
+spiralY
+spiralZ
+spiralAngle
+spiralScale
+spiralSpeed
+spiralCosX
+spiralCosY
+spiralCosZ
+spiralCosAngle
+spiralCosScale
+spiralCosSpeed
+
+
+attenuate 	
+attenuateY 
+attenuateZ 
+attenuateAngle
+attenuateSkewX
+attenuateSkewY
+
+
+noteOffsetX				-> Moves notes by this amount in pixels. Useful for patching small visual bugs.
+noteOffsetY
+noteOffsetZ
+holdOffsetX
+holdOffsetY
+holdOffsetZ
+strumOffsetX
+strumOffsetY
+strumOffsetZ
+
+
+linearX					-> The notes position gets added by it's distance from receptor.
+linearY
+linearZ
+linearAngle
+linearScale
+linearScaleX
+linearScaleY
+linearSkewX
+linearSkewY
+linearSpeed
+scaleLinear 				-> makes notes shrink as they approach the receptors. Legacy mod!
+
+
+circX					-> Same as linear but with multiplication (adds a bit of a curve)
+circY
+circZ 
+circAngleZ
+circAngleY
+circAngleX
+circScale
+circScaleX
+circScaleY
+circSkewX
+circSkewY
+circSpeed
+
+
+
+tiny					-> Makes notes smaller. Value of 1 means they are at 0 scale! Negative values make them bigger!
+tinyX
+tinyY
+tinyZ
+tinyStrum				
+tinyStrumX
+tinyStrumY
+tinyStrumZ
+tinyNote
+tinyNoteX
+tinyNoteY
+tinyNoteZ
+tinyHold
+
+scale
+scaleX
+scaleY
+scaleStrum
+scaleStrumX
+scaleStrumY
+scaleNote
+scaleNoteX
+scaleNoteY
+scaleHold
+
+
+skewX
+skewY
+noteSkewX
+noteSkewY
+strumSkewX
+strumSkewY
+
+
+dizzy 					-> arrows spin as they move towards the receptors.
+twirl					-> same as dizzy but on different axis.
+roll
+dizzy2
+twirl2
+roll2
+
+confusion 				-> strums spin as well as the arrows!
+confusionZOffset 		-> rotates the strums by degrees
+confusionYOffset 		
+confusionXOffset 
+notesConfusionZOffset
+notesConfusionYOffset
+notesConfusionXOffset
+
+invert 					-> [Left Down Up Right] will become [Down Left Right Up]
+flip 					-> [Left Down Up Right] will become [Right Up Down Left]
+videogames 				-> [Left Down Up Right] will become [Left Up Down Right]
+
+blacksphere				-> Makes the notes spin around each other in a funny way. Submod: variant (set to 1 for cross version instead of alternate), speedaffect (defaults to 1. Multiplies the lane speed by a value which makes the notes stay correctly aligned on the y axis during the vertical spin)
+blacksphereFlip
+
+
+rotateX					-> rotate the playfield! Notes will always face towards camera though due to technical limitations. Submods: offset_x, offset_y
+rotateY					should also mention that when moving the notes around, it's highly recommended you also adjust the offset too!
+rotateZ
+strumRotateX			-> same as rotate mod but without changing incoming angle. Can be combined with regular rotation mods for funky effects
+strumRotateY	
+strumRotateZ
+notesRotateX
+notesRotateY
+notesRotateZ
+
+reverse 				-> changes scroll direction. So upscroll will become downscroll if set to 1
+
+centered 				-> Moves receptors towards the center of the screen (center being the middle between reverse).
+centerNotes	
+
+drive 					-> Applies the same math for the notes scrolling but to the receptors. Feed it the correct value and it can create a driven drop!
+drive2 					-> Same as regular drive but follows arrowpath
+
+
+moveX					-> Moves the receptors around. Note that a value of 1 means moving it a whole receptor!
+moveY
+moveYD					-> Same as moveY but automatically gets multiplied by -1 for downscroll
+moveZ
+	
+x					-> Same as move mods but based on pixels instead of arrowsize
+y
+yd
+z
+
+strumX					-> Moves the actual strumline / playfield object by this amount of pixels. This is an offset! NOT IMPLEMENTED YET!
+strumY
+strumYD
+strumZ
+
+brake 					-> Notes slow down as they approach the receptors. 
+boost 					-> Notes speed up as they approach the receptors.
+wave
+
+slowdown				-> Some scuffed implementation of brake mod. Affects note speed! VERY BUGGY!
+
+3D						-> Swaps to an alternative way of rendering the notes, allowing them to rotate properly in 3D space! EXPERIMENTAL
+cull 					-> Defines the culling to be used with 3D mode. 0: nocull, 1: backface, 2:always front face, -1: frontface, -2: always backface 
+cullSustain
+cullStrum
+cullNote
+
+straightHolds 			-> if 1, notes will always point straight up / down, straightening them. Negative values do the opposite and make them... less straight lol
+
+longHolds 				-> Holds appear to be visually longer
+
+spiralHolds				-> If set to higher then 0.5, will change how holds are handled so they rotate towards the direction of travel. Useful for when notes approach from the sides!
+
+grain 					-> The value used to calculate the hold resolution. Higher values means lower resolution, and vice versa. Default value is 80.
+
+drawDistance 			-> How far away the notes get rendered. 0 is default, 1 is twice, -1 is no draw distance
+drawDistanceBack		-> Same as regular drawDistance mod but for behind the receptors.
+
+mathCutOff				-> If a note is past this mod Value (in distance / curPos values), then it won't do any mod math. Very useful for optimisation, especially for long holds!
+
+noholdmathshortcut		-> disables a small optimisation with holds, you can just safely ignore this mod lol
+
+zSort 					-> Handles how Z Sorting is handled. -1 is off, 0 is default, and 1 is adding note sprite into one big group to then be sorted through (so stacked playfields can be sorted properly)
+
+orient 					-> Notes angle themselves towards the direction of travel.
+orient2
+
+customPath 				-> Some funky experimental mod that allows you to import your own custom path
+
+debugX					-> Moves the debug text which displays all active mods around.
+debugY 	
+debugAlpha 				->Controls the alpha of the debugText. when set to 1, text will be fully hidden (and also no longer updates, use this instead of moving it offscreen to hide it!)				
+debugShowZeroValueMods 	-> If set to 1, then all mods with a value of 0 (disabled) will still be listed!
+debugShowSubMods		-> If set to 1, all sub mods will be shown
+debugShowExtra			-> If set to 0, then some non-important mods will get hidden. 1 to show these mods again. (defaults to 0)
+debugShowLaneMods		-> If set to 1, shows lane mods (as they are hidden by default to prevent clutter)
+debugShowAll			-> Fuck it, show everything!
+
+
+arrowPath 				-> sets opacity of arrowpath. Arrowpath being a line which is drawn to show the path the arrows will take.
+arrowPathwidth 			-> width of the arrow path. 0 is no width, 1 is width of a hold, 2 is double hold width
+arrowPathred 			-> sets the red color of the arrowpath, between 0-1
+arrowPathgreen 			-> sets the green color of the arrowpath, between 0-1
+arrowPathblue 			-> sets the blue color of the arrowpath, between 0-1
+arrowPathlength			-> Sets the length of the arrowpath. Uses same logic as sustain length.
+arrowPathbacklength		-> Sets the length of the arrowpath BEHIND the receptor!
+arrowPathgrain 			-> Same as grain for regular holds, but for arrowpath.
+arrowPathstraighthold	-> Same as straightholds for regular holds, but for arrowpath!
+arrowpath_notitg 		-> when enabled, will change the look of arrowpaths to mimick NotITG. Though more intensive (somehow?)
+
+notered 				-> for tinting the notes (untested lol)
+noteblue
+notegreen
+strumred
+strumgreen
+strumblue

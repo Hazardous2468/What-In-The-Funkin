@@ -406,6 +406,7 @@ class Strumline extends FlxSpriteGroup
       child.strumExtraModData.noteStyleOffsetY = strumlineOffsets[1];
 
       this.strumlineNotes.add(child);
+      this.strumlineNotesArray.push(child);
 
       child.weBelongTo = this;
     }
@@ -1739,6 +1740,8 @@ class Strumline extends FlxSpriteGroup
     }
   }
 
+  private var strumlineNotesArray:Array<StrumlineNote> = [];
+
   /**
    * Get a strumline note sprite by its index.
    * @param index The index of the note to get.
@@ -1746,17 +1749,14 @@ class Strumline extends FlxSpriteGroup
    */
   public function getByIndex(index:Int):StrumlineNote
   {
-    var returnValue:StrumlineNote = this.strumlineNotes.members[index];
-    if (mods != null)
+    if (mods != null) // Because the order of the strumLineNotes will be different thanks to us sorting on the z-axis, we need an alternative method...
     {
-      strumlineNotes.forEach(function(note:StrumlineNote) {
-        if (note.direction == index)
-        {
-          returnValue = note;
-        }
-      });
+      return this.strumlineNotesArray[index];
     }
-    return returnValue;
+    else
+    {
+      return this.strumlineNotes.members[index];
+    }
   }
 
   /**

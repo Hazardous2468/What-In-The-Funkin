@@ -84,7 +84,7 @@ class BlackSphereInvertMod extends Modifier
     speedMod = true;
   }
 
-  override function speedMath(lane:Int, curPos:Float, strumLine, isHoldNote = false):Float
+  override function speedMath(lane:Int, curPos:Float, strumLine:Strumline, isHoldNote:Bool = false):Float
   {
     currentValue = currentValue % 360;
     if (currentValue == 0) return 1; // skip math if mod is 0
@@ -93,6 +93,11 @@ class BlackSphereInvertMod extends Modifier
     var retu_val:Float = 1;
     var speedAffectM:Float = getSubVal("speedaffect");
     var yValue:Float = FlxMath.fastSin(currentValue * Math.PI / 180);
+
+    // multiply by the reverse amount for this movement
+    var whichStrummy = strumLine.getByIndex(lane);
+    var reverseModAmount:Float = whichStrummy.strumExtraModData.reverseMod + whichStrummy.strumExtraModData.reverseModLane; // 0 to 1
+    var reverseMult:Float = FlxMath.remapToRange(reverseModAmount, 0, 1, 1, -1);
 
     var variant:Float = getSubVal("variant");
     if (variant >= 100)
@@ -106,7 +111,7 @@ class BlackSphereInvertMod extends Modifier
 
     if (!Preferences.downscroll) yValue *= -1;
 
-    retu_val += yValue * 0.125 * speedAffectM;
+    retu_val += yValue * 0.125 * speedAffectM * reverseMult;
 
     return retu_val;
   }
@@ -155,7 +160,7 @@ class BlackSphereFlipMod extends Modifier
     speedMod = true;
   }
 
-  override function speedMath(lane:Int, curPos:Float, strumLine, isHoldNote = false):Float
+  override function speedMath(lane:Int, curPos:Float, strumLine:Strumline, isHoldNote:Bool = false):Float
   {
     currentValue = currentValue % 360;
     if (currentValue == 0) return 1; // skip math if mod is 0
@@ -173,8 +178,14 @@ class BlackSphereFlipMod extends Modifier
     {
       if (lane % 2 == 1) yValue *= -1;
     }
+
+    // multiply by the reverse amount for this movement
+    var whichStrummy = strumLine.getByIndex(lane);
+    var reverseModAmount:Float = whichStrummy.strumExtraModData.reverseMod + whichStrummy.strumExtraModData.reverseModLane; // 0 to 1
+    var reverseMult:Float = FlxMath.remapToRange(reverseModAmount, 0, 1, 1, -1);
+
     if (!Preferences.downscroll) yValue *= -1;
-    retu_val += yValue * 0.125 * speedAffectM;
+    retu_val += yValue * 0.125 * speedAffectM * reverseMult;
 
     return retu_val;
   }

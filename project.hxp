@@ -789,6 +789,10 @@ class Project extends HXProject {
 		addAssetLibrary("art", shouldEmbedArt, shouldPreloadArt);
 		addAsset("art/readme.txt", "do NOT readme.txt", "art", shouldEmbedArt);
 		addAsset("LICENSE.md", "LICENSE.md", "art", shouldEmbedArt);
+
+		addAsset("WITF_Currently Known Issues.txt", "WITF - Currently Known Issues.txt");
+		addAsset("WITF_HOW TO MODCHART.txt", "WITF - How To Modchart.txt");
+		addAsset("WITF_ModchartSystemChangelog.txt", "WITF - Changelog.txt");
 	}
 
   /**

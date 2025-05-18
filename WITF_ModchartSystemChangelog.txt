@@ -1,0 +1,514 @@
+v0.9.1a:
+
+Re-added 'isPlayer' variable to Strumline.hx to fix scripts which may rely on said variable.
+
+Updated the bold font to now include numbers (taken from Psych lmfao). Now you can actually see the numbers for playback rate in the pause menu.
+
+Blacksphere now automatically takes into account reverse modifier, similar to Centered mod.
+
+
+
+
+v0.9.0a:
+
+Updated to FNF v0.6.4
+	-NOTE: DRAW DISTANCE LOGIC WAS MODIFIED TO NOW ACCOUNT FOR SCROLL SPEED. MODCHARTS WILL NEED TO BE UPDATED!
+Variations are now appended to the end of the modchart folder! For example, if you wish to modchart an erect variation or pico variation, you would now name your modchart folder to "spookeez-pico" for example.
+vibrateEffect added to Sustains
+Quant skins are now even more accurate!
+getNoteBeats(start, end, target) for lua added!
+Fixed tweens having weird behaviour sometimes with songs containing bpm changes.
+Expo eases not ending on 1.0 fixed. Also added tapElastic, popElastic, pulseElastic, and Impulse eases. Also fixed outIn eases.
+Added ease functions which can modify eases (specifically: "flip()", "blend()", "lerp()", and "merge()")
+Attempted to fix a crash when reloading assets with F5 while debug text was active.
+Added missing variation variable for lua (oops my bad, now you can modchart variations properly)
+NoteAngleOffset mods now no longer affect the strums / receptors with drive2 modifier
+BaseModifier songPosition variables removed (just refers to the current conductor.instance instead). Also cleaned up some code here and there to hopefully improve performance.
+Fixed arrowpath straight holds modifier
+Updated reverse math
+Updated offsets for notesplashes and hold covers. Should now be much more accurate to vanilla positioning.
+Added 'setStrumControl()' function for lua. You can now easily swap a strumline's control! Also a small refactor to Strumline.hx with isPlayerControlled related stuff
+customStrumAmount() is now obsolete.
+
+Restored HALVED freeplay functionality.
+Redid Excellent results animation.
+Stickers for modchart hell.
+Fixed MetaMods only being applied once.
+Meta mods will also replace the default strum background with a custom black arrowpath one so that it will follow the path the notes take. This behaviour can be disabled in the script.hx file if desired.
+
+
+
+
+
+v0.8.0a:
+
+Updated to FNF v0.6.2
+
+Ported Blissful-Chaos from NotITG
+New song: Matoi
+New song: Hyper-Nova
+
+New tween type: Value! Works like a combination of func_tween and tween!
+Usage: value(beat, length, ease, startValue, endValue, modname, player)
+
+New resort function! Use it like you would with reset() but instead of reseting all the mods, it'll force the mods to resort themselves based on their priority. Why is this useful? Well
+
+Added priority_additive! Now every modifier has a special submod called priority which allows you to change the mods priority! For example, set(4, -100, "movex__priority") will make the movex mod have 100 less priority, making it be applied later on! Then once modified, calling the resort function will update the mod order! This is done separately because if there are a lot of modifiers for a modchart, it could cause some lag, so using carefully!
+In some cases though, it may just be better to clone an already existing mod as a custom mod and change the priority that way instead.
+
+Speaking of priority, the x,y,z mods are now applied AFTER the rotate mod (the intended behaviour so you can use moveXYZ for before rotation, and xyz for after rotation instead of the move mods just being xyz * 112)
+
+New modifier: Hourglass! It's like a combination of flip and sudden.
+New modifier: SpiralCos. Same as spiral mod but uses cos. Meant to be a replacement for the cos submod (the submod will still remain for legacy support)
+New modifier: Scale. I can't believe I haven't added this yet, used to control the scale of the notes.
+New modifier: Angle. Does the same as confusionoffset.
+WARNING: ConfusionOffset is now in radians for parity with NotITG! If you wish to use degrees, convert it when using this mod OR use the angle modifier! All modcharts have been edited to address this, as well as the new z priority fix
+Reworked centered mod! Now there is a Centered2 modifier which acts like the old centered logic (with always_calculate now defaulting to 1.0) and the new Centered logic will now work closer to NotITG (moves towards the center taking into account reverse mod but being unaffected by move mods)
+New Modifier: Orient2. Same as Orient but now uses mod math instead of last known position (doesn't get affected by move mods now for example)
+New Modifier: skewX, skewY
+Skew math has been tweaked slightly for 3D mode to be more accurate. Also holds will now also try and skew.
+Also added skewz and noteskewz, though they're pretty experimental and don't play nice with rotation (only for 3D mode). NOTE: Skew currently doesn't work properly spiral holds, and skewY breaks for holds when moving on the z axis (use 3D mode to fix!)
+New Modifier: RotatingX, RotatingY, RotatingZ
+
+FINALLY fixed tweens not ending properly with eases that end in 0! (Can now finally use bounce, pop, etc for func_tween and regular tweens). Also hopefully fixed additive tweens not having the proper ending value also
+
+Fixed "z" mod having incorrect priority! Should now work like "x" and "y" mod!
+
+Another attempt at fixing zsort mod having holds and notes layered incorrectly (so holds ontop of receptors when they shouldn't be for example). 
+If there are STILL problems, you can adjust the zSortMod_SustainOffset (-1.33333) and zSortMod_StrumNoteOffset (-0.4 default) values in the PlayState instance to fine tune their z offsets for their calculations
+
+Added album covers
+
+Updated hurt note logic, should now recycle sprites instead of creating new ones constantly for note splashes
+
+Notestyles now have a new "copyHSV" data for notesplashes and holdCovers which allow them to copy the HSV values of the note that triggered them. Made mainly for quant skins.
+
+New chart editor themes for colouring the squares based on their quant colours (ported from Inhuman)
+
+Custom Path mod now reloads its path when changing the "pathToLoad" variable. Also included a new "createCloneMod(modName)" for easily making copies of already existing mods to modify (mainly so you can now have multiple custompath mods each with their own different path files).
+
+3D note meshes (ZProjectSprite_Note.hx) now has vertOffsetX, vertOffsetY, and vertOffsetZ arrays. Use this to modify vertices individually for funky effects!
+
+3D note meshes now have the ability to mess around with their UV's!
+
+3D note meshes can now have their rotation order altered! This means instead of zyx by default, you can now change it to be xyz (or any other order). You can even do something cursed like xyyzx to stack rotations lol
+
+Pressing the reset key in the meta mods menu will now reset all mods back to default (disable all)
+
+drawTriangles now respect the repeatTexture variable. By default, 3D note meshes WON'T repeat the texture!
+
+Added "sets, setdefaults, adds, tweens, eases, values" functions that can be used as an alternative.
+These alternative functions only accept 1 string input but can contain arrays. 
+So for example,
+`adds("0, 1, outSine, [1, drunk, 1, tipsy], bf")`
+is the same as
+`add(0, 1, "outSine", 1, drunk, bf)
+add(0, 1, "outSine", 1, tipsy, bf)`
+
+Made Credits hard difficulty extra funny
+
+Fixed ZProjectSprite memory leak with update color transform
+Fixed drive2 breaking confusionyoffset and confusionxoffset
+Changed lastKnownPosition for zSprites to be a vector3 instead of a vector2
+Updated speedMathFunc for custom mods (instead of just curpos, it's now curpos and lane)
+Fixed noteModData noteType not being set to hold / path!
+Fixed zigzag and sawtooth math being flipped when past the receptors.
+Fixed metamods not triggering the intro tween (so strums stayed invisible)
+Fixed disappearing arrowpaths during countdown
+
+
+
+
+
+v0.7.6a:
+Official name of this fork going forward: "What in the Funkin'?!"
+New example song: 19ZZ. Also moved the old songs into an unused folder and did some cleaning up.
+S-Bahn added (vs Hazard real?)
+Holds now work properly with sudden and hidden mods! Use the "oldStealthHolds" mod to revert back to the old style of having it appear all at once.
+Updated stealth "noglow" submods to now blend (or whatever). CHECK YOUR MODFILES IF THEY USE NOGLOW!
+BPM change support! This also includes note quant colours as well!
+Imported the shader resize fix from Inhuman!
+FINALLY updated the debug helper scripts.
+CustomPath mod has returned
+Made the code which checks if you've gone back in time have leniency, meaning it should trigger the going backwards code less.
+Fixed responsive holds not resetting to normal value properly (was most noticable in too many trumpets in the spiral holds section in tranquil).
+Hold covers will now face towards the hold note when spiral holds is enabled.
+Updated Hazard's art (was using wrong colours for Hazard's outfit, oops)
+Added a warning message for when trying to access a player which doesn't exist
+Fixed Too Many Trumpets having broken inputs for Disruption (oops my bad)
+Fixed speed mult for blacksphere being wrong for upscroll
+Fixed tiny mods being applied twice on strums when drive2 is active
+New arrowpath offset mods (arrowpathoffsetx, arrowpathoffsety, arrowpathoffsetz)
+Added cull modifier for arrowpath
+Fixed hurt notes triggering for ALL players (meaning if you had 4 players, it would deal 4x the damage x.x)
+Began work on the wiki documentation for this fork!
+
+
+
+
+
+v0.7.5a:
+Updated to version v0.5.2 of FNF!
+Made the Github page a little bit more nicer
+Temporarily disabled customPath mod
+Can now change the arrowpath graphic
+Fixed "always positive / negative" cull mode (flips the sprite again)
+Fixed crash when trying to add 3D mod when the song is already loaded
+Fix responsive holds mod triggering when it shouldn't
+Updated holds to now have better texture UV's.
+stealthpastreceptors submod added to hidden
+Updated cull mode for 3D sprites! Now works properly! (removed hazCullMode, just uses cullMode now)
+Improved custom strum inputs to work better with scripts
+camNotes and camAFT will now copy camHUD's zoom! Disable this by setting Playstate's noteCamCopyHudZoom to false (copyZoom(false) in lua)
+Sustains now work for 3D mode!
+Hopefully made the 3D perspective math a little bit more stable (previously freaked out when z got too high)
+Fixed memory leak with sustains when changing colour transform (also applies to arrow path, meaning you can now pulse them on every beat without the memory dying now!)
+DebugNotifications can now be hidden
+Adjusted mod priority of CenterX and Orient so Orient works properly when CenterX is used (same done for trueX, trueY, and trueZ move mods)
+DebugTimeBar more stable. Also now requires you to be in practice mode to be useable
+Updated noteMods: Little bit more stable and now works for holds
+Added onStepHit and onBeatHit for Lua!
+Updated note positioning for v0.5.2, should hopefully allow for custom notestyles to work properly between modcharted and non-modcharted songs
+Decreased offset mods priority
+new pixel argos icon
+Ported Operator from Inhuman
+Moved most of the modchart songs to a new character dedicated to modcharts with no characters.
+Fixed hurt note splash being on camHUD and not camNotes
+Started moving out the shaders into their own files instead of overriding wiggle.frag
+Re-added funnyInputs cuz of the smoother conductor which makes the notes move a lot smoother (this mod is so fucking based)
+Added the option for a notestyle to position it's holds behind the strum
+Kind of added support for custom noteSplashes?
+Added a vibrate effect to the 3D mesh class.
+3D notes no longer update their triangles if they haven't moved at all (experimental performance change. Might be good, might be bad)
+Hidden all the custom weeks in the story menu (so they only appear in freeplay now)!
+Fixed fade in tween for notes
+Updated zSort mod to only work for boyfriend (to prevent accidental conflicts between two strums having different zsort states, causing them to constantly fight over zsort state value)
+3D mod now attempts to preload all the animation frames before the song starts. NOTE: May still encounter a slight lagspike for when the first note appears if the notes and strums use seperate animation textures!
+Updated dad invert mod list (the list of mods which invert for the opponent when invert values is enabled)
+New modifiers:
+DrunkAngleX
+DrunkAngleY
+BumpyAngleX
+BumpyAngleY
+zigzagAngleX
+zigzagAngleY
+bounceAngleX
+bounceAngleY
+sawAngleX
+sawAngleY
+beatAngleX
+beatAngleY
+digitalAngleX
+digitalAngleY
+CosBumpy (and all the other extra mods like CosBumpyAngleY)
+CosBounce (and all the other extra mods)
+NotesRotateX
+NotesRotateY
+NotesRotateZ
+
+
+
+
+
+v0.7.3a:
+Updated input system!
+Now it should feel a lot better with less bullshit misses (thanks funny inputs mod lol)
+Fixed custom strums sometimes missing a note when pressing two keys at once (hopefully).
+
+Made hurt notes low priority
+
+Slightly fixed the notesplash positioning when moving on the z axis
+
+Cut Boing's song length down since the rest isn't planned to be modcharted
+
+3D render mode memory leak fixed!
+Notes now vwoosh properly with 3D render mode
+
+Tweens can now work before the song has started (allowing for custom countdown intros)
+
+Debug notifications can now stack!
+
+Argo↑↓s added (ported from Inhuman)
+HALVED HALVED HALVED
+
+Note:
+Culling mode behaviour may be even more scuffed with this new update.
+Also note flipX and flipY won't work on 3D notes either.
+
+
+
+v0.7.2a:
+Culling mode added to 3D mode... though it's kinda scuffed lol
+
+Updated FNF to latest version (v0.4.1)
+
+Fixed tantipsy mod not using tan
+
+Culling mod added to 3D mode (so you can choose to cull backfaces or front faces for example for some funky effects)
+
+CenterX mod added
+Also slightly reworked center mod
+
+Added dashes around scrollSpeed to help not mislead people into thinking it's a valid mod that can be changed
+
+Updated hxscripts to break less often (hopefully). And yes, this means clicking on results screen no longer breaks timebar script lol
+
+Fixed stealthGlow for strums
+
+Updated Final-Hope
+
+New snap mod
+New jump mod
+
+Added meta-mods! You can now force metamods by pressing CTRL in freeplay.
+
+Hurt note script added... >:3
+
+Known problems which will be fixed:
+BlackSquare bug with 3D mode enabled and using an AFT
+3D mode potential memory leak?
+Sustains don't work with 3D mode (yet)
+ZSort mod places holds infront of notes
+
+
+TODO:
+vsHazard
+Argo↑↓s ported from Inhuman
+MATOI
+Fixed blacksquare bug with AFT and 3D mod
+Sustains now work with 3D mod
+Improved hxScript in Lua
+DefineMod added to lua!
+ZProjectSprite class overhaul -> use draw quads and fix subdivision math
+Strums can now be set to Player or Opponent at runtime! EXCEPT PLAYER 1 WILL ALWAYS BE PLAYER CONTROLLED FOR SCORE AND HEALTH CALCS!
+
+
+
+
+v0.7.1a:
+Fixed spiral holds! 
+Fixed sudden not working if added by itself (only worked if hidden or stealth was also added? wtf?)
+
+When a strumline is set to sleep, it automatically hides / shows itself. Behaviour can be disabled (seen in NULCTRL for sleep gimicks lmao)
+
+New experimental ZProjectSprite which creates a 3D plane for you to fuck around with.
+
+Tweaked the toggle debug script to toggle for all instead of for each one. Also remembers this state when swapping between songs
+Also CTRL+H does not toggle visiblity for the tween list anymore. That can only be seen by using CTRL+T to toggle it.
+
+Minimal mode in Playstate no longer loads modcharts! (next version will add the ability to choose to load lua files in minimal or not)
+
+Made stealth glow unable to go above 1 or below 0 in shader (to prevent weirdness)
+
+New (scuffed) timebar added to the pause menu which when clicked on, allows you to seek through a song. Very useful to get to where you wanna go on longer songs!
+
+New helper texts added to PlayState to help debug problems (and for when you create new problems lol)
+
+Major code refactor! Expect bugs, but also much better framerate (hopefully)
+Also comes with a few new mods
+
+Spiral mods now have a new submod called "cos". Set it to 0.5 or higher to swap to using cos instead of sin. Also values are automatically divided by 100 since the values you would use were so small
+
+Tipsy and Drunk mod now have timertype submod which allows you to use beatTime instead of songTime. Also Tipsy math updated!
+
+Fixed sawZ mod being applied twice
+
+Brake and boost finally added. Also added wave
+
+Can now attach mods onto specific notes. (experimental)
+
+New experimental "3D" mod which enables ThreeD projection for the strums and notes. Currently doesn't affect sustains.
+
+runHaxeCode ported from Psych (experimental, added cuz I wanna do haxe stuff without having to reload the entire script lmao)
+
+New experimental customMod setup (for creating your own mods)
+
+Added Burgerballs's "funnyinputs" mod to help combat the shitty V-Slice input system (still sucks ass as seen in Donacdum and Credits Hard)
+
+Optimised Final-Hope by merging 2 shaders into one.
+
+New song: Credits (with easy, normal, hard difficulties)
+Ported Cat meme song from Inhuman (with easy and normal difficulties)
+
+Known bugs:
+Clicking on the results screen will break the timebar script (lol?)
+With 3D mod enabled, sustains aren't affected. Also, the receptors will appear as a black square sometimes when captured by an AFT. (I'm guessing a desync between render and update timings?)
+Scripts don't seem to pick up on downscroll variable on first load? (load Boing and then see the first drop gimick is broken till reloaded)
+Eases that end back at 0 (like bounce, pop, tri, etc) don't work properly with func_tweens (ease jumps to 1 at the end instead of reseting back to 0)
+DrawTriangles seems to cause memory leak? God damnit (this includes sustains, arrowpaths, and 3D notes if enabled)
+ChartEditor is still fucked and cannot set playbackrate midsong :(
+Cuz of V-Slice being funny with it's inputs, sometimes a custom player controlled strumline will miss a note but player 1 won't, resulting in visually missing a note but not actually missing, and vice versa (hitting a note but not really)
+
+
+
+v0.7.0a:
+2 new demo songs added - NULCTRL and Final-Hope
+
+Stealth Glow added!
+
+New mod (like, game mod, not modifier mod) which changes combo sprite to be half opacity. Temporary until combo mods are added so you can just do comboAlpha = 0.5
+Also decided to keep null stickers mod cuz funny
+
+Notesplash and holdnotecover now copy the strum alpha. Eventually will be replaced with mods!
+
+Pressing 8 in playstate will get rid of the loaded modchart and reload it!
+Pressing 4 will instantly set the song position back to the start (quick restart)
+Pressing 5 will instantly set the song position 10 seconds before the end
+
+Fixed bug where when arrowpath alpha gets set to 0, it's logic stops correctly but it stops its logic before being fully hidden
+
+New arrowpath_notitg mod - makes arrowpaths appear like NotITG, though more costly (for some reason? how is drawing a line more costly then a bunch of verts on a flxstrip?).
+
+Reworked center mod math to work as intended (so it takes into account reverse!). New rework: mod value of 1 will ALWAYS make the strums reach the center of the screen
+(calculates the value it needs to get to FlxG.screenHeight/2)
+set submod "oldmath" to 1 to use the old math!
+
+New centernotes mod. Basically works like notespeed but with affecting note distance? very wacky mod lmao
+
+New orient mod. Kinda scuffed right now but it seems to work
+
+Fixed tanbumpy mod (forget to test it oops)
+
+NoteSkew mod added (noteskewx and noteskewy)
+
+Z sort mod added (0 = default, -1 removes z sort and go back to vanilla sort, 1 = full z sort where everything gets thrown into one big group in playstate to be sorted (so playfields can be correctly layered)
+
+CustomPath mod added
+
+New mathCutOff mod added. If the distance from receptor is this value or higher, it will skip doing mod math. Very useful for stopping long holds doing all the math when you can't even see them! Also mod math is now skipped if the hold is being held and is at the curpos 0 (optimisation can be disabled with "noHoldMathShortcut" if needed)
+
+Long holds mod added
+
+Adjusted the invert values variable so now it works as a mod, allowing you to easily use it for custom playfield (invertmodvalues mod). Untested though!
+
+Updated the debugdisplay.hx script to now reset vanilla song events when going forwards and backwards
+
+Adjusted debug text position for upscroll
+Also debug text has been slightly optimised. Now only updates when it needs too instead of every frame.
+
+Fixed reset lua function (always applied to all players, oops)
+
+Resetting SHOULD also reset special mods (like spiralholds or note grain!). This is to fix if you use a special mod, but then remove and reload the modchart, it would break.
+
+Support for different hold note skins added (so wide holds don't break!). Also general hold improvements (hopefully)
+
+New eases work properly with func_tweens (like bounce)
+
+New functions added to lua for a simple AFT setup.
+WARNING: SEEMS TO CAUSE MEMORY LEAK LOL? WAIT UNTIL NEXT VERSION OR USE HXSCRIPT FOR AFTS INSTEAD!
+setupAFT()
+aftRecursive(0,true)
+aftSize(0,1.1)
+aftUpdateRate(0,0.0)
+aftBlend(0,"normal")
+aftAlpha(0,0.8)
+beat, value
+
+aftTweenAlpha(0, 1, linear, 0.0)
+aftTweenSize(0, 1, linear, 0.7)
+
+Also TRIED to make recursive afts now work properly but nope. I think there is some render engine limitations going on here which makes that impossible :(
+
+
+
+
+
+
+v0.6.7a:
+Fixed hidden and sudden not working for upscroll
+Vanish mod added
+Digital mod added (math might get redone in future)
+TanBumpy added (lol?)
+
+
+
+
+
+v0.6.6a:
+Players can now be made asleep using
+setasleep(time, player, isSleep).
+This will make the player not really do anything so you can have inactive players in the background without eating performance
+
+Attempted to fix the sustain zperspective math crash... again
+Also hopefully fixed sustains covering the screen 
+
+Seperate mod arrays for strums, notes, and arrowpaths
+This is a test for performance so that when there are a lot of mods to loop through, it doesn't have to go through ones which are 'useless' (so for example, the arrowpath mod won't no longer try to do math for debugx since only strums can use that mod)
+
+Lane mods now have higher priority then regular notes!
+
+Fixed rotationy mod math!
+Fixed rotationx mod math!
+Updated the math for rotatez (no more goofy offset fix needed!)
+Added strumRotate which is the same as a rotate mod but only moves the strums around visually. Useful if you wanna rotate on the y axis but keep the notes coming from the z axis for example instead of having to do some counterrotate shenaniguns with the rotatey mod.
+
+Added tinystrumx and tinystrumy, tinynotex, tinynotey, showextra,showlanemods, showallmods
+(lane and some non-important mods are now hidden by default in debug to have less clutter)
+
+oh, and donacdum updated i guess
+
+
+
+
+
+v0.6.5a:
+
+Fixed hold cover note splash always appearing on left arrow
+Fixed add tweens not working properly with eases when skipping past them lol
+
+Proper custom playfield support!
+You can now refer to target as a number instead of a string. Doing so will target what player.
+Player 1 is always BF,
+Player 2 is always Dad,
+Player 3 and onwards refer to custom strums you added (make sure they're added first lol).
+New system for creating custom strums, and the ability to make them player or bot controlled.
+
+WaveyStrum mod added
+
+
+
+v0.6a:
+
+Ported all mirin template eases in, as well as made it possible to use the NotITG ease names!
+(so instead of sineOut, you can use outSine)
+
+Lua now has variables: beatLength, stepLength, and measureLength, difficulty, song name
+
+Added setdefault()
+Add tweens now work properly! (work just like mirin template (hopefully), where you can overlap multiple tweens for cool effects)
+
+Made invert for opponent start disabled by default, however can now be enabled / disabled through lua in the setup function.
+
+Blacksphere mod now affects scroll speed of the lane! This is to make it easier to read without the notes going all fucky on the y axis. This can be controlled with it's new "speedaffect" submod. When going reverse, make sure to invert this value!
+
+New mods:
+drive
+bounceangle
+zigzagangle
+zigzagscale
+sawscale
+sawangle
+squarespeed
+square
+squarey
+squarez
+squarescale
+squareangle
+beatscale
+beatspeed
+drunkscale
+tipsyangle
+tipsyscale
+tornadoy
+tornadoangle
+tornadoscale
+bumpyspeed
+bouncespeed
+linearspeed
+debugShowZeroValueMods
+debugShowSubValueMods
+
+Changed bumpyScale to not be comedically exaggerated
+Fixed drunk time_add not working
+Added beat offset submod
+some other bug fixes lol
