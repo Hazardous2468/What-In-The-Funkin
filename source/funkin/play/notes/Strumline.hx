@@ -190,7 +190,15 @@ class Strumline extends FlxSpriteGroup
 
   /**
    * Whether this strumline is controlled by the player's inputs.
+   * False means it's controlled by the opponent or Bot Play.
+   * For WITF, this variable exists just for script parity with base game.
+   */
+  public var isPlayer:Bool;
+
+  /**
+   * Whether this strumline is controlled by the player's inputs.
    * False means it's controlled by the opponent.
+   * This variable is used over the vanilla "isPlayer" variable!
    */
   public var isPlayerControlled(default, set):Bool;
 
@@ -304,6 +312,7 @@ class Strumline extends FlxSpriteGroup
   {
     super();
 
+    this.isPlayer = isPlayer;
     this.isPlayerControlled = isPlayer;
     this.defaultPlayerControl = isPlayer;
     this.noteStyle = noteStyle;

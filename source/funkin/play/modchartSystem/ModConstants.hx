@@ -82,7 +82,7 @@ class ModConstants
 {
   public static var orientTimeOffset:Float = 4.0; // in ms
 
-  public static final MODCHART_VERSION:String = "v0.9.0a";
+  public static final MODCHART_VERSION:String = "v0.9.1a";
 
   public static var tooCloseToCameraFix:Float = 0.975; // dumb fix for preventing freak out on z math or something
 
