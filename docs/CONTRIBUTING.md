@@ -1,3 +1,9 @@
+# What in the Funkin'?!  
+Please keep any contributions of any kind to only apply to the modchart system itself. This fork's primary focus is for modcharting, _not_ for making a "better" version of the vanilla engine.  
+For example, any base game issues will be closed as this fork doesn't seek to patch any existing / already known problems.  
+Please keep issues to specifically WITF!
+
+
 # Contributing
 Welcome to the Contributing Guide!
 You can contribute to the Funkin' repository by opening issues or pull requests.
