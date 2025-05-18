@@ -7,100 +7,95 @@ import funkin.save.Save.SaveScoreTallyData;
  */
 class DebugTallies
 {
-  /**
-   * 2400 total notes = 7% = LOSS
-   */
   public static var LOSS:SaveScoreTallyData =
     {
-      sick: 130,
-      good: 60,
-      bad: 69,
-      shit: 69,
-      missed: 69,
-      combo: 69,
-      maxCombo: 69,
-      totalNotesHit: 170,
-      totalNotes: 2400
+      sick: 70,
+      good: 5,
+      bad: 2,
+      shit: 1,
+      missed: 1402,
+      combo: 77,
+      maxCombo: 77,
+      totalNotesHit: 77,
+      totalNotes: 1480
     };
 
-  /**
-   * 275 total notes = 69% = NICE
-   */
   public static var NICE:SaveScoreTallyData =
     {
-      sick: 130,
-      good: 60,
-      bad: 69,
-      shit: 69,
-      missed: 69,
+      sick: 69,
+      good: 0,
+      bad: 0,
+      shit: 31,
+      missed: 0,
       combo: 69,
       maxCombo: 69,
-      totalNotesHit: 190,
-      totalNotes: 275
+      totalNotesHit: 69,
+      totalNotes: 100
     };
 
-  /**
-   * 240 total notes = 79% = GOOD
-   */
   public static var GOOD:SaveScoreTallyData =
     {
-      sick: 130,
-      good: 60,
-      bad: 69,
-      shit: 69,
-      missed: 69,
-      combo: 69,
-      maxCombo: 69,
-      totalNotesHit: 190,
-      totalNotes: 240
+      sick: 82,
+      good: 2,
+      bad: 0,
+      shit: 0,
+      missed: 16,
+      combo: 15,
+      maxCombo: 60,
+      totalNotesHit: 84,
+      totalNotes: 100
     };
 
-  /**
-   * 230 total notes = 82% = GREAT
-   */
   public static var GREAT:SaveScoreTallyData =
     {
-      sick: 130,
-      good: 60,
-      bad: 69,
-      shit: 69,
-      missed: 69,
-      combo: 69,
-      maxCombo: 69,
-      totalNotesHit: 190,
-      totalNotes: 230
+      sick: 86,
+      good: 2,
+      bad: 1,
+      shit: 7,
+      missed: 8,
+      combo: 15,
+      maxCombo: 60,
+      totalNotesHit: 88,
+      totalNotes: 99
     };
 
-  /**
-   * 210 total notes = 91% = EXCELLENT
-   */
   public static var EXCELLENT:SaveScoreTallyData =
     {
-      sick: 130,
-      good: 60,
-      bad: 69,
-      shit: 69,
-      missed: 69,
-      combo: 69,
-      maxCombo: 69,
-      totalNotesHit: 190,
-      totalNotes: 210
+      sick: 94,
+      good: 3,
+      bad: 1,
+      shit: 1,
+      missed: 5,
+      combo: 4,
+      maxCombo: 90,
+      totalNotesHit: 94,
+      totalNotes: 100
     };
 
-  /**
-   * 190 total notes = PERFECT
-   */
   public static var PERFECT:SaveScoreTallyData =
     {
-      sick: 130,
-      good: 60,
-      bad: 69,
-      shit: 69,
-      missed: 69,
-      combo: 69,
-      maxCombo: 69,
-      totalNotesHit: 190,
-      totalNotes: 190
+      sick: 189,
+      good: 11,
+      bad: 0,
+      shit: 0,
+      missed: 0,
+      combo: 200,
+      maxCombo: 200,
+      totalNotesHit: 200,
+      totalNotes: 200
+    };
+
+  public static var PERFECT_GOLD:SaveScoreTallyData =
+    {
+      sick: 200,
+      good: 0,
+      bad: 0,
+      shit: 0,
+      missed: 0,
+      combo: 200,
+      maxCombo: 200,
+      totalNotesHit: 200,
+      totalNotes: 200
     };
 
   public static function getTallyForRank(rank:DebugRank):SaveScoreTallyData
@@ -113,10 +108,19 @@ class DebugTallies
       case GREAT_RANK: GREAT;
       case EXCELLENT_RANK: EXCELLENT;
       case PERFECT_RANK: PERFECT;
+      case PERFECTGOLD_RANK: PERFECT_GOLD;
     }
   }
 
-  public static var DEBUG_RANKS:Array<DebugRank> = [LOSS_RANK, NICE_RANK, GOOD_RANK, GREAT_RANK, EXCELLENT_RANK, PERFECT_RANK];
+  public static var DEBUG_RANKS:Array<DebugRank> = [
+    LOSS_RANK,
+    NICE_RANK,
+    GOOD_RANK,
+    GREAT_RANK,
+    EXCELLENT_RANK,
+    PERFECT_RANK,
+    PERFECTGOLD_RANK
+  ];
 }
 
 enum abstract DebugRank(String) from String to String
@@ -127,4 +131,5 @@ enum abstract DebugRank(String) from String to String
   var GREAT_RANK = "Great";
   var EXCELLENT_RANK = "Excellent";
   var PERFECT_RANK = "Perfect";
+  var PERFECTGOLD_RANK = "Perfect Gold";
 }

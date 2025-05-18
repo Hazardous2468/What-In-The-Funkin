@@ -54,7 +54,10 @@ class ResultsDebugSubState extends MusicBeatSubState
           FlxG.switchState(() -> new funkin.play.ResultState(resultsParams));
       });
     });
-    createToggleListItem("Character", PlayerRegistry.instance.listBaseGameEntryIds(), function(result:String) {
+    // Get base game players:
+    var players = PlayerRegistry.instance.listBaseGameEntryIds();
+    players = players.concat(PlayerRegistry.instance.listModdedEntryIds());
+    createToggleListItem("Character", players, function(result:String) {
       resultsParams.characterId = result;
     });
     createToggleListItem("Results Mode", ["Debug", "Story", "Freeplay"], function(result:String) {
