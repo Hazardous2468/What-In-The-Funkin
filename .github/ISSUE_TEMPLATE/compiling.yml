@@ -33,8 +33,8 @@ body:
   - type: input
     attributes:
       label: Version
-      description: Which version are you compiling? The game version is in the bottom left corner of the main menu or in the project.hxp file. 
-      placeholder: ex. 0.6.4
+      description: Which version of WITF are you compiling? The game version is in the bottom left corner of the main menu or in the project.hxp file. 
+      placeholder: ex. v0.9.0a
     validations:
       required: true
   
