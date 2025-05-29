@@ -199,7 +199,7 @@ class HazardModLuaTest
         return;
       }
 
-      if (playerTarget == "both" || playerTarget == "all")
+      if (playerTarget == "everyone" || playerTarget == "both" || playerTarget == "all")
       {
         for (customStrummer in PlayState.instance.allStrumLines)
         {
@@ -225,7 +225,7 @@ class HazardModLuaTest
     });
 
     Lua_helper.add_callback(lua, "setStrumControl", function(playerTarget:String, isPlayerControlled:Bool, time:Float) {
-      if (playerTarget == "both" || playerTarget == "all")
+      if (playerTarget == "everyone" || playerTarget == "both" || playerTarget == "all")
       {
         for (customStrummer in PlayState.instance.allStrumLines)
         {
@@ -256,6 +256,19 @@ class HazardModLuaTest
     });
 
     // LMAO
+    Lua_helper.add_callback(lua, "easeFlip", function(ease1:String):String {
+      return 'flip(${ease1})';
+    });
+    Lua_helper.add_callback(lua, "easeBlend", function(ease1:String, ease2:String):String {
+      return 'blend(${ease1},${ease2})';
+    });
+    Lua_helper.add_callback(lua, "easeMerge", function(ease1:String, ease2:String):String {
+      return 'merge(${ease1},${ease2})';
+    });
+    Lua_helper.add_callback(lua, "easeLerp", function(ease1:String, ease2:String):String {
+      return 'lerp(${ease1},${ease2})';
+    });
+
     Lua_helper.add_callback(lua, "flip", function(ease1:String):String {
       return 'flip(${ease1})';
     });
@@ -272,11 +285,8 @@ class HazardModLuaTest
     Lua_helper.add_callback(lua, "tween", tweenFunc);
     Lua_helper.add_callback(lua, "ease", tweenFunc);
     Lua_helper.add_callback(lua, "value", valueFunc);
-
     Lua_helper.add_callback(lua, "setdefault", setDefaultFunc);
-
     Lua_helper.add_callback(lua, "set", setFunc);
-
     Lua_helper.add_callback(lua, "add", addFunc);
 
     Lua_helper.add_callback(lua, "setdefaults", function(data:String) {
@@ -573,7 +583,7 @@ class HazardModLuaTest
     });
 
     Lua_helper.add_callback(lua, "reset", function(startBeat:Float, playerTarget:String = "all") {
-      if (playerTarget == "both" || playerTarget == "all")
+      if (playerTarget == "everyone" || playerTarget == "both" || playerTarget == "all")
       {
         for (customStrummer in PlayState.instance.allStrumLines)
         {
@@ -589,7 +599,7 @@ class HazardModLuaTest
 
     Lua_helper.add_callback(lua, "resort", function(startBeat:Float, playerTarget:String = "all") {
       PlayState.instance.modchartEventHandler.modChartHasResort = true;
-      if (playerTarget == "both" || playerTarget == "all")
+      if (playerTarget == "everyone" || playerTarget == "both" || playerTarget == "all")
       {
         for (customStrummer in PlayState.instance.allStrumLines)
         {
@@ -606,6 +616,7 @@ class HazardModLuaTest
     Lua_helper.add_callback(lua, "percentageMode", function(newval:Bool = false) {
       trace("set percentage mode to: " + newval);
       PlayState.instance.modchartEventHandler.percentageMods = newval;
+      luaTrace("'percentageMode' is not available!", FlxColor.RED);
     });
 
     Lua_helper.add_callback(lua, "hideNotifs", function(newval:Bool = false) {
@@ -623,7 +634,6 @@ class HazardModLuaTest
     });
 
     Lua_helper.add_callback(lua, "centerPlayer", function(pointless:String = "") {
-      trace("attempting to center player 0");
       var playerStrumline:Strumline = PlayState.instance.playerStrumline;
       if (playerStrumline != null)
       {
@@ -632,31 +642,84 @@ class HazardModLuaTest
     });
     Lua_helper.add_callback(lua, "hideOpponent", function(pointless:String = "") {
       trace("attempting to hide opponent");
-      var opponentStrumline = PlayState.instance.opponentStrumline;
-      if (opponentStrumline != null)
+      var strummer = PlayState.instance.opponentStrumline;
+      if (strummer != null)
       {
-        opponentStrumline.x = -999;
-        for (arrow in opponentStrumline.members)
+        strummer.asleep = true;
+        strummer.x = -999;
+        strummer.visible = false;
+        for (arrow in strummer.members)
         {
           arrow.visible = false;
         }
       }
     });
-    Lua_helper.add_callback(lua, "centerOpponent", function(pointless:String = "") {
-      trace("attempting to center opponent");
-      var playerStrumline:FlxSprite = PlayState.instance.opponentStrumline;
-      if (playerStrumline != null)
+
+    Lua_helper.add_callback(lua, "centerStrum", function(playerTarget:String = "all") {
+      if (playerTarget == "everyone" || playerTarget == "both" || playerTarget == "all")
       {
-        playerStrumline.x = (FlxG.width / 2 - playerStrumline.width / 2);
+        for (customStrummer in PlayState.instance.allStrumLines)
+        {
+          customStrummer.x = (FlxG.width / 2 - customStrummer.width / 2);
+        }
+      }
+      else
+      {
+        var strummer:FlxSprite = ModConstants.grabStrumModTarget(playerTarget).strum;
+        if (strummer != null)
+        {
+          strummer.x = (FlxG.width / 2 - strummer.width / 2);
+        }
       }
     });
+
+    Lua_helper.add_callback(lua, "hideStrum", function(playerTarget:String = "opponent") {
+      if (playerTarget == "everyone" || playerTarget == "both" || playerTarget == "all")
+      {
+        for (strummer in PlayState.instance.allStrumLines)
+        {
+          strummer.asleep = true;
+          strummer.x = -999;
+          strummer.visible = false;
+          for (arrow in strummer.members)
+          {
+            arrow.visible = false;
+          }
+        }
+      }
+      else
+      {
+        var strummer:Strumline = ModConstants.grabStrumModTarget(playerTarget).strum;
+        if (strummer != null)
+        {
+          strummer.asleep = true;
+          strummer.x = -999;
+          strummer.visible = false;
+          for (arrow in strummer.members)
+          {
+            arrow.visible = false;
+          }
+        }
+      }
+    });
+
+    Lua_helper.add_callback(lua, "centerOpponent", function(pointless:String = "") {
+      var strummer:FlxSprite = PlayState.instance.opponentStrumline;
+      if (strummer != null)
+      {
+        strummer.x = (FlxG.width / 2 - strummer.width / 2);
+      }
+    });
+
     Lua_helper.add_callback(lua, "hidePlayer", function(pointless:String = "") {
       trace("attempting to hide player");
-      var opponentStrumline:Strumline = PlayState.instance.playerStrumline;
-      if (opponentStrumline != null)
+      var strummer:Strumline = PlayState.instance.playerStrumline;
+      if (strummer != null)
       {
-        opponentStrumline.x = -999;
-        for (arrow in opponentStrumline.members)
+        strummer.asleep = true;
+        strummer.x = -999;
+        strummer.visible = false;
+        for (arrow in strummer.members)
         {
           arrow.visible = false;
         }
@@ -665,7 +728,8 @@ class HazardModLuaTest
 
     // legacy function, just use the grain mod
     Lua_helper.add_callback(lua, "setGrain", function(newGrainValue:Float = 80, playerTarget:String = "all") {
-      if (playerTarget == "both" || playerTarget == "all")
+      luaTrace("'setGrain' is deprecated! Use the 'grain' modifier instead!", FlxColor.RED);
+      if (playerTarget == "everyone" || playerTarget == "both" || playerTarget == "all")
       {
         for (strumLine in PlayState.instance.allStrumLines)
         {
@@ -692,7 +756,7 @@ class HazardModLuaTest
 
     // legacy function, use createNewPlayer
     Lua_helper.add_callback(lua, "customStrumAmount", function(newval:Int = 0) {
-      luaTrace("'customStrumAmount' is obsolete! Use 'createNewPlayer()' instead!", FlxColor.RED);
+      luaTrace("'customStrumAmount' is obsolete! Use 'createNewPlayer()' instead!", true, FlxColor.RED);
     });
 
     Lua_helper.add_callback(lua, "createNewPlayer", function(playerControlled:Bool, ?noteStyle:String) {
@@ -712,15 +776,13 @@ class HazardModLuaTest
       }
     });
 
-    Lua_helper.add_callback(lua, "aftSetup", function(startBeat:Float = -95) {
+    Lua_helper.add_callback(lua, "aftSetup", function(startBeat:Null<Float> = null) {
       if (PlayState.instance.luaAFT_Capture != null)
       {
-        // PlayState.instance.modDebugNotif("Can only have one Lua AFT!");
-        // trace("Lua already added!");
         luaTrace("Only one Lua AFT sprite can exist.", FlxColor.ORANGE);
         return;
       }
-      if (startBeat == -95)
+      if (startBeat == null)
       {
         PlayState.instance.setUpLuaAft();
       }
@@ -1139,7 +1201,7 @@ class HazardModLuaTest
 
     // trace("ease name : " + easeToUse);
     // trace("ease to use : " + ModConstants.getEaseFromString(easeToUse));
-    if (playerTarget == "both" || playerTarget == "all")
+    if (playerTarget == "everyone" || playerTarget == "both" || playerTarget == "all")
     {
       for (customStrummer in PlayState.instance.allStrumLines)
       {
@@ -1163,7 +1225,7 @@ class HazardModLuaTest
 
     // trace("ease name : " + easeToUse);
     // trace("ease to use : " + ModConstants.getEaseFromString(easeToUse));
-    if (playerTarget == "both" || playerTarget == "all")
+    if (playerTarget == "everyone" || playerTarget == "both" || playerTarget == "all")
     {
       for (customStrummer in PlayState.instance.allStrumLines)
       {
@@ -1183,7 +1245,7 @@ class HazardModLuaTest
   {
     modName = ModConstants.modAliasCheck(modName);
 
-    if (playerTarget == "both" || playerTarget == "all")
+    if (playerTarget == "everyone" || playerTarget == "both" || playerTarget == "all")
     {
       for (customStrummer in PlayState.instance.allStrumLines)
       {
@@ -1203,7 +1265,7 @@ class HazardModLuaTest
     // trace("WOW! WE NEED SET: " + modName);
     modName = ModConstants.modAliasCheck(modName);
 
-    if (playerTarget == "both" || playerTarget == "all")
+    if (playerTarget == "everyone" || playerTarget == "both" || playerTarget == "all")
     {
       for (customStrummer in PlayState.instance.allStrumLines)
       {
@@ -1222,7 +1284,7 @@ class HazardModLuaTest
   {
     // trace("WOW! WE NEED ADD: " + modName);
     modName = ModConstants.modAliasCheck(modName);
-    if (playerTarget == "both" || playerTarget == "all")
+    if (playerTarget == "everyone" || playerTarget == "both" || playerTarget == "all")
     {
       for (customStrummer in PlayState.instance.allStrumLines)
       {

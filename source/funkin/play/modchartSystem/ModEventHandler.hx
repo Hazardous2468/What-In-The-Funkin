@@ -19,11 +19,10 @@ import flixel.util.FlxSort;
 // tween
 import flixel.tweens.FlxTween;
 import flixel.tweens.FlxEase;
-// mod lol
+// mod system
 import funkin.play.modchartSystem.ModConstants;
 import funkin.play.modchartSystem.ModTimeEvent;
 import funkin.play.modchartSystem.ModHandler;
-// import funkin.play.modchartSystem.Modifier;
 import funkin.play.modchartSystem.modifiers.BaseModifier;
 import funkin.modding.events.ScriptEvent;
 import funkin.play.modchartSystem.HazardEase;
@@ -41,10 +40,10 @@ class ModEventHandler
 
   public var modchartTweens:Map<String, FlxTween> = new Map<String, FlxTween>();
 
-  // If set to true, then MOST mods will be divided by 100% when being added into the timeline. This is so you can treat it like NotITG lmao
+  // If set to true, then MOST mods will be divided by 100% when being added into the timeline. This is so you can treat it like NotITG lmao. Currently not implemented.
   public var percentageMods:Bool = false;
 
-  // If set to true, then some mods will be inverted for opponent. Defaults to false.
+  // If set to true, then some mods will be inverted for opponent. Defaults to false. Hasn't been tested / used in a long time. Could potentially be deprecated.
   public var invertForOpponent:Bool = false;
 
   public function new()
@@ -71,10 +70,7 @@ class ModEventHandler
       modchartTweens.get(key).cancel();
       modchartTweens.remove(key);
     }
-    // for (key in modResetFuncs.keys())
-    // {
-    //   modResetFuncs.remove(key);
-    // }
+
     modResetFuncs = new Array();
 
     for (modEvent in modEvents)
@@ -82,7 +78,7 @@ class ModEventHandler
       modEvent.hasTriggered = false;
     }
     tweenManager.clear();
-    bullshitCounter = 0;
+    tweenCounter = 0;
 
     modEvents = new Array();
 
@@ -92,7 +88,7 @@ class ModEventHandler
       strum.asleep = false;
       strum.mods.resetModValues();
       strum.mods.clearMods();
-      strum.mods.addMod('speedmod', 1, 1);
+      strum.mods.addMod('speedmod', 1, 1); // Every strum ALWAYS has this modifier by default.
     }
   }
 
@@ -103,8 +99,6 @@ class ModEventHandler
   var lastReportedSongTime:Float = 0.0;
 
   var backInTimeLeniency:Float = 250; // in Miliseconds. Done because V-Slice sometimes often tries to go backwards in time? (???)
-
-  // Note that when paused, it will ignore this!
 
   public function update(elapsed:Float):Void
   {
@@ -122,9 +116,7 @@ class ModEventHandler
 
     var timeBetweenLastReport:Float = (songTime - lastReportedSongTime) / Constants.MS_PER_SEC; // Because the elapsed from flxg or the playstate doesn't account for lagspikes? okay, sure.
     // trace("customElapsed: " + timeBetweenLastReport);
-    tweenManager.update(timeBetweenLastReport); // should be automatically paused when you pause in game
-
-    // tweenManager.update(elapsed); // should be automatically paused when you pause in game
+    tweenManager.update(timeBetweenLastReport);
     handleEvents();
 
     lastReportedSongTime = songTime;
@@ -209,8 +201,10 @@ class ModEventHandler
     }
   }
 
-  var bullshitCounter:Int = 0;
+  // Every single tween is given a unique ID! Done so additive tweens can overlap properly.
+  var tweenCounter:Int = 0;
 
+  // A function that gets a modifier name, and outputs the actual modifier.
   function figureOutMod(target:ModHandler, modName:String):Modifier
   {
     var mod:Modifier = null;
@@ -224,7 +218,6 @@ class ModEventHandler
     {
       isSub = true;
       subModArr = _tag.split('__');
-      // _tag = subModArr[1];
     }
 
     if (isSub)
@@ -254,7 +247,7 @@ class ModEventHandler
     // trace("Mod to tween: " + _tag);
     // trace("-------------------------");
 
-    bullshitCounter++;
+    tweenCounter++;
 
     var mmm = ModConstants.invertValueCheck(_tag, target.invertValues);
     newValue *= mmm;
@@ -329,7 +322,7 @@ class ModEventHandler
     var _tag:String = modName.toLowerCase();
     var realTag:String = ModConstants.modTag(modName.toLowerCase(), target);
 
-    bullshitCounter++;
+    tweenCounter++;
     var mmm = ModConstants.invertValueCheck(_tag, target.invertValues);
     addValue *= mmm;
 
@@ -340,17 +333,16 @@ class ModEventHandler
     {
       isSub = true;
       subModArr = _tag.split('__');
-      // _tag = subModArr[1];
     }
 
     if (isSub)
     {
-      realTag += "+s" + bullshitCounter;
+      realTag += "+s" + tweenCounter;
     }
     else
     {
       // so every add tween has it's own unique tag so they don't fight over each other.
-      realTag += "+m" + bullshitCounter;
+      realTag += "+m" + tweenCounter;
     }
 
     if (isSub)
@@ -412,6 +404,7 @@ class ModEventHandler
     }
   }
 
+  // This function will trigger all the functions that need to be called when a reset is triggered!
   public function triggerResetFuncs():Void
   {
     for (resetFunc in modResetFuncs)
@@ -429,6 +422,7 @@ class ModEventHandler
     }
   }
 
+  // If true, then the modfile has the resort function in it. Used in the resetMods function to resort everything back to default.
   public var modChartHasResort:Bool = false;
 
   // Call this function to resetEvents!
@@ -450,7 +444,7 @@ class ModEventHandler
       modEvent.hasTriggered = false;
     }
     tweenManager.clear();
-    bullshitCounter = 0;
+    tweenCounter = 0;
 
     // wake everyone back up as that is the default!
     for (strum in PlayState.instance.allStrumLines)
@@ -476,6 +470,7 @@ class ModEventHandler
     PlayState.instance.dispatchEvent(new ScriptEvent(MODCHART_RESET));
   }
 
+  // This function is responsible for triggering events!
   function handleEvents():Void
   {
     for (i in 0...modEvents.length)
@@ -642,10 +637,10 @@ class ModEventHandler
             // trace("funky tween triggered! was tagged? - " + (tweenTagged ? modEvent.modName.toLowerCase() : "nope"));
         }
       }
+      // We add how many seconds have elapsed from the starting beat to move the tween to it's proper position!
       if (tween != null)
       {
         var addAmount:Float = ((songTime - ModConstants.getTimeFromBeat(modEvent.startingBeat)) * 0.001);
-        // trace("Tween Funny! " + addAmount);
         @:privateAccess
         tween._secondsSinceStart += addAmount;
         @:privateAccess
@@ -668,20 +663,26 @@ class ModEventHandler
       {
         modchartTweens.get(key).cancel();
         modchartTweens.remove(key);
-        // trace("stopping this tween cuz reset lol - " + key);
+        // trace("stopping this tween cuz reset - " + key);
       }
     }
     target.resetModValues();
   }
 
-  // Call this to reset all mod values and cancel any existing tweens for this player!
+  // Call this to forcefully resort all the modifiers for the target mod handler.
   public function resortMods_ForTarget(target:ModHandler):Void
   {
     target.resortMods();
   }
 
-  // Use these funcs to manage events timeline!
-  // Event to reset all mods to default at this beatTime!
+  //
+  // Use these funcs to add events to the timeline!
+  //
+
+  /** Adds a 'reset' event to the timeline.
+   * @param target The ModHandler that will be affected by this event.
+   * @param startTime The beat this event will occur on.
+   */
   public function resetModEvent(target:ModHandler, startTime:Float):Void
   {
     var timeEventTest:ModTimeEvent = new ModTimeEvent();
@@ -693,6 +694,10 @@ class ModEventHandler
     modEvents.push(timeEventTest);
   }
 
+  /** Adds a 'resort' event to the timeline.
+   * @param target The ModHandler that will be affected by this event.
+   * @param startTime The beat this event will occur on.
+   */
   public function resortModEvent(target:ModHandler, startTime:Float):Void
   {
     var timeEventTest:ModTimeEvent = new ModTimeEvent();
@@ -704,33 +709,67 @@ class ModEventHandler
     modEvents.push(timeEventTest);
   }
 
-  // Event to set a mod value at this beatTime!
+  /** Adds a 'set' event to the timeline. This event will instantly snap the modName to the input value.
+   * @param target The ModHandler that will be affected by this event.
+   * @param startTime The beat this event will occur on.
+   * @param value The value the modifier will be set to.
+   * @param modName The name of the modifier to target.
+   */
   public function setModEvent(target:ModHandler, startTime:Float, value:Float, modName:String):Void
   {
     addModEventToTimeline(target, startTime, 0, ModConstants.getEaseFromString("linear"), value, modName, "set");
   }
 
-  // Event to trigger a tween between current mod value to value at beatTime
+  /** Adds a 'tween' event to the timeline. This event will ease a value from it's current value to the input value using the provided ease.
+   * @param target The ModHandler that will be affected by this event.
+   * @param startTime The beat this event will occur on.
+   * @param length The length of the tween in beats.
+   * @param ease The ease function that will be used for the tween.
+   * @param value The value the modifier will be set to.
+   * @param modName The name of the modifier to target.
+   */
   public function tweenModEvent(target:ModHandler, startTime:Float, length:Float, ease:Null<Float->Float>, value:Float, modName:String):Void
   {
     addModEventToTimeline(target, startTime, length, ease, value, modName, "tween");
     // FunkinSound.playOnce(Paths.sound("pauseDisable"), 1.0);
   }
 
-  // Same as tween, but adds the value onto the current value instead of replacing it sorta deal
+  /** Adds an 'add' event to the timeline. This event is the same as a tween event EXCEPT the input value is added to the current value.
+   * @param target The ModHandler that will be affected by this event.
+   * @param startTime The beat this event will occur on.
+   * @param length The length of the tween in beats.
+   * @param ease The ease function that will be used for the tween.
+   * @param value The amount to add to the modifier.
+   * @param modName The name of the modifier to target.
+   */
   public function addModEvent(target:ModHandler, startTime:Float, length:Float, ease:Null<Float->Float>, value:Float, modName:String):Void
   {
     addModEventToTimeline(target, startTime, length, ease, value, modName, "add");
     // FunkinSound.playOnce(Paths.sound("pauseDisable"), 1.0);
   }
 
-  // Event to trigger a function at this beatTime!
+  /** Adds an 'func' event to the timeline. This event will trigger a function at the startTime beat!
+   * @param target The ModHandler that will be affected by this event.
+   * @param startTime The beat this event will occur on.
+   * @param funky The function that will get called when this event triggers.
+   * @param tweenName An optional value that if provided, will cancel any tweens that match this name.
+   * @param persist An optional value that if set to false, will mean that this event will be skipped over if the conductor is 1 second past this event.
+   */
   public function funcModEvent(target:ModHandler, startTime:Float, funky:Void->Void, ?tweenName:String = null, ?persist:Bool = true):Void
   {
     addModEventToTimeline(target, startTime, 1, ModConstants.getEaseFromString("linear"), 0, tweenName, "func", persist, funky);
   }
 
-  //  V0.7.7a -> New valueTween which acts like a func_tween but for mods!
+  /** Adds an 'value' event to the timeline. Same as a tween but can specify the starting value.
+   * Added in v0.7.7a.
+   * @param target The ModHandler that will be affected by this event.
+   * @param startTime The beat this event will occur on.
+   * @param length The duration of this tween in beats.
+   * @param ease The ease function to use for this tween.
+   * @param startValue The value this tween will start at.
+   * @param endValue The value this tween will end at.
+   * @param modName The name of the modifier to target.
+   */
   public function valueTweenModEvent(target:ModHandler, startTime:Float, length:Float, ease:Null<Float->Float>, startValue:Float, endValue:Float,
       modName:String):Void
   {
@@ -766,7 +805,17 @@ class ModEventHandler
     modEvents.push(timeEventTest);
   }
 
-  // Event to trigger a function at this beatTime!
+  /** Adds an 'func_tween' event to the timeline.
+   * @param target The ModHandler that will be affected by this event.
+   * @param startTime The beat this event will occur on.
+   * @param length The duration of this tween in beats.
+   * @param ease The ease function to use for this tween.
+   * @param startValue The value this tween will start at.
+   * @param endValue The value this tween will end at.
+   * @param funky The function that will get called every frame this tween is active.
+   * @param tweenName An optional value that if provided, will be used for this tweens' ID and will also cancel any tweens that match this name.
+   * @param persist An optional value that if set to false, will mean that this event will be skipped over if the conductor is 1 second past this event.
+   */
   public function funcTweenModEvent(target:ModHandler, startTime:Float, length:Float, ease:Null<Float->Float>, startValue:Float, endValue:Float, funky,
       ?tweenName:String = null, ?persist:Bool = true):Void
   {
@@ -798,9 +847,19 @@ class ModEventHandler
     timeEventTest.style = "func_tween";
     timeEventTest.funcTween = funky;
     modEvents.push(timeEventTest);
-    // trace("funky tween added!");
   }
 
+  /** Adds an event to the timeline.
+   * @param target The ModHandler that will be affected by this event.
+   * @param startTime The beat this event will occur on.
+   * @param length The duration of this tween.
+   * @param ease The ease function to use for this tween.
+   * @param value The target value to tween to.
+   * @param modName The modifier name to target.
+   * @param type What type of event are we adding?
+   * @param persist An optional value that if set to false, will mean that this event will be skipped over if the conductor is past this event.
+   * @param funky An optional value which is a function that is triggered.
+   */
   public function addModEventToTimeline(?target:ModHandler, startTime:Float, length:Float, ease:Null<Float->Float>, value:Float, modName:String, type:String,
       ?persist:Bool = true, ?funky:Void->Void = null):Void
   {
@@ -817,7 +876,6 @@ class ModEventHandler
     {
       target = PlayState.instance.playerStrumline.mods;
       PlayState.instance.modDebugNotif("null target for funcTween,\ndefaulting to player.", FlxColor.ORANGE);
-      // trace("null target when trying to add mod, defaulting to player!");
     }
 
     timeEventTest.target = target;
@@ -826,7 +884,6 @@ class ModEventHandler
     {
       ease = FlxEase.linear;
       PlayState.instance.modDebugNotif("no ease defined.\nDefaulting to linear.", FlxColor.ORANGE);
-      // trace("no ease, default to null");
     }
     timeEventTest.easeToUse = ease;
 

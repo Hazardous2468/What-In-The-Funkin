@@ -16,16 +16,9 @@ import funkin.play.modchartSystem.ModConstants;
 import StringTools;
 import flixel.util.FlxStringUtil;
 import flixel.math.FlxMath;
-import lime.math.Vector2;
-import openfl.geom.Vector3D;
-import flixel.math.FlxAngle;
 import funkin.util.SortUtil;
 import flixel.util.FlxSort;
-// tween
-import flixel.tweens.FlxTween;
-// import flixel.tweens.FlxTweenManager;
-import flixel.tweens.FlxEase;
-// For holds
+// extra
 import funkin.graphics.FunkinSprite;
 import flixel.FlxSprite;
 import flixel.FlxStrip;
@@ -55,10 +48,7 @@ class ModHandler
   public var mods_speed:Array<Modifier> = [];
   public var mods_special:Array<Modifier> = [];
 
-  public var modEvents:Array<ModTimeEvent> = [];
-
-  public var tweenManager:FlxTweenManager;
-
+  // The prefix added to every tween name associated with this ModHandler.
   public var customTweenerName:String = "???";
 
   // The strumline this modHandler is tied to
@@ -66,8 +56,6 @@ class ModHandler
 
   public function new(daddy:Bool = false)
   {
-    // super("modsloaded");
-
     // this is so fucking stupid lmao
     modifiers = ["dumb_setup" => null];
     modifiers.remove("dumb_setup");
@@ -75,12 +63,9 @@ class ModHandler
     if (daddy)
     {
       isDad = daddy;
-      // this.invertValues = daddy;
     }
 
     addMod('speedmod', 1, 1);
-
-    // addModsFromEventList();
   }
 
   public function resortMods():Void
@@ -549,6 +534,7 @@ class ModHandler
     }
   }
 
+  // if true, will do all the traces above ^
   var traceDebug:Bool = false;
 
   public function getHoldOffsetX(arrowpath:Bool = false, graphicWidth:Float = 0):Float

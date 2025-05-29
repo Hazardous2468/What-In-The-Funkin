@@ -157,9 +157,6 @@ class ModifierSubValue
 
 class Modifier
 {
-  // Variable used for testing if a mod already exists or some shit.
-  public var fuck:Bool = false;
-
   var beatTime(get, never):Float;
 
   function get_beatTime():Float

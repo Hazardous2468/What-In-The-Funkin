@@ -99,7 +99,10 @@ class ModConstants
     "beat",
     "beatangley",
     "beatangle",
+    "beatanglez",
     "confusionoffset",
+    "anglez",
+    "angle",
     "bumpyx",
     "bumpyangle",
     "bumpyangley",
@@ -113,6 +116,8 @@ class ModConstants
     "circx",
     "twirl",
     "dizzy",
+    "twirl2",
+    "dizzy2",
     "zigzag",
     "spiralx",
     "spiralcosx",
@@ -123,6 +128,7 @@ class ModConstants
     "skewx"
   ];
 
+  // These modifiers are hidden from the debug Text by default to avoid clutter.
   public static var hideSomeDebugBois:Array<String> = [
     "showsubmods",
     "showzerovalue",
@@ -950,7 +956,7 @@ class ModConstants
       {
         newz = zNear + ModConstants.tooCloseToCameraFix;
       }
-      // else if (newz < (zFar * -1)) // To far from camera!
+      // else if (newz < (zFar * -1)) // Too far from camera!
       // {
       // culled = true;
       // }
@@ -988,26 +994,39 @@ class ModConstants
     }
   }
 
-  public static function createNewCustomMod(name:String, defaultBaseValue:Float = 0):CustomModifier
+  /** Creates a new custom modifier!
+   * @param name The name of the custom modifier.
+   * @param defaultBaseValue The default value this modifier will have
+   * @return The Modifier that will be created by this function. CAN BE NULL!
+   */
+  public static function createNewCustomMod(name:String, defaultBaseValue:Float = 0):Null<CustomModifier>
   {
     var modName:String = name.toLowerCase();
 
     // check if the name is okay to use
-    var testIfModAlreadyExists:Modifier = createNewMod(modName, false);
-    if (!testIfModAlreadyExists.fuck || ModConstants.isTagSub(modName))
+    var testIfModAlreadyExists:Null<Modifier> = createNewMod(modName, false);
+
+    if (testIfModAlreadyExists != null || ModConstants.isTagSub(modName))
     {
       if (PlayState.instance != null) PlayState.instance.modDebugNotif(name + " is not a valid mod name", FlxColor.RED);
       else
         trace(name + " is not a valid mod name ");
       return null;
     }
-
-    var newMod:CustomModifier = new CustomModifier(modName, defaultBaseValue);
-    return newMod;
+    else
+    {
+      // We good to go.
+      var newMod:CustomModifier = new CustomModifier(modName, defaultBaseValue);
+      return newMod;
+    }
   }
 
-  // Use this to get
-  public static function createNewMod(name:String, notif:Bool = true):Modifier
+  /** Creates a new modifier using it's name and returns it
+   * @param name The name of the modifier.
+   * @param notif If set to false, will hide any notifications this function could trigger
+   * @return The Modifier that will be created by this function. CAN BE NULL!
+   */
+  public static function createNewMod(name:String, notif:Bool = true):Null<Modifier>
   {
     var tag:String = name.toLowerCase();
     var tag_:String = tag;
@@ -1020,7 +1039,7 @@ class ModConstants
       lane = Std.parseInt(subModArr[1]);
     }
 
-    var newMod:Modifier;
+    var newMod:Null<Modifier>;
     // lmfao
     switch (tag_)
     {
@@ -1174,7 +1193,7 @@ class ModConstants
 
       // scale mods
       case "zoom":
-        if (PlayState.instance != null) PlayState.instance.modDebugNotif("Zoom mod math is not finished!", FlxColor.ORANGE);
+        if (PlayState.instance != null && notif) PlayState.instance.modDebugNotif("Zoom mod math is not finished!", FlxColor.ORANGE);
         newMod = new ZoomModifier(tag);
 
       case "scale":
@@ -1772,7 +1791,7 @@ class ModConstants
       case "linearskewy":
         newMod = new LinearSkewYMod(tag);
       case "scalelinear":
-        if (PlayState.instance != null) PlayState.instance.modDebugNotif("'scalelinear' is outdated! Use 'linearScale' instead!", FlxColor.ORANGE);
+        if (PlayState.instance != null && notif) PlayState.instance.modDebugNotif("'scalelinear' is outdated! Use 'linearScale' instead!", FlxColor.ORANGE);
         newMod = new ScaleLinearLegacyMod(tag);
 
       // circ mods
@@ -1971,14 +1990,14 @@ class ModConstants
 
       default:
         // Alright, we don't know wtf this mod is, let the player know.
-        newMod = new Modifier(tag);
-        newMod.fuck = true;
-
+        // newMod = new Modifier(tag);
+        // newMod.fuck = true;
         if (notif)
         {
           if (PlayState.instance != null) PlayState.instance.modDebugNotif(tag + " mod is unknown", FlxColor.ORANGE);
           trace(tag + " mod is unknown");
         }
+        return null;
     }
 
     newMod.targetLane = lane;
