@@ -197,6 +197,10 @@ class ModHandler
   public function addMod(nameOfMod:String, startingValue:Float = 0.0, baseVal = null):Void
   {
     var mod = ModConstants.createNewMod(nameOfMod);
+    if (mod == null)
+    {
+      mod = new Modifier(nameOfMod); // to prevent everything from going to shit when an unknown mod gets used
+    }
 
     var mmm = ModConstants.invertValueCheck(nameOfMod, invertValues);
 

@@ -101,6 +101,7 @@ class ModConstants
     "beatangle",
     "beatanglez",
     "confusionoffset",
+    "confusion",
     "anglez",
     "angle",
     "bumpyx",

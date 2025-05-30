@@ -6,6 +6,9 @@ Updated the bold font to now include numbers (taken from Psych lmfao). Now you c
 
 Blacksphere now automatically takes into account reverse modifier, similar to Centered mod.
 
+Metamods script overhaul:
+More modifiers, overhauled menu visuals
+
 
 
 
