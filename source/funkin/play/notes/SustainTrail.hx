@@ -782,7 +782,7 @@ class SustainTrail extends ZSprite
   public var distanceFromReceptor_unscaledpos:Float = 0;
 
   // The lower the number, the more hold segments are rendered and calculated!
-  public var grain:Float = 82.0;
+  public var grain:Float = ModConstants.defaultHoldGrain;
 
   /**
    * Sets up new vertex and UV data to clip the trail.
@@ -795,7 +795,7 @@ class SustainTrail extends ZSprite
 
     if (fakeNote == null) fakeNote = new ZSprite();
 
-    grain = isArrowPath ? (whichStrumNote?.strumExtraModData?.pathGrain ?? 95) : (whichStrumNote?.strumExtraModData?.holdGrain ?? 82);
+    grain = isArrowPath ? (whichStrumNote?.strumExtraModData?.pathGrain ?? ModConstants.defaultPathGrain) : (whichStrumNote?.strumExtraModData?.holdGrain ?? ModConstants.defaultHoldGrain);
     var songTimmy:Float = (Conductor?.instance?.songPosition ?? songTime);
 
     var longHolds:Float = 0;

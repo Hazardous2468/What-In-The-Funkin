@@ -84,6 +84,9 @@ class ModConstants
 
   public static final MODCHART_VERSION:String = "v0.9.1a";
 
+  public static var defaultHoldGrain = 75;
+  public static var defaultPathGrain = defaultHoldGrain;
+
   public static var tooCloseToCameraFix:Float = 0.975; // dumb fix for preventing freak out on z math or something
 
   // If a mod tag is in this array, it will automatically invert the mod value
