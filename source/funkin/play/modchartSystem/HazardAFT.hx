@@ -28,7 +28,7 @@ class HazardAFT
 
   // For limiting the AFT update rate. Useful to make it less framerate dependent.
   public var updateTimer:Float = 0.0;
-  public var updateRate:Float = 0.25;
+  public var updateRate:Float = 1 / 60; // default to 60fps
 
   // The blend mode to use when drawing the camera onto the bitmap.
   public var blendMode:String = "normal";
@@ -73,7 +73,7 @@ class HazardAFT
 
   public function targetFps(fps:Float = 60):Void
   {
-    if (fps >= 0)
+    if (fps <= 0)
     {
       updateRate = 0;
     }
