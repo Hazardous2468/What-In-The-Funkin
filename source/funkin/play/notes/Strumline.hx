@@ -670,7 +670,6 @@ class Strumline extends FlxSpriteGroup
     for (note in holdNotes)
     {
       note.updateClipping();
-      // ModConstants.applyPerspective(note);
     }
 
     strumlineNotes.forEach(function(note:StrumlineNote) {
@@ -680,21 +679,21 @@ class Strumline extends FlxSpriteGroup
     for (note in notes)
     {
       if (!(note.noteModData?.whichStrumNote?.strumExtraModData?.threeD ?? false)) ModConstants.applyPerspective(note);
-      // ModConstants.applyPerspective(note);
     }
     for (cover in noteHoldCovers)
     {
       if (cover.alive)
       {
-        ModConstants.applyPerspective(cover.glow);
+        var o = noteStyle.getHoldCoverZCalcOffsetMultipliers();
+        ModConstants.applyPerspective(cover.glow, cover.glow.width * o[0], cover.glow.height * o[1]);
       }
     }
     for (splash in noteSplashes)
     {
       if (splash.alive)
       {
-        // ModConstants.applyPerspective(splash);
-        ModConstants.applyPerspective(splash, splash.width / 2.2, splash.height / 2.2);
+        var o = noteStyle.getSplashZCalcOffsetMultipliers();
+        ModConstants.applyPerspective(splash, splash.width / 2.2 * o[0], splash.height / 2.2 * o[1]);
       }
     }
   }
@@ -799,38 +798,6 @@ class Strumline extends FlxSpriteGroup
         if (mod.targetLane != -1 && note.noteModData.direction != mod.targetLane) continue;
         mod.strumMath(note.noteModData, this);
       }
-      /*
-        if (note.direction == 1)
-        {
-          trace("ATTEMPTING BENCHMARK");
-          var startTime:Float = Sys.time() * 1000.0; // Date.now().getTime();
-
-          for (mod in mods.mods_strums)
-          {
-            if (mod.targetLane != -1 && note.noteModData.direction != mod.targetLane) continue;
-            mod.strumMath(note.noteModData, this);
-          }
-
-          var endTime:Float = Sys.time() * 1000.0; // Date.now().getTime();
-
-          var timeDifference:Float = endTime - startTime;
-          var output:String = "\nSTART TIME: " + startTime;
-          output += "\n";
-          output += "END TIME: " + endTime;
-          output += "\n";
-          output += "TIME DIFFERENCE: " + timeDifference;
-          output += "\n";
-          trace(output);
-        }
-        else
-        {
-          for (mod in mods.mods_strums)
-          {
-            if (mod.targetLane != -1 && note.noteModData.direction != mod.targetLane) continue;
-            mod.strumMath(note.noteModData, this);
-          }
-        }
-       */
     }
     note.applyNoteData(note.noteModData);
     note.updateLastKnownPos();
@@ -863,7 +830,6 @@ class Strumline extends FlxSpriteGroup
 
   function updateStrums():Void
   {
-    // var i:Int = 0;
     strumlineNotes.forEach(function(note:StrumlineNote) {
       setStrumPos(note);
 
@@ -886,7 +852,6 @@ class Strumline extends FlxSpriteGroup
         setStrumPos(note);
       }
       updateStrums_single(note);
-      // i++;
     });
   }
 

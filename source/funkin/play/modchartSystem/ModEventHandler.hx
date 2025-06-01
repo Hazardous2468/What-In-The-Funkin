@@ -446,6 +446,8 @@ class ModEventHandler
     tweenManager.clear();
     tweenCounter = 0;
 
+    // HazardModLuaTest.allTargetExlusions = [];
+
     // wake everyone back up as that is the default!
     for (strum in PlayState.instance.allStrumLines)
     {

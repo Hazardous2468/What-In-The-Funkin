@@ -36,6 +36,9 @@ using StringTools;
 
 class HazardModLuaTest
 {
+  // Any strumlines added to here will be ignored by the any uses of "all" when picking targets. Useful if you know you are never going to use opponentStrumline for example.
+  var allTargetExlusions:Array<Strumline> = [];
+
   public var lua:State = null;
   public var scriptName:String = '';
 
@@ -94,6 +97,7 @@ class HazardModLuaTest
     set('strumSize', ModConstants.strumSize);
 
     set('modchartVersion', ModConstants.MODCHART_VERSION);
+    set('witfVersion', ModConstants.MODCHART_VERSION);
     set('gameVersion', Constants.VERSION);
 
     set('difficulty', PlayState.instance.currentChart.difficulty);
@@ -102,20 +106,20 @@ class HazardModLuaTest
 
     set('scriptName', scriptName);
 
-    // set('crochet', Conductor.crochet);
-    // set('stepCrochet', Conductor.stepCrochet);
-    // set('songLength', FlxG.sound.music.length);
-    // set('songName', PlayState.SONG.song);
-    // set('difficulty', PlayState.storyDifficulty);
-    // var difficultyName:String = CoolUtil.difficulties[PlayState.storyDifficulty];
-    // set('difficultyName', difficultyName);
     set('screenWidth', FlxG.width);
     set('screenHeight', FlxG.height);
     set('sw', FlxG.width);
     set('sh', FlxG.height);
     set('downscroll', Preferences.downscroll);
     set('downScroll', Preferences.downscroll);
+    set('upscroll', !Preferences.downscroll);
+    set('upScroll', !Preferences.downscroll);
     set('scrollSpeed', PlayState.instance.currentChart.scrollSpeed);
+
+    Lua_helper.add_callback(lua, "targetExclude", function(who:String):Void {
+      var strummy:Null<Strumline> = ModConstants.grabStrumModTarget(who).strum;
+      if (strummy != null) allTargetExlusions.push(strummy);
+    });
 
     // v0.8.1a -> New function that allows you to get the beats of notes between two points in a song, similar to using GetNoteData() for NotITG mirin
     // v[1] == the beats that the charted notes are on
@@ -585,9 +589,9 @@ class HazardModLuaTest
     Lua_helper.add_callback(lua, "reset", function(startBeat:Float, playerTarget:String = "all") {
       if (playerTarget == "everyone" || playerTarget == "both" || playerTarget == "all")
       {
-        for (customStrummer in PlayState.instance.allStrumLines)
+        for (strummer in PlayState.instance.allStrumLines)
         {
-          PlayState.instance.modchartEventHandler.resetModEvent(customStrummer.mods, startBeat);
+          if (!allTargetExlusions.contains(strummer)) PlayState.instance.modchartEventHandler.resetModEvent(strummer.mods, startBeat);
         }
       }
       else
@@ -601,9 +605,9 @@ class HazardModLuaTest
       PlayState.instance.modchartEventHandler.modChartHasResort = true;
       if (playerTarget == "everyone" || playerTarget == "both" || playerTarget == "all")
       {
-        for (customStrummer in PlayState.instance.allStrumLines)
+        for (strummer in PlayState.instance.allStrumLines)
         {
-          PlayState.instance.modchartEventHandler.resortModEvent(customStrummer.mods, startBeat);
+          if (!allTargetExlusions.contains(strummer)) PlayState.instance.modchartEventHandler.resortModEvent(strummer.mods, startBeat);
         }
       }
       else
@@ -658,9 +662,12 @@ class HazardModLuaTest
     Lua_helper.add_callback(lua, "centerStrum", function(playerTarget:String = "all") {
       if (playerTarget == "everyone" || playerTarget == "both" || playerTarget == "all")
       {
-        for (customStrummer in PlayState.instance.allStrumLines)
+        for (strummer in PlayState.instance.allStrumLines)
         {
-          customStrummer.x = (FlxG.width / 2 - customStrummer.width / 2);
+          if (!allTargetExlusions.contains(strummer))
+          {
+            strummer.x = (FlxG.width / 2 - strummer.width / 2);
+          }
         }
       }
       else
@@ -678,12 +685,15 @@ class HazardModLuaTest
       {
         for (strummer in PlayState.instance.allStrumLines)
         {
-          strummer.asleep = true;
-          strummer.x = -999;
-          strummer.visible = false;
-          for (arrow in strummer.members)
+          if (!allTargetExlusions.contains(strummer))
           {
-            arrow.visible = false;
+            strummer.asleep = true;
+            strummer.x = -999;
+            strummer.visible = false;
+            for (arrow in strummer.members)
+            {
+              arrow.visible = false;
+            }
           }
         }
       }
@@ -1203,10 +1213,10 @@ class HazardModLuaTest
     // trace("ease to use : " + ModConstants.getEaseFromString(easeToUse));
     if (playerTarget == "everyone" || playerTarget == "both" || playerTarget == "all")
     {
-      for (customStrummer in PlayState.instance.allStrumLines)
+      for (strummer in PlayState.instance.allStrumLines)
       {
-        PlayState.instance.modchartEventHandler.valueTweenModEvent(customStrummer.mods, startBeat, lengthInBeats, ModConstants.getEaseFromString(easeToUse),
-          startingValue, endingValue, modName);
+        if (!allTargetExlusions.contains(strummer)) PlayState.instance.modchartEventHandler.valueTweenModEvent(strummer.mods, startBeat, lengthInBeats,
+          ModConstants.getEaseFromString(easeToUse), startingValue, endingValue, modName);
       }
     }
     else
@@ -1227,10 +1237,13 @@ class HazardModLuaTest
     // trace("ease to use : " + ModConstants.getEaseFromString(easeToUse));
     if (playerTarget == "everyone" || playerTarget == "both" || playerTarget == "all")
     {
-      for (customStrummer in PlayState.instance.allStrumLines)
+      for (strummer in PlayState.instance.allStrumLines)
       {
-        PlayState.instance.modchartEventHandler.tweenModEvent(customStrummer.mods, startBeat, lengthInBeats, ModConstants.getEaseFromString(easeToUse),
-          modValue, modName);
+        if (!allTargetExlusions.contains(strummer))
+        {
+          PlayState.instance.modchartEventHandler.tweenModEvent(strummer.mods, startBeat, lengthInBeats, ModConstants.getEaseFromString(easeToUse), modValue,
+            modName);
+        }
       }
     }
     else
@@ -1247,9 +1260,9 @@ class HazardModLuaTest
 
     if (playerTarget == "everyone" || playerTarget == "both" || playerTarget == "all")
     {
-      for (customStrummer in PlayState.instance.allStrumLines)
+      for (strummer in PlayState.instance.allStrumLines)
       {
-        customStrummer.mods.setDefaultModVal(modName, modValue);
+        if (!allTargetExlusions.contains(strummer)) strummer.mods.setDefaultModVal(modName, modValue);
       }
     }
     else
@@ -1267,9 +1280,9 @@ class HazardModLuaTest
 
     if (playerTarget == "everyone" || playerTarget == "both" || playerTarget == "all")
     {
-      for (customStrummer in PlayState.instance.allStrumLines)
+      for (strummer in PlayState.instance.allStrumLines)
       {
-        PlayState.instance.modchartEventHandler.setModEvent(customStrummer.mods, startBeat, modValue, modName);
+        if (!allTargetExlusions.contains(strummer)) PlayState.instance.modchartEventHandler.setModEvent(strummer.mods, startBeat, modValue, modName);
       }
     }
     else
@@ -1286,10 +1299,10 @@ class HazardModLuaTest
     modName = ModConstants.modAliasCheck(modName);
     if (playerTarget == "everyone" || playerTarget == "both" || playerTarget == "all")
     {
-      for (customStrummer in PlayState.instance.allStrumLines)
+      for (strummer in PlayState.instance.allStrumLines)
       {
-        PlayState.instance.modchartEventHandler.addModEvent(customStrummer.mods, startBeat, lengthInBeats, ModConstants.getEaseFromString(easeToUse),
-          modValue, modName);
+        if (!allTargetExlusions.contains(strummer)) PlayState.instance.modchartEventHandler.addModEvent(strummer.mods, startBeat, lengthInBeats,
+          ModConstants.getEaseFromString(easeToUse), modValue, modName);
       }
     }
     else

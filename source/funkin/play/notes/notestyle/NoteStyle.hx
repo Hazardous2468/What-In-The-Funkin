@@ -391,7 +391,7 @@ class NoteStyle implements IRegistryEntry<NoteStyleData>
 
   public function holdsBehindStrums():Bool
   {
-    return _data?.assets?.holdNote?.data?.behindStrums ?? false;
+    return _data?.assets?.holdNote?.data?.behindStrums ?? fallback?.holdsBehindStrums() ?? false;
   }
 
   public function isHoldNoteCoverEnabled():Bool
@@ -402,6 +402,16 @@ class NoteStyle implements IRegistryEntry<NoteStyleData>
   public function shouldHoldNoteCoverCopyHSV():Bool
   {
     return _data?.assets?.holdNoteCover?.data?.copyHSV ?? fallback?.isHoldNoteCoverEnabled() ?? false;
+  }
+
+  public function getHoldCoverZCalcOffsetMultipliers():Array<Float>
+  {
+    return _data?.assets?.holdNoteCover?.data?.zCalcMult ?? fallback?.getHoldCoverZCalcOffsetMultipliers() ?? [1.08, 0.75];
+  }
+
+  public function getSplashZCalcOffsetMultipliers():Array<Float>
+  {
+    return _data?.assets?.noteSplash?.data?.zCalcMult ?? fallback?.getSplashZCalcOffsetMultipliers() ?? [1.0, 1.0];
   }
 
   /**

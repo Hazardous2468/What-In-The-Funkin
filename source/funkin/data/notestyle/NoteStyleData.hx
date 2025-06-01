@@ -275,6 +275,14 @@ typedef NoteStyleData_NoteSplash =
   var enabled:Bool;
 
   /**
+   * Use to adjust the width and height in the zPerspective Calcs. Note that this is a multiplier!
+   * @default [1.0, 1.0]
+   */
+  @:default([1.0, 1.0])
+  @:optional
+  var zCalcMult:Null<Array<Float>>;
+
+  /**
    * If true, note splashes will copy the HSV shader values from the note that triggered them (if possible).
    * @default Default vanilla behaviour (in other words, doesn't copy the HSV values)
    */
@@ -324,6 +332,15 @@ typedef NoteStyleData_HoldNoteCover =
   @:optional
   @:default(false)
   var copyHSV:Bool;
+
+  /**
+   * Use to adjust the width and height in the zPerspective Calcs. Note that this is a multiplier!
+   * Default values based on making funkin notestyle work.
+   * @default [1.08, 0.75]
+   */
+  @:default([1.08, 0.75])
+  @:optional
+  var zCalcMult:Null<Array<Float>>;
 
   @:optional
   var left:NoteStyleData_HoldNoteCoverDirectionData;

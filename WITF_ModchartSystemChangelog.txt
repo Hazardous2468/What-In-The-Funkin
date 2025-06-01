@@ -6,8 +6,15 @@ Updated the bold font to now include numbers (taken from Psych lmfao). Now you c
 
 Blacksphere now automatically takes into account reverse modifier, similar to Centered mod.
 
+Added 'targetExclude' which allows you to remove a strumLine from being targeted by "all" (if you don't plan on ever using a strumLine like opponentStrumline for example).
+
 Metamods script overhaul:
-More modifiers, overhauled menu visuals
+More modifiers, overhauled menu visuals, now works in StoryMenuState.
+
+Notestyles now have "zCalcMult" variable in data for holdCovers and splashes. Also fixed hold covers zMath
+
+Refactored some stuff
+
 
 
 
