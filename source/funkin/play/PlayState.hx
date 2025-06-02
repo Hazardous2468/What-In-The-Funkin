@@ -1900,6 +1900,8 @@ class PlayState extends MusicBeatSubState
     });
   };
 
+  public var notesAboveHUD:Bool = true;
+
   /**
      * Initializes the game and HUD cameras.
      */
@@ -1916,17 +1918,23 @@ class PlayState extends MusicBeatSubState
     {
       camNotes = new FlxCamera();
       camNotes.bgColor.alpha = 0; // Show the game scene behind the camera.
+
       camAFT = new FlxCamera();
       camAFT.bgColor.alpha = 0; // Show the game scene behind the camera.
     }
 
     FlxG.cameras.reset(camGame);
-    if (isModchartSong)
+    if (isModchartSong && !notesAboveHUD)
     {
       FlxG.cameras.add(camNotes, false);
       FlxG.cameras.add(camAFT, false);
     }
     FlxG.cameras.add(camHUD, false);
+    if (isModchartSong && notesAboveHUD)
+    {
+      FlxG.cameras.add(camNotes, false);
+      FlxG.cameras.add(camAFT, false);
+    }
     FlxG.cameras.add(camCutscene, false);
 
     // Configure camera follow point.

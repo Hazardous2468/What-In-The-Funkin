@@ -1,9 +1,9 @@
-Fork specific issues (V0.9.0a):
+Fork specific issues (V0.9.1a):
 
 - Pixel Notesplashes are incorrectly positioned when moving on the z axis
 - Pixel arrowpath appears very large. Could also impact other notestyles with a different hold width and scale
 
-- Playback rate numbers are shown as "#" in the pause menu
+- Passing nothing into a built-in lua function (like "centerPlayer()") will trigger an instant game crash.
 
 - Offsets (input / visual) aren't properly tested
 

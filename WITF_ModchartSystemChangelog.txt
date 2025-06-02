@@ -8,6 +8,8 @@ Blacksphere now automatically takes into account reverse modifier, similar to Ce
 
 Added 'targetExclude' which allows you to remove a strumLine from being targeted by "all" (if you don't plan on ever using a strumLine like opponentStrumline for example).
 
+Changed notesCamera and AFTcamera to be ABOVE the HUD instead of behind for parity with baseGame. This can be reverted by adding "notesBehindHUD(true)" in the onCreate function (has to be onCreate as it needs to be done before cameras are created!) 
+
 Metamods script overhaul:
 More modifiers, overhauled menu visuals, now works in StoryMenuState.
 
