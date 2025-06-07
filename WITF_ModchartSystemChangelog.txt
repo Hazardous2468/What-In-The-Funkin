@@ -5,6 +5,7 @@ Re-added 'isPlayer' variable to Strumline.hx to fix scripts which may rely on sa
 Updated the bold font to now include numbers (taken from Psych lmfao). Now you can actually see the numbers for playback rate in the pause menu.
 
 Blacksphere now automatically takes into account reverse modifier, similar to Centered mod.
+Drive and Jump also account for reverse modifier too.
 
 Added 'targetExclude' which allows you to remove a strumLine from being targeted by "all" (if you don't plan on ever using a strumLine like opponentStrumline for example).
 

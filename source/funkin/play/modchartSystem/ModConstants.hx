@@ -1138,17 +1138,6 @@ class ModConstants
       case "movez":
         newMod = new MoveZMod(tag);
 
-      /*
-        case "strumx":
-          newMod = new StrumXMod(tag);
-        case "strumy":
-          newMod = new StrumYMod(tag);
-        // case "strumyd":
-        //  newMod = new StrumYDMod(tag);
-        case "strumz":
-          newMod = new StrumZMod(tag);
-       */
-
       case "x":
         newMod = new MoveXMod_true(tag);
       case "y":

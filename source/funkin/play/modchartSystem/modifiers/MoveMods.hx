@@ -287,6 +287,7 @@ class JumpMod extends Modifier
 
     createSubMod("beat", 1.0);
     createSubMod("offset", 0.0);
+    createSubMod("reverse_affect", 1.0);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -296,8 +297,12 @@ class JumpMod extends Modifier
     var time:Float = (beatTime + getSubVal("offset")) % getSubVal("beat");
     var val:Float = time * Conductor.instance.beatLengthMs;
 
+    var reverseModAmount:Float = data.whichStrumNote.strumExtraModData.reverseMod + data.whichStrumNote.strumExtraModData.reverseModLane; // 0 to 1
+    var reverseMult:Float = FlxMath.remapToRange(reverseModAmount, 0, 1, 1, -1);
+    reverseMult = FlxMath.lerp(1, reverseMult, getSubVal("reverse_affect"));
+
     var scrollSpeed = PlayState.instance.currentChart.scrollSpeed;
-    data.y += Constants.PIXELS_PER_MS * scrollSpeed * (Preferences.downscroll ? -1 : 1) * val * currentValue;
+    data.y += Constants.PIXELS_PER_MS * scrollSpeed * (Preferences.downscroll ? -1 : 1) * val * currentValue * reverseMult;
   }
 }
 
@@ -309,13 +314,20 @@ class DriveMod extends Modifier
     modPriority = 97;
     unknown = false;
     strumsMod = true;
+    createSubMod("reverse_affect", 1.0);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
+
+    // multiply by the reverse amount for this movement
+    var reverseModAmount:Float = data.whichStrumNote.strumExtraModData.reverseMod + data.whichStrumNote.strumExtraModData.reverseModLane; // 0 to 1
+    var reverseMult:Float = FlxMath.remapToRange(reverseModAmount, 0, 1, 1, -1);
+    reverseMult = FlxMath.lerp(1, reverseMult, getSubVal("reverse_affect"));
+
     var scrollSpeed = PlayState.instance.currentChart.scrollSpeed;
-    data.y += Constants.PIXELS_PER_MS * scrollSpeed * (Preferences.downscroll ? -1 : 1) * currentValue;
+    data.y += Constants.PIXELS_PER_MS * scrollSpeed * (Preferences.downscroll ? -1 : 1) * currentValue * reverseMult;
   }
 }
 
@@ -340,50 +352,5 @@ class Drive2Mod extends Modifier
     whichStrum.strumExtraModData.strumPos = funny;
 
     // strumLine.mods.strumPos[lane] = funny;
-  }
-}
-
-class StrumXMod extends Modifier
-{
-  public function new(name:String)
-  {
-    super(name, 0);
-    unknown = false;
-    specialMod = true;
-  }
-
-  override function specialMath(lane:Int, strumLine:Strumline):Void
-  {
-    return; // doesn't do anything as of now.
-  }
-}
-
-class StrumYMod extends Modifier
-{
-  public function new(name:String)
-  {
-    super(name, 0);
-    unknown = false;
-    specialMod = true;
-  }
-
-  override function specialMath(lane:Int, strumLine:Strumline):Void
-  {
-    return; // doesn't do anything as of now.
-  }
-}
-
-class StrumZMod extends Modifier
-{
-  public function new(name:String)
-  {
-    super(name, 0);
-    unknown = false;
-    specialMod = true;
-  }
-
-  override function specialMath(lane:Int, strumLine:Strumline):Void
-  {
-    return; // doesn't do anything as of now.
   }
 }
