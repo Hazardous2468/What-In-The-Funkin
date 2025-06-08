@@ -16,7 +16,7 @@ class ModTimeEvent
   public var modName:String = "drunk";
 
   // what type of event is this?
-  public var style:String = "tween"; // tween, add, set, func, func_tween, perframe, reset
+  public var style:String = "tween"; // tween, add, set, func, func_tween, perframe, reset, resort
 
   // perframe not added yet!
   public var startValue:Float = 0.0; // only used for func_tweens.   v0.7.7a -> Now also used for value tweens

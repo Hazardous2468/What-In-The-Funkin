@@ -166,18 +166,24 @@ class ModEventHandler
     {
       var timeEventTest = modEvents[i];
 
-      if (timeEventTest.style == "func" || timeEventTest.style == "func_tween" || timeEventTest.style == "reset" || timeEventTest.style == "perframe") continue;
+      if (timeEventTest.style == "resort" || timeEventTest.style == "func" || timeEventTest.style == "func_tween" || timeEventTest.style == "reset"
+        || timeEventTest.style == "perframe") continue;
+
+      var modifierName:String = timeEventTest.modName;
 
       // check if sub first to avoid adding a subvalue as a mod!
-      if (ModConstants.isTagSub(timeEventTest.modName)) continue;
-
-      if (!timeEventTest.target.modifiers.exists(timeEventTest.modName))
+      if (ModConstants.isTagSub(modifierName))
       {
-        timeEventTest.target.addMod(timeEventTest.modName, 0.0, 0.0);
+        // if we are a submod, then we try and add the source modifier
+        modifierName = modifierName.split('__')[0];
+      }
 
-        var mmm:Float = ModConstants.invertValueCheck(timeEventTest.modName, timeEventTest.target.invertValues);
-        timeEventTest.target.modifiers.get(timeEventTest.modName).currentValue *= mmm;
-        // timeEventTest.target.modifiers.get(timeEventTest.modName).setVal(timeEventTest.target.modifiers.get(timeEventTest.modName).currentValue * mmm);
+      if (!timeEventTest.target.modifiers.exists(modifierName))
+      {
+        timeEventTest.target.addMod(modifierName, 0.0, 0.0);
+
+        var mmm:Float = ModConstants.invertValueCheck(modifierName, timeEventTest.target.invertValues);
+        timeEventTest.target.modifiers.get(modifierName).currentValue *= mmm;
       }
     }
 
