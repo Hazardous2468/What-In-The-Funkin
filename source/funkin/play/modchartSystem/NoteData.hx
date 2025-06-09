@@ -24,10 +24,10 @@ class NoteData
   // Time in the song this note is to be hit at!
   public var strumTime:Float = 0;
 
-  // The distance from receptors, taking into account speedMod
+  // The distance (in pixels) from receptors, taking into account speedMods.
   public var curPos:Float = 0;
 
-  // The TRUE distance from receptors
+  // The TRUE distance (in pixels) from receptors. Same as Curpos but ignores speed mods.
   public var curPos_unscaled:Float = 0;
 
   // Position of the strum in terms of curPos. Could be useful later when the strums can follow the notepath in drive2 mod or something lol

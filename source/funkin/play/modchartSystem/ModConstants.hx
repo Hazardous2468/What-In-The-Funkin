@@ -138,6 +138,7 @@ class ModConstants
     "showzerovalue",
     "debugx",
     "debugy",
+    "debugalpha",
     "arrowpathred",
     "arrowpathgreen",
     "arrowpathblue",

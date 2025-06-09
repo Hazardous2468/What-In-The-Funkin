@@ -19,7 +19,8 @@ class Constants
    * The title of the game, for debug printing purposes.
    * Change this if you're making an engine.
    */
-  public static final TITLE:String = "Friday Night Funkin'";
+  // public static final TITLE:String = "Friday Night Funkin'";
+  public static final TITLE:String = "What in the Funkin'";
 
   /**
    * The current version number of the game.
