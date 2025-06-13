@@ -344,7 +344,8 @@ class SustainTrail extends ZSprite
   {
     graphicHeight = sustainHeight(sustainLength, parentStrumline?.scrollSpeed ?? 1.0);
     updateHitbox();
-    updateClipping(); // Commenting this out = holds don't render for 1 frame when being hit. Keeping this means the hold renders incorrectly... what?
+    if (!usingHazModHolds) // Don't update cuz we updateClipping every frame anyway in Strumline.hx
+      updateClipping(); // Commenting this out = holds don't render for 1 frame when being hit. Keeping this means the hold renders incorrectly... what?
   }
 
   public override function updateHitbox():Void
@@ -791,6 +792,12 @@ class SustainTrail extends ZSprite
    */
   public function updateClipping_mods(songTime:Float = 0, uvSetup:Bool = true):Void
   {
+    // Make sure we're at the proper position!
+    // This is cuz hold notes are always set to this exact position, then the tris are set to make it appear where it needs to be on the screen.
+    // Done cuz I'm lazy and it made the calcs easier lol
+    this.x = ModConstants.holdNoteJankX;
+    this.y = ModConstants.holdNoteJankY;
+
     whichStrumNote = parentStrumline.getByIndex(noteDirection);
 
     if (fakeNote == null) fakeNote = new ZSprite();

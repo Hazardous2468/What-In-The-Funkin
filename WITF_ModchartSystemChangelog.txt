@@ -4,6 +4,8 @@ Re-added 'isPlayer' variable to Strumline.hx to fix scripts which may rely on sa
 
 Updated the bold font to now include numbers (taken from Psych lmfao). Now you can actually see the numbers for playback rate in the pause menu.
 
+Hopefully fixed the hold note flicker on hit problem
+
 Blacksphere now automatically takes into account reverse modifier, similar to Centered mod.
 Drive and Jump also account for reverse modifier too.
 
@@ -15,6 +17,8 @@ Metamods script overhaul:
 More modifiers, overhauled menu visuals, now works in StoryMenuState.
 
 Notestyles now have "zCalcMult" variable in data for holdCovers and splashes. Also fixed hold covers zMath
+
+Fixed HyperNova for upscroll
 
 Refactored some stuff
 

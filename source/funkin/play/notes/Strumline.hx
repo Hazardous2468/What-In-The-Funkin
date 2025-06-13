@@ -1173,6 +1173,7 @@ class Strumline extends FlxSpriteGroup
     var timmy:Float = note.noteModData.strumTime - note.noteModData.whichStrumNote.strumExtraModData.strumPos;
 
     note.noteModData.curPos_unscaled = calculateNoteYPos(timmy);
+
     for (mod in mods.mods_speed)
     {
       if (mod.targetLane != -1 && note.direction != mod.targetLane) continue;
@@ -1678,7 +1679,7 @@ class Strumline extends FlxSpriteGroup
     {
       note.holdNoteSprite.hitNote = true;
       note.holdNoteSprite.missedNote = false;
-
+      note.holdNoteSprite.visible = true;
       note.holdNoteSprite.sustainLength = (note.holdNoteSprite.strumTime + note.holdNoteSprite.fullSustainLength) - conductorInUse.songPosition;
     }
 
@@ -2039,11 +2040,19 @@ class Strumline extends FlxSpriteGroup
 
       @:privateAccess holdNoteSprite.noteModData.clearNoteMods();
 
-      holdNoteSprite.x = this.x;
-      holdNoteSprite.x += getXPos(DIRECTIONS[note.getDirection() % KEY_COUNT]);
-      holdNoteSprite.x += STRUMLINE_SIZE / 2;
-      holdNoteSprite.x -= holdNoteSprite.width / 2;
-      holdNoteSprite.y = -9999;
+      if (mods != null)
+      {
+        holdNoteSprite.x = ModConstants.holdNoteJankX;
+        holdNoteSprite.y = ModConstants.holdNoteJankY;
+      }
+      else
+      {
+        holdNoteSprite.x = this.x;
+        holdNoteSprite.x += getXPos(DIRECTIONS[note.getDirection() % KEY_COUNT]);
+        holdNoteSprite.x += STRUMLINE_SIZE / 2;
+        holdNoteSprite.x -= holdNoteSprite.width / 2;
+        holdNoteSprite.y = -9999;
+      }
 
       holdNoteSprite.whichStrumNote = getByIndex(holdNoteSprite.noteDirection);
 
