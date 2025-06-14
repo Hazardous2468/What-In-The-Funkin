@@ -619,4 +619,302 @@ class ModHandler
 
     ModConstants.applyPerspective(susFakeNote, fakeNoteWidth, fakeNoteHeight);
   }
+
+  /**
+   * Input a noteSprite into this function to set it's position, applying this ModHandler's Mods Array
+   * @param note The note to be set.
+   * @param orientPass If true, will set the note based on a slightly different strumTime so that it's last known position gets set for orient2 to work.
+   */
+  public function setNotePos(note:NoteSprite, orientPass:Bool = false):Void
+  {
+    if (!orientPass && (note.noteModData.orient2[0] != 0 || note.noteModData.orient2[1] != 0 || note.noteModData.orient2[2] != 0))
+    {
+      setNotePos(note, true);
+    }
+
+    note.noteModData.defaultValues();
+    note.noteModData.strumTime = note.strumTime + (orientPass ? ModConstants.orientTimeOffset : 0);
+    note.noteModData.noteType = note.kind;
+    note.noteModData.direction = note.direction;
+    note.color = FlxColor.WHITE;
+    note.noteModData.whichStrumNote = strum.getByIndex(note.noteModData.direction);
+    var timmy:Float = note.noteModData.strumTime - note.noteModData.whichStrumNote.strumExtraModData.strumPos;
+
+    note.noteModData.curPos_unscaled = strum.calculateNoteYPos(timmy);
+
+    for (mod in this.mods_speed)
+    {
+      if (mod.targetLane != -1 && note.noteModData.direction != mod.targetLane) continue;
+      note.noteModData.speedMod *= mod.speedMath(note.noteModData.direction, note.noteModData.curPos_unscaled, strum, false);
+    }
+    note.noteModData.curPos = strum.calculateNoteYPos(timmy) * note.noteModData.speedMod;
+
+    if (strum.dumbTempScaleTargetThing == null) strum.dumbTempScaleTargetThing = note.targetScale;
+
+    note.scale.set(note.targetScale, note.targetScale);
+    note.noteModData.scaleX = note.scale.x;
+    note.noteModData.scaleY = note.scale.y;
+
+    note.noteModData.angleZ = note.noteModData.whichStrumNote.angle;
+    note.noteModData.y = note.noteModData.whichStrumNote.y + note.noteModData.getNoteYOffset() + note.noteModData.curPos;
+    note.noteModData.z = note.noteModData.whichStrumNote.z; // Copy strum Z
+
+    note.noteModData.x = strum.x;
+    note.noteModData.x += strum.getXPos(note.noteModData.direction);
+    note.noteModData.x -= (note.width - Strumline.STRUMLINE_SIZE) / 2; // Center it
+    note.noteModData.x -= Strumline.NUDGE;
+
+    var defaultPosition:Array<Float> = getDefaultStrumPos(note.noteModData.direction);
+    var xDif:Float = note.noteModData.whichStrumNote.x - defaultPosition[0];
+    note.noteModData.x += xDif;
+    note.noteModData.y -= note.noteModData.whichStrumNote.strumExtraModData.noteStyleOffsetY;
+
+    if (!this.mathCutOffCheck(note.noteModData.curPos, note.noteModData.direction))
+    {
+      for (mod in this.mods_notes)
+      {
+        if (mod.targetLane != -1 && note.noteModData.direction != mod.targetLane) continue;
+        mod.noteMath(note.noteModData, strum);
+      }
+
+      for (mod in note.noteModData.noteMods)
+      {
+        if (mod.targetLane != -1 && note.noteModData.direction != mod.targetLane) continue;
+        mod.noteMath(note.noteModData, strum);
+      }
+    }
+    note.noteModData.funnyOffMyself();
+
+    note.applyNoteData(note.noteModData);
+    note.updateLastKnownPos();
+    note.noteModData.lastKnownPosition = note.lastKnownPosition;
+
+    if (!(note.noteModData?.whichStrumNote?.strumExtraModData?.threeD ?? false))
+    {
+      ModConstants.playfieldSkew(note, note.noteModData.skewX_playfield, note.noteModData.skewY_playfield,
+        note.noteModData.whichStrumNote.strumExtraModData.playfieldX, note.noteModData.whichStrumNote.strumExtraModData.playfieldY, note.width / 2,
+        note.height / 2);
+      // undo the strum skew
+      note.x -= note.noteModData.whichStrumNote.strumExtraModData.skewMovedX;
+      note.y -= note.noteModData.whichStrumNote.strumExtraModData.skewMovedY;
+      note.skew.x += note.noteModData.skewX_playfield;
+      note.skew.y += note.noteModData.skewY_playfield;
+    }
+
+    // for mesh shenaniguns
+    if (note.mesh != null)
+    {
+      note.mesh.pivotOffsetX = note.noteModData.meshOffsets_PivotX;
+      note.mesh.pivotOffsetY = note.noteModData.meshOffsets_PivotY;
+      note.mesh.pivotOffsetZ = note.noteModData.meshOffsets_PivotZ;
+      note.mesh.skewX_offset = note.noteModData.meshOffsets_SkewX;
+      note.mesh.skewY_offset = note.noteModData.meshOffsets_SkewY;
+      note.mesh.skewZ_offset = note.noteModData.meshOffsets_SkewZ;
+    }
+
+    note.updateStealthGlow();
+    // perspective applied in applyperspective part of update routine
+  }
+
+  /**
+   * Go through each special mod and trigger it's specialMath function
+   */
+  public function updateSpecialMods():Void
+  {
+    for (lane in 0...Strumline.KEY_COUNT)
+    {
+      for (mod in this.mods_special)
+      {
+        if (mod.targetLane != -1 && lane != mod.targetLane) continue;
+        try
+        {
+          mod.specialMath(lane, strum);
+        }
+        catch (e)
+        {
+          PlayState.instance.modDebugNotif(e.toString(), FlxColor.RED);
+          return;
+        }
+      }
+    }
+  }
+
+  public function getStrumOffsetX():Float
+  {
+    @:privateAccess
+    return strum.noteStyle._data.assets.noteStrumline.offsets[0];
+  }
+
+  public function getStrumOffsetY():Float
+  {
+    @:privateAccess
+    return strum.noteStyle._data.assets.noteStrumline.offsets[1];
+  }
+
+  public function getDefaultStrumPos(direction):Array<Float>
+  {
+    var pos:Array<Float> = [0, 0, 0]; // x,y,z
+
+    pos[0] = strum.getXPos(direction);
+    pos[0] += strum.x;
+    pos[0] += Strumline.INITIAL_OFFSET;
+    pos[1] = strum.y;
+
+    var offsets:Array<Float> = strum.noteStyle.getStrumlineOffsets();
+    pos[0] += offsets[0];
+    pos[1] += offsets[1];
+
+    return pos;
+  }
+
+  /**
+   * Sets the StrumlineNote to where it's supposed to be first, BEFORE any modifiers are applied to it.
+   */
+  function setStrumPos(note:StrumlineNote):Void
+  {
+    var p:Array<Float> = getDefaultStrumPos(note.direction);
+    note.x = p[0];
+    note.y = p[1];
+    note.z = p[2];
+
+    note.alpha = 1;
+    note.angle = 0;
+    note.scale.set(note.targetScale, note.targetScale);
+
+    note.skew.x = 0;
+    note.skew.y = 0;
+
+    if (note.strumExtraModData.introTweenPercentage != 1)
+    {
+      var p:Float = note.strumExtraModData.introTweenPercentage;
+      note.alpha = p;
+      p = 1 - p;
+      note.y -= p * 10;
+    }
+
+    note.resetStealthGlow(true);
+    note.noteModData.defaultValues();
+    note.noteModData.setValuesFromZSprite(note);
+    note.noteModData.direction = note.direction;
+    note.noteModData.whichStrumNote = note;
+    note.noteModData.noteType = "receptor";
+
+    note.noteModData.curPos = 0;
+    note.noteModData.curPos_unscaled = 0;
+
+    var ohgod:Float = note.strumExtraModData.strumPos;
+    note.strumDistance = ohgod;
+    note.noteModData.strumPosition = ohgod;
+
+    note.strumExtraModData.playfieldX = strum.x + (2 * Strumline.NOTE_SPACING);
+    // note.strumExtraModData.playfieldY = strum.y + (strum.height / 2);
+    note.strumExtraModData.playfieldY = FlxG.height / 2;
+    note.strumExtraModData.playfieldZ = 0;
+  }
+
+  /**
+   * This function applies the modifier math onto the strumline note!
+   */
+  function applyStrumModifierMath(note:StrumlineNote, timeOffset:Float = 0):Void
+  {
+    if (note.strumDistance != 0 || timeOffset != 0)
+    {
+      note.noteModData.strumTime = Conductor.instance?.songPosition ?? 0;
+      note.noteModData.strumTime += note.noteModData.strumPosition + timeOffset;
+
+      note.noteModData.curPos_unscaled = strum.calculateNoteYPos(note.noteModData.strumTime) * -1;
+      for (mod in this.mods_speed)
+      {
+        if (mod.targetLane != -1 && note.direction != mod.targetLane) continue;
+        note.noteModData.speedMod *= mod.speedMath(note.noteModData.direction, note.noteModData.curPos_unscaled, strum, false);
+      }
+      note.noteModData.curPos = strum.calculateNoteYPos(note.noteModData.strumTime) * note.noteModData.speedMod * -1;
+      for (mod in this.mods_strums)
+      {
+        if (mod.targetLane != -1 && note.noteModData.direction != mod.targetLane) continue;
+        mod.strumMath(note.noteModData, strum);
+      }
+
+      note.noteModData.setStrumPosWasHere(); // for rotate mods to still function as intended
+
+      note.noteModData.y += note.noteModData.curPos; // move it like a regular note
+
+      if (!this.mathCutOffCheck(note.noteModData.curPos, note.noteModData.direction))
+      {
+        for (mod in this.mods_notes)
+        {
+          if (mod.targetLane != -1 && note.noteModData.direction != mod.targetLane) continue;
+          mod.noteMath(note.noteModData, strum, false);
+        }
+      }
+      note.noteModData.strumPosOffsetThingy.x = note.noteModData.strumPosWasHere.x - note.noteModData.x;
+      note.noteModData.strumPosOffsetThingy.y = note.noteModData.strumPosWasHere.y - note.noteModData.y;
+      note.noteModData.strumPosOffsetThingy.z = note.noteModData.strumPosWasHere.z - note.noteModData.z;
+    }
+    else
+    {
+      for (mod in this.mods_strums)
+      {
+        if (mod.targetLane != -1 && note.noteModData.direction != mod.targetLane) continue;
+        mod.strumMath(note.noteModData, strum);
+      }
+    }
+    note.applyNoteData(note.noteModData);
+    note.updateLastKnownPos();
+    note.noteModData.lastKnownPosition = note.lastKnownPosition;
+    note.updateStealthGlow();
+
+    if (!(note.strumExtraModData?.threeD ?? false))
+    {
+      var wasX:Float = note.x;
+      var wasY:Float = note.y;
+      ModConstants.playfieldSkew(note, note.noteModData.skewX_playfield, note.noteModData.skewY_playfield, note.strumExtraModData.playfieldX,
+        note.strumExtraModData.playfieldY, note.width / 2, note.height / 2);
+      note.strumExtraModData.skewMovedX = note.x - wasX;
+      note.strumExtraModData.skewMovedY = note.y - wasY;
+      note.skew.x += note.noteModData.skewX_playfield;
+      note.skew.y += note.noteModData.skewY_playfield;
+    }
+
+    // for mesh shenaniguns
+    if (note.mesh != null)
+    {
+      note.mesh.pivotOffsetX = note.noteModData.meshOffsets_PivotX;
+      note.mesh.pivotOffsetY = note.noteModData.meshOffsets_PivotY;
+      note.mesh.pivotOffsetZ = note.noteModData.meshOffsets_PivotZ;
+      note.mesh.skewX_offset = note.noteModData.meshOffsets_SkewX;
+      note.mesh.skewY_offset = note.noteModData.meshOffsets_SkewY;
+      note.mesh.skewZ_offset = note.noteModData.meshOffsets_SkewZ;
+    }
+  }
+
+  /**
+   * Goes through each strumlineNote and set's their position using the current active mods.
+   */
+  public function updateStrums():Void
+  {
+    strum.strumlineNotes.forEach(function(note:StrumlineNote) {
+      setStrumPos(note);
+
+      note.updateLastKnownPos();
+      note.noteModData.lastKnownPosition = note.lastKnownPosition;
+
+      var doOrientPass:Bool = false;
+      for (o in 0...note.strumExtraModData.orientExtraMath.length)
+      {
+        if (note.strumExtraModData.orientExtraMath[o] != 0)
+        {
+          doOrientPass = true;
+          break;
+        }
+      }
+
+      if (doOrientPass)
+      {
+        applyStrumModifierMath(note, ModConstants.orientTimeOffset);
+        setStrumPos(note);
+      }
+      applyStrumModifierMath(note);
+    });
+  }
 }

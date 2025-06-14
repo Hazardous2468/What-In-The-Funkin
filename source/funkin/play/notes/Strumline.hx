@@ -538,8 +538,8 @@ class Strumline extends FlxSpriteGroup
         generatedArrowPaths = true;
       }
 
-      updateSpecialMods();
-      updateStrums();
+      mods.updateSpecialMods();
+      mods.updateStrums();
       updateNotes();
       #if FEATURE_GHOST_TAPPING
       updateGhostTapTimer(elapsed);
@@ -568,27 +568,6 @@ class Strumline extends FlxSpriteGroup
       #if FEATURE_GHOST_TAPPING
       updateGhostTapTimer(elapsed);
       #end
-    }
-  }
-
-  function updateSpecialMods():Void
-  {
-    for (lane in 0...KEY_COUNT)
-    {
-      // for (mod in mods.mods_special)
-      for (mod in mods.mods_special)
-      {
-        if (mod.targetLane != -1 && lane != mod.targetLane) continue;
-        try
-        {
-          mod.specialMath(lane, this);
-        }
-        catch (e)
-        {
-          PlayState.instance.modDebugNotif(e.toString(), FlxColor.RED);
-          return;
-        }
-      }
     }
   }
 
@@ -696,163 +675,6 @@ class Strumline extends FlxSpriteGroup
         ModConstants.applyPerspective(splash, splash.width / 2.2 * o[0], splash.height / 2.2 * o[1]);
       }
     }
-  }
-
-  public function getStrumOffsetX():Float
-  {
-    @:privateAccess
-    return noteStyle._data.assets.noteStrumline.offsets[0];
-  }
-
-  public function getStrumOffsetY():Float
-  {
-    @:privateAccess
-    return noteStyle._data.assets.noteStrumline.offsets[1];
-  }
-
-  function setStrumPos(note:StrumlineNote):Void
-  {
-    note.x = getXPos(note.direction);
-    note.x += this.x;
-    note.x += INITIAL_OFFSET;
-    note.y = this.y;
-    noteStyle.applyStrumlineOffsets(note);
-
-    note.alpha = 1;
-    note.angle = 0;
-    // note.scale.set(ModConstants.noteScale * sizeMod, ModConstants.noteScale * sizeMod);
-    note.scale.set(note.targetScale, note.targetScale);
-    note.z = 0.0;
-
-    note.skew.x = 0;
-    note.skew.y = 0;
-
-    if (note.strumExtraModData.introTweenPercentage != 1)
-    {
-      var p:Float = note.strumExtraModData.introTweenPercentage;
-      note.alpha = p;
-      p = 1 - p;
-      note.y -= p * 10;
-    }
-
-    note.resetStealthGlow(true);
-    note.noteModData.defaultValues();
-    note.noteModData.setValuesFromZSprite(note);
-    note.noteModData.direction = note.direction;
-    note.noteModData.whichStrumNote = note;
-    note.noteModData.noteType = "receptor";
-
-    note.noteModData.curPos = 0;
-    note.noteModData.curPos_unscaled = 0;
-
-    var ohgod:Float = note.strumExtraModData.strumPos; // mods.strumPos[note.direction];
-    note.strumDistance = ohgod;
-    note.noteModData.strumPosition = ohgod;
-
-    note.strumExtraModData.playfieldX = this.x + (2 * Strumline.NOTE_SPACING);
-    // note.strumExtraModData.playfieldY = this.y + (this.height / 2);
-    note.strumExtraModData.playfieldY = FlxG.height / 2;
-    note.strumExtraModData.playfieldZ = 0;
-  }
-
-  function updateStrums_single(note:StrumlineNote, timeOffset:Float = 0):Void
-  {
-    if (note.strumDistance != 0 || timeOffset != 0)
-    {
-      note.noteModData.strumTime = Conductor.instance?.songPosition ?? 0;
-      note.noteModData.strumTime += note.noteModData.strumPosition + timeOffset;
-
-      note.noteModData.curPos_unscaled = calculateNoteYPos(note.noteModData.strumTime) * -1;
-      for (mod in mods.mods_speed)
-      {
-        if (mod.targetLane != -1 && note.direction != mod.targetLane) continue;
-        note.noteModData.speedMod *= mod.speedMath(note.noteModData.direction, note.noteModData.curPos_unscaled, this, false);
-      }
-      note.noteModData.curPos = calculateNoteYPos(note.noteModData.strumTime) * note.noteModData.speedMod * -1;
-      for (mod in mods.mods_strums)
-      {
-        if (mod.targetLane != -1 && note.noteModData.direction != mod.targetLane) continue;
-        mod.strumMath(note.noteModData, this);
-      }
-
-      note.noteModData.setStrumPosWasHere(); // for rotate mods to still function as intended
-
-      note.noteModData.y += note.noteModData.curPos; // move it like a regular note
-
-      if (!mods.mathCutOffCheck(note.noteModData.curPos, note.noteModData.direction))
-      {
-        for (mod in mods.mods_notes)
-        {
-          if (mod.targetLane != -1 && note.noteModData.direction != mod.targetLane) continue;
-          mod.noteMath(note.noteModData, this, false);
-        }
-      }
-      note.noteModData.strumPosOffsetThingy.x = note.noteModData.strumPosWasHere.x - note.noteModData.x;
-      note.noteModData.strumPosOffsetThingy.y = note.noteModData.strumPosWasHere.y - note.noteModData.y;
-      note.noteModData.strumPosOffsetThingy.z = note.noteModData.strumPosWasHere.z - note.noteModData.z;
-    }
-    else
-    {
-      for (mod in mods.mods_strums)
-      {
-        if (mod.targetLane != -1 && note.noteModData.direction != mod.targetLane) continue;
-        mod.strumMath(note.noteModData, this);
-      }
-    }
-    note.applyNoteData(note.noteModData);
-    note.updateLastKnownPos();
-    note.noteModData.lastKnownPosition = note.lastKnownPosition;
-    note.updateStealthGlow();
-
-    if (!(note.strumExtraModData?.threeD ?? false))
-    {
-      var wasX:Float = note.x;
-      var wasY:Float = note.y;
-      ModConstants.playfieldSkew(note, note.noteModData.skewX_playfield, note.noteModData.skewY_playfield, note.strumExtraModData.playfieldX,
-        note.strumExtraModData.playfieldY, note.width / 2, note.height / 2);
-      note.strumExtraModData.skewMovedX = note.x - wasX;
-      note.strumExtraModData.skewMovedY = note.y - wasY;
-      note.skew.x += note.noteModData.skewX_playfield;
-      note.skew.y += note.noteModData.skewY_playfield;
-    }
-
-    // for mesh shenaniguns
-    if (note.mesh != null)
-    {
-      note.mesh.pivotOffsetX = note.noteModData.meshOffsets_PivotX;
-      note.mesh.pivotOffsetY = note.noteModData.meshOffsets_PivotY;
-      note.mesh.pivotOffsetZ = note.noteModData.meshOffsets_PivotZ;
-      note.mesh.skewX_offset = note.noteModData.meshOffsets_SkewX;
-      note.mesh.skewY_offset = note.noteModData.meshOffsets_SkewY;
-      note.mesh.skewZ_offset = note.noteModData.meshOffsets_SkewZ;
-    }
-  }
-
-  function updateStrums():Void
-  {
-    strumlineNotes.forEach(function(note:StrumlineNote) {
-      setStrumPos(note);
-
-      note.updateLastKnownPos();
-      note.noteModData.lastKnownPosition = note.lastKnownPosition;
-
-      var doOrientPass:Bool = false;
-      for (o in 0...note.strumExtraModData.orientExtraMath.length)
-      {
-        if (note.strumExtraModData.orientExtraMath[o] != 0)
-        {
-          doOrientPass = true;
-          break;
-        }
-      }
-
-      if (doOrientPass)
-      {
-        updateStrums_single(note, ModConstants.orientTimeOffset);
-        setStrumPos(note);
-      }
-      updateStrums_single(note);
-    });
   }
 
   /**
@@ -1135,12 +957,11 @@ class Strumline extends FlxSpriteGroup
     }
   }
 
-  // WAIT THIS GETS USED FOR MOD MATH? WHY? WHY PAST ME? WTF NOW THIS IS SPAGHETTI!!!
-  // TODO - FIX THIS!
   // var dumbMagicNumberForX:Float = 24;
   // This value popped up again but as 24.6 when doing (-INITIAL_OFFSET + (STRUMLINE_SIZE / 2) - (ModConstants.strumSize/2.0)) while trying to figure out some offset stuff... coincidence? no idea
   var dumbMagicNumberForX:Float = 24.6;
-  var dumbTempScaleTargetThing:Null<Float> = null;
+
+  public var dumbTempScaleTargetThing:Null<Float> = null;
 
   public function getNoteXOffset():Float
   {
@@ -1154,94 +975,6 @@ class Strumline extends FlxSpriteGroup
   public function getNoteYOffset():Float
   {
     return -INITIAL_OFFSET;
-  }
-
-  function setNotePos(note:NoteSprite, vwoosh:Bool = false, orientPass:Bool = false):Void
-  {
-    if (!orientPass && (note.noteModData.orient2[0] != 0 || note.noteModData.orient2[1] != 0 || note.noteModData.orient2[2] != 0))
-    {
-      setNotePos(note, vwoosh, true);
-    }
-
-    note.noteModData.defaultValues();
-    note.noteModData.strumTime = note.strumTime + (orientPass ? ModConstants.orientTimeOffset : 0);
-    note.noteModData.noteType = note.kind;
-    note.noteModData.direction = note.direction;
-    note.color = FlxColor.WHITE;
-    note.noteModData.direction = note.direction % KEY_COUNT;
-    note.noteModData.whichStrumNote = getByIndex(note.noteModData.direction);
-    var timmy:Float = note.noteModData.strumTime - note.noteModData.whichStrumNote.strumExtraModData.strumPos;
-
-    note.noteModData.curPos_unscaled = calculateNoteYPos(timmy);
-
-    for (mod in mods.mods_speed)
-    {
-      if (mod.targetLane != -1 && note.direction != mod.targetLane) continue;
-      note.noteModData.speedMod *= mod.speedMath(note.noteModData.direction, note.noteModData.curPos_unscaled, this, false);
-    }
-    note.noteModData.curPos = calculateNoteYPos(timmy) * note.noteModData.speedMod;
-
-    if (this.dumbTempScaleTargetThing == null) dumbTempScaleTargetThing = note.targetScale;
-
-    note.scale.set(note.targetScale, note.targetScale);
-    note.noteModData.scaleX = note.scale.x;
-    note.noteModData.scaleY = note.scale.y;
-
-    note.noteModData.angleZ = note.noteModData.whichStrumNote.angle;
-    note.noteModData.y = note.noteModData.whichStrumNote.y + note.noteModData.getNoteYOffset() + note.noteModData.curPos;
-    note.noteModData.z = note.noteModData.whichStrumNote.z;
-
-    note.noteModData.x = note.noteModData.whichStrumNote.x + note.noteModData.getNoteXOffset();
-    note.noteModData.x -= (note.width - Strumline.STRUMLINE_SIZE) / 2; // Center it
-    note.noteModData.x -= note.noteModData.whichStrumNote.strumExtraModData.noteStyleOffsetX; // undo strum offset
-    note.noteModData.y -= note.noteModData.whichStrumNote.strumExtraModData.noteStyleOffsetY;
-    note.noteModData.x -= NUDGE;
-
-    if (!mods.mathCutOffCheck(note.noteModData.curPos, note.noteModData.direction))
-    {
-      for (mod in mods.mods_notes)
-      {
-        if (mod.targetLane != -1 && note.noteModData.direction != mod.targetLane) continue;
-        mod.noteMath(note.noteModData, this, vwoosh);
-      }
-
-      for (mod in note.noteModData.noteMods)
-      {
-        if (mod.targetLane != -1 && note.noteModData.direction != mod.targetLane) continue;
-        mod.noteMath(note.noteModData, this, vwoosh);
-      }
-    }
-    note.noteModData.funnyOffMyself();
-
-    note.applyNoteData(note.noteModData);
-    note.updateLastKnownPos();
-    note.noteModData.lastKnownPosition = note.lastKnownPosition;
-
-    if (!(note.noteModData?.whichStrumNote?.strumExtraModData?.threeD ?? false))
-    {
-      ModConstants.playfieldSkew(note, note.noteModData.skewX_playfield, note.noteModData.skewY_playfield,
-        note.noteModData.whichStrumNote.strumExtraModData.playfieldX, note.noteModData.whichStrumNote.strumExtraModData.playfieldY, note.width / 2,
-        note.height / 2);
-      // undo the strum skew
-      note.x -= note.noteModData.whichStrumNote.strumExtraModData.skewMovedX;
-      note.y -= note.noteModData.whichStrumNote.strumExtraModData.skewMovedY;
-      note.skew.x += note.noteModData.skewX_playfield;
-      note.skew.y += note.noteModData.skewY_playfield;
-    }
-
-    // for mesh shenaniguns
-    if (note.mesh != null)
-    {
-      note.mesh.pivotOffsetX = note.noteModData.meshOffsets_PivotX;
-      note.mesh.pivotOffsetY = note.noteModData.meshOffsets_PivotY;
-      note.mesh.pivotOffsetZ = note.noteModData.meshOffsets_PivotZ;
-      note.mesh.skewX_offset = note.noteModData.meshOffsets_SkewX;
-      note.mesh.skewY_offset = note.noteModData.meshOffsets_SkewY;
-      note.mesh.skewZ_offset = note.noteModData.meshOffsets_SkewZ;
-    }
-
-    note.updateStealthGlow();
-    // perspective applied in applyperspective part of update routine
   }
 
   /**
@@ -1311,7 +1044,7 @@ class Strumline extends FlxSpriteGroup
       // Set the note's position.
       if (mods != null)
       {
-        setNotePos(note, false);
+        mods.setNotePos(note);
 
         var drawDistanceBackkk:Float = 1;
         if (mods != null)
@@ -2199,7 +1932,12 @@ class Strumline extends FlxSpriteGroup
     return result;
   }
 
-  function getXPos(direction:NoteDirection):Float
+  /**
+   * Converts a noteDirection into a Float corrosponding to the direction's x Position.
+   * @param direction The direction to input.
+   * @return The x position this noteDirection is!
+   */
+  public function getXPos(direction:NoteDirection):Float
   {
     return switch (direction)
     {

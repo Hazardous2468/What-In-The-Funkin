@@ -145,12 +145,14 @@ class NoteData
 
   public function getNoteXOffset():Float
   {
-    return dumbMagicNumberForX;
+    // return dumbMagicNumberForX;
+    return whichStrumNote.weBelongTo.getNoteXOffset();
   }
 
   public function getNoteYOffset():Float
   {
-    return Strumline.INITIAL_OFFSET * -1;
+    return whichStrumNote.weBelongTo.getNoteYOffset();
+    // return Strumline.INITIAL_OFFSET * -1;
   }
 
   // call this to set the values from an already existing sprite!

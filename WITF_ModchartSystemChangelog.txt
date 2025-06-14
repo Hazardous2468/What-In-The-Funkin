@@ -19,6 +19,7 @@ More modifiers, overhauled menu visuals, now works in StoryMenuState.
 Notestyles now have "zCalcMult" variable in data for holdCovers and splashes. Also fixed hold covers zMath
 
 Fixed HyperNova for upscroll
+Fixed hurt note splashes and offsets.
 
 Refactored some stuff
 
