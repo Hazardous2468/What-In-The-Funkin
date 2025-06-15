@@ -3,384 +3,277 @@ package funkin.play.modchartSystem.modifiers;
 import funkin.play.notes.Strumline;
 import funkin.play.modchartSystem.NoteData;
 import funkin.play.modchartSystem.modifiers.BaseModifier;
-import flixel.math.FlxMath;
 import funkin.play.modchartSystem.ModConstants;
 import lime.math.Vector2;
 
 // Contains all mods which control strumline rotation!
-// rotate on x axis
-class RotateXModifier extends Modifier
+class RotateModBase extends Modifier
 {
   public function new(name:String)
   {
     super(name, 0);
     modPriority = 21;
-    createSubMod("offset_x", 0.0);
-    createSubMod("offset_y", 0.0);
+    createSubMod("offset_x", 1.0);
+    createSubMod("offset_y", 1.0);
+    createSubMod("offset_z", 0.0);
     unknown = false;
     notesMod = true;
     holdsMod = true;
     strumsMod = true;
     pathMod = true;
-  }
-
-  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
-  {
-    if (currentValue % 360 == 0) return; // skip math if mod is 0
-    // this is dumb lmfao
-    var xrot:Float = (FlxMath.fastSin(currentValue * Math.PI / 180));
-    var yrot:Float = (FlxMath.fastCos(currentValue * Math.PI / 180));
-
-    // grab the current x
-    var beforeShit_y:Float = data.y;
-    var beforeShit_z:Float = data.z;
-
-    // grab strum x
-    var whichStrumNote = strumLine.getByIndex(data.direction % Strumline.KEY_COUNT);
-    var strumY:Float = whichStrumNote.y - whichStrumNote.strumExtraModData.noteStyleOffsetY;
-    var strumZ:Float = whichStrumNote.z;
-
-    if (data.noteType != "receptor")
-    {
-      if (isHoldNote)
-      {
-        if (Preferences.downscroll)
-        {
-          strumY += (Strumline.STRUMLINE_SIZE / 2);
-        }
-        else
-        {
-          strumY += (Strumline.STRUMLINE_SIZE / 2) - Strumline.INITIAL_OFFSET;
-        }
-      }
-      else
-      {
-        strumY += strumLine.getNoteYOffset();
-      }
-    }
-    else
-    {
-      strumY = data.strumPosWasHere.y;
-      strumZ = data.strumPosWasHere.z;
-    }
-
-    // figure out difference
-    var lolx:Float = beforeShit_y - strumY;
-    var lolz:Float = beforeShit_z - strumZ;
-
-    var lolx_2:Float = lolz;
-    var lolz_2:Float = lolx;
-
-    lolx_2 *= xrot; // 0
-    lolz_2 *= xrot;
-
-    lolx *= yrot; // 1
-    lolz *= yrot;
-
-    data.y = strumY + lolx + lolx_2;
-    data.z = strumZ + lolz - lolz_2;
   }
 
   var pivotPoint:Vector2 = new Vector2(0, 0);
   var point:Vector2 = new Vector2(0, 0);
 
-  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  function noteRotateFunc_GetPivotX(data:NoteData, strumLine:Strumline):Float
   {
-    if (currentValue % 360 == 0) return; // skip math if mod is 0
-
-    pivotPoint.x = 0;
-    pivotPoint.y = (FlxG.height / 2) - (data.whichStrumNote.height / 2);
-    pivotPoint.x += getSubVal("offset_x");
-    pivotPoint.y += getSubVal("offset_y");
-
-    point.setTo(data.z, data.y);
-
-    var output:Vector2 = ModConstants.rotateAround(pivotPoint, point, currentValue);
-    data.y = output.y;
-    data.z = output.x;
-  }
-}
-
-// rotate on y axis
-class RotateYMod extends Modifier
-{
-  public function new(name:String)
-  {
-    super(name, 0);
-    modPriority = 22;
-    createSubMod("offset_x", 0.0);
-    createSubMod("offset_y", 0.0);
-    unknown = false;
-    notesMod = true;
-    holdsMod = true;
-    strumsMod = true;
-    pathMod = true;
-  }
-
-  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
-  {
-    if (currentValue % 360 == 0) return; // skip math if mod is 0
-    // this is dumb lmfao
-    var xrot:Float = (FlxMath.fastSin(currentValue * Math.PI / 180.0));
-    var yrot:Float = (FlxMath.fastCos(currentValue * Math.PI / 180.0));
-
-    // grab the current x
-    var beforeShit_x:Float = data.x;
-    var beforeShit_z:Float = data.z;
-
-    // grab strum x
-
-    var whichStrumNote = strumLine.getByIndex(data.direction % Strumline.KEY_COUNT);
-
-    var strumX:Float = whichStrumNote.x - whichStrumNote.strumExtraModData.noteStyleOffsetX;
-    var strumZ:Float = whichStrumNote.z;
+    var r:Float = data.whichStrumNote.x;
     if (data.noteType == "receptor")
     {
-      strumX = data.strumPosWasHere.x;
-      strumZ = data.strumPosWasHere.z;
+      r = data.strumPosWasHere.x;
     }
-    else
+    else if (data.noteType == "hold" || data.noteType == "path")
     {
-      strumX += isHoldNote ? strumLine.mods.getHoldOffsetX(isArrowPath) : strumLine.getNoteXOffset();
+      r += strumLine.mods.getHoldOffsetX(data.noteType == "path");
+      r -= strumLine.getNoteXOffset();
     }
-
-    // figure out difference
-    var lolx:Float = beforeShit_x - strumX;
-    var lolz:Float = beforeShit_z - strumZ;
-
-    var lolx_2:Float = lolz;
-    var lolz_2:Float = lolx;
-
-    lolx_2 *= xrot;
-    lolz_2 *= xrot;
-
-    lolx *= yrot;
-    lolz *= yrot;
-
-    data.x = strumX + lolx - lolx_2;
-    data.z = strumZ + lolz + lolz_2;
+    return r;
   }
 
-  var pivotPoint:Vector2 = new Vector2(0, 0);
-  var point:Vector2 = new Vector2(0, 0);
-
-  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  function noteRotateFunc_GetPivotY(data:NoteData, strumLine:Strumline):Float
   {
-    if (currentValue % 360 == 0) return; // skip math if mod is 0
+    var r:Float = data.whichStrumNote.y;
+    if (data.noteType == "receptor")
+    {
+      r = data.strumPosWasHere.y;
+    }
+    else if (data.noteType == "hold" || data.noteType == "path")
+    {
+      if (Preferences.downscroll)
+      {
+        r += (Strumline.STRUMLINE_SIZE / 2);
+      }
+      else
+      {
+        r += (Strumline.STRUMLINE_SIZE / 2) - Strumline.INITIAL_OFFSET;
+      }
+      r -= strumLine.getNoteYOffset();
+    }
+    return r;
+  }
 
-    pivotPoint.x = strumLine.x + Strumline.INITIAL_OFFSET + (Strumline.NOTE_SPACING * 1.5);
-    pivotPoint.y = data.z;
-    pivotPoint.x += getSubVal("offset_x");
-    pivotPoint.y += getSubVal("offset_y");
-    pivotPoint.x += strumLine.getByIndex(data.direction % Strumline.KEY_COUNT).strumExtraModData.noteStyleOffsetX;
+  function noteRotateFunc_GetPivotZ(data:NoteData, strumLine:Strumline):Float
+  {
+    return (data.noteType == "receptor" ? data.strumPosWasHere.z : data.whichStrumNote.z);
+  }
 
-    point.setTo(data.x, data.z);
+  function noteRotateFunc(data:NoteData, strumLine:Strumline, variant:String, angle:Null<Float> = null):Void
+  {
+    if (angle == null) angle = this.currentValue;
+    if (angle % 360 == 0) return;
+    switch (variant)
+    {
+      case "z":
+        pivotPoint.x = noteRotateFunc_GetPivotX(data, strumLine);
+        pivotPoint.y = noteRotateFunc_GetPivotY(data, strumLine);
+        point.x = data.x;
+        point.y = data.y;
+        var output:Vector2 = ModConstants.rotateAround(pivotPoint, point, angle);
+        data.x = output.x;
+        data.y = output.y;
+      case "y":
+        pivotPoint.x = noteRotateFunc_GetPivotX(data, strumLine);
+        pivotPoint.y = noteRotateFunc_GetPivotZ(data, strumLine);
+        point.x = data.x;
+        point.y = data.z;
+        var output:Vector2 = ModConstants.rotateAround(pivotPoint, point, angle);
+        data.x = output.x;
+        data.z = output.y;
+      case "x":
+        pivotPoint.x = noteRotateFunc_GetPivotZ(data, strumLine);
+        pivotPoint.y = noteRotateFunc_GetPivotY(data, strumLine);
+        point.x = data.z;
+        point.y = data.y;
+        var output:Vector2 = ModConstants.rotateAround(pivotPoint, point, angle);
+        data.z = output.x;
+        data.y = output.y;
+    }
+  }
 
-    var output:Vector2 = ModConstants.rotateAround(pivotPoint, point, currentValue);
-    data.x = output.x;
-    data.z = output.y;
+  function strumRotateFunc_GetPivotX(data:NoteData, strumLine:Strumline):Float
+  {
+    if (strumLine == null)
+    {
+      strumLine = data.whichStrumNote.weBelongTo;
+    }
+    var r:Float = 0;
+    r += strumLine.x + Strumline.INITIAL_OFFSET + (Strumline.NOTE_SPACING * 1.5);
+    r += strumLine.getByIndex(data.direction % Strumline.KEY_COUNT).strumExtraModData.noteStyleOffsetX;
+    r += this.getSubVal("offset_x");
+    return r;
+  };
+
+  function strumRotateFunc_GetPivotY(data:NoteData, strumLine:Strumline):Float
+  {
+    return (FlxG.height / 2) - (data.whichStrumNote.height / 2) + this.getSubVal("offset_y");
+  };
+
+  function strumRotateFunc_GetPivotZ(data:NoteData, strumLine:Strumline):Float
+  {
+    return 0.0 + this.getSubVal("offset_z");
+  };
+
+  function strumRotateFunc(data:NoteData, strumLine:Strumline, variant:String, angle:Null<Float> = null):Void
+  {
+    if (angle == null) angle = this.currentValue;
+    if (angle % 360 == 0) return;
+    switch (variant)
+    {
+      case "z":
+        pivotPoint.x = strumRotateFunc_GetPivotX(data, strumLine);
+        pivotPoint.y = strumRotateFunc_GetPivotY(data, strumLine);
+        point.setTo(data.x, data.y);
+        var output:Vector2 = ModConstants.rotateAround(pivotPoint, point, angle);
+        data.x = output.x;
+        data.y = output.y;
+      case "y":
+        pivotPoint.x = strumRotateFunc_GetPivotX(data, strumLine);
+        pivotPoint.y = strumRotateFunc_GetPivotZ(data, strumLine);
+        point.setTo(data.x, data.z);
+        var output:Vector2 = ModConstants.rotateAround(pivotPoint, point, angle);
+        data.x = output.x;
+        data.z = output.y;
+      case "x":
+        pivotPoint.x = strumRotateFunc_GetPivotZ(data, strumLine);
+        pivotPoint.y = strumRotateFunc_GetPivotY(data, strumLine);
+        point.setTo(data.z, data.y);
+        var output:Vector2 = ModConstants.rotateAround(pivotPoint, point, angle);
+        data.z = output.x;
+        data.y = output.y;
+    }
   }
 }
 
-// rotate on y axis
-class RotateZMod extends Modifier
+class RotateXModifier extends RotateModBase
 {
   public function new(name:String)
   {
-    super(name, 0);
-    modPriority = 23;
-    createSubMod("offset_x", 0.0);
-    createSubMod("offset_y", 0.0);
-    unknown = false;
-    notesMod = true;
-    holdsMod = true;
-    strumsMod = true;
-    pathMod = true;
+    super(name);
+    modPriority = 21;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue % 360 == 0) return; // skip math if mod is 0
-    // this is dumb lmfao
-    var xrot:Float = (FlxMath.fastSin(currentValue * Math.PI / 180.0));
-    var yrot:Float = (FlxMath.fastCos(currentValue * Math.PI / 180.0));
-
-    // grab the current x
-    var beforeShit_x:Float = data.x;
-    var beforeShit_y:Float = data.y;
-
-    // grab strum x
-    var whichStrumNote = strumLine.getByIndex(data.direction % Strumline.KEY_COUNT);
-    var strumX:Float = whichStrumNote.x - whichStrumNote.strumExtraModData.noteStyleOffsetX;
-    var strumY:Float = whichStrumNote.y - whichStrumNote.strumExtraModData.noteStyleOffsetY;
-
-    if (data.noteType != "receptor")
-    {
-      if (isHoldNote)
-      {
-        strumX += strumLine.mods.getHoldOffsetX(isArrowPath);
-
-        if (Preferences.downscroll)
-        {
-          strumY += (Strumline.STRUMLINE_SIZE / 2);
-        }
-        else
-        {
-          strumY += (Strumline.STRUMLINE_SIZE / 2) - Strumline.INITIAL_OFFSET;
-        }
-      }
-      else
-      {
-        strumX += strumLine.getNoteXOffset();
-        strumY += strumLine.getNoteYOffset();
-      }
-    }
-    else
-    {
-      strumX = data.strumPosWasHere.x;
-      strumY = data.strumPosWasHere.y;
-    }
-
-    // figure out difference
-    var lolx:Float = beforeShit_x - strumX;
-    var loly:Float = beforeShit_y - strumY;
-
-    var lolx_2:Float = loly;
-    var loly_2:Float = lolx;
-
-    lolx_2 *= xrot;
-    loly_2 *= xrot;
-
-    lolx *= yrot;
-    loly *= yrot;
-
-    data.x = strumX + lolx - lolx_2;
-    data.y = strumY + loly + loly_2;
+    noteRotateFunc(data, strumLine, "x");
   }
-
-  var pivotPoint:Vector2 = new Vector2(0, 0);
-  var point:Vector2 = new Vector2(0, 0);
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue % 360 == 0) return; // skip math if mod is 0
-
-    pivotPoint.x = strumLine.x + Strumline.INITIAL_OFFSET + (Strumline.NOTE_SPACING * 1.5);
-    pivotPoint.y = (FlxG.height / 2) - (data.whichStrumNote.height / 2);
-    pivotPoint.x += getSubVal("offset_x");
-    pivotPoint.y += getSubVal("offset_y");
-    pivotPoint.x += strumLine.getByIndex(data.direction % Strumline.KEY_COUNT).strumExtraModData.noteStyleOffsetX;
-
-    point.setTo(data.x, data.y);
-
-    var output:Vector2 = ModConstants.rotateAround(pivotPoint, point, currentValue);
-    data.x = output.x;
-    data.y = output.y;
+    strumRotateFunc(data, strumLine, "x");
   }
 }
 
-// receptors rotate on x axis
-class StrumRotateXMod extends Modifier
+class RotateYModifier extends RotateModBase
 {
   public function new(name:String)
   {
-    super(name, 0);
+    super(name);
+    modPriority = 22;
+  }
+
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
+  {
+    noteRotateFunc(data, strumLine, "y");
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    strumRotateFunc(data, strumLine, "y");
+  }
+}
+
+class RotateZModifier extends RotateModBase
+{
+  public function new(name:String)
+  {
+    super(name);
+    modPriority = 23;
+  }
+
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
+  {
+    noteRotateFunc(data, strumLine, "z");
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    strumRotateFunc(data, strumLine, "z");
+  }
+}
+
+class StrumRotateXModifier extends RotateModBase
+{
+  public function new(name:String)
+  {
+    super(name);
     modPriority = 21 + 6;
-    createSubMod("offset_x", 0.0);
-    createSubMod("offset_y", 0.0);
     unknown = false;
+    notesMod = false;
+    holdsMod = false;
     strumsMod = true;
+    pathMod = false;
   }
-
-  var pivotPoint:Vector2 = new Vector2(0, 0);
-  var point:Vector2 = new Vector2(0, 0);
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue % 360 == 0) return; // skip math if mod is 0
-    pivotPoint.x = 0;
-    pivotPoint.x += getSubVal("offset_x");
-    pivotPoint.y = (FlxG.height / 2) - (data.whichStrumNote.height / 2);
-    pivotPoint.y += getSubVal("offset_y");
-
-    point.setTo(data.z, data.y);
-
-    var thing:Vector2 = ModConstants.rotateAround(pivotPoint, point, currentValue);
-    data.y = thing.y;
-    data.z = thing.x;
+    strumRotateFunc(data, strumLine, "x");
   }
 }
 
-// receptors rotate on y axis
-class StrumRotateYMod extends Modifier
+class StrumRotateYModifier extends RotateModBase
 {
   public function new(name:String)
   {
-    super(name, 0);
+    super(name);
     modPriority = 22 + 6;
-    createSubMod("offset_x", 0.0);
-    createSubMod("offset_y", 0.0);
     unknown = false;
+    notesMod = false;
+    holdsMod = false;
     strumsMod = true;
+    pathMod = false;
   }
-
-  var pivotPoint:Vector2 = new Vector2(0, 0);
-  var point:Vector2 = new Vector2(0, 0);
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue % 360 == 0) return; // skip math if mod is 0
-
-    pivotPoint.x = strumLine.x + Strumline.INITIAL_OFFSET + (Strumline.NOTE_SPACING * 1.5);
-    pivotPoint.x += getSubVal("offset_x");
-    pivotPoint.y = data.z;
-    pivotPoint.y += getSubVal("offset_y");
-    pivotPoint.x += strumLine.getByIndex(data.direction % Strumline.KEY_COUNT).strumExtraModData.noteStyleOffsetX;
-
-    point.setTo(data.x, data.z);
-
-    var thing:Vector2 = ModConstants.rotateAround(pivotPoint, point, currentValue);
-    data.x = thing.x;
-    data.z = thing.y;
+    strumRotateFunc(data, strumLine, "y");
   }
 }
 
-// receptors rotate on y axis
-class StrumRotateZMod extends Modifier
+class StrumRotateZModifier extends RotateModBase
 {
   public function new(name:String)
   {
-    super(name, 0);
+    super(name);
     modPriority = 23 + 6;
-    createSubMod("offset_x", 0.0);
-    createSubMod("offset_y", 0.0);
     unknown = false;
+    notesMod = false;
+    holdsMod = false;
     strumsMod = true;
+    pathMod = false;
   }
-
-  var pivotPoint:Vector2 = new Vector2(0, 0);
-  var point:Vector2 = new Vector2(0, 0);
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue % 360 == 0) return; // skip math if mod is 0
-    pivotPoint.x = strumLine.x + Strumline.INITIAL_OFFSET + (Strumline.NOTE_SPACING * 1.5);
-    pivotPoint.x += getSubVal("offset_x");
-    pivotPoint.y = (FlxG.height / 2) - (data.whichStrumNote.height / 2);
-    pivotPoint.y += getSubVal("offset_y");
-    pivotPoint.x += strumLine.getByIndex(data.direction % Strumline.KEY_COUNT).strumExtraModData.noteStyleOffsetX;
-    point.setTo(data.x, data.y);
-    var thing:Vector2 = ModConstants.rotateAround(pivotPoint, point, currentValue);
-    data.x = thing.x;
-    data.y = thing.y;
+    strumRotateFunc(data, strumLine, "z");
   }
 }
 
-class NotesRotateXModifier extends Modifier
+class NotesRotateXModifier extends RotateModBase
 {
   public function new(name:String)
   {
-    super(name, 0);
+    super(name);
     modPriority = 21 + 6;
     unknown = false;
     notesMod = true;
@@ -389,70 +282,17 @@ class NotesRotateXModifier extends Modifier
     pathMod = true;
   }
 
-  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue % 360 == 0) return; // skip math if mod is 0
-    // this is dumb lmfao
-    var xrot:Float = (FlxMath.fastSin(currentValue * Math.PI / 180));
-    var yrot:Float = (FlxMath.fastCos(currentValue * Math.PI / 180));
-
-    // grab the current x
-    var beforeShit_y:Float = data.y;
-    var beforeShit_z:Float = data.z;
-
-    // grab strum x
-    var whichStrumNote = strumLine.getByIndex(data.direction % Strumline.KEY_COUNT);
-    var yyyy:Float = whichStrumNote.y - whichStrumNote.strumExtraModData.noteStyleOffsetY;
-    var strumZ:Float = whichStrumNote.z;
-
-    if (data.noteType != "receptor")
-    {
-      if (isHoldNote)
-      {
-        if (Preferences.downscroll)
-        {
-          yyyy += (Strumline.STRUMLINE_SIZE / 2);
-        }
-        else
-        {
-          yyyy += (Strumline.STRUMLINE_SIZE / 2) - Strumline.INITIAL_OFFSET;
-        }
-      }
-      else
-      {
-        yyyy += strumLine.getNoteYOffset();
-      }
-    }
-    else
-    {
-      yyyy = data.strumPosWasHere.y;
-      strumZ = data.strumPosWasHere.z;
-    }
-
-    // figure out difference
-    var lolx:Float = beforeShit_y - yyyy;
-    var lolz:Float = beforeShit_z - strumZ;
-
-    var lolx_2:Float = lolz;
-    var lolz_2:Float = lolx;
-
-    lolx_2 *= xrot;
-    lolz_2 *= xrot;
-
-    lolx *= yrot;
-    lolz *= yrot;
-
-    data.y = yyyy + lolx + lolx_2;
-    data.z = strumZ + lolz - lolz_2;
+    strumRotateFunc(data, strumLine, "x");
   }
 }
 
-// rotate on y axis
-class NotesRotateYMod extends Modifier
+class NotesRotateYModifier extends RotateModBase
 {
   public function new(name:String)
   {
-    super(name, 0);
+    super(name);
     modPriority = 22 + 6;
     unknown = false;
     notesMod = true;
@@ -463,55 +303,15 @@ class NotesRotateYMod extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue % 360 == 0) return; // skip math if mod is 0
-    // this is dumb lmfao
-    var xrot:Float = (FlxMath.fastSin(currentValue * Math.PI / 180.0));
-    var yrot:Float = (FlxMath.fastCos(currentValue * Math.PI / 180.0));
-
-    // grab the current x
-    var beforeShit_x:Float = data.x;
-    var beforeShit_z:Float = data.z;
-
-    // grab strum x
-
-    var whichStrumNote = strumLine.getByIndex(data.direction % Strumline.KEY_COUNT);
-
-    var strumX:Float = whichStrumNote.x - whichStrumNote.strumExtraModData.noteStyleOffsetX;
-    var strumZ:Float = whichStrumNote.z;
-    if (data.noteType == "receptor")
-    {
-      strumX = data.strumPosWasHere.x;
-      strumZ = data.strumPosWasHere.z;
-    }
-    else
-    {
-      strumX += isHoldNote ? strumLine.mods.getHoldOffsetX(isArrowPath) : strumLine.getNoteXOffset();
-    }
-
-    // figure out difference
-    var lolx:Float = beforeShit_x - strumX;
-    var lolz:Float = beforeShit_z - strumZ;
-
-    var lolx_2:Float = lolz;
-    var lolz_2:Float = lolx;
-
-    lolx_2 *= xrot;
-    lolz_2 *= xrot;
-
-    lolx *= yrot;
-    lolz *= yrot;
-
-    data.x = strumX + lolx - lolx_2;
-    data.z = strumZ + lolz + lolz_2;
+    noteRotateFunc(data, strumLine, "y");
   }
 }
 
-// rotate on y axis
-class NotesRotateZMod extends Modifier
+class NotesRotateZModifier extends RotateModBase
 {
   public function new(name:String)
   {
-    super(name, 0);
+    super(name);
     modPriority = 23 + 6;
     unknown = false;
     notesMod = true;
@@ -522,339 +322,75 @@ class NotesRotateZMod extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue % 360 == 0) return; // skip math if mod is 0
-    // this is dumb lmfao
-    // var xrot = currentValue ;// *(Math.PI / 180);
-    var xrot:Float = (FlxMath.fastSin(currentValue * Math.PI / 180.0));
-    var yrot:Float = (FlxMath.fastCos(currentValue * Math.PI / 180.0));
-
-    // grab the current x
-    var beforeShit_x:Float = data.x;
-    var beforeShit_y:Float = data.y;
-
-    // grab strum x
-    var whichStrumNote = strumLine.getByIndex(data.direction % Strumline.KEY_COUNT);
-    var strumX:Float = whichStrumNote.x - whichStrumNote.strumExtraModData.noteStyleOffsetX;
-    var strumY:Float = whichStrumNote.y - whichStrumNote.strumExtraModData.noteStyleOffsetY;
-
-    if (data.noteType != "receptor")
-    {
-      if (isHoldNote)
-      {
-        strumX += strumLine.mods.getHoldOffsetX(isArrowPath);
-
-        if (Preferences.downscroll)
-        {
-          strumY += (Strumline.STRUMLINE_SIZE / 2);
-        }
-        else
-        {
-          strumY += (Strumline.STRUMLINE_SIZE / 2) - Strumline.INITIAL_OFFSET;
-        }
-      }
-      else
-      {
-        strumX += strumLine.getNoteXOffset();
-        strumY += strumLine.getNoteYOffset();
-      }
-    }
-    else
-    {
-      strumX = data.strumPosWasHere.x;
-      strumY = data.strumPosWasHere.y;
-    }
-
-    // figure out difference
-    var lolx:Float = beforeShit_x - strumX;
-    var loly:Float = beforeShit_y - strumY;
-
-    // if (lane == 0) trace("xdif " + lolx);
-
-    var lolx_2:Float = loly;
-    var loly_2:Float = lolx;
-
-    lolx_2 *= xrot;
-    loly_2 *= xrot;
-
-    lolx *= yrot;
-    loly *= yrot;
-
-    data.x = strumX + lolx - lolx_2;
-    data.y = strumY + loly + loly_2;
+    noteRotateFunc(data, strumLine, "z");
   }
 }
 
-// experimental rotate based on curDistance.
-class RotatingXModifier extends Modifier
+class RotatingXModifier extends RotateModBase
 {
   public function new(name:String)
   {
-    super(name, 0);
+    super(name);
     modPriority = 21;
-    createSubMod("offset_x", 0.0);
-    createSubMod("offset_y", 0.0);
     createSubMod("affect_strum", 0.0);
-    unknown = false;
-    notesMod = true;
-    holdsMod = true;
-    strumsMod = true;
-    pathMod = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
     var curVal:Float = currentValue * data.curPos / 180;
-    // this is dumb lmfao
-    var xrot:Float = (FlxMath.fastSin(curVal * Math.PI / 180));
-    var yrot:Float = (FlxMath.fastCos(curVal * Math.PI / 180));
-
-    // grab the current x
-    var beforeShit_y:Float = data.y;
-    var beforeShit_z:Float = data.z;
-
-    // grab strum x
-    var whichStrumNote = strumLine.getByIndex(data.direction % Strumline.KEY_COUNT);
-    var strumY:Float = whichStrumNote.y - whichStrumNote.strumExtraModData.noteStyleOffsetY;
-    var strumZ:Float = whichStrumNote.z;
-
-    if (data.noteType != "receptor")
-    {
-      if (isHoldNote)
-      {
-        if (Preferences.downscroll)
-        {
-          strumY += (Strumline.STRUMLINE_SIZE / 2);
-        }
-        else
-        {
-          strumY += (Strumline.STRUMLINE_SIZE / 2) - Strumline.INITIAL_OFFSET;
-        }
-      }
-      else
-      {
-        strumY += strumLine.getNoteYOffset();
-      }
-    }
-    else
-    {
-      strumY = data.strumPosWasHere.y;
-      strumZ = data.strumPosWasHere.z;
-    }
-
-    // figure out difference
-    var lolx:Float = beforeShit_y - strumY;
-    var lolz:Float = beforeShit_z - strumZ;
-
-    var lolx_2:Float = lolz;
-    var lolz_2:Float = lolx;
-
-    lolx_2 *= xrot; // 0
-    lolz_2 *= xrot;
-
-    lolx *= yrot; // 1
-    lolz *= yrot;
-
-    data.y = strumY + lolx + lolx_2;
-    data.z = strumZ + lolz - lolz_2;
+    noteRotateFunc(data, strumLine, "x", curVal);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0 || getSubVal("affect_strum") == 0) return; // skip math if mod is 0
+    if (this.currentValue % 360 == 0 || getSubVal("affect_strum") == 0) return;
     var curVal:Float = currentValue * data.curPos / 180;
-    var rotateModPivotPoint:Vector2 = new Vector2(0, 0);
-    rotateModPivotPoint.x = 0;
-    rotateModPivotPoint.x += getSubVal("offset_x");
-    // rotateModPivotPoint.y = (FlxG.height / 2) - (ModConstants.strumSize / 2);
-    rotateModPivotPoint.y = (FlxG.height / 2) - (data.whichStrumNote.height / 2);
-    rotateModPivotPoint.y += getSubVal("offset_y");
-
-    var thing:Vector2 = ModConstants.rotateAround(rotateModPivotPoint, new Vector2(data.z, data.y), curVal);
-    data.y = thing.y;
-    data.z = thing.x;
+    strumRotateFunc(data, strumLine, "x", curVal);
   }
 }
 
-// rotate on y axis
-class RotatingYModifier extends Modifier
+class RotatingYModifier extends RotateModBase
 {
   public function new(name:String)
   {
-    super(name, 0);
+    super(name);
     modPriority = 22;
-    createSubMod("offset_x", 0.0);
-    createSubMod("offset_y", 0.0);
     createSubMod("affect_strum", 0.0);
-    unknown = false;
-    notesMod = true;
-    holdsMod = true;
-    strumsMod = true;
-    pathMod = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
-    // this is dumb lmfao
     var curVal:Float = currentValue * data.curPos / 180;
-    var xrot:Float = (FlxMath.fastSin(curVal * Math.PI / 180.0));
-    var yrot:Float = (FlxMath.fastCos(curVal * Math.PI / 180.0));
-
-    // grab the current x
-    var beforeShit_x:Float = data.x;
-    var beforeShit_z:Float = data.z;
-
-    // grab strum x
-
-    var whichStrumNote = strumLine.getByIndex(data.direction % Strumline.KEY_COUNT);
-
-    var strumX:Float = whichStrumNote.x - whichStrumNote.strumExtraModData.noteStyleOffsetX;
-    var strumZ:Float = whichStrumNote.z;
-    if (data.noteType == "receptor")
-    {
-      strumX = data.strumPosWasHere.x;
-      strumZ = data.strumPosWasHere.z;
-    }
-    else
-    {
-      strumX += isHoldNote ? strumLine.mods.getHoldOffsetX(isArrowPath) : strumLine.getNoteXOffset();
-    }
-
-    // figure out difference
-    var lolx:Float = beforeShit_x - strumX;
-    var lolz:Float = beforeShit_z - strumZ;
-
-    var lolx_2:Float = lolz;
-    var lolz_2:Float = lolx;
-
-    lolx_2 *= xrot;
-    lolz_2 *= xrot;
-
-    lolx *= yrot;
-    lolz *= yrot;
-
-    data.x = strumX + lolx - lolx_2;
-    data.z = strumZ + lolz + lolz_2;
+    noteRotateFunc(data, strumLine, "y", curVal);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0 || getSubVal("affect_strum") == 0) return; // skip math if mod is 0
+    if (this.currentValue % 360 == 0 || getSubVal("affect_strum") == 0) return;
     var curVal:Float = currentValue * data.curPos / 180;
-    var rotateModPivotPoint:Vector2 = new Vector2(0, 0);
-    rotateModPivotPoint.x = strumLine.x + Strumline.INITIAL_OFFSET + (Strumline.NOTE_SPACING * 1.5);
-    rotateModPivotPoint.x += getSubVal("offset_x");
-    rotateModPivotPoint.y = data.z;
-    rotateModPivotPoint.y += getSubVal("offset_y");
-
-    rotateModPivotPoint.x += strumLine.getByIndex(data.direction % Strumline.KEY_COUNT).strumExtraModData.noteStyleOffsetX;
-
-    var thing:Vector2 = ModConstants.rotateAround(rotateModPivotPoint, new Vector2(data.x, data.z), curVal);
-    data.x = thing.x;
-    data.z = thing.y;
+    strumRotateFunc(data, strumLine, "y", curVal);
   }
 }
 
-// rotate on y axis
-class RotatingZModifier extends Modifier
+class RotatingZModifier extends RotateModBase
 {
   public function new(name:String)
   {
-    super(name, 0);
+    super(name);
     modPriority = 23;
-    createSubMod("offset_x", 0.0);
-    createSubMod("offset_y", 0.0);
     createSubMod("affect_strum", 0.0);
-    unknown = false;
-    notesMod = true;
-    holdsMod = true;
-    strumsMod = true;
-    pathMod = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
     var curVal:Float = currentValue * data.curPos / 180;
-    // this is dumb lmfao
-    // var xrot = currentValue ;// *(Math.PI / 180);
-    var xrot:Float = (FlxMath.fastSin(curVal * Math.PI / 180.0));
-    var yrot:Float = (FlxMath.fastCos(curVal * Math.PI / 180.0));
-
-    // grab the current x
-    var beforeShit_x:Float = data.x;
-    var beforeShit_y:Float = data.y;
-
-    // grab strum x
-    var whichStrumNote = strumLine.getByIndex(data.direction % Strumline.KEY_COUNT);
-    var strumX:Float = whichStrumNote.x - whichStrumNote.strumExtraModData.noteStyleOffsetX;
-    var strumY:Float = whichStrumNote.y - whichStrumNote.strumExtraModData.noteStyleOffsetY;
-
-    if (data.noteType != "receptor")
-    {
-      if (isHoldNote)
-      {
-        strumX += strumLine.mods.getHoldOffsetX(isArrowPath);
-
-        if (Preferences.downscroll)
-        {
-          strumY += (Strumline.STRUMLINE_SIZE / 2);
-        }
-        else
-        {
-          strumY += (Strumline.STRUMLINE_SIZE / 2) - Strumline.INITIAL_OFFSET;
-        }
-      }
-      else
-      {
-        // strumX += data.getNoteXOffset();
-        // strumX += data.getNoteXOffset();
-        strumX += strumLine.getNoteXOffset();
-        strumY += strumLine.getNoteYOffset();
-      }
-    }
-    else
-    {
-      strumX = data.strumPosWasHere.x;
-      strumY = data.strumPosWasHere.y;
-    }
-
-    // figure out difference
-    var lolx:Float = beforeShit_x - strumX;
-    var loly:Float = beforeShit_y - strumY;
-
-    // if (lane == 0) trace("xdif " + lolx);
-
-    var lolx_2:Float = loly;
-    var loly_2:Float = lolx;
-
-    lolx_2 *= xrot;
-    loly_2 *= xrot;
-
-    lolx *= yrot;
-    loly *= yrot;
-
-    data.x = strumX + lolx - lolx_2;
-    data.y = strumY + loly + loly_2;
+    noteRotateFunc(data, strumLine, "z", curVal);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0 || getSubVal("affect_strum") == 0) return; // skip math if mod is 0
+    if (this.currentValue % 360 == 0 || getSubVal("affect_strum") == 0) return;
     var curVal:Float = currentValue * data.curPos / 180;
-    var rotateModPivotPoint:Vector2 = new Vector2(0, 0);
-    rotateModPivotPoint.x = strumLine.x + Strumline.INITIAL_OFFSET + (Strumline.NOTE_SPACING * 1.5);
-    rotateModPivotPoint.x += getSubVal("offset_x");
-    // rotateModPivotPoint.y = strumLine.y;
-    // rotateModPivotPoint.y = (FlxG.height / 2) - (ModConstants.strumSize / 2);
-    rotateModPivotPoint.y = (FlxG.height / 2) - (data.whichStrumNote.height / 2);
-    rotateModPivotPoint.y += getSubVal("offset_y");
-
-    rotateModPivotPoint.x += strumLine.getByIndex(data.direction % Strumline.KEY_COUNT).strumExtraModData.noteStyleOffsetX;
-
-    var thing:Vector2 = ModConstants.rotateAround(rotateModPivotPoint, new Vector2(data.x, data.y), curVal);
-    data.x = thing.x;
-    data.y = thing.y;
+    strumRotateFunc(data, strumLine, "z", curVal);
   }
 }

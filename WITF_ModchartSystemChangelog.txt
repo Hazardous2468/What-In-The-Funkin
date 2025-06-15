@@ -21,7 +21,7 @@ Notestyles now have "zCalcMult" variable in data for holdCovers and splashes. Al
 Fixed HyperNova for upscroll
 Fixed hurt note splashes and offsets.
 
-Refactored some stuff
+Refactored some stuff -> This includes changing offset submods for the rotate modifiers to be more understandable.
 
 
 

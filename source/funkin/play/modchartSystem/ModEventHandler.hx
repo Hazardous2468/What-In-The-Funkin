@@ -660,8 +660,7 @@ class ModEventHandler
   // Call this to reset all mod values and cancel any existing tweens for this player!
   public function resetMods_ForTarget(target:ModHandler):Void
   {
-    var lookForInString:String = "player.";
-    if (target.isDad) lookForInString = "opponent.";
+    var lookForInString:String = ModConstants.targetTag(target);
 
     // For now, we just clear ALL tweens lol
     for (key in modchartTweens.keys())

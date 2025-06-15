@@ -718,11 +718,11 @@ class ModConstants
     }
   }
 
-  public static function modTag(tag:String = "drunk", target:ModHandler = null):String
+  public static function targetTag(target:ModHandler = null):String
   {
     var stringReturn = "unknown";
 
-    if (target.customTweenerName == "???")
+    if (target.customTweenerName == "???") // attempt to correct
     {
       if (target == PlayState.instance.playerStrumline.mods)
       {
@@ -737,7 +737,12 @@ class ModConstants
     {
       stringReturn = target.customTweenerName;
     }
+    return stringReturn;
+  }
 
+  public static function modTag(tag:String = "drunk", target:ModHandler = null):String
+  {
+    var stringReturn = targetTag(target);
     stringReturn += "." + tag;
     return stringReturn;
   }
@@ -1297,21 +1302,21 @@ class ModConstants
       case "rotatex":
         newMod = new RotateXModifier(tag);
       case "rotatey":
-        newMod = new RotateYMod(tag);
+        newMod = new RotateYModifier(tag);
       case "rotatez":
-        newMod = new RotateZMod(tag);
+        newMod = new RotateZModifier(tag);
       case "strumrotatex":
-        newMod = new StrumRotateXMod(tag);
+        newMod = new StrumRotateXModifier(tag);
       case "strumrotatey":
-        newMod = new StrumRotateYMod(tag);
+        newMod = new StrumRotateYModifier(tag);
       case "strumrotatez":
-        newMod = new StrumRotateZMod(tag);
+        newMod = new StrumRotateZModifier(tag);
       case "notesrotatex":
         newMod = new NotesRotateXModifier(tag);
       case "notesrotatey":
-        newMod = new NotesRotateYMod(tag);
+        newMod = new NotesRotateYModifier(tag);
       case "notesrotatez":
-        newMod = new NotesRotateZMod(tag);
+        newMod = new NotesRotateZModifier(tag);
 
       case "rotatingx":
         newMod = new RotatingXModifier(tag);

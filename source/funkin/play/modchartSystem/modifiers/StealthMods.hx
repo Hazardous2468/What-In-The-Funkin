@@ -148,7 +148,7 @@ class StealthMod extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (!isArrowPath || data.noteType == "receptor")
+    if (!(data.noteType == "receptor" || data.noteType == "path"))
     {
       var curPos2:Float = data.curPos_unscaled;
       curPos2 *= Preferences.downscroll ? -1 : 1;
@@ -501,7 +501,7 @@ class AlphaModifier extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (!isArrowPath)
+    if (!(data.noteType == "receptor" || data.noteType == "path"))
     {
       data.alpha -= currentValue;
     }
