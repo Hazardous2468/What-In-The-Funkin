@@ -202,7 +202,7 @@ class ModConstants
   public static var holdNoteJankY:Float = 0;
 
   // size in pixels for each note
-  public static var strumSize:Float = 112;
+  public static var strumSize:Float = Strumline.NOTE_SPACING;
 
   // arrowpathScale
   public static var arrowPathScale:Float = (0.696774193548387 * 0.25);

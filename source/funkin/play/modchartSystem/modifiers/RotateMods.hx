@@ -36,7 +36,12 @@ class RotateModBase extends Modifier
     else if (data.noteType == "hold" || data.noteType == "path")
     {
       r += strumLine.mods.getHoldOffsetX(data.noteType == "path");
-      r -= strumLine.getNoteXOffset();
+      r -= data.whichStrumNote.strumExtraModData.noteStyleOffsetX;
+    }
+    else
+    {
+      r += data.whichStrumNote.weBelongTo.getNoteXOffset();
+      r -= data.whichStrumNote.strumExtraModData.noteStyleOffsetX;
     }
     return r;
   }
@@ -58,7 +63,12 @@ class RotateModBase extends Modifier
       {
         r += (Strumline.STRUMLINE_SIZE / 2) - Strumline.INITIAL_OFFSET;
       }
-      r -= strumLine.getNoteYOffset();
+      r -= data.whichStrumNote.strumExtraModData.noteStyleOffsetY;
+    }
+    else
+    {
+      r += data.whichStrumNote.weBelongTo.getNoteYOffset();
+      r -= data.whichStrumNote.strumExtraModData.noteStyleOffsetY;
     }
     return r;
   }

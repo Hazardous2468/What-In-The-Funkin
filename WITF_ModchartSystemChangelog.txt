@@ -23,6 +23,8 @@ Fixed hurt note splashes and offsets.
 
 Refactored some stuff -> This includes changing offset submods for the rotate modifiers to be more understandable.
 
+Updated Too Many Trumpets
+
 
 
 
