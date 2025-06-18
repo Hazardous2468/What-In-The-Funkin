@@ -81,6 +81,7 @@ class MoveXMod_true extends Modifier
     unknown = false;
     strumsMod = true;
     modPriority = -9999;
+    notPercentage = true;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -97,6 +98,7 @@ class MoveYMod_true extends Modifier
     super(name, 0);
     unknown = false;
     strumsMod = true;
+    notPercentage = true;
     modPriority = -9999;
   }
 
@@ -114,6 +116,7 @@ class MoveYDMod_true extends Modifier
     super(name, 0);
     unknown = false;
     strumsMod = true;
+    notPercentage = true;
     modPriority = -9999;
   }
 
@@ -132,6 +135,7 @@ class MoveZMod_true extends Modifier
     unknown = false;
     strumsMod = true;
     modPriority = -9999;
+    notPercentage = true;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -314,6 +318,7 @@ class DriveMod extends Modifier
     modPriority = 97;
     unknown = false;
     strumsMod = true;
+    notPercentage = true;
     createSubMod("reverse_affect", 1.0);
   }
 
@@ -339,6 +344,7 @@ class Drive2Mod extends Modifier
     modPriority = 0;
     unknown = false;
     // strumsMod = true;
+    notPercentage = true;
     specialMod = true;
   }
 

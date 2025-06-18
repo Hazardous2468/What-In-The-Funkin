@@ -22,7 +22,7 @@ class SpiralCosXMod extends Modifier
     if (currentValue == 0) return; // skip math if mod is 0
     var curPos2:Float = data.curPos_unscaled * (Preferences.downscroll ? -1 : 1);
     var curPos_:Float = curPos2 * -0.1;
-    data.x += (FlxMath.fastCos(curPos_ * Math.PI * getSubVal("mult")) * curPos_ * curPos_) * currentValue / 100;
+    data.x += (cos(curPos_ * Math.PI * getSubVal("mult")) * curPos_ * curPos_) * currentValue / 100;
   }
 }
 
@@ -45,7 +45,7 @@ class SpiralCosYMod extends Modifier
     var curPos_:Float = curPos2 * -0.1;
     var curVal:Float = currentValue * (Preferences.downscroll ? 1 : -1) / 100;
 
-    data.y += (FlxMath.fastCos(curPos_ * Math.PI * getSubVal("mult")) * curPos_ * curPos_) * curVal;
+    data.y += (cos(curPos_ * Math.PI * getSubVal("mult")) * curPos_ * curPos_) * curVal;
   }
 }
 
@@ -66,7 +66,7 @@ class SpiralCosZMod extends Modifier
     if (currentValue == 0) return; // skip math if mod is 0
     var curPos2:Float = data.curPos_unscaled * (Preferences.downscroll ? -1 : 1);
     var curPos_:Float = curPos2 * -0.1;
-    data.z += (FlxMath.fastCos(curPos_ * Math.PI * getSubVal("mult")) * curPos_ * curPos_) * currentValue / 100;
+    data.z += (cos(curPos_ * Math.PI * getSubVal("mult")) * curPos_ * curPos_) * currentValue / 100;
   }
 }
 
@@ -87,7 +87,7 @@ class SpiralCosAngleZMod extends Modifier
     if (currentValue == 0) return; // skip math if mod is 0
     var curPos2:Float = data.curPos_unscaled * (Preferences.downscroll ? -1 : 1);
     var curPos_:Float = curPos2 * -0.1;
-    data.angleZ += (FlxMath.fastCos(curPos_ * Math.PI * getSubVal("mult")) * curPos_ * curPos_) * currentValue / 100;
+    data.angleZ += (cos(curPos_ * Math.PI * getSubVal("mult")) * curPos_ * curPos_) * currentValue / 100;
   }
 }
 
@@ -109,8 +109,8 @@ class SpiralCosScaleMod extends Modifier
     var curPos2:Float = data.curPos_unscaled * (Preferences.downscroll ? -1 : 1);
     var curPos_:Float = curPos2 * -0.1;
 
-    data.scaleX += (FlxMath.fastCos(curPos_ * Math.PI * getSubVal("mult")) * curPos_ * curPos_) * currentValue / 100 * 0.01;
-    data.scaleY += (FlxMath.fastSin(curPos_ * Math.PI * getSubVal("mult")) * curPos_ * curPos_) * currentValue / 100 * 0.01;
+    data.scaleX += (cos(curPos_ * Math.PI * getSubVal("mult")) * curPos_ * curPos_) * currentValue / 100 * 0.01;
+    data.scaleY += (sin(curPos_ * Math.PI * getSubVal("mult")) * curPos_ * curPos_) * currentValue / 100 * 0.01;
   }
 }
 
@@ -134,7 +134,7 @@ class SpiralCosSpeedMod extends Modifier
     if (currentValue == 0) return 1; // skip math if mod is 0
     var curPos2:Float = curPos * (Preferences.downscroll ? -1 : 1);
     var curPos_:Float = curPos2 * -0.1;
-    r += (FlxMath.fastCos(curPos_ * Math.PI * getSubVal("mult")) * curPos_ * curPos_) * currentValue / 100;
+    r += (cos(curPos_ * Math.PI * getSubVal("mult")) * curPos_ * curPos_) * currentValue / 100;
 
     return (r * 0.005) + 1;
   }

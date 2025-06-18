@@ -13,6 +13,7 @@ class DebugXMod extends Modifier
     modPriority = -8;
     unknown = false;
     specialMod = true;
+    notPercentage = true;
   }
 
   override function specialMath(lane:Int, strumLine:Strumline):Void
@@ -28,6 +29,7 @@ class DebugYMod extends Modifier
     super(name, 0);
     modPriority = -9;
     unknown = false;
+    notPercentage = true;
     specialMod = true;
   }
 

@@ -43,6 +43,141 @@ class BangarangMod extends Modifier
   }
 }
 
+class SinClip extends Modifier
+{
+  public function new(name:String)
+  {
+    super(name, 1);
+    unknown = false;
+    specialMod = true;
+    modPriority = 500;
+    baseValue = 1;
+  }
+
+  override function specialMath(lane:Int, strumLine:Strumline):Void
+  {
+    strumLine.mods.sinClip = currentValue;
+  }
+}
+
+class CosClip extends Modifier
+{
+  public function new(name:String)
+  {
+    super(name, 1);
+    unknown = false;
+    specialMod = true;
+    modPriority = 500;
+    baseValue = 1;
+  }
+
+  override function specialMath(lane:Int, strumLine:Strumline):Void
+  {
+    strumLine.mods.cosClip = currentValue;
+  }
+}
+
+class Cosecant extends Modifier
+{
+  public function new(name:String)
+  {
+    super(name, 0);
+    unknown = false;
+    specialMod = true;
+    modPriority = 500;
+  }
+
+  override function specialMath(lane:Int, strumLine:Strumline):Void
+  {
+    strumLine.mods.useCosecant = currentValue >= 0.5;
+  }
+}
+
+class TanClip extends Modifier
+{
+  public function new(name:String)
+  {
+    // Can't use inf otherwise eases break.
+    super(name, /*Math.POSITIVE_INFINITY*/ 10000);
+    unknown = false;
+    specialMod = true;
+    modPriority = 500;
+  }
+
+  override function specialMath(lane:Int, strumLine:Strumline):Void
+  {
+    strumLine.mods.tanClip = currentValue;
+  }
+}
+
+class SinOffset extends Modifier
+{
+  public function new(name:String)
+  {
+    super(name, 0);
+    unknown = false;
+    specialMod = true;
+    modPriority = 500;
+    notPercentage = true;
+  }
+
+  override function specialMath(lane:Int, strumLine:Strumline):Void
+  {
+    strumLine.mods.sinOffset = currentValue;
+  }
+}
+
+class CosOffset extends Modifier
+{
+  public function new(name:String)
+  {
+    super(name, 0);
+    unknown = false;
+    specialMod = true;
+    modPriority = 500;
+    notPercentage = true;
+  }
+
+  override function specialMath(lane:Int, strumLine:Strumline):Void
+  {
+    strumLine.mods.cosOffset = currentValue;
+  }
+}
+
+class TanOffset extends Modifier
+{
+  public function new(name:String)
+  {
+    super(name, 0);
+    unknown = false;
+    specialMod = true;
+    modPriority = 500;
+    notPercentage = true;
+  }
+
+  override function specialMath(lane:Int, strumLine:Strumline):Void
+  {
+    strumLine.mods.tanOffset = currentValue;
+  }
+}
+
+class CosecantOffset extends Modifier
+{
+  public function new(name:String)
+  {
+    super(name, 0);
+    unknown = false;
+    specialMod = true;
+    modPriority = 500;
+    notPercentage = true;
+  }
+
+  override function specialMath(lane:Int, strumLine:Strumline):Void
+  {
+    strumLine.mods.cosecantOffset = currentValue;
+  }
+}
+
 // If enabled, *all* sprites will be sorted by their z value! Can lead to holds and arrowpath being infront of receptors / notes!
 class ZSortMod extends Modifier
 {
@@ -98,6 +233,7 @@ class MathCutOffMod extends Modifier
     super(name, 0);
     unknown = false;
     specialMod = true;
+    notPercentage = true;
   }
 
   override function specialMath(lane:Int, strumLine:Strumline):Void

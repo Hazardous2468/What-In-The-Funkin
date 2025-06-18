@@ -88,7 +88,7 @@ class ModEventHandler
       strum.asleep = false;
       strum.mods.resetModValues();
       strum.mods.clearMods();
-      strum.mods.addMod('speedmod', 1, 1); // Every strum ALWAYS has this modifier by default.
+      strum.mods.addMod('speedmod', 1); // Every strum ALWAYS has this modifier by default.
     }
   }
 
@@ -180,20 +180,18 @@ class ModEventHandler
 
       if (!timeEventTest.target.modifiers.exists(modifierName))
       {
-        timeEventTest.target.addMod(modifierName, 0.0, 0.0);
+        timeEventTest.target.addMod(modifierName);
 
         var mmm:Float = ModConstants.invertValueCheck(modifierName, timeEventTest.target.invertValues);
         timeEventTest.target.modifiers.get(modifierName).currentValue *= mmm;
       }
     }
 
-    var lol:Int = 1;
     for (strumLine in PlayState.instance.allStrumLines)
     {
       strumLine.mods.sortMods();
 
-      trace("\nSTRUM-" + lol + " mods list: \n" + strumLine.mods.modifiers);
-      lol++;
+      trace("\nSTRUM-" + strumLine.mods.customTweenerName + " mods list: \n" + strumLine.mods.modifiers);
     }
   }
 

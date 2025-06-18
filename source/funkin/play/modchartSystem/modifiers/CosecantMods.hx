@@ -7,7 +7,7 @@ import funkin.play.modchartSystem.ModConstants;
 import funkin.play.modchartSystem.NoteData;
 import funkin.play.modchartSystem.modifiers.BaseModifier;
 
-// Contains all the mods related to cosecant! Stoled from Edwhak lmfao
+// Contains all the mods related to cosecant! Stolen from Edwhak lmfao
 class CosecantModifierBase extends Modifier
 {
   function cosecant(angle:Null<Float>):Float

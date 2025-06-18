@@ -2266,10 +2266,7 @@ class PlayState extends MusicBeatSubState
       }
 
       modchartEventHandler.setupEvents();
-      dispatchEvent(new ScriptEvent(MODCHART_RESET));
-
-      // trigger reset funcs
-      modchartEventHandler.triggerResetFuncs();
+      modchartEventHandler.resetMods(); // also calls the modchart_reset scriptevent
     }
     else
     {
@@ -2389,6 +2386,8 @@ class PlayState extends MusicBeatSubState
 
     if (isModchartSong)
     {
+      opponentStrumline.mods.customTweenerName = "opponent";
+      playerStrumline.mods.customTweenerName = "player";
       playerStrumline.cameras = [camNotes];
       opponentStrumline.cameras = [camNotes];
 

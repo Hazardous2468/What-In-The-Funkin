@@ -22,7 +22,7 @@ class DigitalModBase extends Modifier
   {
     var s:Float = getSubVal("steps") / 2;
 
-    var funny:Float = FlxMath.fastSin(curPos * Math.PI * getSubVal("mult") / 250) * s;
+    var funny:Float = sin(curPos * Math.PI * getSubVal("mult") / 250) * s;
     // trace("1: " + funny);
     funny = Math.floor(funny);
     // funny = Math.round(funny); //Why does this not work? no idea :(

@@ -409,7 +409,7 @@ class BlinkMod extends Modifier
   {
     if (isArrowPath || data.noteType == "receptor") return;
 
-    var a:Float = FlxMath.fastSin((beatTime + getSubVal("offset")) * getSubVal("speed") * Math.PI) * 2;
+    var a:Float = sin((beatTime + getSubVal("offset")) * getSubVal("speed") * Math.PI) * 2;
     // f = Quantize(f, 0.3333 f);
     // var a:Float = FlxMath.remapToRange(f, 0, 1, -1, 0);
     a = FlxMath.bound(a, 0, 1); // clamp

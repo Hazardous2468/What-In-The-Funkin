@@ -26,11 +26,11 @@ class SpiralXMod extends Modifier
     var curPos_:Float = curPos2 * -0.1;
     if (useCos)
     {
-      data.x += (FlxMath.fastCos(curPos_ * Math.PI * getSubVal("mult")) * curPos_ * curPos_) * currentValue / 100;
+      data.x += (cos(curPos_ * Math.PI * getSubVal("mult")) * curPos_ * curPos_) * currentValue / 100;
     }
     else
     {
-      data.x += (FlxMath.fastSin(curPos_ * Math.PI * getSubVal("mult")) * curPos_ * curPos_) * currentValue / 100;
+      data.x += (sin(curPos_ * Math.PI * getSubVal("mult")) * curPos_ * curPos_) * currentValue / 100;
     }
   }
 }
@@ -57,11 +57,11 @@ class SpiralYMod extends Modifier
     var curVal:Float = currentValue * (Preferences.downscroll ? 1 : -1) / 100;
     if (useCos)
     {
-      data.y += (FlxMath.fastCos(curPos_ * Math.PI * getSubVal("mult")) * curPos_ * curPos_) * curVal;
+      data.y += (cos(curPos_ * Math.PI * getSubVal("mult")) * curPos_ * curPos_) * curVal;
     }
     else
     {
-      data.y += (FlxMath.fastSin(curPos_ * Math.PI * getSubVal("mult")) * curPos_ * curPos_) * curVal;
+      data.y += (sin(curPos_ * Math.PI * getSubVal("mult")) * curPos_ * curPos_) * curVal;
     }
   }
 }
@@ -87,11 +87,11 @@ class SpiralZMod extends Modifier
     var curPos_:Float = curPos2 * -0.1;
     if (useCos)
     {
-      data.z += (FlxMath.fastCos(curPos_ * Math.PI * getSubVal("mult")) * curPos_ * curPos_) * currentValue / 100;
+      data.z += (cos(curPos_ * Math.PI * getSubVal("mult")) * curPos_ * curPos_) * currentValue / 100;
     }
     else
     {
-      data.z += (FlxMath.fastSin(curPos_ * Math.PI * getSubVal("mult")) * curPos_ * curPos_) * currentValue / 100;
+      data.z += (sin(curPos_ * Math.PI * getSubVal("mult")) * curPos_ * curPos_) * currentValue / 100;
     }
   }
 }
@@ -117,11 +117,11 @@ class SpiralAngleZMod extends Modifier
     var curPos_:Float = curPos2 * -0.1;
     if (useCos)
     {
-      data.angleZ += (FlxMath.fastCos(curPos_ * Math.PI * getSubVal("mult")) * curPos_ * curPos_) * currentValue / 100;
+      data.angleZ += (cos(curPos_ * Math.PI * getSubVal("mult")) * curPos_ * curPos_) * currentValue / 100;
     }
     else
     {
-      data.angleZ += (FlxMath.fastSin(curPos_ * Math.PI * getSubVal("mult")) * curPos_ * curPos_) * currentValue / 100;
+      data.angleZ += (sin(curPos_ * Math.PI * getSubVal("mult")) * curPos_ * curPos_) * currentValue / 100;
     }
   }
 }
@@ -147,13 +147,13 @@ class SpiralScaleMod extends Modifier
     var curPos_:Float = curPos2 * -0.1;
     if (useCos)
     {
-      data.scaleX += (FlxMath.fastCos(curPos_ * Math.PI * getSubVal("mult")) * curPos_ * curPos_) * currentValue / 100 * 0.01;
-      data.scaleY += (FlxMath.fastSin(curPos_ * Math.PI * getSubVal("mult")) * curPos_ * curPos_) * currentValue / 100 * 0.01;
+      data.scaleX += (cos(curPos_ * Math.PI * getSubVal("mult")) * curPos_ * curPos_) * currentValue / 100 * 0.01;
+      data.scaleY += (sin(curPos_ * Math.PI * getSubVal("mult")) * curPos_ * curPos_) * currentValue / 100 * 0.01;
     }
     else
     {
-      data.scaleX += (FlxMath.fastSin(curPos_ * Math.PI * getSubVal("mult")) * curPos_ * curPos_) * currentValue / 100 * 0.01;
-      data.scaleY += (FlxMath.fastSin(curPos_ * Math.PI * getSubVal("mult")) * curPos_ * curPos_) * currentValue / 100 * 0.01;
+      data.scaleX += (sin(curPos_ * Math.PI * getSubVal("mult")) * curPos_ * curPos_) * currentValue / 100 * 0.01;
+      data.scaleY += (sin(curPos_ * Math.PI * getSubVal("mult")) * curPos_ * curPos_) * currentValue / 100 * 0.01;
     }
   }
 }
@@ -182,11 +182,11 @@ class SpiralSpeedMod extends Modifier
     var curPos_:Float = curPos2 * -0.1;
     if (useCos)
     {
-      r += (FlxMath.fastCos(curPos_ * Math.PI * getSubVal("mult")) * curPos_ * curPos_) * currentValue / 100;
+      r += (cos(curPos_ * Math.PI * getSubVal("mult")) * curPos_ * curPos_) * currentValue / 100;
     }
     else
     {
-      r += (FlxMath.fastSin(curPos_ * Math.PI * getSubVal("mult")) * curPos_ * curPos_) * currentValue / 100;
+      r += (sin(curPos_ * Math.PI * getSubVal("mult")) * curPos_ * curPos_) * currentValue / 100;
     }
 
     return (r * 0.005) + 1;

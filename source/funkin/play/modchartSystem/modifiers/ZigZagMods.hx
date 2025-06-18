@@ -5,7 +5,6 @@ import funkin.play.notes.Strumline;
 import funkin.play.modchartSystem.ModConstants;
 import funkin.play.modchartSystem.modifiers.BaseModifier;
 import funkin.play.modchartSystem.NoteData;
-import flixel.math.FlxMath;
 
 // Contains all the mods related zig zagging!
 // :p

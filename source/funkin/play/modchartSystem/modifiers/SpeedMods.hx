@@ -77,7 +77,7 @@ class SlowDownMod extends Modifier
 {
   public function new(name:String)
   {
-    super(name, 1);
+    super(name, 0);
     unknown = false;
     speedMod = true;
   }
@@ -96,7 +96,7 @@ class BrakeMod extends Modifier
 {
   public function new(name:String)
   {
-    super(name, 1);
+    super(name, 0);
     unknown = false;
     speedMod = true;
   }
@@ -121,14 +121,54 @@ class BoostMod extends Modifier
 {
   public function new(name:String)
   {
-    super(name, 1);
+    super(name, 0);
+    unknown = false;
+    speedMod = true;
+    createSubMod("start", 900);
+  }
+
+  override function speedMath(lane:Int, curPos:Float, strumLine, isHoldNote = false):Float
+  {
+    var speed:Float = 1.0; // return value
+    var start:Float = this.getSubVal("start");
+    var finalTargetSpeed:Float = 1.0; /*this.getSubVal("target_speed");*/
+    var div:Float = start * 2;
+    var curPosEdit:Float = curPos * (Preferences.downscroll ? -1 : 1);
+
+    if (curPosEdit <= 0) speed = 1; // past receptors
+    else if (curPosEdit >= start) // before effect start
+    {
+      speed /= curPosEdit / start;
+
+      // for smooth transition:
+      currentValue = Math.abs(currentValue);
+      if (currentValue > 1) currentValue = 1;
+      speed = FlxMath.lerp(1, speed, currentValue * 0.75);
+    }
+    else // approaching receptors
+    {
+      var lol:Float = (curPosEdit) / div;
+      lol += lol;
+      speed /= curPosEdit / start;
+      speed = FlxMath.lerp(finalTargetSpeed * currentValue, speed, lol);
+    }
+
+    return speed;
+  }
+}
+
+class OldBoostMod extends Modifier
+{
+  public function new(name:String)
+  {
+    super(name, 0);
     unknown = false;
     speedMod = true;
   }
 
   override function speedMath(lane:Int, curPos:Float, strumLine, isHoldNote = false):Float
   {
-    // IT'S THE SAME AS BOOST, BUT THE CURVALUE IS REVERSED LMAO
+    // IT'S THE SAME AS BRAKE, BUT THE CURVALUE IS REVERSED LMAO
     var returnVal:Float = 1.0;
     var curPos_Part1:Float = curPos * (Preferences.downscroll ? -1 : 1); // Make it act the same for upscroll and downscroll
     var curPos_Part2:Float = curPos_Part1 * 0.001 * 0.4; // Slow the curPos right the fuck down to stop the notes from zooming so hard
@@ -140,12 +180,35 @@ class BoostMod extends Modifier
   }
 }
 
-// notes slow down and speed up before reaching receptor
+// notes slow down and speed up before reaching receptor. Fixed version where the effect doesn't intensify the further notes are.
 class WaveMod extends Modifier
 {
   public function new(name:String)
   {
-    super(name, 1);
+    super(name, 0);
+    unknown = false;
+    speedMod = true;
+    createSubMod("mult", 1);
+  }
+
+  override function speedMath(lane:Int, curPos:Float, strumLine, isHoldNote = false):Float
+  {
+    var curValue:Float = this.currentValue * 0.58;
+    var curPos_Edit:Float = curPos * (Preferences.downscroll ? -1 : 1); // Make it act the same for upscroll and downscroll
+    curPos_Edit *= 0.00875; // Slow the curPos right the fuck down to stop the notes from zooming so hard
+    curPos_Edit *= this.getSubVal("mult");
+    var test:Float = curPos_Edit;
+    if (test < 1) test = 1;
+    return 1 + (this.sin(curPos_Edit) / test * curValue);
+  }
+}
+
+// notes slow down and speed up before reaching receptor
+class OldWaveMod extends Modifier
+{
+  public function new(name:String)
+  {
+    super(name, 0);
     unknown = false;
     speedMod = true;
     createSubMod("mult", 1);
@@ -154,13 +217,10 @@ class WaveMod extends Modifier
   override function speedMath(lane:Int, curPos:Float, strumLine, isHoldNote = false):Float
   {
     var returnVal:Float = 1.0;
-
-    // same magic numbers found by just messing around with values to get it as close as possible to NotITG
-
+    // some magic numbers found by just messing around with values to get it as close as possible to NotITG
     var curPos_Part1:Float = curPos * (Preferences.downscroll ? -1 : 1); // Make it act the same for upscroll and downscroll
     var curPos_Part2:Float = curPos_Part1; // Slow the curPos right the fuck down to stop the notes from zooming so hard
-    returnVal += currentValue * 0.22 * FlxMath.fastSin(curPos_Part2 / 38.0 * getSubVal("mult") * 0.2);
-
+    returnVal += currentValue * 0.22 * sin(curPos_Part2 / 38.0 * getSubVal("mult") * 0.2);
     return returnVal;
   }
 }

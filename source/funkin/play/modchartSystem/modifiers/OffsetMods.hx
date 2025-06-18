@@ -12,6 +12,7 @@ class NoteOffsetXMod extends Modifier
   {
     super(name, 0);
     modPriority = -670;
+    notPercentage = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -26,6 +27,7 @@ class NoteOffsetYMod extends Modifier
   {
     super(name, 0);
     modPriority = -670;
+    notPercentage = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -40,6 +42,7 @@ class NoteOffsetZMod extends Modifier
   {
     super(name, 0);
     modPriority = -670;
+    notPercentage = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -54,6 +57,7 @@ class HoldOffsetXMod extends Modifier
   {
     super(name, 0);
     modPriority = -670;
+    notPercentage = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -68,6 +72,7 @@ class HoldOffsetYMod extends Modifier
   {
     super(name, 0);
     modPriority = -670;
+    notPercentage = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -82,6 +87,7 @@ class HoldOffsetZMod extends Modifier
   {
     super(name, 0);
     modPriority = -670;
+    notPercentage = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -96,6 +102,7 @@ class StrumOffsetXMod extends Modifier
   {
     super(name, 0);
     modPriority = -670;
+    notPercentage = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -115,6 +122,7 @@ class StrumOffsetYMod extends Modifier
   {
     super(name, 0);
     modPriority = -670;
+    notPercentage = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -134,6 +142,7 @@ class StrumOffsetZMod extends Modifier
   {
     super(name, 0);
     modPriority = -670;
+    notPercentage = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -153,6 +162,7 @@ class ArrowPathOffsetXMod extends Modifier
   {
     super(name, 0);
     modPriority = -670;
+    notPercentage = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -167,6 +177,7 @@ class ArrowPathOffsetYMod extends Modifier
   {
     super(name, 0);
     modPriority = -670;
+    notPercentage = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -181,6 +192,7 @@ class ArrowPathOffsetZMod extends Modifier
   {
     super(name, 0);
     modPriority = -670;
+    notPercentage = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -201,6 +213,7 @@ class MeshSkewOffsetX extends Modifier
     pathMod = true;
     specialMod = false;
     speedMod = false;
+    notPercentage = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -219,6 +232,7 @@ class MeshSkewOffsetY extends Modifier
   public function new(name:String)
   {
     super(name, 0);
+    notPercentage = true;
     unknown = false;
     strumsMod = true;
     notesMod = true;
@@ -246,6 +260,7 @@ class MeshSkewOffsetZ extends Modifier
     super(name, 0);
     unknown = false;
     strumsMod = true;
+    notPercentage = true;
     notesMod = true;
     holdsMod = true;
     pathMod = true;
@@ -269,6 +284,7 @@ class MeshPivotOffsetX extends Modifier
   public function new(name:String)
   {
     super(name, 0);
+    notPercentage = true;
     unknown = false;
     strumsMod = true;
     notesMod = true;
@@ -294,6 +310,7 @@ class MeshPivotOffsetY extends Modifier
   public function new(name:String)
   {
     super(name, 0);
+    notPercentage = true;
     unknown = false;
     strumsMod = true;
     notesMod = true;
@@ -319,6 +336,7 @@ class MeshPivotOffsetZ extends Modifier
   public function new(name:String)
   {
     super(name, 0);
+    notPercentage = true;
     unknown = false;
     strumsMod = true;
     notesMod = true;

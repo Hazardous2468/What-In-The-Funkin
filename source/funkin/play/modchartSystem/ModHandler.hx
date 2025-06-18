@@ -65,7 +65,47 @@ class ModHandler
       isDad = daddy;
     }
 
-    addMod('speedmod', 1, 1);
+    addMod('speedmod', 1);
+  }
+
+  public var sinClip:Float = 1;
+  public var cosClip:Float = 1;
+  public var tanClip:Float = Math.POSITIVE_INFINITY;
+  public var sinOffset:Float = 0.0;
+  public var cosOffset:Float = 0.0;
+  public var tanOffset:Float = 0.0;
+  public var useCosecant:Bool = false;
+  public var cosecantOffset:Float = 0.0;
+
+  // FlxMath fastSin but with sinClip applied
+  public function sin(r:Float):Float
+  {
+    return FlxMath.bound(FlxMath.fastSin(r + sinOffset), -sinClip, sinClip);
+  }
+
+  // FlxMath fastSin but with cosClip applied
+  public function cos(r:Float):Float
+  {
+    return FlxMath.bound(FlxMath.fastCos(r + cosOffset), -cosClip, cosClip);
+  }
+
+  // FlxMath fastSin but with cosClip applied
+  public function tan(r:Float):Float
+  {
+    if (useCosecant)
+    {
+      return (tanClip == Math.POSITIVE_INFINITY ? cosecant(r) : FlxMath.bound(cosecant(r), -tanClip, tanClip));
+    }
+    else
+    {
+      return (tanClip == Math.POSITIVE_INFINITY ? ModConstants.fastTan(r + tanOffset) : FlxMath.bound(ModConstants.fastTan(r + tanOffset), -tanClip, tanClip));
+    }
+  }
+
+  function cosecant(angle:Float):Float
+  {
+    // Edwhak claims math.sin is better her instead of fastSin.
+    return 1 / Math.sin(angle + cosecantOffset);
   }
 
   public function resortMods():Void
@@ -76,13 +116,24 @@ class ModHandler
 
   public function resetModValues():Void
   {
-    // trace("Reset mod values lol");
+    trace("Mod Values Reset - " + customTweenerName);
 
     for (mod in mods_all)
+    {
       mod.reset();
+    }
 
     debugTxtOffsetX = 0;
     debugTxtOffsetY = 0;
+
+    sinClip = 1;
+    cosClip = 1;
+    tanClip = Math.POSITIVE_INFINITY;
+    sinOffset = 0.0;
+    cosOffset = 0.0;
+    tanOffset = 0.0;
+    cosecantOffset = 0.0;
+    useCosecant = false;
 
     for (i in 0...Strumline.KEY_COUNT)
     {
@@ -140,8 +191,13 @@ class ModHandler
       if (modifiers.exists(subModArr[0]))
       {
         modifiers.get(subModArr[0]).setSubVal(subModArr[1], val * mmm);
-        strum.debugNeedsUpdate = true;
       }
+      else
+      {
+        addMod(subModArr[0]); // try and add the mod
+        modifiers.get(subModArr[0]).setSubVal(subModArr[1], val * mmm);
+      }
+      strum.debugNeedsUpdate = true;
       return;
     }
 
@@ -152,7 +208,7 @@ class ModHandler
     else
     {
       PlayState.instance.modDebugNotif(tagToUse + " mod doesn't exist!\nTrying to add it now!", FlxColor.ORANGE);
-      addMod(tagToUse, val, 0.0); // try and add the mod lol
+      addMod(tagToUse, val); // try and add the mod lol
       modifiers.get(tagToUse).setVal(val * mmm);
       sortMods();
     }
@@ -180,6 +236,12 @@ class ModHandler
       {
         modifiers.get(subModArr[0]).setDefaultSubVal(subModArr[1], val * mmm);
       }
+      else
+      {
+        addMod(subModArr[0]); // try and add the mod
+        modifiers.get(subModArr[0]).setDefaultSubVal(subModArr[1], val * mmm);
+      }
+      strum.debugNeedsUpdate = true;
       return;
     }
 
@@ -189,12 +251,13 @@ class ModHandler
     }
     else
     {
-      addMod(tagToUse, val, 0.0); // try and add the mod lol
+      addMod(tagToUse, val * mmm); // try and add the mod lol
       modifiers.get(tagToUse).setDefaultVal(val * mmm);
     }
+    strum.debugNeedsUpdate = true;
   }
 
-  public function addMod(nameOfMod:String, startingValue:Float = 0.0, baseVal = null):Void
+  public function addMod(nameOfMod:String, startingValue:Null<Float> = null):Void
   {
     var mod = ModConstants.createNewMod(nameOfMod);
     if (mod == null)
@@ -204,9 +267,12 @@ class ModHandler
 
     var mmm = ModConstants.invertValueCheck(nameOfMod, invertValues);
 
-    startingValue *= mmm;
-    mod.baseValue = baseVal == null ? startingValue : baseVal;
-    mod.setVal(startingValue);
+    // mod.baseValue = baseVal == null ? startingValue : baseVal;
+    if (startingValue != null)
+    {
+      startingValue *= mmm;
+      mod.setVal(startingValue);
+    }
 
     // check if is lane mod
     var subModArr = null;

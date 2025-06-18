@@ -24,7 +24,7 @@ class SquareModBase extends Modifier
     var mult:Float = getSubVal("mult") / (ModConstants.strumSize * 2);
     var timeOffset:Float = getSubVal("yoffset");
     var xOffset:Float = getSubVal("xoffset");
-    var xVal:Float = FlxMath.fastSin((curPos + timeOffset) * Math.PI * mult);
+    var xVal:Float = sin((curPos + timeOffset) * Math.PI * mult);
     xVal = Math.floor(xVal) + 0.5 + xOffset;
     return xVal;
   }

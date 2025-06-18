@@ -21,6 +21,7 @@ class RotateModBase extends Modifier
     holdsMod = true;
     strumsMod = true;
     pathMod = true;
+    notPercentage = true;
   }
 
   var pivotPoint:Vector2 = new Vector2(0, 0);

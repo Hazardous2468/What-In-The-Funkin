@@ -32,6 +32,7 @@ class CustomModifier extends Modifier
   private var speedMathBroke:Bool = false;
   private var specialMathBroke:Bool = false;
 
+  // Create and return a new copy of this CustomModifier
   public function clone():CustomModifier
   {
     var newShit:CustomModifier = new CustomModifier(tag, baseValue);
@@ -52,6 +53,8 @@ class CustomModifier extends Modifier
     newShit.specialMod = this.specialMod;
     newShit.speedMod = this.speedMod;
 
+    newShit.notPercentage = this.notPercentage;
+
     return newShit;
   }
 
@@ -60,13 +63,17 @@ class CustomModifier extends Modifier
     super(name, baseVal);
 
     // Add it to all mod arrays by default!
-    unknown = false;
-    strumsMod = true;
-    notesMod = true;
-    holdsMod = true;
-    pathMod = true;
-    specialMod = true;
-    speedMod = true;
+    /*
+      unknown = false;
+      strumsMod = true;
+      notesMod = true;
+      holdsMod = true;
+      pathMod = true;
+      specialMod = true;
+      speedMod = true;
+     */
+
+    notPercentage = true; // default to not using %
 
     noteMathBroke = false;
     strumMathBroke = false;
@@ -171,6 +178,21 @@ class Modifier
     return Conductor.instance?.songPosition ?? 0.0;
   }
 
+  function sin(r:Float):Float
+  {
+    return strumOwner.mods.sin(r);
+  }
+
+  function cos(r:Float):Float
+  {
+    return strumOwner.mods.cos(r);
+  }
+
+  function tan(r:Float):Float
+  {
+    return strumOwner.mods.tan(r);
+  }
+
   // Variables for defining which array this mod should be added to for performance reasons!
   public var unknown:Bool = true; // If true, will probe the mod to try and figure out what it does
   public var specialMod:Bool = false;
@@ -179,6 +201,9 @@ class Modifier
   public var holdsMod:Bool = false;
   public var strumsMod:Bool = false;
   public var speedMod:Bool = false;
+
+  // If true, will not be treated as a % (will only use raw values)
+  public var notPercentage:Bool = false;
 
   public var tag:String = "mod";
   public var baseValue:Float = 0;
@@ -214,7 +239,7 @@ class Modifier
     subValues.remove("dumb_setup");
   }
 
-  public function reset():Void // for the editor
+  public function reset():Void
   {
     currentValue = baseValue;
     modPriority_additive = 0;
@@ -249,7 +274,6 @@ class Modifier
       }
       else
       {
-        // trace(name + " is not a valid subname!");
         PlayState.instance.modDebugNotif(name + " is not a valid subname!");
       }
     }
@@ -262,12 +286,20 @@ class Modifier
 
   public function setDefaultSubVal(name, newval):Void
   {
+    if (name == "priority")
+    {
+      this.modPriority_additive = newval;
+      return;
+    }
     var sub = subValues.get(name);
-    if (sub != null) sub.baseValue = newval;
+    if (sub != null)
+    {
+      sub.baseValue = newval;
+      if (strumOwner != null) strumOwner.debugNeedsUpdate = true;
+    }
     else
     {
       PlayState.instance.modDebugNotif(name + " is not a valid subname!");
-      // trace(name + "not valid lol");
     }
   }
 

@@ -23,7 +23,16 @@ Fixed hurt note splashes and offsets.
 
 Refactored some stuff -> This includes changing offset submods for the rotate modifiers to be more understandable.
 
+New song: Stroll
 Updated Too Many Trumpets
+
+Improved inconsistencies with setDefault behaviour.
+
+"sinClip", "cosClip", "tanClip" added! 
+Also removed Cosecant modifiers. Instead, it now works like NotITG where using the "Cosecant" modifier will enable Cosecant on all Tan modifiers.
+Also added offsets to sin, cos, tan, and cosecant for silly I guess?
+
+Overhauled wave and boost mod math
 
 
 

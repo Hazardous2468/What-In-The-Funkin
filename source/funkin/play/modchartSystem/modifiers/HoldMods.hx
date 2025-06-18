@@ -46,6 +46,7 @@ class HoldGrainMod extends Modifier
     super(name, 82);
     unknown = false;
     specialMod = true;
+    notPercentage = true;
   }
 
   override function specialMath(lane:Int, strumLine:Strumline):Void

@@ -143,6 +143,7 @@ class ArrowpathBackLengthMod extends Modifier
     super(name, 400);
     unknown = false;
     specialMod = true;
+    notPercentage = true;
   }
 
   override function specialMath(lane:Int, strumLine:Strumline):Void
@@ -160,6 +161,7 @@ class ArrowpathFrontLengthMod extends Modifier
     super(name, 1500);
     unknown = false;
     specialMod = true;
+    notPercentage = true;
   }
 
   override function specialMath(lane:Int, strumLine:Strumline):Void
@@ -193,6 +195,7 @@ class ArrowpathGrainMod extends Modifier
   {
     super(name, 95);
     unknown = false;
+    notPercentage = true;
     specialMod = true;
   }
 

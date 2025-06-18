@@ -24,8 +24,8 @@ class TornadoModBase extends Modifier
     var playerColumn:Float = lane % Strumline.KEY_COUNT;
     var columnPhaseShift = playerColumn * Math.PI / 3;
     var phaseShift = (curPos / 135) * getSubVal("speed") * 0.2;
-    var returnReceptorToZeroOffsetX = (-FlxMath.fastCos(-columnPhaseShift) + 1) / 2 * swagWidth * 3;
-    var offsetX = (-FlxMath.fastCos((phaseShift - columnPhaseShift)) + 1) / 2 * swagWidth * 3 - returnReceptorToZeroOffsetX;
+    var returnReceptorToZeroOffsetX = (-cos(-columnPhaseShift) + 1) / 2 * swagWidth * 3;
+    var offsetX = (-cos((phaseShift - columnPhaseShift)) + 1) / 2 * swagWidth * 3 - returnReceptorToZeroOffsetX;
 
     return offsetX;
   }
@@ -37,8 +37,8 @@ class TornadoModBase extends Modifier
     var playerColumn:Float = lane % Strumline.KEY_COUNT;
     var columnPhaseShift = playerColumn * Math.PI / 3;
     var phaseShift = (curPos / 135) * getSubVal("speed") * 0.2;
-    var returnReceptorToZeroOffsetX = (-ModConstants.fastTan(-columnPhaseShift) + 1) / 2 * swagWidth * 3;
-    var offsetX = (-ModConstants.fastTan((phaseShift - columnPhaseShift)) + 1) / 2 * swagWidth * 3 - returnReceptorToZeroOffsetX;
+    var returnReceptorToZeroOffsetX = (-tan(-columnPhaseShift) + 1) / 2 * swagWidth * 3;
+    var offsetX = (-tan((phaseShift - columnPhaseShift)) + 1) / 2 * swagWidth * 3 - returnReceptorToZeroOffsetX;
 
     return offsetX;
   }

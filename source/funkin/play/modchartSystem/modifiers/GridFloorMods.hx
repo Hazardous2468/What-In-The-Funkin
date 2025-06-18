@@ -13,6 +13,7 @@ class GridModBase extends Modifier
   {
     super(name, 0);
     modPriority = -666;
+    notPercentage = true;
   }
 
   function toGrid(pos:Float):Float

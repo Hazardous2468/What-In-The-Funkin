@@ -53,7 +53,7 @@ class WaveyModBase extends Modifier
       var waveyX_timeMult:Float = getSubVal("speed");
       var waveyX_timeAdd:Float = getSubVal("time_add");
       var waveyX_desync:Float = getSubVal("desync");
-      returnValue = currentValue * (FlxMath.fastSin((((beatTime + waveyX_timeAdd / Conductor.instance.beatLengthMs) * waveyX_timeMult)
+      returnValue = currentValue * (sin((((beatTime + waveyX_timeAdd / Conductor.instance.beatLengthMs) * waveyX_timeMult)
         + (lane * waveyX_desync)) * Math.PI) * ModConstants.strumSize / 2);
     }
     else
@@ -61,7 +61,7 @@ class WaveyModBase extends Modifier
       var time:Float = (getSubVal("timertype") >= 0.5 ? beatTime : songTime * 0.001);
       time *= getSubVal("speed");
       time += getSubVal("time_add");
-      returnValue = currentValue * FlxMath.fastSin(time + (lane * getSubVal("desync")) * Math.PI) * (ModConstants.strumSize / 2);
+      returnValue = currentValue * sin(time + (lane * getSubVal("desync")) * Math.PI) * (ModConstants.strumSize / 2);
     }
 
     return returnValue;

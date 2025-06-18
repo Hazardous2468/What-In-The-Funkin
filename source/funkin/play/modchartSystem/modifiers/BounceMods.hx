@@ -22,7 +22,7 @@ class BounceModBase extends Modifier
     if (currentValue == 0) return 0;
     var speed:Float = getSubVal("mult");
     // var scrollSpeed = PlayState.instance?.currentChart?.scrollSpeed ?? 1.0;
-    return currentValue * ModConstants.strumSize * Math.abs(FlxMath.fastSin(curPos * 0.005 * (speed * 2)));
+    return currentValue * ModConstants.strumSize * Math.abs(sin(curPos * 0.005 * (speed * 2)));
   }
 
   function cosBumpyMath(curPos:Float):Float
@@ -30,7 +30,7 @@ class BounceModBase extends Modifier
     if (currentValue == 0) return 0;
     var speed:Float = getSubVal("mult");
     // var scrollSpeed = PlayState.instance?.currentChart?.scrollSpeed ?? 1.0;
-    return currentValue * ModConstants.strumSize * Math.abs(FlxMath.fastCos(curPos * 0.005 * (speed * 2)));
+    return currentValue * ModConstants.strumSize * Math.abs(cos(curPos * 0.005 * (speed * 2)));
   }
 
   function tanBumpyMath(curPos:Float):Float
@@ -38,7 +38,7 @@ class BounceModBase extends Modifier
     if (currentValue == 0) return 0;
     var speed:Float = getSubVal("mult");
     // var scrollSpeed = PlayState.instance?.currentChart?.scrollSpeed ?? 1.0;
-    return currentValue * ModConstants.strumSize * Math.abs(ModConstants.fastTan(curPos * 0.005 * (speed * 2)));
+    return currentValue * ModConstants.strumSize * Math.abs(tan(curPos * 0.005 * (speed * 2)));
   }
 }
 
@@ -308,7 +308,7 @@ class BounceSpeedMod extends BounceModBase
     var bumpyx_Mult:Float = getSubVal("mult");
 
     var scrollSpeed = PlayState.instance?.currentChart?.scrollSpeed ?? 1.0;
-    var modWouldBe:Float = currentValue * 0.025 * FlxMath.fastSin(curPos / (Strumline.STRUMLINE_SIZE / 3.0) / scrollSpeed * bumpyx_Mult) * (Strumline.STRUMLINE_SIZE / 2.0);
+    var modWouldBe:Float = currentValue * 0.025 * sin(curPos / (Strumline.STRUMLINE_SIZE / 3.0) / scrollSpeed * bumpyx_Mult) * (Strumline.STRUMLINE_SIZE / 2.0);
     return (modWouldBe + 1);
   }
 }

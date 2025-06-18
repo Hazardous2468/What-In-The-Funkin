@@ -724,12 +724,17 @@ class Strumline extends FlxSpriteGroup
     // for (mod in modifiers){
     for (mod in mods.mods_all)
     {
+      var usePercentage:Bool = PlayState.instance.modchartEventHandler.percentageMods && !mod.notPercentage;
       var modVal = FlxMath.roundDecimal(mod.currentValue, 2);
       if (modVal == 0 && hideZeroValueMods && !debugShowALL) continue;
+      // if (mod.currentValue == mod.baseValue && hideZeroValueMods && !debugShowALL) continue;
+
+      if (usePercentage) modVal *= 100;
+
       if (ModConstants.hideSomeDebugBois.contains(mod.tag) && debugHideUtil && !debugShowALL) continue;
       if (StringTools.contains(mod.tag, "--") && debugHideLane && !debugShowALL) continue;
       newString += "\n";
-      newString += mod.tag + ": " + Std.string(modVal);
+      newString += mod.tag + ": " + Std.string(modVal) + (usePercentage ? "%" : "");
       if (!hideSubMods || debugShowALL)
       {
         if (mod.modPriority_additive != 0)

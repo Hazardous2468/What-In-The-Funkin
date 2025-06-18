@@ -68,7 +68,7 @@ import funkin.play.modchartSystem.modifiers.SquareMods;
 import funkin.play.modchartSystem.modifiers.DigitalMods;
 import funkin.play.modchartSystem.modifiers.ColorTintMods;
 import funkin.play.modchartSystem.modifiers.SawtoothMods;
-import funkin.play.modchartSystem.modifiers.CosecantMods;
+import funkin.play.modchartSystem.modifiers.CosecantMods; // for legacy I guess?
 import funkin.play.modchartSystem.modifiers.ExtraMods;
 import funkin.play.modchartSystem.modifiers.CullMods;
 import funkin.play.modchartSystem.modifiers.GridFloorMods;
@@ -91,6 +91,7 @@ class ModConstants
 
   // If a mod tag is in this array, it will automatically invert the mod value
   // Best to only use this for more simple modcharts.
+  // TODO -> Move these to base modifiers class!
   public static var dadInvert:Array<String> = [
     "rotatez",
     "rotatey",
@@ -1083,6 +1084,23 @@ class ModConstants
       case "cullpath":
         newMod = new CullArrowPathModifier(tag);
 
+      case "sinclip":
+        newMod = new SinClip(tag);
+      case "cosclip":
+        newMod = new CosClip(tag);
+      case "tanclip":
+        newMod = new TanClip(tag);
+      case "cosecant":
+        newMod = new Cosecant(tag);
+      case "cosoffset":
+        newMod = new CosOffset(tag);
+      case "sinoffset":
+        newMod = new SinOffset(tag);
+      case "tanoffset":
+        newMod = new TanOffset(tag);
+      case "cosecantoffset":
+        newMod = new CosecantOffset(tag);
+
       case "bangarang":
         newMod = new BangarangMod(tag);
       case "mathcutoff":
@@ -1117,8 +1135,12 @@ class ModConstants
         newMod = new BrakeMod(tag);
       case "boost":
         newMod = new BoostMod(tag);
+      case "oldboost":
+        newMod = new OldBoostMod(tag);
       case "wave":
         newMod = new WaveMod(tag);
+      case "oldwave":
+        newMod = new OldWaveMod(tag);
       case "reverse":
         newMod = new ReverseMod(tag);
 
@@ -1451,7 +1473,7 @@ class ModConstants
       case "beatspeed":
         newMod = new BeatSpeedMod(tag);
 
-      // cosecant mods
+      // cosecant mods (legacy)
       case "cosecantx":
         newMod = new CosecantXMod(tag);
       case "cosecanty":
