@@ -154,6 +154,12 @@ class StrumExtraData
   public var playfieldY:Float = 0;
   public var playfieldZ:Float = 0;
 
+  // scaleChange memory to be applied to noteSplashes and hold covers
+  public var splashCopyStrumScale:Bool = true;
+  public var holdCoverCopyStrumScale:Bool = true;
+  public var strumScaleDifX:Float = 0;
+  public var strumScaleDifY:Float = 0;
+
   // For hold hidden / sudden shader to work
   public var suddenModAmount:Float = 0;
   public var suddenStart:Float = 500;
@@ -186,6 +192,11 @@ class StrumExtraData
     cullModeSustain = "none";
     cullModeArrowpath = "none";
 
+    splashCopyStrumScale = true;
+    holdCoverCopyStrumScale = true;
+    strumScaleDifX = 0;
+    strumScaleDifY = 0;
+
     useOldStealthGlowStyle = false;
     suddenModAmount = 0;
     suddenStart = 500;
@@ -193,6 +204,16 @@ class StrumExtraData
     hiddenModAmount = 0;
     hiddenStart = 500;
     hiddenEnd = 300;
+
+    sudden_noGlow = 0;
+    hidden_noGlow = 0;
+    vanish_noGlow = 0;
+
+    vanishModAmount = 0;
+    vanish_HiddenStart = 475;
+    vanish_HiddenEnd = 397.5;
+    vanish_SuddenStart = 202.5;
+    vanish_SuddenEnd = 125;
 
     mathCutOff = 0;
     drawdistanceForward = 0;

@@ -244,6 +244,40 @@ class MathCutOffMod extends Modifier
   }
 }
 
+class NoteSplashCopyStrumScaleMod extends Modifier
+{
+  public function new(name:String)
+  {
+    super(name, 1);
+    modPriority = 400;
+    unknown = false;
+    specialMod = true;
+  }
+
+  override function specialMath(lane:Int, strumLine:Strumline):Void
+  {
+    var whichStrum:StrumlineNote = strumLine.getByIndex(lane);
+    whichStrum.strumExtraModData.splashCopyStrumScale = currentValue >= 0.5;
+  }
+}
+
+class HoldCoverCopyStrumScaleMod extends Modifier
+{
+  public function new(name:String)
+  {
+    super(name, 1);
+    modPriority = 400;
+    unknown = false;
+    specialMod = true;
+  }
+
+  override function specialMath(lane:Int, strumLine:Strumline):Void
+  {
+    var whichStrum:StrumlineNote = strumLine.getByIndex(lane);
+    whichStrum.strumExtraModData.holdCoverCopyStrumScale = currentValue >= 0.5;
+  }
+}
+
 class DisableHoldMathShortCutMod extends Modifier
 {
   public function new(name:String)

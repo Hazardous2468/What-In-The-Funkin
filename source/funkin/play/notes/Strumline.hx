@@ -1572,6 +1572,13 @@ class Strumline extends FlxSpriteGroup
     if (cover.glow != null)
     {
       cover.glow.scale.set(noteStyleScale, noteStyleScale);
+
+      if (whichStrumNote.strumExtraModData.holdCoverCopyStrumScale)
+      {
+        cover.glow.scale.x += whichStrumNote.strumExtraModData.strumScaleDifX;
+        cover.glow.scale.y += whichStrumNote.strumExtraModData.strumScaleDifY;
+      }
+
       // default holdCover positioning
       cover.x = this.x;
       cover.x += getXPos(cover.holdNoteDir);
@@ -1628,6 +1635,7 @@ class Strumline extends FlxSpriteGroup
   function noteSplashSetPos(splash:NoteSplash, direction:Int):Void
   {
     splash.scale.set(noteStyle.getSplashScale(), noteStyle.getSplashScale());
+
     // default notesplash positioning
     splash.x = this.x;
     splash.x += getXPos(direction);
@@ -1640,6 +1648,11 @@ class Strumline extends FlxSpriteGroup
     splash.y += noteStyle.getSplashOffsets()[1] * splash.scale.y;
 
     var whichStrumNote:StrumlineNote = getByIndex(direction % KEY_COUNT);
+    if (whichStrumNote.strumExtraModData.splashCopyStrumScale)
+    {
+      splash.scale.x += whichStrumNote.strumExtraModData.strumScaleDifX;
+      splash.scale.y += whichStrumNote.strumExtraModData.strumScaleDifY;
+    }
 
     // Move the splash to where the strum is
     var strumStartX:Float = INITIAL_OFFSET + this.x + getXPos(direction) + noteStyle.getStrumlineOffsets()[0];

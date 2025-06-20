@@ -925,10 +925,16 @@ class ModHandler
         mod.strumMath(note.noteModData, strum);
       }
     }
+
+    var rememberMeX:Float = note.scale.x;
+    var rememberMeY:Float = note.scale.y;
     note.applyNoteData(note.noteModData);
     note.updateLastKnownPos();
     note.noteModData.lastKnownPosition = note.lastKnownPosition;
     note.updateStealthGlow();
+
+    note.strumExtraModData.strumScaleDifX = note.scale.x - rememberMeX;
+    note.strumExtraModData.strumScaleDifY = note.scale.y - rememberMeY;
 
     if (!(note.strumExtraModData?.threeD ?? false))
     {

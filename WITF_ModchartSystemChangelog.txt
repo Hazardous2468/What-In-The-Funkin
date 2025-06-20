@@ -34,6 +34,8 @@ Also added offsets to sin, cos, tan, and cosecant for silly I guess?
 
 Overhauled wave and boost mod math
 
+NoteSplashes and HoldCovers now copy the strum scale. This behaviour can be disabled with "holdCoversScaleCopy" or "noteSplashScaleCopy" modifier
+
 
 
 

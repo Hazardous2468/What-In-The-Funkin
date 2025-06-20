@@ -2201,19 +2201,30 @@ class PlayState extends MusicBeatSubState
 
     // scan for lua file for modchart!
     var filesPushed:Array<String> = [];
+
     var vari:String = (currentVariation == Constants.DEFAULT_VARIATION ? "" : '-${currentVariation.toLowerCase()}');
     var songna:String = (currentSong?.id ?? '').toLowerCase() + vari;
-    var firstCheckTest:String = 'assets/data/modchart/' + currentChart.songName.toLowerCase() + "/";
-    var secondCheckTest:String = 'assets/data/modchart/' + songna + "/";
-    var foldersToCheck:Array<String> = [firstCheckTest, secondCheckTest];
+    var foldersToCheck:Array<String> = [];
+
+    var checkHere:String = 'assets/data/modchart/' + songna + "/";
+    foldersToCheck.push(checkHere);
+    if (currentChart != null && false)
+    {
+      checkHere = 'assets/data/modchart/' + currentChart.songName.toLowerCase() + vari + "/";
+      foldersToCheck.push(checkHere);
+    }
 
     // fuck it, we just check every mod lmfao
-    for (modid in PolymodHandler.loadedModIds)
+    for (modID in PolymodHandler.loadedModIds)
     {
-      var lmfao:String = 'mods/' + modid + '/data/modchart/' + songna + "/";
-      foldersToCheck.insert(0, lmfao);
-      lmfao = 'mods/${modid}/data/modchart/${currentChart.songName.toLowerCase() + vari}/';
-      foldersToCheck.insert(0, lmfao);
+      checkHere = 'mods/' + modID + '/data/modchart/' + songna + "/";
+      foldersToCheck.push(checkHere);
+
+      if (currentChart != null && false)
+      {
+        checkHere = 'mods/${modID}/data/modchart/${currentChart.songName.toLowerCase() + vari}/';
+        foldersToCheck.push(checkHere);
+      }
     }
 
     for (folder in foldersToCheck)

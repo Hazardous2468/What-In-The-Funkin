@@ -353,6 +353,10 @@ class ModConstants
     }
     modName = noLaneName + noLaneName_2;
 
+    modName = StringTools.replace(modName, "notesplashsscalecopy", "notesplashscalecopy");
+    modName = StringTools.replace(modName, "notesplashesscalecopy", "notesplashscalecopy");
+    modName = StringTools.replace(modName, "holdcoversscalecopy", "holdcoverscalecopy");
+
     modName = StringTools.replace(modName, "scaleholds", "scalehold");
     modName = StringTools.replace(modName, "scalestrums", "scalestrum");
     modName = StringTools.replace(modName, "scalenotes", "scalenote");
@@ -1386,6 +1390,11 @@ class ModConstants
         newMod = new AlphaNoteSplashModifier(tag);
       case "alphaholdcover":
         newMod = new AlphaHoldCoverModifier(tag);
+
+      case "notesplashscalecopy":
+        newMod = new NoteSplashCopyStrumScaleMod(tag);
+      case "holdcoverscalecopy":
+        newMod = new HoldCoverCopyStrumScaleMod(tag);
 
       // drunk mods
       case "drunk":
