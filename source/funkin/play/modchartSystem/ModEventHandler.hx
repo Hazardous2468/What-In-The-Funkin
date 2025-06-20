@@ -319,6 +319,11 @@ class ModEventHandler
     }
   }
 
+  function appendAdditiveTag(isSub:Bool = false):String
+  {
+    return '++' + (isSub ? "s" : "m") + tweenCounter;
+  }
+
   // Tween a mod from one value to another.
   function tweenAddMod(target:ModHandler, modName:String, addValue:Float, time:Float, easeToUse:Null<Float->Float>):FlxTween
   {
@@ -340,15 +345,7 @@ class ModEventHandler
       subModArr = _tag.split('__');
     }
 
-    if (isSub)
-    {
-      realTag += "+s" + tweenCounter;
-    }
-    else
-    {
-      // so every add tween has it's own unique tag so they don't fight over each other.
-      realTag += "+m" + tweenCounter;
-    }
+    realTag += appendAdditiveTag(isSub);
 
     if (isSub)
     {
@@ -675,13 +672,27 @@ class ModEventHandler
   public function cancelTweensOf(tag:String, target:ModHandler):Void
   {
     var lookForInString:String = ModConstants.modTag(tag, target);
+    // plr3.scale
+
     for (key in modchartTweens.keys())
     {
-      if (StringTools.contains(key, lookForInString))
+      // remove the additive stuff
+      var key_edited:String = key;
+      if (StringTools.contains(key, "++"))
+      {
+        key_edited = key.split('++')[0];
+      }
+
+      if (key_edited == lookForInString)
       {
         modchartTweens.get(key).cancel();
         modchartTweens.remove(key);
       }
+      // if (StringTools.contains(key, lookForInString))
+      // {
+      //  modchartTweens.get(key).cancel();
+      //  modchartTweens.remove(key);
+      // }
     }
   }
 
