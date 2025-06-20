@@ -2337,7 +2337,7 @@ class PlayState extends MusicBeatSubState
     newStrummer.zIndex = 1003 + allStrumLines.length + 1;
     newStrummer.cameras = playerStrumline.cameras;
 
-    newStrummer.mods.customTweenerName = Std.string(allStrumLines.length + 1);
+    newStrummer.mods.customTweenerName = "plr" + Std.string(allStrumLines.length + 1);
 
     customStrumLines.push(newStrummer);
     allStrumLines.push(newStrummer);

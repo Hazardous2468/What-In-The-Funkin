@@ -244,6 +244,7 @@ class ModEventHandler
     // FunkinSound.playOnce(Paths.sound("pauseEnable"), 1.0);
 
     var _tag:String = modName.toLowerCase();
+    cancelTweensOf(_tag, target);
     var realTag:String = ModConstants.modTag(modName.toLowerCase(), target);
 
     // trace("// !Triggered a tween! \\");
@@ -354,24 +355,33 @@ class ModEventHandler
       var mod:Modifier = target.modifiers.get(subModArr[0]);
       if (mod != null)
       {
-        var lastReportedChange:Float = 0;
-        var tween:FlxTween = tweenManager.num(0, 1, time,
-          {
-            ease: FlxEase.linear,
-            onComplete: function(twn:FlxTween) {
-              modchartTweens.remove(realTag);
-              var v:Float = addValue * easeToUse(1.0);
+        if (time == 0)
+        {
+          var v:Float = addValue * easeToUse(1.0);
+          mod.setSubVal(subModArr[1], mod.getSubVal(subModArr[1]) + (v));
+          return null;
+        }
+        else
+        {
+          var lastReportedChange:Float = 0;
+          var tween:FlxTween = tweenManager.num(0, 1, time,
+            {
+              ease: FlxEase.linear,
+              onComplete: function(twn:FlxTween) {
+                modchartTweens.remove(realTag);
+                var v:Float = addValue * easeToUse(1.0);
+                mod.setSubVal(subModArr[1], mod.getSubVal(subModArr[1]) + (v - lastReportedChange));
+                lastReportedChange = v;
+              }
+            }, function(t) {
+              var v:Float = addValue * easeToUse(t); // ???, cuz for some silly reason tweenValue was being set incorrectly by the tween function / manager? I don't know lmfao
               mod.setSubVal(subModArr[1], mod.getSubVal(subModArr[1]) + (v - lastReportedChange));
               lastReportedChange = v;
-            }
-          }, function(t) {
-            var v:Float = addValue * easeToUse(t); // ???, cuz for some silly reason tweenValue was being set incorrectly by the tween function / manager? I don't know lmfao
-            mod.setSubVal(subModArr[1], mod.getSubVal(subModArr[1]) + (v - lastReportedChange));
-            lastReportedChange = v;
-          });
+            });
 
-        modchartTweens.set(realTag, tween);
-        return tween;
+          modchartTweens.set(realTag, tween);
+          return tween;
+        }
       }
       else
       {
@@ -382,25 +392,33 @@ class ModEventHandler
     var mod:Modifier = target.modifiers.get(_tag);
     if (mod != null)
     {
-      // var initialValue:Float = mod.currentValue;
-      var lastReportedChange:Float = 0;
-      var tween:FlxTween = tweenManager.num(0, 1, time,
-        {
-          ease: FlxEase.linear,
-          onComplete: function(twn:FlxTween) {
-            modchartTweens.remove(realTag);
-            var v:Float = addValue * easeToUse(1.0);
+      if (time == 0)
+      {
+        var v:Float = addValue * easeToUse(1.0);
+        mod.currentValue = mod.currentValue + (v);
+        return null;
+      }
+      else
+      {
+        var lastReportedChange:Float = 0;
+        var tween:FlxTween = tweenManager.num(0, 1, time,
+          {
+            ease: FlxEase.linear,
+            onComplete: function(twn:FlxTween) {
+              modchartTweens.remove(realTag);
+              var v:Float = addValue * easeToUse(1.0);
+              mod.currentValue = mod.currentValue + (v - lastReportedChange);
+              lastReportedChange = v;
+            }
+          }, function(t) {
+            var v:Float = addValue * easeToUse(t); // ???, cuz for some silly reason tweenValue was being set incorrectly by the tween function / manager? I don't know lmfao
             mod.currentValue = mod.currentValue + (v - lastReportedChange);
             lastReportedChange = v;
-          }
-        }, function(t) {
-          var v:Float = addValue * easeToUse(t); // ???, cuz for some silly reason tweenValue was being set incorrectly by the tween function / manager? I don't know lmfao
-          mod.currentValue = mod.currentValue + (v - lastReportedChange);
-          lastReportedChange = v;
-        });
+          });
 
-      modchartTweens.set(realTag, tween);
-      return tween;
+        modchartTweens.set(realTag, tween);
+        return tween;
+      }
     }
     else
     {
@@ -498,7 +516,7 @@ class ModEventHandler
         switch (modEvent.style)
         {
           case "add":
-            tween = tweenAddMod(modEvent.target, modEvent.modName, modEvent.gotoValue, 0.001, modEvent.easeToUse);
+            tween = tweenAddMod(modEvent.target, modEvent.modName, modEvent.gotoValue, 0.0, modEvent.easeToUse);
           case "add_old":
             var modToTween:Modifier;
             if (modEvent.target.modifiers.exists(modEvent.modName))
@@ -509,8 +527,7 @@ class ModEventHandler
             {
               continue; // next event please
             }
-
-            modEvent.target.setModVal(modEvent.modName, modToTween.currentValue + (modEvent.gotoValue * (modEvent?.easeToUse(1)))); // get mod and add to it lol
+            setModVal(modEvent.target, modEvent.modName, modToTween.currentValue + (modEvent.gotoValue * (modEvent?.easeToUse(1))), false);
 
           case "func_tween":
             if (modEvent.modName != null)
@@ -529,12 +546,12 @@ class ModEventHandler
             continue;
 
           case "set":
-            modEvent.target.setModVal(modEvent.modName, modEvent.gotoValue);
+            setModVal(modEvent.target, modEvent.modName, modEvent.gotoValue, true);
             continue;
           case "value":
             // grab current mod value
             var finishPoint:Float = modEvent.startValue + ((modEvent.gotoValue - modEvent.startValue) * modEvent.easeToUse(1.0));
-            modEvent.target.setModVal(modEvent.modName, finishPoint);
+            setModVal(modEvent.target, modEvent.modName, finishPoint, true);
 
             continue;
           case "tween":
@@ -543,13 +560,12 @@ class ModEventHandler
             if (mod != null)
             {
               var finishPoint:Float = mod.currentValue + ((modEvent.gotoValue - mod.currentValue) * modEvent.easeToUse(1.0));
-              modEvent.target.setModVal(modEvent.modName, finishPoint);
+              setModVal(modEvent.target, modEvent.modName, finishPoint, true);
             }
             else
             {
               PlayState.instance.modDebugNotif("Tween set error! \n" + modEvent.modName, 0xFFFF7300);
-
-              modEvent.target.setModVal(modEvent.modName, modEvent.gotoValue);
+              setModVal(modEvent.target, modEvent.modName, modEvent.gotoValue, true);
             }
             continue;
           default:
@@ -572,7 +588,7 @@ class ModEventHandler
             resortMods_ForTarget(modEvent.target);
             continue;
           case "set":
-            modEvent.target.setModVal(modEvent.modName, modEvent.gotoValue);
+            setModVal(modEvent.target, modEvent.modName, modEvent.gotoValue, true);
             continue;
           case "tween":
             // FunkinSound.playOnce(Paths.sound("pauseDisable"), 1.0);
@@ -653,6 +669,30 @@ class ModEventHandler
         tween.update(0);
       }
     }
+  }
+
+  // Call this function to cancel every tween that matches this tag
+  public function cancelTweensOf(tag:String, target:ModHandler):Void
+  {
+    var lookForInString:String = ModConstants.modTag(tag, target);
+    for (key in modchartTweens.keys())
+    {
+      if (StringTools.contains(key, lookForInString))
+      {
+        modchartTweens.get(key).cancel();
+        modchartTweens.remove(key);
+      }
+    }
+  }
+
+  // Use this to set the Mod Value instantly. Also has the logic of cancelling all tweens of that type to avoid overlap if necessary.
+  public function setModVal(target:ModHandler, tag:String, val:Float, cancelTweensOfSameMod:Bool = false):Void
+  {
+    if (cancelTweensOfSameMod)
+    {
+      cancelTweensOf(tag, target);
+    }
+    target.setModVal(tag, val);
   }
 
   // Call this to reset all mod values and cancel any existing tweens for this player!

@@ -342,7 +342,7 @@ class RotatingXModifier extends RotateModBase
   public function new(name:String)
   {
     super(name);
-    modPriority = 21;
+    modPriority = 21 + 9;
     createSubMod("affect_strum", 0.0);
   }
 
@@ -365,7 +365,7 @@ class RotatingYModifier extends RotateModBase
   public function new(name:String)
   {
     super(name);
-    modPriority = 22;
+    modPriority = 22 + 9;
     createSubMod("affect_strum", 0.0);
   }
 
@@ -388,7 +388,7 @@ class RotatingZModifier extends RotateModBase
   public function new(name:String)
   {
     super(name);
-    modPriority = 23;
+    modPriority = 23 + 9;
     createSubMod("affect_strum", 0.0);
   }
 

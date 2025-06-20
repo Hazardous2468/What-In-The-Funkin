@@ -723,7 +723,7 @@ class ModConstants
     }
   }
 
-  public static function targetTag(target:ModHandler = null):String
+  public static function targetTag(target:ModHandler):String
   {
     var stringReturn = "unknown";
 
@@ -745,7 +745,7 @@ class ModConstants
     return stringReturn;
   }
 
-  public static function modTag(tag:String = "drunk", target:ModHandler = null):String
+  public static function modTag(tag:String = "drunk", target:ModHandler):String
   {
     var stringReturn = targetTag(target);
     stringReturn += "." + tag;
