@@ -222,13 +222,13 @@ class CosBumpySkewXMod extends BumpyModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    data.skewX -= cosBumpyMath(data.whichStrumNote?.strumDistance ?? 0) * 0.01;
-    data.skewX += cosBumpyMath(data.curPos) * 0.01;
+    data.skewX -= cosBumpyMath(data.whichStrumNote?.strumDistance ?? 0);
+    data.skewX += cosBumpyMath(data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    data.skewX += cosBumpyMath(data.curPos) * 0.01;
+    data.skewX += cosBumpyMath(data.curPos);
   }
 }
 
@@ -241,13 +241,13 @@ class CosBumpySkewYMod extends BumpyModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    data.skewY -= cosBumpyMath(data.whichStrumNote?.strumDistance ?? 0) * 0.01;
-    data.skewY += cosBumpyMath(data.curPos) * 0.01;
+    data.skewY -= cosBumpyMath(data.whichStrumNote?.strumDistance ?? 0);
+    data.skewY += cosBumpyMath(data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    data.skewY += cosBumpyMath(data.curPos) * 0.01;
+    data.skewY += cosBumpyMath(data.curPos);
   }
 }
 
