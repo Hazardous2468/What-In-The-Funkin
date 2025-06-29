@@ -873,7 +873,7 @@ class ModConstants
       for (timeChange in conductor.timeChanges)
       {
         var beatStamp:Float = ModConstants.getBeatFromTime(timeChange.timeStamp);
-        if (beat >= lastTimeChangeBeat)
+        if (beat >= beatStamp)
         {
           lastTimeChange = timeChange;
           timmy = lastTimeChange.timeStamp;
@@ -887,7 +887,7 @@ class ModConstants
       }
       // timmy is now at the ms timestamp of the last bpm change
       var leftOver:Float = beat - lastTimeChangeBeat;
-      leftOver = conductor.beatLengthMs * leftOver;
+      leftOver = ((Constants.SECS_PER_MIN / lastTimeChange.bpm) * Constants.MS_PER_SEC) * leftOver;
       timmy += leftOver;
       return timmy;
     }
