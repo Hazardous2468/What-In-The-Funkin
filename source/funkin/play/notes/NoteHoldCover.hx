@@ -7,7 +7,7 @@ import funkin.graphics.ZSprite;
 import funkin.play.modchartSystem.ModConstants;
 import funkin.play.notes.notestyle.NoteStyle;
 import funkin.util.assets.FlxAnimationUtil;
-import funkin.graphics.shaders.HSVShader;
+import funkin.graphics.shaders.HSVNotesShader;
 
 class NoteHoldCover extends FlxTypedSpriteGroup<ZSprite>
 {
@@ -20,14 +20,14 @@ class NoteHoldCover extends FlxTypedSpriteGroup<ZSprite>
 
   public var holdNoteDir:Int = 0;
 
-  var hsvShader:HSVShader;
+  var hsvShader:HSVNotesShader;
 
   public function new(noteStyle:NoteStyle)
   {
     super(0, 0);
 
     setupHoldNoteCover(noteStyle);
-    this.hsvShader = new HSVShader();
+    this.hsvShader = new HSVNotesShader();
     this.shader = hsvShader;
   }
 

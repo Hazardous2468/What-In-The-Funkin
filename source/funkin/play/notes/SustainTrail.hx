@@ -9,7 +9,7 @@ import flixel.util.FlxColor;
 import funkin.data.song.SongData.SongNoteData;
 import funkin.graphics.FunkinSprite;
 import funkin.graphics.ZSprite;
-import funkin.graphics.shaders.HSVShader;
+import funkin.graphics.shaders.HSVNotesShader;
 import funkin.play.modchartSystem.ModConstants;
 import funkin.play.modchartSystem.ModHandler;
 import funkin.play.modchartSystem.NoteData;
@@ -1523,7 +1523,7 @@ class SustainTrail extends ZSprite
     }
     if (useShader && this.hsvShader == null)
     {
-      this.hsvShader = new HSVShader();
+      this.hsvShader = new HSVNotesShader();
     }
   }
 
@@ -1539,5 +1539,5 @@ class SustainTrail extends ZSprite
 
   var useShader:Bool = true;
 
-  public var hsvShader:HSVShader = null;
+  public var hsvShader:HSVNotesShader = null;
 }

@@ -9,7 +9,7 @@ import funkin.data.song.SongData.SongNoteData;
 import funkin.graphics.FunkinSprite;
 import funkin.graphics.ZProjectSprite_Note;
 import funkin.graphics.ZSprite;
-import funkin.graphics.shaders.HSVShader;
+import funkin.graphics.shaders.HSVNotesShader;
 import funkin.play.modchartSystem.NoteData;
 import funkin.play.notes.notestyle.NoteStyle;
 
@@ -22,7 +22,7 @@ class NoteSprite extends ZSprite
 
   public var holdNoteSprite:SustainTrail;
 
-  public var hsvShader:HSVShader;
+  public var hsvShader:HSVNotesShader;
 
   /**
    * The strum time at which the note should be hit, in milliseconds.
@@ -230,7 +230,7 @@ class NoteSprite extends ZSprite
     super(0, -9999);
     this.direction = direction;
 
-    this.hsvShader = new HSVShader();
+    this.hsvShader = new HSVNotesShader();
 
     noteModData = new NoteData();
 

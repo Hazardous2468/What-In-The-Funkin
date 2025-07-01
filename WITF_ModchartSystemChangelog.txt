@@ -36,6 +36,8 @@ Overhauled wave and boost mod math
 
 NoteSplashes and HoldCovers now copy the strum scale. This behaviour can be disabled with "holdCoversScaleCopy" or "noteSplashScaleCopy" modifier
 
+Separated the modified HSV shader from the original so any mods that may use the base game HSV shader won't be incorrect.
+
 
 
 

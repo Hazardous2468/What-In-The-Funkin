@@ -5,7 +5,7 @@ import flixel.graphics.frames.FlxAtlasFrames;
 import funkin.graphics.FunkinSprite;
 import funkin.play.notes.NoteSprite;
 import funkin.graphics.ZSprite;
-import funkin.graphics.shaders.HSVShader;
+import funkin.graphics.shaders.HSVNotesShader;
 import funkin.play.modchartSystem.NoteData;
 import funkin.play.modchartSystem.StrumExtraData;
 import funkin.graphics.ZProjectSprite_Note;
@@ -20,7 +20,7 @@ class StrumlineNote extends ZSprite
 {
   public var mesh:ZProjectSprite_Note;
 
-  var hsvShader:HSVShader;
+  var hsvShader:HSVNotesShader;
 
   public var noteModData:NoteData;
   public var strumExtraModData:StrumExtraData;
@@ -93,7 +93,7 @@ class StrumlineNote extends ZSprite
     noteModData = new NoteData();
     strumExtraModData = new StrumExtraData(this);
 
-    this.hsvShader = new HSVShader();
+    this.hsvShader = new HSVNotesShader();
     this.shader = hsvShader;
     updateStealthGlow();
   }
