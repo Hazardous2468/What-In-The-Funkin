@@ -500,6 +500,10 @@ class ModEventHandler
       if (modEvent.hasTriggered) continue;
       var tween:FlxTween = null;
 
+      // for more accuracy:
+      var eventStartMS:Float = Conductor.instance.getBeatTimeInMs(modEvent.startingBeat);
+      var beatLength:Float = Conductor.instance.getTypeLengthAtMs(eventStartMS, "beat") / Constants.MS_PER_SEC;
+
       // If beat time is PAST the event!
       if (beatTime >= modEvent.startingBeat + modEvent.timeInBeats
         && !(modEvent.style == "func" && modEvent.persist)
@@ -588,16 +592,15 @@ class ModEventHandler
             setModVal(modEvent.target, modEvent.modName, modEvent.gotoValue, true);
             continue;
           case "tween":
-            // FunkinSound.playOnce(Paths.sound("pauseDisable"), 1.0);
-            tween = tweenMod(modEvent.target, modEvent.modName, modEvent.gotoValue, timeBetweenBeats * modEvent.timeInBeats, modEvent.easeToUse, "tween");
+            tween = tweenMod(modEvent.target, modEvent.modName, modEvent.gotoValue, beatLength * modEvent.timeInBeats, modEvent.easeToUse, "tween");
 
           case "value":
-            tween = tweenMod(modEvent.target, modEvent.modName, modEvent.gotoValue, timeBetweenBeats * modEvent.timeInBeats, modEvent.easeToUse, "value",
+            tween = tweenMod(modEvent.target, modEvent.modName, modEvent.gotoValue, beatLength * modEvent.timeInBeats, modEvent.easeToUse, "value",
               modEvent.startValue);
 
           case "add":
             // FunkinSound.playOnce(Paths.sound("pauseEnable"), 1.0);
-            tween = tweenAddMod(modEvent.target, modEvent.modName, modEvent.gotoValue, timeBetweenBeats * modEvent.timeInBeats, modEvent.easeToUse);
+            tween = tweenAddMod(modEvent.target, modEvent.modName, modEvent.gotoValue, beatLength * modEvent.timeInBeats, modEvent.easeToUse);
           case "add_old":
             // FunkinSound.playOnce(Paths.sound("pauseEnable"), 1.0);
             var modToTween;
@@ -634,7 +637,7 @@ class ModEventHandler
             }
 
             var finishPoint:Float = modEvent.startValue + ((modEvent.gotoValue - modEvent.startValue) * modEvent.easeToUse(1.0));
-            tween = tweenManager.num(modEvent.startValue, modEvent.gotoValue, timeBetweenBeats * modEvent.timeInBeats,
+            tween = tweenManager.num(modEvent.startValue, modEvent.gotoValue, beatLength * modEvent.timeInBeats,
               {
                 ease: modEvent.easeToUse,
                 onComplete: function(twn:FlxTween) {
