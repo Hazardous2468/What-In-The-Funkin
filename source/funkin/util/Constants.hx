@@ -8,6 +8,7 @@ import lime.app.Application;
 /**
  * A store of unchanging, globally relevant values.
  */
+@:nullSafety
 class Constants
 {
   /**
@@ -394,7 +395,7 @@ class Constants
 
   /**
    * Number of steps in a beat.
-   * One step is one 16th note and one beat is one quarter note.
+   * The note length of a step varies based on the time signature denominator.
    */
   public static final STEPS_PER_BEAT:Int = 4;
 
@@ -537,6 +538,11 @@ class Constants
    * - "Actually new or just a renamed ZIP?"
    */
   public static final EXT_CHART = "fnfc";
+
+  /**
+   * The file extension used when exporting stage files.
+   */
+  public static final EXT_STAGE = "fnfs";
 
   /**
    * The file extension used when loading audio files.

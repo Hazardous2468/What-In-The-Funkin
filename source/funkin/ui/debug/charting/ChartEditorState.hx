@@ -17,6 +17,7 @@ import flixel.math.FlxRect;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import flixel.util.FlxSort;
+import flixel.util.FlxStringUtil;
 import flixel.util.FlxTimer;
 import funkin.audio.FunkinSound;
 import funkin.audio.visualize.PolygonSpectogram;
@@ -30,6 +31,7 @@ import funkin.data.song.SongData.SongNoteData;
 import funkin.data.song.SongData.SongOffsets;
 import funkin.data.song.SongData.NoteParamData;
 import funkin.data.song.SongDataUtils;
+import funkin.data.song.SongNoteDataUtils;
 import funkin.graphics.FunkinCamera;
 import funkin.graphics.FunkinSprite;
 import funkin.input.Cursor;
@@ -46,6 +48,7 @@ import funkin.play.song.Song;
 import funkin.save.Save;
 import funkin.ui.debug.charting.commands.AddEventsCommand;
 import funkin.ui.debug.charting.commands.AddNotesCommand;
+import funkin.ui.debug.charting.commands.AddNewTimeChangeCommand;
 import funkin.ui.debug.charting.commands.ChartEditorCommand;
 import funkin.ui.debug.charting.commands.CopyItemsCommand;
 import funkin.ui.debug.charting.commands.CutItemsCommand;
@@ -61,6 +64,7 @@ import funkin.ui.debug.charting.commands.PasteItemsCommand;
 import funkin.ui.debug.charting.commands.RemoveEventsCommand;
 import funkin.ui.debug.charting.commands.RemoveItemsCommand;
 import funkin.ui.debug.charting.commands.RemoveNotesCommand;
+import funkin.ui.debug.charting.commands.RemoveStackedNotesCommand;
 import funkin.ui.debug.charting.commands.SelectAllItemsCommand;
 import funkin.ui.debug.charting.commands.SelectItemsCommand;
 import funkin.ui.debug.charting.commands.SetItemSelectionCommand;
@@ -88,6 +92,7 @@ import haxe.io.Bytes;
 import haxe.io.Path;
 import haxe.ui.backend.flixel.UIState;
 import haxe.ui.components.Button;
+import haxe.ui.components.DropDown;
 import haxe.ui.components.Label;
 import haxe.ui.components.Slider;
 import haxe.ui.containers.dialogs.CollapsibleDialog;
@@ -172,12 +177,12 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
   /**
    * The height of the note selection buttons above the grid.
    */
-  public static final NOTE_SELECT_BUTTON_HEIGHT:Int = 24;
+  public static final NOTE_SELECT_BUTTON_HEIGHT:Int = 32;
 
   /**
    * The amount of padding between the menu bar and the chart grid when fully scrolled up.
    */
-  public static final GRID_TOP_PAD:Int = NOTE_SELECT_BUTTON_HEIGHT + 12;
+  public static final GRID_TOP_PAD:Int = NOTE_SELECT_BUTTON_HEIGHT + 4;
 
   /**
    * The initial vertical position of the chart grid.
@@ -192,7 +197,7 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
   /**
    * The Y position of the note preview area.
    */
-  public static final NOTE_PREVIEW_Y_POS:Int = GRID_INITIAL_Y_POS - NOTE_SELECT_BUTTON_HEIGHT - 4;
+  public static final NOTE_PREVIEW_Y_POS:Int = GRID_INITIAL_Y_POS - NOTE_SELECT_BUTTON_HEIGHT + 4;
 
   /**
    * The X position of the note grid.
@@ -355,6 +360,10 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
       value = 0;
     }
 
+    // Make sure playhead doesn't scroll outside the song.
+    if (value + playheadPositionInPixels < 0) playheadPositionInPixels = -value;
+    if (value + playheadPositionInPixels > songLengthInPixels) playheadPositionInPixels = songLengthInPixels - value;
+
     if (value > songLengthInPixels) value = songLengthInPixels;
 
     if (value == scrollPositionInPixels) return value;
@@ -399,8 +408,7 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
     setNotePreviewViewportBounds(calculateNotePreviewViewportBounds());
     refreshNotePreviewPlayheadPosition();
 
-    // Update the measure tick display.
-    if (measureTicks != null) measureTicks.y = gridTiledSprite?.y ?? 0.0;
+    if (measureTicks != null) handleMeasureTickPosition();
     return this.scrollPositionInPixels;
   }
 
@@ -490,13 +498,13 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
 
   function get_playheadPositionInMs():Float
   {
-    return Conductor.instance.getStepTimeInMs(playheadPositionInSteps);
+    var playheadPositionInSong:Float = Conductor.instance.getStepTimeInMs(playheadPositionInSteps + scrollPositionInSteps);
+    return playheadPositionInSong - scrollPositionInMs;
   }
 
   function set_playheadPositionInMs(value:Float):Float
   {
     playheadPositionInSteps = Conductor.instance.getTimeInSteps(value);
-
     return value;
   }
 
@@ -567,7 +575,7 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
 
   function get_noteSnapRatio():Float
   {
-    return BASE_QUANT / noteSnapQuant;
+    return BASE_QUANT / (noteSnapQuant * 4 / Conductor.instance.timeSignatureDenominator);
   }
 
   /**
@@ -779,6 +787,15 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
    */
   var currentLiveInputPlaceNoteData:Array<SongNoteData> = [];
 
+  /**
+   * Defines how "close" two notes must be to be considered stacked, based on steps.
+   * For example, setting this to `0.5` (16/32) will highlight notes half a step apart.
+   * Setting it to `0` only highlights notes that are nearly perfectly aligned.
+   * In the dropdown menu, the threshold is based on note snaps instead.
+   * For example, `0.5` would be displayed as `1/32`, and `0` would show as `Exact`.
+   */
+  public static var stackedNoteThreshold:Float = 0;
+
   // Note Movement
 
   /**
@@ -839,7 +856,7 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
     {
       if (currentNoteSelection.length > 0 && isSuperset)
       {
-        notePreview.addSelectedNotes(currentNoteSelection, Std.int(songLengthInMs));
+        notePreview.addSelectedNotes(currentNoteSelection, songLengthInPixels);
       }
       else
       {
@@ -849,6 +866,32 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
     }
 
     return currentNoteSelection;
+  }
+
+  var currentOverlappingNotes(default, set):Array<SongNoteData> = [];
+
+  function set_currentOverlappingNotes(value:Array<SongNoteData>):Array<SongNoteData>
+  {
+    // This value is true if all elements of the current overlapping array are also in the new array.
+    var isSuperset:Bool = currentOverlappingNotes.isSubset(value);
+    var isEqual:Bool = currentOverlappingNotes.isEqualUnordered(value);
+
+    currentOverlappingNotes = value;
+
+    if (!isEqual)
+    {
+      if (currentOverlappingNotes.length > 0 && isSuperset)
+      {
+        notePreview.addOverlappingNotes(currentOverlappingNotes, songLengthInPixels);
+      }
+      else
+      {
+        // The new array might add or remove elements from the old array, so we have to redraw the note preview.
+        notePreviewDirty = true;
+      }
+    }
+
+    return currentOverlappingNotes;
   }
 
   /**
@@ -1240,7 +1283,7 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
       for (x in availableVariations)
       {
         var m:Null<SongMetadata> = songMetadata.get(x);
-        m?.playData?.difficulties ?? [];
+        [for (diff in (m?.playData?.difficulties ?? [])) '$diff-$x'];
       }
     ];
     return result.flatten();
@@ -1294,6 +1337,16 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
   function set_currentSongChartData(value:SongChartData):SongChartData
   {
     songChartData.set(selectedVariation, value);
+    var variationMetadata:Null<SongMetadata> = songMetadata.get(selectedVariation);
+    if (variationMetadata != null)
+    {
+      // Add the chartdata difficulties to the metadata difficulties if they don't exist so that the editor properly loads them
+      var keys:Array<String> = [for (x in songChartData.get(selectedVariation).notes.keys()) x];
+      for (key in keys)
+      {
+        variationMetadata.playData.difficulties.pushUnique(key);
+      }
+    }
     return value;
   }
 
@@ -1743,6 +1796,11 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
   var menubarItemDelete:MenuItem;
 
   /**
+   * The `Edit -> Delete Stacked Notes` menu item.
+   */
+  var menubarItemDeleteStacked:MenuItem;
+
+  /**
    * The `Edit -> Flip Notes` menu item.
    */
   var menubarItemFlipNotes:MenuItem;
@@ -1786,6 +1844,11 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
    * The `Edit -> Decrease Note Snap Precision` menu item.
    */
   var menuBarItemNoteSnapIncrease:MenuItem;
+
+  /**
+   * The `Edit -> Stacked Note Threshold` menu dropdown
+   */
+  var menuBarStackedNoteThreshold:DropDown;
 
   /**
    * The `View -> Downscroll` menu item.
@@ -1898,6 +1961,16 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
   var playbarSongPos:Label;
 
   /**
+   * The label by the playbar telling the current beat rounded to 2
+   */
+  var playbarBeatNum:Label;
+
+  /**
+   * The label by the playbar telling the current step
+   */
+  var playbarStepNum:Label;
+
+  /**
    * The label by the playbar telling the song time remaining.
    */
   var playbarSongRemaining:Label;
@@ -1931,6 +2004,12 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
    * The button by the playbar to jump to the end of the song.
    */
   var playbarEnd:Button;
+
+  /**
+   * The button above the grid that does nothing currently. Used for covering up the measure ticks being cut off :)
+   * Constructed manually and added to the layout so we can control its position.
+   */
+  var buttonSelectDummy:Button;
 
   /**
    * The button above the grid that selects all notes on the opponent's side.
@@ -1978,9 +2057,10 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
 
   /**
    * The IMAGE used for the selection squares. Updated by ChartEditorThemeHandler.
-   * Used two ways:
+   * Used three ways:
    * 1. A sprite is given this bitmap and placed over selected notes.
-   * 2. The image is split and used for a 9-slice sprite for the selection box.
+   * 2. Same as above but for notes that are overlapped by another.
+   * 3. The image is split and used for a 9-slice sprite for the selection box.
    */
   var selectionSquareBitmap:Null<BitmapData> = null;
 
@@ -2231,7 +2311,9 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
     }
     else if (params != null && params.targetSongId != null)
     {
-      this.loadSongAsTemplate(params.targetSongId);
+      var targetSongDifficulty = params.targetSongDifficulty ?? null;
+      var targetSongVariation = params.targetSongVariation ?? null;
+      this.loadSongAsTemplate(params.targetSongId, targetSongDifficulty, targetSongVariation);
     }
     else
     {
@@ -2286,13 +2368,13 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
     currentTheme = save.chartEditorTheme;
     metronomeVolume = save.chartEditorMetronomeVolume;
     hitsoundVolumePlayer = save.chartEditorHitsoundVolumePlayer;
-    hitsoundVolumePlayer = save.chartEditorHitsoundVolumeOpponent;
+    hitsoundVolumeOpponent = save.chartEditorHitsoundVolumeOpponent;
     this.welcomeMusic.active = save.chartEditorThemeMusic;
 
-    // audioInstTrack.volume = save.chartEditorInstVolume;
-    // audioInstTrack.pitch = save.chartEditorPlaybackSpeed;
-    // audioVocalTrackGroup.volume = save.chartEditorVoicesVolume;
-    // audioVocalTrackGroup.pitch = save.chartEditorPlaybackSpeed;
+    menubarItemVolumeInstrumental.value = Std.int(save.chartEditorInstVolume * 100);
+    menubarItemVolumeVocalsPlayer.value = Std.int(save.chartEditorPlayerVoiceVolume * 100);
+    menubarItemVolumeVocalsOpponent.value = Std.int(save.chartEditorOpponentVoiceVolume * 100);
+    menubarItemPlaybackSpeed.value = Std.int(save.chartEditorPlaybackSpeed * 100);
   }
 
   public function writePreferences(hasBackup:Bool):Void
@@ -2318,9 +2400,10 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
     save.chartEditorHitsoundVolumeOpponent = hitsoundVolumeOpponent;
     save.chartEditorThemeMusic = this.welcomeMusic.active;
 
-    // save.chartEditorInstVolume = audioInstTrack.volume;
-    // save.chartEditorVoicesVolume = audioVocalTrackGroup.volume;
-    // save.chartEditorPlaybackSpeed = audioInstTrack.pitch;
+    save.chartEditorInstVolume = menubarItemVolumeInstrumental.value / 100.0;
+    save.chartEditorPlayerVoiceVolume = menubarItemVolumeVocalsPlayer.value / 100.0;
+    save.chartEditorOpponentVoiceVolume = menubarItemVolumeVocalsOpponent.value / 100.0;
+    save.chartEditorPlaybackSpeed = menubarItemPlaybackSpeed.value / 100.0;
   }
 
   public function populateOpenRecentMenu():Void
@@ -2469,7 +2552,7 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
     add(gridPlayhead);
     gridPlayhead.zIndex = 30;
 
-    var playheadWidth:Int = GRID_SIZE * (STRUMLINE_SIZE * 2 + 1) + (PLAYHEAD_SCROLL_AREA_WIDTH * 2);
+    var playheadWidth:Int = GRID_SIZE * (STRUMLINE_SIZE * 2 + 1) + PLAYHEAD_SCROLL_AREA_WIDTH;
     var playheadBaseYPos:Float = GRID_INITIAL_Y_POS;
     gridPlayhead.setPosition(GRID_X_POS, playheadBaseYPos);
     var playheadSprite:FunkinSprite = new FunkinSprite().makeSolidColor(playheadWidth, PLAYHEAD_HEIGHT, PLAYHEAD_COLOR);
@@ -2746,7 +2829,7 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
     buttonSelectOpponent.allowFocus = false;
     buttonSelectOpponent.text = "Opponent"; // Default text.
     buttonSelectOpponent.x = GRID_X_POS;
-    buttonSelectOpponent.y = GRID_INITIAL_Y_POS - NOTE_SELECT_BUTTON_HEIGHT - 8;
+    buttonSelectOpponent.y = GRID_INITIAL_Y_POS - NOTE_SELECT_BUTTON_HEIGHT;
     buttonSelectOpponent.width = GRID_SIZE * 4;
     buttonSelectOpponent.height = NOTE_SELECT_BUTTON_HEIGHT;
     buttonSelectOpponent.tooltip = "Click to set selection to all notes on this side.\nShift-click to add all notes on this side to selection.";
@@ -2812,6 +2895,15 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
         performCommand(new SetItemSelectionCommand([], currentSongChartEventData));
       }
     }
+
+    buttonSelectDummy = new Button();
+    buttonSelectDummy.allowFocus = false;
+    buttonSelectDummy.x = buttonSelectOpponent.x - GRID_SIZE;
+    buttonSelectDummy.y = buttonSelectEvent.y;
+    buttonSelectDummy.width = GRID_SIZE;
+    buttonSelectDummy.height = NOTE_SELECT_BUTTON_HEIGHT;
+    buttonSelectDummy.zIndex = 110;
+    add(buttonSelectDummy);
   }
 
   /**
@@ -2936,6 +3028,17 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
       }
     };
 
+    menubarItemDeleteStacked.onClick = _ -> {
+      if (currentEventSelection.length > 0 && currentNoteSelection.length == 0)
+      {
+        performCommand(new RemoveEventsCommand(currentEventSelection));
+      }
+      else
+      {
+        performCommand(new RemoveStackedNotesCommand(currentNoteSelection.length > 0 ? currentNoteSelection : null));
+      }
+    };
+
     menubarItemFlipNotes.onClick = _ -> performCommand(new FlipNotesCommand(currentNoteSelection));
 
     menubarItemSelectAllNotes.onClick = _ -> performCommand(new SelectAllItemsCommand(true, false));
@@ -2958,6 +3061,21 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
       if (noteSnapQuantIndex >= SNAP_QUANTS.length) noteSnapQuantIndex = 0;
     };
 
+    final REVERSE_SNAPS = SNAP_QUANTS.reversed();
+    for (snap in REVERSE_SNAPS)
+    {
+      menuBarStackedNoteThreshold.dataSource.add({text: '1/$snap'});
+    }
+
+    menuBarStackedNoteThreshold.onChange = event -> {
+      // NOTE: It needs to be offset by 1 because of the 'Exact' option
+      // -1 value means that it is the one selected
+      var selectedIdx:Int = menuBarStackedNoteThreshold.selectedIndex - 1;
+      stackedNoteThreshold = selectedIdx == -1 ? 0 : BASE_QUANT / REVERSE_SNAPS[selectedIdx];
+      noteDisplayDirty = true;
+      notePreviewDirty = true;
+    }
+
     menuBarItemInputStyleNone.onClick = function(event:UIEvent) {
       currentLiveInputStyle = None;
     };
@@ -2977,7 +3095,7 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
     #if sys
     menubarItemGoToBackupsFolder.onClick = _ -> this.openBackupsFolder();
     #else
-    // Disable the menu item if we're not on a desktop platform.
+    // Disable the menu item if we're not on a native platform.
     menubarItemGoToBackupsFolder.disabled = true;
     #end
 
@@ -3340,7 +3458,10 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
 
     if (metronomeVolume > 0.0 && this.subState == null && (audioInstTrack != null && audioInstTrack.isPlaying))
     {
-      playMetronomeTick(Conductor.instance.currentBeat % Conductor.instance.beatsPerMeasure == 0);
+      var currentMeasureTime:Float = Conductor.instance.getMeasureTimeInMs(Conductor.instance.currentMeasure);
+      var currentStepTime:Float = Conductor.instance.getStepTimeInMs(Conductor.instance.currentStep);
+      final msTreshold:Float = 10.0;
+      playMetronomeTick(currentMeasureTime >= currentStepTime - msTreshold && currentMeasureTime <= currentStepTime + msTreshold);
     }
 
     // Show the mouse cursor.
@@ -3411,7 +3532,7 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
 
         var oldStepTime:Float = Conductor.instance.currentStepTime;
         var oldSongPosition:Float = Conductor.instance.songPosition + Conductor.instance.instrumentalOffset;
-        Conductor.instance.update(audioInstTrack.time);
+        updateSongTime();
         handleHitsounds(oldSongPosition, Conductor.instance.songPosition + Conductor.instance.instrumentalOffset);
         // Resync vocals.
         if (Math.abs(audioInstTrack.time - audioVocalTrackGroup.time) > 100)
@@ -3429,7 +3550,7 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
       {
         // Else, move the entire view.
         var oldSongPosition:Float = Conductor.instance.songPosition + Conductor.instance.instrumentalOffset;
-        Conductor.instance.update(audioInstTrack.time);
+        updateSongTime();
         handleHitsounds(oldSongPosition, Conductor.instance.songPosition + Conductor.instance.instrumentalOffset);
         // Resync vocals.
         if (Math.abs(audioInstTrack.time - audioVocalTrackGroup.time) > 100)
@@ -3497,7 +3618,7 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
         {
           // This sprite is off-screen or was deleted.
           // Kill the note sprite and recycle it.
-          noteSprite.noteData = null;
+          noteSprite.kill();
         }
       }
       // Sort the note data array, using an algorithm that is fast on nearly-sorted data.
@@ -3509,13 +3630,16 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
       {
         if (holdNoteSprite == null || holdNoteSprite.noteData == null || !holdNoteSprite.exists || !holdNoteSprite.visible) continue;
 
+        // Fixes an issue where dragging an hold note too far would hide its sustain trail
+        var isSelectedAndDragged = currentNoteSelection.fastContains(holdNoteSprite.noteData) && (dragTargetCurrentStep != 0);
+
         if (holdNoteSprite.noteData == currentPlaceNoteData)
         {
           // This hold note is for the note we are currently dragging.
           // It will be displayed by gridGhostHoldNoteSprite instead.
           holdNoteSprite.kill();
         }
-        else if (!holdNoteSprite.isHoldNoteVisible(FlxG.height - MENU_BAR_HEIGHT, GRID_TOP_PAD))
+        else if (!holdNoteSprite.isHoldNoteVisible(viewAreaBottomPixels, viewAreaTopPixels) && !isSelectedAndDragged)
         {
           // This hold note is off-screen.
           // Kill the hold note sprite and recycle it.
@@ -3536,10 +3660,10 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
         else
         {
           displayedHoldNoteData.push(holdNoteSprite.noteData);
-          // Update the event sprite's height and position.
+          // Update the hold note sprite's height and position.
           // var holdNoteHeight = holdNoteSprite.noteData.getStepLength() * GRID_SIZE;
           // holdNoteSprite.setHeightDirectly(holdNoteHeight);
-          holdNoteSprite.updateHoldNotePosition(renderedNotes);
+          holdNoteSprite.updateHoldNotePosition(renderedHoldNotes);
         }
       }
       // Sort the note data array, using an algorithm that is fast on nearly-sorted data.
@@ -3555,7 +3679,7 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
         // Resolve an issue where dragging an event too far would cause it to be hidden.
         var isSelectedAndDragged = currentEventSelection.fastContains(eventSprite.eventData) && (dragTargetCurrentStep != 0);
 
-        if ((eventSprite.isEventVisible(FlxG.height - PLAYBAR_HEIGHT, MENU_BAR_HEIGHT)
+        if ((eventSprite.isEventVisible(viewAreaBottomPixels, viewAreaTopPixels)
           && currentSongChartEventData.fastContains(eventSprite.eventData))
           || isSelectedAndDragged)
         {
@@ -3571,7 +3695,7 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
         {
           // This event was deleted.
           // Kill the event sprite and recycle it.
-          eventSprite.eventData = null;
+          eventSprite.kill();
         }
       }
       // Sort the note data array, using an algorithm that is fast on nearly-sorted data.
@@ -3580,8 +3704,9 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
 
       // Let's try testing only notes within a certain range of the view area.
       // TODO: I don't think this messes up really long sustains, does it?
-      var viewAreaTopMs:Float = scrollPositionInMs - (Conductor.instance.measureLengthMs * 2); // Is 2 measures enough?
-      var viewAreaBottomMs:Float = scrollPositionInMs + (Conductor.instance.measureLengthMs * 2); // Is 2 measures enough?
+      // Only at Numerator of 1 do we need to extend the view area. Though, who makes songs with 1 beat in a measure?
+      var viewAreaTopMs:Float = scrollPositionInMs - (Conductor.instance.measureLengthMs * (Conductor.instance.timeSignatureNumerator == 1 ? 4 : 2));
+      var viewAreaBottomMs:Float = scrollPositionInMs + (Conductor.instance.measureLengthMs * (Conductor.instance.timeSignatureNumerator == 1 ? 4 : 2));
 
       // Add notes that are now visible.
       for (noteData in currentSongChartNoteData)
@@ -3628,6 +3753,8 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
           var noteLengthPixels:Float = noteSprite.noteData.getStepLength() * GRID_SIZE;
 
           holdNoteSprite.noteData = noteSprite.noteData;
+          holdNoteSprite.overrideStepTime = null;
+          holdNoteSprite.overrideData = null;
           holdNoteSprite.noteDirection = noteSprite.noteData.getDirection();
 
           holdNoteSprite.setHeightDirectly(noteLengthPixels);
@@ -3680,7 +3807,7 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
         if (noteData == currentPlaceNoteData) continue;
 
         // Is the hold note rendered already?
-        if (displayedHoldNoteData.indexOf(noteData) != -1) continue;
+        if (displayedHoldNoteData.fastContains(noteData)) continue;
 
         // Is the hold note offscreen?
         if (!ChartEditorHoldNoteSprite.wouldHoldNoteBeVisible(viewAreaBottomPixels, viewAreaTopPixels, noteData, renderedHoldNotes)) continue;
@@ -3695,6 +3822,8 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
         var noteLengthPixels:Float = noteData.getStepLength() * GRID_SIZE;
 
         holdNoteSprite.noteData = noteData;
+        holdNoteSprite.overrideStepTime = null;
+        holdNoteSprite.overrideData = null;
         holdNoteSprite.noteDirection = noteData.getDirection();
         holdNoteSprite.setHeightDirectly(noteLengthPixels);
 
@@ -3712,13 +3841,32 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
         member.kill();
       }
 
+      // Gather stacked notes to render later
+      // No need to update it every time we scroll
+      if (Math.abs(currentScrollEase - scrollPositionInPixels) < .0001)
+      {
+        currentOverlappingNotes = SongNoteDataUtils.listStackedNotes(currentSongChartNoteData, stackedNoteThreshold);
+      }
+
       // Readd selection squares for selected notes.
       // Recycle selection squares if possible.
       for (noteSprite in renderedNotes.members)
       {
+        if (noteSprite == null || noteSprite.noteData == null || !noteSprite.exists || !noteSprite.visible) continue;
+
         // TODO: Handle selection of hold notes.
         if (isNoteSelected(noteSprite.noteData))
         {
+          var holdNoteSprite:ChartEditorHoldNoteSprite = null;
+
+          if (noteSprite.noteData != null && noteSprite.noteData.length > 0)
+          {
+            for (holdNote in renderedHoldNotes.members)
+            {
+              if (holdNote.noteData == noteSprite.noteData && holdNoteSprite == null) holdNoteSprite = holdNote;
+            }
+          }
+
           // Determine if the note is being dragged and offset the vertical position accordingly.
           if (dragTargetCurrentStep != 0.0)
           {
@@ -3727,6 +3875,13 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
             noteSprite.overrideStepTime = (stepTime + dragTargetCurrentStep).clamp(0, songLengthInSteps - (1 * noteSnapRatio));
             // Then reapply the note sprite's position relative to the grid.
             noteSprite.updateNotePosition(renderedNotes);
+
+            // We only need to update the position of the hold note tails as we drag the note.
+            if (holdNoteSprite != null)
+            {
+              holdNoteSprite.overrideStepTime = noteSprite.overrideStepTime;
+              holdNoteSprite.updateHoldNotePosition(renderedHoldNotes);
+            }
           }
           else
           {
@@ -3736,6 +3891,12 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
               noteSprite.overrideStepTime = null;
               // Then reapply the note sprite's position relative to the grid.
               noteSprite.updateNotePosition(renderedNotes);
+
+              if (holdNoteSprite != null)
+              {
+                holdNoteSprite.overrideStepTime = null;
+                holdNoteSprite.updateHoldNotePosition(renderedHoldNotes);
+              }
             }
           }
 
@@ -3748,6 +3909,14 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
               ChartEditorState.STRUMLINE_SIZE * 2 - 1));
             // Then reapply the note sprite's position relative to the grid.
             noteSprite.updateNotePosition(renderedNotes);
+
+            // We only need to update the position of the hold note tails as we drag the note.
+            if (holdNoteSprite != null)
+            {
+              holdNoteSprite.overrideData = noteSprite.overrideData;
+              holdNoteSprite.updateHoldNotePosition(renderedHoldNotes);
+              holdNoteSprite.updateHoldNoteGraphic();
+            }
           }
           else
           {
@@ -3757,6 +3926,13 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
               noteSprite.overrideData = null;
               // Then reapply the note sprite's position relative to the grid.
               noteSprite.updateNotePosition(renderedNotes);
+
+              if (holdNoteSprite != null)
+              {
+                holdNoteSprite.overrideData = null;
+                holdNoteSprite.updateHoldNotePosition(renderedHoldNotes);
+                holdNoteSprite.updateHoldNoteGraphic();
+              }
             }
           }
 
@@ -3769,14 +3945,30 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
           selectionSquare.x = noteSprite.x;
           selectionSquare.y = noteSprite.y;
           selectionSquare.width = GRID_SIZE;
+          selectionSquare.color = FlxColor.WHITE;
 
           var stepLength = noteSprite.noteData.getStepLength();
           selectionSquare.height = (stepLength <= 0) ? GRID_SIZE : ((stepLength + 1) * GRID_SIZE);
+        }
+        else if (doesNoteStack(noteSprite.noteData, currentOverlappingNotes))
+        {
+          // TODO: Maybe use another way to display these notes
+          var selectionSquare:ChartEditorSelectionSquareSprite = renderedSelectionSquares.recycle(buildSelectionSquare);
+
+          // Set the position and size (because we might be recycling one with bad values).
+          selectionSquare.noteData = noteSprite.noteData;
+          selectionSquare.eventData = null;
+          selectionSquare.x = noteSprite.x;
+          selectionSquare.y = noteSprite.y;
+          selectionSquare.width = selectionSquare.height = GRID_SIZE;
+          selectionSquare.color = FlxColor.RED;
         }
       }
 
       for (eventSprite in renderedEvents.members)
       {
+        if (eventSprite == null || eventSprite.eventData == null || !eventSprite.exists || !eventSprite.visible) continue;
+
         if (isEventSelected(eventSprite.eventData))
         {
           // Determine if the note is being dragged and offset the position accordingly.
@@ -3808,6 +4000,7 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
           selectionSquare.y = eventSprite.y;
           selectionSquare.width = eventSprite.width;
           selectionSquare.height = eventSprite.height;
+          selectionSquare.color = FlxColor.WHITE;
         }
 
         // Additional cleanup on notes.
@@ -3912,23 +4105,30 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
     }
 
     var funcJumpUp = (playheadOnly:Bool) -> {
-      var measureHeight:Float = GRID_SIZE * 4 * Conductor.instance.beatsPerMeasure;
-      var playheadPos:Float = scrollPositionInPixels + playheadPositionInPixels;
-      var targetScrollPosition:Float = Math.floor(playheadPos / measureHeight) * measureHeight;
-      // If we would move less than one grid, instead move to the top of the previous measure.
-      var targetScrollAmount = Math.abs(targetScrollPosition - playheadPos);
-      if (targetScrollAmount < GRID_SIZE)
+      var playheadPosition:Float = scrollPositionInMs + playheadPositionInMs;
+      var currentPositionMeasure:Float = Conductor.instance.currentMeasureTime;
+      var currentPositionMeasureFlooredInMs:Float = Conductor.instance.getMeasureTimeInMs(Math.floor(currentPositionMeasure));
+      var targetScrollPosition:Float = 0;
+      if (FlxMath.inBounds(playheadPosition, currentPositionMeasureFlooredInMs - 1,
+        currentPositionMeasureFlooredInMs + Conductor.instance.getTypeLengthAtMs(playheadPosition, "step")))
       {
-        targetScrollPosition -= GRID_SIZE * Constants.STEPS_PER_BEAT * Conductor.instance.beatsPerMeasure;
-      }
-
-      if (playheadOnly)
-      {
-        playheadAmount = targetScrollPosition - playheadPos;
+        targetScrollPosition = Conductor.instance.getMeasureTimeInMs(Math.floor(currentPositionMeasure - 1));
       }
       else
       {
-        scrollAmount = targetScrollPosition - playheadPos;
+        targetScrollPosition = currentPositionMeasureFlooredInMs;
+      }
+
+      targetScrollPosition = Conductor.instance.getTimeInSteps(targetScrollPosition) * GRID_SIZE;
+      playheadPosition = Conductor.instance.getTimeInSteps(playheadPosition) * GRID_SIZE;
+
+      if (playheadOnly)
+      {
+        playheadAmount = targetScrollPosition - playheadPosition;
+      }
+      else
+      {
+        scrollAmount = targetScrollPosition - playheadPosition;
       }
     }
 
@@ -3952,23 +4152,23 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
     }
 
     var funcJumpDown = (playheadOnly:Bool) -> {
-      var measureHeight:Float = GRID_SIZE * 4 * Conductor.instance.beatsPerMeasure;
-      var playheadPos:Float = scrollPositionInPixels + playheadPositionInPixels;
-      var targetScrollPosition:Float = Math.ceil(playheadPos / measureHeight) * measureHeight;
-      // If we would move less than one grid, instead move to the top of the next measure.
-      var targetScrollAmount = Math.abs(targetScrollPosition - playheadPos);
-      if (targetScrollAmount < GRID_SIZE)
-      {
-        targetScrollPosition += GRID_SIZE * Constants.STEPS_PER_BEAT * Conductor.instance.beatsPerMeasure;
-      }
+      var playheadPosition:Float = scrollPositionInMs + playheadPositionInMs;
+      var currentPositionMeasure:Float = Conductor.instance.currentMeasureTime;
+      var targetScrollPosition:Float = Conductor.instance.getMeasureTimeInMs(Math.floor(currentPositionMeasure + 1.0001));
+      // Now, why the hell is that .0001 there? It's to fix floating point bullshit that would result in "floor(measure + 1)" giving back
+      // the SAME MEASURE NUMBER that you can see in the Flixel F2 debugger.
+      // tldr: we wouldn't actually jump to the next measure.
+
+      targetScrollPosition = Conductor.instance.getTimeInSteps(targetScrollPosition) * GRID_SIZE;
+      playheadPosition = Conductor.instance.getTimeInSteps(playheadPosition) * GRID_SIZE;
 
       if (playheadOnly)
       {
-        playheadAmount = targetScrollPosition - playheadPos;
+        playheadAmount = targetScrollPosition - playheadPosition;
       }
       else
       {
-        scrollAmount = targetScrollPosition - playheadPos;
+        scrollAmount = targetScrollPosition - playheadPosition;
       }
     }
 
@@ -4132,13 +4332,26 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
         }
       }
 
+      if (FlxG.mouse.justPressedRight)
+      {
+        if (gridPlayhead != null && FlxG.mouse.overlaps(gridPlayhead) && !isCursorOverHaxeUI)
+        {
+          var currentTimeChangeIndex = currentSongMetadata.timeChanges.indexOf(Conductor.instance.currentTimeChange);
+          // Add a new time change at the grid playhead's position.
+          performCommand(new AddNewTimeChangeCommand(currentTimeChangeIndex, scrollPositionInMs + playheadPositionInMs));
+        }
+      }
+
+      // An odd way to fix this since measureTicks contains more than just the gray sidebar now.
+      var gridPlayheadScrollArea:FlxRect = FlxRect.weak(measureTicks?.x ?? -100, MENU_BAR_HEIGHT + GRID_TOP_PAD, GRID_SIZE, 597);
+
       if (FlxG.mouse.justPressed)
       {
         if (scrollAnchorScreenPos != null)
         {
           scrollAnchorScreenPos = null;
         }
-        else if (measureTicks != null && FlxG.mouse.overlaps(measureTicks) && !isCursorOverHaxeUI)
+        else if (measureTicks != null && gridPlayheadScrollArea.containsXY(FlxG.mouse.viewX, FlxG.mouse.viewY) && !isCursorOverHaxeUI)
         {
           gridPlayheadScrollAreaPressed = true;
         }
@@ -4382,7 +4595,7 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
               else if (highlightedHoldNote != null && highlightedHoldNote.noteData != null)
               {
                 // Control click to select/deselect an individual note.
-                if (isNoteSelected(highlightedNote.noteData))
+                if (isNoteSelected(highlightedHoldNote.noteData))
                 {
                   performCommand(new DeselectItemsCommand([highlightedHoldNote.noteData], []));
                 }
@@ -4677,7 +4890,7 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
               }
               else if (highlightedHoldNote != null && highlightedHoldNote.noteData != null)
               {
-                if (isNoteSelected(highlightedNote.noteData))
+                if (isNoteSelected(highlightedHoldNote.noteData))
                 {
                   performCommand(new DeselectItemsCommand([highlightedHoldNote.noteData], []));
                 }
@@ -5121,17 +5334,11 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
     playbarHeadLayout.y = FlxG.height - 48 - 8;
 
     var songPos:Float = Conductor.instance.songPosition + Conductor.instance.instrumentalOffset;
-    var songPosMilliseconds:String = Std.string(Math.floor(Math.abs(songPos) % 1000)).lpad('0', 2).substr(0, 2);
+    var songPosMilliseconds:String = Std.string(Math.floor(Math.abs(songPos) % 1000)).lpad('0', 3).substr(0, 2);
     var songPosSeconds:String = Std.string(Math.floor((Math.abs(songPos) / 1000) % 60)).lpad('0', 2);
     var songPosMinutes:String = Std.string(Math.floor((Math.abs(songPos) / 1000) / 60)).lpad('0', 2);
     if (songPos < 0) songPosMinutes = '-' + songPosMinutes;
     var songPosString:String = '${songPosMinutes}:${songPosSeconds}.${songPosMilliseconds}';
-
-    var roundedBeat = FlxMath.roundDecimal(Conductor.instance.currentBeatTime, 2);
-    var parts:Array<String> = Std.string(roundedBeat).split('.');
-    if (parts.length == 1) parts.push('00');
-    else if (parts[1].length < 2) parts[1] += '0';
-    songPosString += ' | Beat: ${parts.join('.')} | Step: ${Conductor.instance.currentStep}';
 
     if (playbarSongPos.value != songPosString) playbarSongPos.value = songPosString;
 
@@ -5142,9 +5349,12 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
 
     if (playbarSongRemaining.value != songRemainingString) playbarSongRemaining.value = songRemainingString;
 
+    playbarBeatNum.text = 'Beat: ${FlxStringUtil.formatMoney(Conductor.instance.currentBeatTime)}';
+    playbarStepNum.text = 'Step: ${Conductor.instance.currentStep}';
+
     playbarNoteSnap.text = '1/${noteSnapQuant}';
-    playbarDifficulty.text = '${selectedDifficulty.toTitleCase()}';
-    playbarBPM.text = 'BPM: ${(Conductor.instance.bpm ?? 0.0)}';
+    playbarDifficulty.text = '${selectedDifficulty.toTitleCase()}${selectedVariation == Constants.DEFAULT_VARIATION ? '' : ' (${selectedVariation.toTitleCase()})'}';
+    playbarBPM.text = 'BPM: ${(Conductor.instance.bpm ?? 0.0)} in ${Conductor.instance.timeSignatureNumerator}/${Conductor.instance.timeSignatureDenominator}';
   }
 
   function handlePlayhead():Void
@@ -5168,20 +5378,19 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
     // SHIFT + press or LEFT_SHOULDER + press to remove notes instead of placing them.
     var removeNoteInstead:Bool = FlxG.keys.pressed.SHIFT || (FlxG.gamepads.firstActive?.pressed?.LEFT_SHOULDER ?? false);
 
-    var playheadPos:Float = scrollPositionInPixels + playheadPositionInPixels;
-    var playheadPosFractionalStep:Float = playheadPos / GRID_SIZE / noteSnapRatio;
-    var playheadPosStep:Int = Std.int(Math.floor(playheadPosFractionalStep));
-    var playheadPosSnappedMs:Float = playheadPosStep * Conductor.instance.stepLengthMs * noteSnapRatio;
+    var playheadFractionalStep:Float = (scrollPositionInPixels + playheadPositionInPixels) / GRID_SIZE;
+    var playheadSnappedStep:Float = Math.floor(playheadFractionalStep / noteSnapRatio) * noteSnapRatio;
+    var playheadSnappedMs:Float = Conductor.instance.getStepTimeInMs(playheadSnappedStep);
 
     // Look for notes within 1 step of the playhead.
-    var notesAtPos:Array<SongNoteData> = SongDataUtils.getNotesInTimeRange(currentSongChartNoteData, playheadPosSnappedMs,
-      playheadPosSnappedMs + Conductor.instance.stepLengthMs * noteSnapRatio);
+    var notesAtPos:Array<SongNoteData> = SongDataUtils.getNotesInTimeRange(currentSongChartNoteData, playheadSnappedMs,
+      playheadSnappedMs + Conductor.instance.getTypeLengthAtMs(playheadSnappedMs, "step") * noteSnapRatio);
     notesAtPos = SongDataUtils.getNotesWithData(notesAtPos, [column]);
 
     if (notesAtPos.length == 0 && !removeNoteInstead)
     {
       trace('Placing note. ${column}');
-      var newNoteData:SongNoteData = new SongNoteData(playheadPosSnappedMs, column, 0, noteKindToPlace, ChartEditorState.cloneNoteParams(noteParamsToPlace));
+      var newNoteData:SongNoteData = new SongNoteData(playheadSnappedMs, column, 0, noteKindToPlace, ChartEditorState.cloneNoteParams(noteParamsToPlace));
       performCommand(new AddNotesCommand([newNoteData], pressingControl()));
       currentLiveInputPlaceNoteData[column] = newNoteData;
     }
@@ -5201,20 +5410,19 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
     // SHIFT + press or LEFT_SHOULDER + press to remove events instead of placing them.
     var removeEventInstead:Bool = FlxG.keys.pressed.SHIFT || (FlxG.gamepads.firstActive?.pressed?.LEFT_SHOULDER ?? false);
 
-    var playheadPos:Float = scrollPositionInPixels + playheadPositionInPixels;
-    var playheadPosFractionalStep:Float = playheadPos / GRID_SIZE / noteSnapRatio;
-    var playheadPosStep:Int = Std.int(Math.floor(playheadPosFractionalStep));
-    var playheadPosSnappedMs:Float = playheadPosStep * Conductor.instance.stepLengthMs * noteSnapRatio;
+    var playheadFractionalStep:Float = (scrollPositionInPixels + playheadPositionInPixels) / GRID_SIZE;
+    var playheadSnappedStep:Float = Math.floor(playheadFractionalStep / noteSnapRatio) * noteSnapRatio;
+    var playheadSnappedMs:Float = Conductor.instance.getStepTimeInMs(playheadSnappedStep);
 
     // Look for events within 1 step of the playhead.
-    var eventsAtPos:Array<SongEventData> = SongDataUtils.getEventsInTimeRange(currentSongChartEventData, playheadPosSnappedMs,
-      playheadPosSnappedMs + Conductor.instance.stepLengthMs * noteSnapRatio);
+    var eventsAtPos:Array<SongEventData> = SongDataUtils.getEventsInTimeRange(currentSongChartEventData, playheadSnappedMs,
+      playheadSnappedMs + Conductor.instance.getTypeLengthAtMs(playheadSnappedMs, "step") * noteSnapRatio);
     eventsAtPos = SongDataUtils.getEventsWithKind(eventsAtPos, ['FocusCamera']);
 
     if (eventsAtPos.length == 0 && !removeEventInstead)
     {
       trace('Placing event ${isOpponent}');
-      var newEventData:SongEventData = new SongEventData(playheadPosSnappedMs, 'FocusCamera',
+      var newEventData:SongEventData = new SongEventData(playheadSnappedMs, 'FocusCamera',
         {
           char: isOpponent ? 1 : 0,
         });
@@ -5279,12 +5487,11 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
         continue;
       }
 
-      var playheadPos:Float = scrollPositionInPixels + playheadPositionInPixels;
-      var playheadPosFractionalStep:Float = playheadPos / GRID_SIZE / noteSnapRatio;
-      var playheadPosStep:Int = Std.int(Math.floor(playheadPosFractionalStep));
-      var playheadPosSnappedMs:Float = playheadPosStep * Conductor.instance.stepLengthMs * noteSnapRatio;
+      var playheadFractionalStep:Float = (scrollPositionInPixels + playheadPositionInPixels) / GRID_SIZE;
+      var playheadSnappedStep:Float = Math.floor(playheadFractionalStep / noteSnapRatio) * noteSnapRatio;
+      var playheadSnappedMs:Float = Conductor.instance.getStepTimeInMs(playheadSnappedStep);
 
-      var newNoteLength:Float = playheadPosSnappedMs - ghostHold.noteData.time;
+      var newNoteLength:Float = playheadSnappedMs - ghostHold.noteData.time;
       trace('newNoteLength: ${newNoteLength}');
 
       if (newNoteLength > 0)
@@ -5321,12 +5528,11 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
   {
     if (currentLiveInputPlaceNoteData[column] == null) return;
 
-    var playheadPos:Float = scrollPositionInPixels + playheadPositionInPixels;
-    var playheadPosFractionalStep:Float = playheadPos / GRID_SIZE / noteSnapRatio;
-    var playheadPosStep:Int = Std.int(Math.floor(playheadPosFractionalStep));
-    var playheadPosSnappedMs:Float = playheadPosStep * Conductor.instance.stepLengthMs * noteSnapRatio;
+    var playheadFractionalStep:Float = (scrollPositionInPixels + playheadPositionInPixels) / GRID_SIZE;
+    var playheadSnappedStep:Float = Math.floor(playheadFractionalStep / noteSnapRatio) * noteSnapRatio;
+    var playheadSnappedMs:Float = Conductor.instance.getStepTimeInMs(playheadSnappedStep);
 
-    var newNoteLength:Float = playheadPosSnappedMs - currentLiveInputPlaceNoteData[column].time;
+    var newNoteLength:Float = playheadSnappedMs - currentLiveInputPlaceNoteData[column].time;
     trace('finishPlace newNoteLength: ${newNoteLength}');
 
     if (newNoteLength < Conductor.instance.stepLengthMs)
@@ -5385,7 +5591,7 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
       var xOffset = 45 - (healthIconBF.width / 2);
       healthIconBF.x = (gridTiledSprite == null) ? (0) : (GRID_X_POS + gridTiledSprite.width + xOffset);
       var yOffset = 30 - (healthIconBF.height / 2);
-      healthIconBF.y = (gridTiledSprite == null) ? (0) : (GRID_INITIAL_Y_POS - NOTE_SELECT_BUTTON_HEIGHT) + yOffset;
+      healthIconBF.y = (gridTiledSprite == null) ? (0) : (GRID_INITIAL_Y_POS - NOTE_SELECT_BUTTON_HEIGHT + 8) + yOffset;
     }
 
     // Visibly center the Dad health icon.
@@ -5394,7 +5600,7 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
       var xOffset = 75 + (healthIconDad.width / 2);
       healthIconDad.x = (gridTiledSprite == null) ? (0) : (GRID_X_POS - xOffset);
       var yOffset = 30 - (healthIconDad.height / 2);
-      healthIconDad.y = (gridTiledSprite == null) ? (0) : (GRID_INITIAL_Y_POS - NOTE_SELECT_BUTTON_HEIGHT) + yOffset;
+      healthIconDad.y = (gridTiledSprite == null) ? (0) : (GRID_INITIAL_Y_POS - NOTE_SELECT_BUTTON_HEIGHT + 8) + yOffset;
     }
   }
 
@@ -5515,18 +5721,36 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
 
     if (delete)
     {
-      // Delete selected items.
-      if (currentNoteSelection.length > 0 && currentEventSelection.length > 0)
+      var noteSelection = currentNoteSelection.length > 0;
+      var eventSelection = currentEventSelection.length > 0;
+
+      // Shift to delete stacked notes
+      if (FlxG.keys.pressed.SHIFT)
       {
-        performCommand(new RemoveItemsCommand(currentNoteSelection, currentEventSelection));
+        if (eventSelection && !noteSelection)
+        {
+          performCommand(new RemoveEventsCommand(currentEventSelection));
+        }
+        else
+        {
+          performCommand(new RemoveStackedNotesCommand(noteSelection ? currentNoteSelection : null));
+        }
       }
-      else if (currentNoteSelection.length > 0)
+      else
       {
-        performCommand(new RemoveNotesCommand(currentNoteSelection));
-      }
-      else if (currentEventSelection.length > 0)
-      {
-        performCommand(new RemoveEventsCommand(currentEventSelection));
+        // Delete selected items.
+        if (noteSelection && eventSelection)
+        {
+          performCommand(new RemoveItemsCommand(currentNoteSelection, currentEventSelection));
+        }
+        else if (noteSelection)
+        {
+          performCommand(new RemoveNotesCommand(currentNoteSelection));
+        }
+        else if (eventSelection)
+        {
+          performCommand(new RemoveEventsCommand(currentEventSelection));
+        }
       }
     }
 
@@ -5648,6 +5872,11 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
 
   function handleQuickWatch():Void
   {
+    FlxG.watch.addQuick('songLengthInMs', audioInstTrack?.length ?? 0.0);
+    FlxG.watch.addQuick('songLengthInSteps', Conductor.instance.getTimeInSteps(audioInstTrack?.length ?? 0.0));
+    FlxG.watch.addQuick('songLengthInPixels', songLengthInPixels);
+    FlxG.watch.addQuick('gridHeight', gridTiledSprite?.height ?? 0.0);
+
     FlxG.watch.addQuick('musicTime', audioInstTrack?.time ?? 0.0);
 
     FlxG.watch.addQuick('noteKindToPlace', noteKindToPlace);
@@ -5897,10 +6126,6 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
     {
       gridTiledSprite.height = songLengthInPixels;
     }
-    if (measureTicks != null)
-    {
-      measureTicks.setHeight(songLengthInPixels);
-    }
 
     // Remove any notes past the end of the song.
     var songCutoffPointSteps:Float = songLengthInSteps - 0.1;
@@ -5999,8 +6224,9 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
 
   function incrementDifficulty(change:Int):Void
   {
+    var variatedDifficulty:String = '$selectedDifficulty-$selectedVariation';
     var currentDifficultyIndex:Int = availableDifficulties.indexOf(selectedDifficulty);
-    var currentAllDifficultyIndex:Int = allDifficulties.indexOf(selectedDifficulty);
+    var currentAllDifficultyIndex:Int = allDifficulties.indexOf(variatedDifficulty);
 
     if (currentDifficultyIndex == -1 || currentAllDifficultyIndex == -1)
     {
@@ -6107,7 +6333,7 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
     {
       audioInstTrack.time = scrollPositionInMs + playheadPositionInMs - Conductor.instance.instrumentalOffset;
       // Update the songPosition in the Conductor.
-      Conductor.instance.update(audioInstTrack.time);
+      updateSongTime();
       audioVocalTrackGroup.time = audioInstTrack.time;
     }
 
@@ -6159,9 +6385,9 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
     fadeInWelcomeMusic(WELCOME_MUSIC_FADE_IN_DELAY, WELCOME_MUSIC_FADE_IN_DURATION);
 
     // Reapply the volume.
-    var instTargetVolume:Float = menubarItemVolumeInstrumental.value ?? 1.0;
-    var vocalPlayerTargetVolume:Float = menubarItemVolumeVocalsPlayer.value ?? 1.0;
-    var vocalOpponentTargetVolume:Float = menubarItemVolumeVocalsOpponent.value ?? 1.0;
+    var instTargetVolume:Float = menubarItemVolumeInstrumental.value / 100.0 ?? 1.0;
+    var vocalPlayerTargetVolume:Float = menubarItemVolumeVocalsPlayer.value / 100.0 ?? 1.0;
+    var vocalOpponentTargetVolume:Float = menubarItemVolumeVocalsOpponent.value / 100.0 ?? 1.0;
 
     if (audioInstTrack != null)
     {
@@ -6175,12 +6401,50 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
     }
   }
 
+  /**
+   * Updates the Conductor instance and checkes for time signature changes.
+   */
+  function updateSongTime():Void
+  {
+    var oldTimeSignatureNum:Int = Conductor.instance.timeSignatureNumerator;
+    var oldTimeSignatureDen:Int = Conductor.instance.timeSignatureDenominator;
+    Conductor.instance.update(audioInstTrack.time);
+    if (Conductor.instance.timeSignatureNumerator != oldTimeSignatureNum
+      || Conductor.instance.timeSignatureDenominator != oldTimeSignatureDen)
+    {
+      updateTimeSignature();
+    }
+  }
+
+  /**
+   * Updates the measure tick bitmap forcibly to make sure it's correct.
+   */
   function updateTimeSignature():Void
   {
-    // Redo the grid bitmap to be 4/4.
-    this.updateTheme();
+    this.updateMeasureTicks(true);
     gridTiledSprite.loadGraphic(gridBitmap);
-    measureTicks.reloadTickBitmap();
+  }
+
+  /**
+   * Handle positioning the measure ticks sprite.
+   */
+  function handleMeasureTickPosition():Void
+  {
+    this.updateMeasureTicks();
+    var currentMeasureTime = Conductor.instance.getMeasureTimeInMs(Math.floor(Conductor.instance.getTimeInMeasures(scrollPositionInMs)));
+    var currentMeasurePos = currentMeasureTime < 0 ? 0 : Conductor.instance.getTimeInSteps(currentMeasureTime) * GRID_SIZE;
+    measureTicks.y = gridTiledSprite?.y + currentMeasurePos;
+    // Make sure the measure tick bitmap does not past the grid itself.
+    var totalMeasureTicksHeight:Float = currentMeasurePos + measureTickBitmap.height;
+    if (totalMeasureTicksHeight >= songLengthInPixels)
+    {
+      var spillOver:Float = totalMeasureTicksHeight - songLengthInPixels;
+      measureTicks.setClipRect(new FlxRect(0, 0, measureTickBitmap.width, measureTickBitmap.height - spillOver));
+    }
+    else
+    {
+      measureTicks.setClipRect(null);
+    }
   }
 
   /**
@@ -6201,9 +6465,10 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
 
       // TODO: Only update the notes that have changed.
       notePreview.erase();
-      notePreview.addNotes(currentSongChartNoteData, Std.int(songLengthInMs));
-      notePreview.addSelectedNotes(currentNoteSelection, Std.int(songLengthInMs));
-      notePreview.addEvents(currentSongChartEventData, Std.int(songLengthInMs));
+      notePreview.addNotes(currentSongChartNoteData, songLengthInPixels);
+      notePreview.addOverlappingNotes(currentOverlappingNotes, songLengthInPixels);
+      notePreview.addSelectedNotes(currentNoteSelection, songLengthInPixels);
+      notePreview.addEvents(currentSongChartEventData, songLengthInPixels);
     }
 
     if (notePreviewViewportBoundsDirty)
@@ -6386,6 +6651,11 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
     return note != null && currentNoteSelection.indexOf(note) != -1;
   }
 
+  function doesNoteStack(note:Null<SongNoteData>, curStackedNotes:Array<SongNoteData>):Bool
+  {
+    return note != null && curStackedNotes.contains(note);
+  }
+
   override function destroy():Void
   {
     super.destroy();
@@ -6535,6 +6805,16 @@ typedef ChartEditorParams =
    * If non-null, load this song immediately instead of the welcome screen.
    */
   var ?targetSongId:String;
+
+  /**
+   * If non-null, load this difficulty immediately instead of the default difficulty.
+   */
+  var ?targetSongDifficulty:String;
+
+  /**
+   * If non-null, load this variation immediately instead of the default variation.
+   */
+  var ?targetSongVariation:String;
 };
 
 /**

@@ -286,7 +286,7 @@ class SongMenuItem extends FlxSpriteGroup
     var clipSize:Int = 290;
     var clipType:Int = 0;
 
-    if (ranking.visible)
+    if (ranking.visible || fakeRanking.visible)
     {
       favIconBlurred.x = this.x + 370;
       favIcon.x = favIconBlurred.x;
@@ -498,8 +498,6 @@ class SongMenuItem extends FlxSpriteGroup
       spr.visible = value;
     }
 
-    textAppear();
-
     updateSelected();
   }
 
@@ -666,7 +664,11 @@ class SongMenuItem extends FlxSpriteGroup
    */
   public function confirm():Void
   {
-    if (songText != null) songText.flickerText();
+    if (songText != null)
+    {
+      textAppear();
+      songText.flickerText();
+    }
     if (pixelIcon != null && pixelIcon.visible)
     {
       pixelIcon.animation.play('confirm');

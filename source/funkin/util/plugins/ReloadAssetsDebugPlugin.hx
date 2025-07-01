@@ -10,6 +10,7 @@ import funkin.play.PlayState;
  * A plugin which adds functionality to press `F5` to reload all game assets, then reload the current state.
  * This is useful for hot reloading assets during development.
  */
+@:nullSafety
 class ReloadAssetsDebugPlugin extends FlxBasic
 {
   public function new()
