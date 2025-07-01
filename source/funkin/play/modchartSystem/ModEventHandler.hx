@@ -93,33 +93,27 @@ class ModEventHandler
   }
 
   var songTime:Float = 0;
-  var timeBetweenBeats:Float = 0;
-  var timeBetweenBeats_ms:Float = 0;
-  var beatTime:Float = 0;
   var lastReportedSongTime:Float = 0.0;
-
+  var beatTime:Float = 0;
+  var lastReportedBeatTime:Float = 0.0;
   var backInTimeLeniency:Float = 250; // in Miliseconds. Done because V-Slice sometimes often tries to go backwards in time? (???)
 
   public function update(elapsed:Float):Void
   {
     songTime = Conductor.instance.songPosition;
-    timeBetweenBeats_ms = Conductor.instance.beatLengthMs;
-    timeBetweenBeats = timeBetweenBeats_ms / Constants.MS_PER_SEC;
     beatTime = Conductor.instance.currentBeatTime;
 
-    // we went, BACK IN TIME?!
     if (songTime + ((PlayState.instance?.isGamePaused ?? false) ? 0 : backInTimeLeniency) < lastReportedSongTime)
     {
       resetMods(); // Just reset everything and let the event handler put everything back.
       // trace("BACK IN TIME");
     }
 
-    var timeBetweenLastReport:Float = (songTime - lastReportedSongTime) / Constants.MS_PER_SEC; // Because the elapsed from flxg or the playstate doesn't account for lagspikes? okay, sure.
-    // trace("customElapsed: " + timeBetweenLastReport);
-    tweenManager.update(timeBetweenLastReport);
+    tweenManager.update(beatTime - lastReportedBeatTime);
     handleEvents();
 
     lastReportedSongTime = songTime;
+    lastReportedBeatTime = beatTime;
   }
 
   // Add a custom mod, make sure this is done BEFORE events are sorted!
@@ -589,15 +583,14 @@ class ModEventHandler
             continue;
           case "tween":
             // FunkinSound.playOnce(Paths.sound("pauseDisable"), 1.0);
-            tween = tweenMod(modEvent.target, modEvent.modName, modEvent.gotoValue, timeBetweenBeats * modEvent.timeInBeats, modEvent.easeToUse, "tween");
+            tween = tweenMod(modEvent.target, modEvent.modName, modEvent.gotoValue, modEvent.timeInBeats, modEvent.easeToUse, "tween");
 
           case "value":
-            tween = tweenMod(modEvent.target, modEvent.modName, modEvent.gotoValue, timeBetweenBeats * modEvent.timeInBeats, modEvent.easeToUse, "value",
-              modEvent.startValue);
+            tween = tweenMod(modEvent.target, modEvent.modName, modEvent.gotoValue, modEvent.timeInBeats, modEvent.easeToUse, "value", modEvent.startValue);
 
           case "add":
             // FunkinSound.playOnce(Paths.sound("pauseEnable"), 1.0);
-            tween = tweenAddMod(modEvent.target, modEvent.modName, modEvent.gotoValue, timeBetweenBeats * modEvent.timeInBeats, modEvent.easeToUse);
+            tween = tweenAddMod(modEvent.target, modEvent.modName, modEvent.gotoValue, modEvent.timeInBeats, modEvent.easeToUse);
           case "add_old":
             // FunkinSound.playOnce(Paths.sound("pauseEnable"), 1.0);
             var modToTween;
@@ -611,8 +604,7 @@ class ModEventHandler
               continue;
             }
 
-            tween = tweenMod(modEvent.target, modEvent.modName, modToTween.currentValue + modEvent.gotoValue, timeBetweenBeats * modEvent.timeInBeats,
-              modEvent.easeToUse, "add");
+            tween = tweenMod(modEvent.target, modEvent.modName, modToTween.currentValue + modEvent.gotoValue, modEvent.timeInBeats, modEvent.easeToUse, "add");
           case "func":
             if (modEvent.modName != null) modchartTweenCancel(modEvent.modName.toLowerCase());
             try
@@ -634,7 +626,7 @@ class ModEventHandler
             }
 
             var finishPoint:Float = modEvent.startValue + ((modEvent.gotoValue - modEvent.startValue) * modEvent.easeToUse(1.0));
-            tween = tweenManager.num(modEvent.startValue, modEvent.gotoValue, timeBetweenBeats * modEvent.timeInBeats,
+            tween = tweenManager.num(modEvent.startValue, modEvent.gotoValue, modEvent.timeInBeats,
               {
                 ease: modEvent.easeToUse,
                 onComplete: function(twn:FlxTween) {
@@ -659,9 +651,8 @@ class ModEventHandler
       // We add how many seconds have elapsed from the starting beat to move the tween to it's proper position!
       if (tween != null)
       {
-        var addAmount:Float = ((songTime - ModConstants.getTimeFromBeat(modEvent.startingBeat)) * 0.001);
         @:privateAccess
-        tween._secondsSinceStart += addAmount;
+        tween._secondsSinceStart += (beatTime - modEvent.startingBeat);
         @:privateAccess
         tween.update(0);
       }
