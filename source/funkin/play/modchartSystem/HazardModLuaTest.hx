@@ -151,7 +151,7 @@ class HazardModLuaTest
         for (songNote in PlayState.instance.currentChart.notes)
         {
           var strumTime:Float = songNote.time;
-          var noteBeat:Float = ModConstants.getTimeInBeats(strumTime);
+          var noteBeat:Float = Conductor.instance.getTimeInSteps(strumTime) / Constants.STEPS_PER_BEAT;
 
           // if outside of range, skip this note
           if (!(startBeat <= noteBeat && endBeat > noteBeat))
