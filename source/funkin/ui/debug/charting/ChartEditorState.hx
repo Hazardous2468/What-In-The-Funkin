@@ -3117,17 +3117,6 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
     };
     menuBarItemThemeDark.selected = currentTheme == ChartEditorTheme.Dark;
 
-    // QUANT
-    menuBarItemThemeLightQuant.onChange = function(event:UIEvent) {
-      if (event.target.value) currentTheme = ChartEditorTheme.LightQuant;
-    };
-    menuBarItemThemeLightQuant.selected = currentTheme == ChartEditorTheme.LightQuant;
-
-    menuBarItemThemeDarkQuant.onChange = function(event:UIEvent) {
-      if (event.target.value) currentTheme = ChartEditorTheme.DarkQuant;
-    };
-    menuBarItemThemeDarkQuant.selected = currentTheme == ChartEditorTheme.DarkQuant;
-
     menubarItemPlayPause.onClick = _ -> toggleAudioPlayback();
 
     menubarItemLoadInstrumental.onClick = _ -> {
@@ -4023,7 +4012,7 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
   function handleScrollKeybinds():Void
   {
     // Don't scroll when the user is interacting with the UI, unless a playbar button (the << >> ones) is pressed.
-    if ((isHaxeUIFocused || isHaxeUIDialogOpen) && playbarButtonPressed == null) return;
+    if ((isHaxeUIFocused || isCursorOverHaxeUI) && playbarButtonPressed == null) return;
 
     var scrollAmount:Float = 0; // Amount to scroll the grid.
     var playheadAmount:Float = 0; // Amount to scroll the playhead relative to the grid.
@@ -4787,15 +4776,12 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
 
               dragLengthCurrent = dragLengthSteps;
             }
-            // https://github.com/FunkinCrew/Funkin/pull/5026/commits/20551db224ca48bfcc856eff8b5649a67d94fd58
-            if (!gridGhostHoldNote.visible)
-            {
-              gridGhostHoldNote.visible = true;
-              gridGhostHoldNote.noteData = currentPlaceNoteData;
-              gridGhostHoldNote.noteDirection = currentPlaceNoteData.getDirection();
-              gridGhostHoldNote.noteStyle = NoteKindManager.getNoteStyleId(currentPlaceNoteData.kind, currentSongNoteStyle) ?? currentSongNoteStyle;
-            }
+
+            gridGhostHoldNote.visible = true;
+            gridGhostHoldNote.noteData = currentPlaceNoteData;
+            gridGhostHoldNote.noteDirection = currentPlaceNoteData.getDirection();
             gridGhostHoldNote.setHeightDirectly(dragLengthPixels, true);
+            gridGhostHoldNote.noteStyle = NoteKindManager.getNoteStyleId(currentPlaceNoteData.kind, currentSongNoteStyle) ?? currentSongNoteStyle;
             gridGhostHoldNote.updateHoldNotePosition(renderedHoldNotes);
           }
           else
