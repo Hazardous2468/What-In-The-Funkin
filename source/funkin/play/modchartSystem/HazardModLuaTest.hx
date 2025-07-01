@@ -293,12 +293,12 @@ class HazardModLuaTest
       return 'lerp(${ease1},${ease2})';
     });
 
-    Lua_helper.add_callback(lua, "tween", tweenFunc);
-    Lua_helper.add_callback(lua, "ease", tweenFunc);
+    Lua_helper.add_callback(lua, "tween", tweenFunc_parser);
+    Lua_helper.add_callback(lua, "ease", tweenFunc_parser);
     Lua_helper.add_callback(lua, "value", valueFunc);
-    Lua_helper.add_callback(lua, "setdefault", setDefaultFunc);
-    Lua_helper.add_callback(lua, "set", setFunc);
-    Lua_helper.add_callback(lua, "add", addFunc);
+    Lua_helper.add_callback(lua, "setdefault", setDefaultFunc_parser);
+    Lua_helper.add_callback(lua, "set", setFunc_parser);
+    Lua_helper.add_callback(lua, "add", addFunc_parser);
 
     Lua_helper.add_callback(lua, "setdefaults", function(data:String) {
       var input:String = StringTools.replace(data, "\n", "");
@@ -1232,6 +1232,199 @@ class HazardModLuaTest
 
       PlayState.instance.modchartEventHandler.valueTweenModEvent(modsTarget, startBeat, lengthInBeats, ModConstants.getEaseFromString(easeToUse),
         startingValue, endingValue, modName);
+    }
+  }
+
+  function formater_targets(targets_raw:Dynamic):Array<String>
+  {
+    var targets:Array<String> = [];
+    if (Std.isOfType(targets_raw, Array))
+    {
+      var targetsArray:Array<String> = cast targets_raw;
+      for (i in targetsArray)
+      {
+        targets.push(i);
+      }
+    }
+    else
+    {
+      targets = [(targets_raw ?? "all")];
+    }
+    return targets;
+  }
+
+  function setDefaultFunc_parser(modValue:Dynamic, modName:Dynamic, _playerTarget:Dynamic = "all"):Void
+  {
+    var targets_raw:Dynamic = _playerTarget;
+
+    var modArray:Bool = false;
+    if (Std.isOfType(modValue, Array))
+    {
+      // modName becomes playerTarget and _playerTarget is unused.
+      modArray = true;
+      targets_raw = modName;
+    }
+
+    var targets:Array<String> = formater_targets(targets_raw);
+
+    var modValues:Array<Float> = [];
+    var modNames:Array<String> = [];
+    if (!modArray)
+    {
+      modValues = [modValue];
+      modNames = [modName];
+    }
+    else
+    {
+      var isName:Bool = false;
+      var modsInputArray:Array<String> = cast modValue;
+      for (i in modsInputArray)
+      {
+        if (isName) modNames.push(i);
+        else
+          modValues.push(Std.parseFloat(i));
+        isName = !isName;
+      }
+    }
+
+    for (t in targets)
+    {
+      for (i in 0...modNames.length)
+      {
+        setDefaultFunc(modValues[i], modNames[i], t);
+      }
+    }
+  }
+
+  function setFunc_parser(startBeat:Float, modValue:Dynamic, modName:Dynamic, _playerTarget:Dynamic = "all"):Void
+  {
+    var targets_raw:Dynamic = _playerTarget;
+
+    var modArray:Bool = false;
+    if (Std.isOfType(modValue, Array))
+    {
+      // modName becomes playerTarget and _playerTarget is unused.
+      modArray = true;
+      targets_raw = modName;
+    }
+
+    var targets:Array<String> = formater_targets(targets_raw);
+
+    var modValues:Array<Float> = [];
+    var modNames:Array<String> = [];
+    if (!modArray)
+    {
+      modValues = [modValue];
+      modNames = [modName];
+    }
+    else
+    {
+      var isName:Bool = false;
+      var modsInputArray:Array<String> = cast modValue;
+      for (i in modsInputArray)
+      {
+        if (isName) modNames.push(i);
+        else
+          modValues.push(Std.parseFloat(i));
+        isName = !isName;
+      }
+    }
+
+    for (t in targets)
+    {
+      for (i in 0...modNames.length)
+      {
+        setFunc(startBeat, modValues[i], modNames[i], t);
+      }
+    }
+  }
+
+  function addFunc_parser(startBeat:Float, lengthInBeats:Float, easeToUse:String, modValue:Dynamic, modName:Dynamic, _playerTarget:Dynamic = "all"):Void
+  {
+    var targets_raw:Dynamic = _playerTarget;
+
+    var modArray:Bool = false;
+    if (Std.isOfType(modValue, Array))
+    {
+      // modName becomes playerTarget and _playerTarget is unused.
+      modArray = true;
+      targets_raw = modName;
+    }
+
+    var targets:Array<String> = formater_targets(targets_raw);
+
+    var modValues:Array<Float> = [];
+    var modNames:Array<String> = [];
+    if (!modArray)
+    {
+      modValues = [modValue];
+      modNames = [modName];
+    }
+    else
+    {
+      var isName:Bool = false;
+      var modsInputArray:Array<String> = cast modValue;
+      for (i in modsInputArray)
+      {
+        if (isName) modNames.push(i);
+        else
+          modValues.push(Std.parseFloat(i));
+        isName = !isName;
+      }
+    }
+
+    for (t in targets)
+    {
+      for (i in 0...modNames.length)
+      {
+        addFunc(startBeat, lengthInBeats, easeToUse, modValues[i], modNames[i], t);
+      }
+    }
+  }
+
+  // could be
+  // tween(0, 4, "linear", 1, "beat", "3")
+  // tween(0, 4, "linear", {1, "beat", 1, "drunk"}, {3,1})
+  // Work In Progress replacement to allow users to input multiple mod values into the same function without needing to convert it all to a string like for tweens func
+  function tweenFunc_parser(startBeat:Float, lengthInBeats:Float, easeToUse:String, modValue:Dynamic, modName:Dynamic, _playerTarget:Dynamic = "all"):Void
+  {
+    var targets_raw:Dynamic = _playerTarget;
+    var modArray:Bool = false;
+    if (Std.isOfType(modValue, Array))
+    {
+      // modName becomes playerTarget and _playerTarget is unused.
+      modArray = true;
+      targets_raw = modName;
+    }
+
+    var targets:Array<String> = formater_targets(targets_raw);
+
+    var modValues:Array<Float> = [];
+    var modNames:Array<String> = [];
+    if (!modArray)
+    {
+      modValues = [modValue];
+      modNames = [modName];
+    }
+    else
+    {
+      var isName:Bool = false;
+      var modsInputArray:Array<String> = cast modValue;
+      for (i in modsInputArray)
+      {
+        if (isName) modNames.push(i);
+        else
+          modValues.push(Std.parseFloat(i));
+        isName = !isName;
+      }
+    }
+
+    for (t in targets)
+    {
+      for (i in 0...modNames.length)
+      {
+        tweenFunc(startBeat, lengthInBeats, easeToUse, modValues[i], modNames[i], t);
+      }
     }
   }
 
