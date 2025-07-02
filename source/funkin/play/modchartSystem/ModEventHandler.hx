@@ -96,7 +96,7 @@ class ModEventHandler
   var lastReportedSongTime:Float = 0;
   var beatTime:Float = 0;
   var lastReportedbeatTime:Float = 0;
-  var backInTimeLeniency:Float = 250; // in Miliseconds. Done because V-Slice sometimes often tries to go backwards in time? (???)
+  var backInTimeLeniency:Float = 150; // in Miliseconds. Done because V-Slice sometimes often tries to go backwards in time? (???)
 
   public function update(elapsed:Float):Void
   {
@@ -106,12 +106,12 @@ class ModEventHandler
     // we went, BACK IN TIME?!
     if (songTime + ((PlayState.instance?.isGamePaused ?? false) ? 0 : backInTimeLeniency) < lastReportedSongTime)
     {
+      lastReportedbeatTime = beatTime;
       resetMods(); // Just reset everything and let the event handler put everything back.
       // trace("BACK IN TIME");
     }
-
-    tweenManager.update((beatTime - lastReportedbeatTime));
     handleEvents();
+    tweenManager.update((beatTime - lastReportedbeatTime));
 
     lastReportedSongTime = songTime;
     lastReportedbeatTime = beatTime;

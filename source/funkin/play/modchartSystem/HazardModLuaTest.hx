@@ -300,6 +300,11 @@ class HazardModLuaTest
     Lua_helper.add_callback(lua, "set", setFunc_parser);
     Lua_helper.add_callback(lua, "add", addFunc_parser);
 
+    Lua_helper.add_callback(lua, "test_test", function(arg1:Any, arg2:Any):Void {
+      var text:String = Std.string(arg1);
+      PlayState.instance.modDebugNotif(text);
+    });
+
     Lua_helper.add_callback(lua, "setdefaults", function(data:String) {
       var input:String = StringTools.replace(data, "\n", "");
       input = StringTools.replace(input, " ", "");
@@ -1235,27 +1240,33 @@ class HazardModLuaTest
     }
   }
 
-  function formater_targets(targets_raw:Dynamic):Array<String>
+  function formaterTargets(targetsRaw:Any):Array<String>
   {
     var targets:Array<String> = [];
-    if (Std.isOfType(targets_raw, Array))
+
+    if (Std.isOfType(targetsRaw, Array))
     {
-      var targetsArray:Array<String> = cast targets_raw;
+      var targetsArray:Array<String> = cast targetsRaw;
       for (i in targetsArray)
       {
         targets.push(i);
       }
+      // trace("1: " + targets);
     }
     else
     {
-      targets = [(targets_raw ?? "all")];
+      if (targetsRaw == null) targetsRaw = "all";
+
+      targets = [Std.string(targetsRaw)];
+      // trace("2: " + targets);
+      // throw('"formater_targets" function failed! ' + targetsRaw);
     }
     return targets;
   }
 
-  function setDefaultFunc_parser(modValue:Dynamic, modName:Dynamic, _playerTarget:Dynamic = "all"):Void
+  function setDefaultFunc_parser(modValue:Any, modName:Any, _playerTarget:Any = "all"):Void
   {
-    var targets_raw:Dynamic = _playerTarget;
+    var targets_raw:Any = _playerTarget;
 
     var modArray:Bool = false;
     if (Std.isOfType(modValue, Array))
@@ -1265,7 +1276,8 @@ class HazardModLuaTest
       targets_raw = modName;
     }
 
-    var targets:Array<String> = formater_targets(targets_raw);
+    var targets:Array<String> = formaterTargets(targets_raw);
+    trace("3: " + targets);
 
     var modValues:Array<Float> = [];
     var modNames:Array<String> = [];
@@ -1296,9 +1308,9 @@ class HazardModLuaTest
     }
   }
 
-  function setFunc_parser(startBeat:Float, modValue:Dynamic, modName:Dynamic, _playerTarget:Dynamic = "all"):Void
+  function setFunc_parser(startBeat:Float, modValue:Any, modName:Any, _playerTarget:Any = "all"):Void
   {
-    var targets_raw:Dynamic = _playerTarget;
+    var targets_raw:Any = _playerTarget;
 
     var modArray:Bool = false;
     if (Std.isOfType(modValue, Array))
@@ -1308,7 +1320,7 @@ class HazardModLuaTest
       targets_raw = modName;
     }
 
-    var targets:Array<String> = formater_targets(targets_raw);
+    var targets:Array<String> = formaterTargets(targets_raw);
 
     var modValues:Array<Float> = [];
     var modNames:Array<String> = [];
@@ -1339,31 +1351,20 @@ class HazardModLuaTest
     }
   }
 
-  function addFunc_parser(startBeat:Float, lengthInBeats:Float, easeToUse:String, modValue:Dynamic, modName:Dynamic, _playerTarget:Dynamic = "all"):Void
+  function addFunc_parser(startBeat:Float, lengthInBeats:Float, easeToUse:String, modStuff:Any, nameStuff:Any, _playerTarget:Any = "all"):Void
   {
-    var targets_raw:Dynamic = _playerTarget;
-
     var modArray:Bool = false;
-    if (Std.isOfType(modValue, Array))
+    var targets:Array<String>;
+    var modValues:Array<Float> = [];
+    var modNames:Array<String> = [];
+    if (Std.isOfType(modStuff, Array))
     {
       // modName becomes playerTarget and _playerTarget is unused.
       modArray = true;
-      targets_raw = modName;
-    }
+      targets = formaterTargets(nameStuff);
 
-    var targets:Array<String> = formater_targets(targets_raw);
-
-    var modValues:Array<Float> = [];
-    var modNames:Array<String> = [];
-    if (!modArray)
-    {
-      modValues = [modValue];
-      modNames = [modName];
-    }
-    else
-    {
       var isName:Bool = false;
-      var modsInputArray:Array<String> = cast modValue;
+      var modsInputArray:Array<String> = cast modStuff;
       for (i in modsInputArray)
       {
         if (isName) modNames.push(i);
@@ -1371,12 +1372,22 @@ class HazardModLuaTest
           modValues.push(Std.parseFloat(i));
         isName = !isName;
       }
+
+      trace(modsInputArray);
+    }
+    else
+    {
+      targets = formaterTargets(_playerTarget);
+      modValues = [modStuff];
+      modNames = [nameStuff];
     }
 
     for (t in targets)
     {
+      trace(t);
       for (i in 0...modNames.length)
       {
+        trace(modValues[i] + " - " + modNames[i]);
         addFunc(startBeat, lengthInBeats, easeToUse, modValues[i], modNames[i], t);
       }
     }
@@ -1386,9 +1397,9 @@ class HazardModLuaTest
   // tween(0, 4, "linear", 1, "beat", "3")
   // tween(0, 4, "linear", {1, "beat", 1, "drunk"}, {3,1})
   // Work In Progress replacement to allow users to input multiple mod values into the same function without needing to convert it all to a string like for tweens func
-  function tweenFunc_parser(startBeat:Float, lengthInBeats:Float, easeToUse:String, modValue:Dynamic, modName:Dynamic, _playerTarget:Dynamic = "all"):Void
+  function tweenFunc_parser(startBeat:Float, lengthInBeats:Float, easeToUse:String, modValue:Any, modName:Any, _playerTarget:Any = "all"):Void
   {
-    var targets_raw:Dynamic = _playerTarget;
+    var targets_raw:Any = _playerTarget;
     var modArray:Bool = false;
     if (Std.isOfType(modValue, Array))
     {
@@ -1397,7 +1408,7 @@ class HazardModLuaTest
       targets_raw = modName;
     }
 
-    var targets:Array<String> = formater_targets(targets_raw);
+    var targets:Array<String> = formaterTargets(targets_raw);
 
     var modValues:Array<Float> = [];
     var modNames:Array<String> = [];
