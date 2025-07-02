@@ -96,7 +96,7 @@ class ModEventHandler
   var lastReportedSongTime:Float = 0.0;
   var beatTime:Float = 0;
   var lastReportedBeatTime:Float = 0.0;
-  var backInTimeLeniency:Float = 250; // in Miliseconds. Done because V-Slice sometimes often tries to go backwards in time? (???)
+  var backInTimeLeniency:Float = 150; // in Miliseconds. Done because V-Slice sometimes often tries to go backwards in time? (???)
 
   public function update(elapsed:Float):Void
   {
@@ -109,8 +109,8 @@ class ModEventHandler
       // trace("BACK IN TIME");
     }
 
-    tweenManager.update(beatTime - lastReportedBeatTime);
     handleEvents();
+    tweenManager.update(beatTime - lastReportedBeatTime);
 
     lastReportedSongTime = songTime;
     lastReportedBeatTime = beatTime;

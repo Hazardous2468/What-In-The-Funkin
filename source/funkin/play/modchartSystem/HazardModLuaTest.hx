@@ -1235,12 +1235,12 @@ class HazardModLuaTest
     }
   }
 
-  function formater_targets(targets_raw:Dynamic):Array<String>
+  function formaterTargets(targetsRaw:Any):Array<String>
   {
     var targets:Array<String> = [];
-    if (Std.isOfType(targets_raw, Array))
+    if (Std.isOfType(targetsRaw, Array))
     {
-      var targetsArray:Array<String> = cast targets_raw;
+      var targetsArray:Array<String> = cast targetsRaw;
       for (i in targetsArray)
       {
         targets.push(i);
@@ -1248,14 +1248,14 @@ class HazardModLuaTest
     }
     else
     {
-      targets = [(targets_raw ?? "all")];
+      targets = [(targetsRaw ?? "all")];
     }
     return targets;
   }
 
-  function setDefaultFunc_parser(modValue:Dynamic, modName:Dynamic, _playerTarget:Dynamic = "all"):Void
+  function setDefaultFunc_parser(modValue:Any, modName:Any, _playerTarget:Any = "all"):Void
   {
-    var targets_raw:Dynamic = _playerTarget;
+    var targets_raw:Any = _playerTarget;
 
     var modArray:Bool = false;
     if (Std.isOfType(modValue, Array))
@@ -1265,7 +1265,7 @@ class HazardModLuaTest
       targets_raw = modName;
     }
 
-    var targets:Array<String> = formater_targets(targets_raw);
+    var targets:Array<String> = formaterTargets(targets_raw);
 
     var modValues:Array<Float> = [];
     var modNames:Array<String> = [];
@@ -1296,9 +1296,9 @@ class HazardModLuaTest
     }
   }
 
-  function setFunc_parser(startBeat:Float, modValue:Dynamic, modName:Dynamic, _playerTarget:Dynamic = "all"):Void
+  function setFunc_parser(startBeat:Float, modValue:Any, modName:Any, _playerTarget:Any = "all"):Void
   {
-    var targets_raw:Dynamic = _playerTarget;
+    var targets_raw:Any = _playerTarget;
 
     var modArray:Bool = false;
     if (Std.isOfType(modValue, Array))
@@ -1308,7 +1308,7 @@ class HazardModLuaTest
       targets_raw = modName;
     }
 
-    var targets:Array<String> = formater_targets(targets_raw);
+    var targets:Array<String> = formaterTargets(targets_raw);
 
     var modValues:Array<Float> = [];
     var modNames:Array<String> = [];
@@ -1339,9 +1339,9 @@ class HazardModLuaTest
     }
   }
 
-  function addFunc_parser(startBeat:Float, lengthInBeats:Float, easeToUse:String, modValue:Dynamic, modName:Dynamic, _playerTarget:Dynamic = "all"):Void
+  function addFunc_parser(startBeat:Float, lengthInBeats:Float, easeToUse:String, modValue:Any, modName:Any, _playerTarget:Any = "all"):Void
   {
-    var targets_raw:Dynamic = _playerTarget;
+    var targets_raw:Any = _playerTarget;
 
     var modArray:Bool = false;
     if (Std.isOfType(modValue, Array))
@@ -1351,7 +1351,7 @@ class HazardModLuaTest
       targets_raw = modName;
     }
 
-    var targets:Array<String> = formater_targets(targets_raw);
+    var targets:Array<String> = formaterTargets(targets_raw);
 
     var modValues:Array<Float> = [];
     var modNames:Array<String> = [];
@@ -1386,9 +1386,9 @@ class HazardModLuaTest
   // tween(0, 4, "linear", 1, "beat", "3")
   // tween(0, 4, "linear", {1, "beat", 1, "drunk"}, {3,1})
   // Work In Progress replacement to allow users to input multiple mod values into the same function without needing to convert it all to a string like for tweens func
-  function tweenFunc_parser(startBeat:Float, lengthInBeats:Float, easeToUse:String, modValue:Dynamic, modName:Dynamic, _playerTarget:Dynamic = "all"):Void
+  function tweenFunc_parser(startBeat:Float, lengthInBeats:Float, easeToUse:String, modValue:Any, modName:Any, _playerTarget:Any = "all"):Void
   {
-    var targets_raw:Dynamic = _playerTarget;
+    var targets_raw:Any = _playerTarget;
     var modArray:Bool = false;
     if (Std.isOfType(modValue, Array))
     {
@@ -1397,7 +1397,7 @@ class HazardModLuaTest
       targets_raw = modName;
     }
 
-    var targets:Array<String> = formater_targets(targets_raw);
+    var targets:Array<String> = formaterTargets(targets_raw);
 
     var modValues:Array<Float> = [];
     var modNames:Array<String> = [];
