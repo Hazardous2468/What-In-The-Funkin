@@ -82,7 +82,7 @@ class ModConstants
 {
   public static var orientTimeOffset:Float = 4.0; // in ms
 
-  public static final MODCHART_VERSION:String = "v0.9.1a";
+  public static final MODCHART_VERSION:String = "EXPERIMENTAL";
 
   public static var defaultHoldGrain = 75;
   public static var defaultPathGrain = defaultHoldGrain;

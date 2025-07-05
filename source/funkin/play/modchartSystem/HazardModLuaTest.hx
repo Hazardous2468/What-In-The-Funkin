@@ -293,6 +293,9 @@ class HazardModLuaTest
       return 'lerp(${ease1},${ease2})';
     });
 
+    Lua_helper.add_callback(lua, "reset", resetFunc_parser);
+    Lua_helper.add_callback(lua, "resort", resortFunc_parser);
+
     Lua_helper.add_callback(lua, "tween", tweenFunc_parser);
     Lua_helper.add_callback(lua, "ease", tweenFunc_parser);
     Lua_helper.add_callback(lua, "value", valueFunc);
@@ -595,37 +598,6 @@ class HazardModLuaTest
             valueFunc(startBeat, length, e, msv, mev, mn, t);
           }
         }
-      }
-    });
-
-    Lua_helper.add_callback(lua, "reset", function(startBeat:Float, playerTarget:String = "all") {
-      if (playerTarget == "everyone" || playerTarget == "both" || playerTarget == "all")
-      {
-        for (strummer in PlayState.instance.allStrumLines)
-        {
-          if (!allTargetExlusions.contains(strummer)) PlayState.instance.modchartEventHandler.resetModEvent(strummer.mods, startBeat);
-        }
-      }
-      else
-      {
-        var modsTarget = ModConstants.grabStrumModTarget(playerTarget);
-        PlayState.instance.modchartEventHandler.resetModEvent(modsTarget, startBeat);
-      }
-    });
-
-    Lua_helper.add_callback(lua, "resort", function(startBeat:Float, playerTarget:String = "all") {
-      PlayState.instance.modchartEventHandler.modChartHasResort = true;
-      if (playerTarget == "everyone" || playerTarget == "both" || playerTarget == "all")
-      {
-        for (strummer in PlayState.instance.allStrumLines)
-        {
-          if (!allTargetExlusions.contains(strummer)) PlayState.instance.modchartEventHandler.resortModEvent(strummer.mods, startBeat);
-        }
-      }
-      else
-      {
-        var modsTarget = ModConstants.grabStrumModTarget(playerTarget);
-        PlayState.instance.modchartEventHandler.resortModEvent(modsTarget, startBeat);
       }
     });
 
@@ -1389,6 +1361,55 @@ class HazardModLuaTest
       {
         trace(modValues[i] + " - " + modNames[i]);
         addFunc(startBeat, lengthInBeats, easeToUse, modValues[i], modNames[i], t);
+      }
+    }
+  }
+
+  function resortFunc_parser(startBeat:Float, players:Any = "all"):Void
+  {
+    var targets:Array<String> = formaterTargets(players);
+    for (t in targets)
+    {
+      resetOrResortFunc(startBeat, t, "resort");
+    }
+  }
+
+  function resetFunc_parser(startBeat:Float, players:Any = "all"):Void
+  {
+    var targets:Array<String> = formaterTargets(players);
+    for (t in targets)
+    {
+      resetOrResortFunc(startBeat, t, "reset");
+    }
+  }
+
+  function resetOrResortFunc(startBeat, playerTarget:String, type:String = "reset"):Void
+  {
+    if (playerTarget == "everyone" || playerTarget == "both" || playerTarget == "all")
+    {
+      for (strummer in PlayState.instance.allStrumLines)
+      {
+        if (!allTargetExlusions.contains(strummer))
+        {
+          switch (type)
+          {
+            case "resort":
+              PlayState.instance.modchartEventHandler.resortModEvent(strummer.mods, startBeat);
+            case "reset":
+              PlayState.instance.modchartEventHandler.resetModEvent(strummer.mods, startBeat);
+          }
+        }
+      }
+    }
+    else
+    {
+      var modsTarget = ModConstants.grabStrumModTarget(playerTarget);
+      switch (type)
+      {
+        case "resort":
+          PlayState.instance.modchartEventHandler.resortModEvent(modsTarget, startBeat);
+        case "reset":
+          PlayState.instance.modchartEventHandler.resetModEvent(modsTarget, startBeat);
       }
     }
   }

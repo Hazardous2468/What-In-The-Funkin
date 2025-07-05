@@ -38,6 +38,11 @@ NoteSplashes and HoldCovers now copy the strum scale. This behaviour can be disa
 
 Separated the modified HSV shader from the original so any mods that may use the base game HSV shader won't be incorrect.
 
+All tweens are now handled by beat Position instead of seconds (now fully synced to BPM changes)
+
+You can now use {} for lua functions. Should make eases, sets, etc obsolete
+for example, you can now do add(4, 4, "linear", {1, "drunk", 1, "tipsy"}, {3,4})
+
 
 
 
