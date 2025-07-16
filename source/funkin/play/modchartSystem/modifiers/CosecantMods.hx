@@ -25,7 +25,7 @@ class CosecantModifierBase extends Modifier
   {
     super(name, 0);
 
-    speed = createSubMod("speed", 1.0);
+    speed = createSubMod("speed", 1.0, ["frequency"]);
     mult = createSubMod("mult", 1.0, ["period", "size"]);
     desync = createSubMod("desync", 0.2, ["spacing"]);
     time_add = createSubMod("time_add", 0.0, ["offset", "timeadd", "time_offset", "timeoffset"]);

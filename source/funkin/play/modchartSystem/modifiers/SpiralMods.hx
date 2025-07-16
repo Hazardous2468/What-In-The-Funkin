@@ -10,6 +10,7 @@ class SpiralModBase extends Modifier
   var useCosSubmod:ModifierSubValue;
   var multSubmod:ModifierSubValue;
   var offsetSubmod:ModifierSubValue;
+  var altCurposSubmod:ModifierSubValue;
 
   public function new(name:String, isCos:Bool = false)
   {
@@ -20,6 +21,7 @@ class SpiralModBase extends Modifier
     holdsMod = true;
     pathMod = true;
 
+    altCurposSubmod = createSubMod("altcurpos", 0.0, ["use_unscaled", "alt_curpos", "type"]);
     offsetSubmod = createSubMod("offset", 0.0);
     multSubmod = createSubMod("mult", 0.05, ["period", "size"]);
     if (!forceUseCos) useCosSubmod = createSubMod("cos", 0.0);
@@ -41,6 +43,13 @@ class SpiralModBase extends Modifier
     }
   }
 
+  var useUnscaledCurpos(get, never):Bool;
+
+  function get_useUnscaledCurpos():Bool
+  {
+    return altCurposSubmod.value >= 0.5;
+  }
+
   function getMult():Float
   {
     return multSubmod?.value ?? 0.05;
@@ -50,24 +59,30 @@ class SpiralModBase extends Modifier
   {
     return offsetSubmod?.value ?? 0.0;
   }
+
+  function spiralMath(curPos:Float):Float
+  {
+    curPos = curPos * (Preferences.downscroll ? -1 : 1);
+    curPos *= -0.1;
+    var curposWithOffset:Float = curPos - getOffset();
+
+    if (useCos)
+    {
+      return (cos(curposWithOffset * Math.PI * getMult()) * curPos * curPos) * currentValue / 100;
+    }
+    else
+    {
+      return (sin(curposWithOffset * Math.PI * getMult()) * curPos * curPos) * currentValue / 100;
+    }
+  }
 }
 
 class SpiralXMod extends SpiralModBase
 {
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
-    var curPos2:Float = data.curPos_unscaled * (Preferences.downscroll ? -1 : 1);
-    var curPos_:Float = curPos2 * -0.1;
-    curPos_ += getOffset();
-    if (useCos)
-    {
-      data.x += (cos(curPos_ * Math.PI * getMult()) * curPos_ * curPos_) * currentValue / 100;
-    }
-    else
-    {
-      data.x += (sin(curPos_ * Math.PI * getMult()) * curPos_ * curPos_) * currentValue / 100;
-    }
+    if (currentValue == 0) return;
+    data.x += spiralMath((useUnscaledCurpos ? data.curPos_unscaled : data.curPos));
   }
 }
 
@@ -75,19 +90,8 @@ class SpiralYMod extends SpiralModBase
 {
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
-    var curPos2:Float = data.curPos_unscaled * (Preferences.downscroll ? -1 : 1);
-    var curPos_:Float = curPos2 * -0.1;
-    curPos_ += getOffset();
-    var curVal:Float = currentValue * (Preferences.downscroll ? 1 : -1) / 100;
-    if (useCos)
-    {
-      data.y += (cos(curPos_ * Math.PI * getMult()) * curPos_ * curPos_) * curVal;
-    }
-    else
-    {
-      data.y += (sin(curPos_ * Math.PI * getMult()) * curPos_ * curPos_) * curVal;
-    }
+    if (currentValue == 0) return;
+    data.y -= spiralMath((useUnscaledCurpos ? data.curPos_unscaled : data.curPos) * (Preferences.downscroll ? -1 : 1));
   }
 }
 
@@ -95,79 +99,49 @@ class SpiralZMod extends SpiralModBase
 {
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
-    var curPos2:Float = data.curPos_unscaled * (Preferences.downscroll ? -1 : 1);
-    var curPos_:Float = curPos2 * -0.1;
-    curPos_ += getOffset();
-    if (useCos)
-    {
-      data.z += (cos(curPos_ * Math.PI * getMult()) * curPos_ * curPos_) * currentValue / 100;
-    }
-    else
-    {
-      data.z += (sin(curPos_ * Math.PI * getMult()) * curPos_ * curPos_) * currentValue / 100;
-    }
+    if (currentValue == 0) return;
+    data.z += spiralMath((useUnscaledCurpos ? data.curPos_unscaled : data.curPos));
   }
 }
 
 class SpiralAngleZMod extends SpiralModBase
 {
-  public function new(name:String)
+  public function new(name:String, isCos:Bool = false)
   {
-    super(name);
+    super(name, isCos);
     holdsMod = false;
     pathMod = false;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
-    var curPos2:Float = data.curPos_unscaled * (Preferences.downscroll ? -1 : 1);
-    var curPos_:Float = curPos2 * -0.1;
-    curPos_ += getOffset();
-    if (useCos)
-    {
-      data.angleZ += (cos(curPos_ * Math.PI * getMult()) * curPos_ * curPos_) * currentValue / 100;
-    }
-    else
-    {
-      data.angleZ += (sin(curPos_ * Math.PI * getMult()) * curPos_ * curPos_) * currentValue / 100;
-    }
+    if (currentValue == 0) return;
+    data.angleZ += spiralMath((useUnscaledCurpos ? data.curPos_unscaled : data.curPos));
   }
 }
 
 class SpiralScaleMod extends SpiralModBase
 {
-  public function new(name:String)
+  public function new(name:String, isCos:Bool = false)
   {
-    super(name);
+    super(name, isCos);
     pathMod = false;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
-    var curPos2:Float = data.curPos_unscaled * (Preferences.downscroll ? -1 : 1);
-    var curPos_:Float = curPos2 * -0.1;
-    curPos_ += getOffset();
-    if (useCos)
-    {
-      data.scaleX += (cos(curPos_ * Math.PI * getMult()) * curPos_ * curPos_) * currentValue / 100 * 0.01;
-      data.scaleY += (sin(curPos_ * Math.PI * getMult()) * curPos_ * curPos_) * currentValue / 100 * 0.01;
-    }
-    else
-    {
-      data.scaleX += (sin(curPos_ * Math.PI * getMult()) * curPos_ * curPos_) * currentValue / 100 * 0.01;
-      data.scaleY += (sin(curPos_ * Math.PI * getMult()) * curPos_ * curPos_) * currentValue / 100 * 0.01;
-    }
+    if (currentValue == 0) return;
+    var modMathResult:Float = spiralMath((useUnscaledCurpos ? data.curPos_unscaled : data.curPos)) * 0.01;
+    data.scaleX += modMathResult;
+    data.scaleY += modMathResult;
   }
 }
 
 class SpiralSpeedMod extends SpiralModBase
 {
-  public function new(name:String)
+  public function new(name:String, isCos:Bool = false)
   {
-    super(name);
+    super(name, isCos);
     modPriority = 395;
     speedMod = true;
     notesMod = false;
@@ -178,22 +152,7 @@ class SpiralSpeedMod extends SpiralModBase
   override function speedMath(lane:Int, curPos:Float, strumLine, isHoldNote = false):Float
   {
     if (currentValue == 0) return 1;
-
-    var r:Float = 0;
-
-    if (currentValue == 0) return 1; // skip math if mod is 0
-    var curPos2:Float = curPos * (Preferences.downscroll ? -1 : 1);
-    var curPos_:Float = curPos2 * -0.1;
-    curPos_ += getOffset();
-    if (useCos)
-    {
-      r += (cos(curPos_ * Math.PI * getMult()) * curPos_ * curPos_) * currentValue / 100;
-    }
-    else
-    {
-      r += (sin(curPos_ * Math.PI * getMult()) * curPos_ * curPos_) * currentValue / 100;
-    }
-
+    var r:Float = spiralMath(curPos);
     return (r * 0.005) + 1;
   }
 }

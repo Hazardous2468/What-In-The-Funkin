@@ -1,5 +1,8 @@
 v0.9.1a:
 
+THIS UPDATE WILL REQUIRE MODCHARTS TO BE UPDATED DUE TO MODIFIER MATH CHANGES! (see below)
+
+
 Re-added 'isPlayer' variable to Strumline.hx to fix scripts which may rely on said variable.
 
 Updated the bold font to now include numbers (taken from Psych lmfao). Now you can actually see the numbers for playback rate in the pause menu.
@@ -29,7 +32,7 @@ Updated Too Many Trumpets
 Improved inconsistencies with setDefault behaviour.
 
 "sinClip", "cosClip", "tanClip" added! 
-Also removed Cosecant modifiers. Instead, it now works like NotITG where using the "Cosecant" modifier will enable Cosecant on all Tan modifiers.
+Using the "Cosecant" modifier will enable Cosecant on all Tan modifiers. (old cosecant modifier will remain for legacy support)
 Also added offsets to sin, cos, tan, and cosecant for silly I guess?
 
 Overhauled wave and boost mod math
@@ -44,6 +47,14 @@ You can now use {} for lua functions. Should make eases, sets, etc obsolete
 for example, you can now do add(4, 4, "linear", {1, "drunk", 1, "tipsy"}, {3,4})
 
 Submod aliases finally added. Can now use "period" instead of "mult" for example. Also optimised subMod usage
+
+Added "offset" submods to: circ, bumpy, bounce, zigzag, attenuate, digital, saw, spiral, tornado
+
+Added: spiralScaleX, spiralScaleY, attenuateScaleX, attenuateScaleY, attenuateAngleX, attenuateAngleY, digitalScaleX, digitalScaleY antiNegativeScale
+Fixed attenuateY affecting z instead of y (oops)
+
+Adjusted Spiral and Circ and Linear math
+Spiral and Circ and linear mods now have a "altCurPos" submod that will use unscaled curPos (the old math)
 
 
 

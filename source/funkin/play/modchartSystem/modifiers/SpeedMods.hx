@@ -217,7 +217,7 @@ class WaveMod extends Modifier
     super(name, 0);
     unknown = false;
     speedMod = true;
-    multSubmod = createSubMod("mult", 1, ["period"]);
+    multSubmod = createSubMod("mult", 1, ["period", "size"]);
     offsetSubmod = createSubMod("offset", 0);
   }
 

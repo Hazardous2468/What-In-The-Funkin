@@ -21,7 +21,7 @@ class WaveyModBase extends Modifier
     super(name, 0);
     modPriority = 77;
 
-    speed = createSubMod("speed", 1.0);
+    speed = createSubMod("speed", 1.0, ["frequency"]);
     desync = createSubMod("desync", 0.2, ["spacing"]);
     offset = createSubMod("time_add", 0.0, ["offset", "timeadd", "time_offset", "timeoffset"]);
     timertype = createSubMod("timertype", 0.0);

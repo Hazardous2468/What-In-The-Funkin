@@ -699,6 +699,10 @@ class ModHandler
    */
   public function setNotePos(note:NoteSprite, orientPass:Bool = false):Void
   {
+    /*
+      Notes DO copy the strums: x, y, z, anglez
+      Notes DO NOT copy the strums: anglex, angley, scalex, scaley, skewx, skewy, skewz (any any other value outside what they do copy)
+     */
     if (!orientPass && (note.noteModData.orient2[0] != 0 || note.noteModData.orient2[1] != 0 || note.noteModData.orient2[2] != 0))
     {
       setNotePos(note, true);

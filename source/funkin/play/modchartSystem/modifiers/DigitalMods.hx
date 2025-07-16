@@ -13,18 +13,21 @@ class DigitalModBase extends Modifier
 {
   var mult:ModifierSubValue;
   var steps:ModifierSubValue;
+
   var offset:ModifierSubValue;
+  var strumResult:Array<Float> = [0, 0, 0, 0];
 
   public function new(name:String)
   {
     super(name, 0);
     mult = createSubMod("mult", 1.0, ["period", "size"]);
     steps = createSubMod("steps", 4.0);
-    // offset?
+    offset = createSubMod("offset", 0.0);
   }
 
   function digitalMath(curPos:Float):Float
   {
+    curPos += offset.value;
     var s:Float = steps.value / 2;
 
     var funny:Float = sin(curPos * Math.PI * mult.value / 250) * s;
@@ -41,95 +44,142 @@ class DigitalModBase extends Modifier
 
 class DigitalXMod extends DigitalModBase
 {
-  public function new(name:String)
-  {
-    super(name);
-  }
-
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
+    data.x -= strumResult[data.direction];
     data.x += digitalMath(data.curPos) * (Strumline.STRUMLINE_SIZE / 2.0);
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (currentValue == 0 || offset.value == 0)
+    {
+      strumResult[data.direction] = 0.0;
+    }
+    else
+    {
+      strumResult[data.direction] = digitalMath(data.curPos) * (Strumline.STRUMLINE_SIZE / 2.0);
+      data.x += strumResult[data.direction];
+    }
   }
 }
 
 class DigitalYMod extends DigitalModBase
 {
-  public function new(name:String)
-  {
-    super(name);
-  }
-
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
+    data.y -= strumResult[data.direction];
     data.y += digitalMath(data.curPos) * (Strumline.STRUMLINE_SIZE / 2.0);
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (currentValue == 0 || offset.value == 0)
+    {
+      strumResult[data.direction] = 0.0;
+    }
+    else
+    {
+      strumResult[data.direction] = digitalMath(data.curPos) * (Strumline.STRUMLINE_SIZE / 2.0);
+      data.y += strumResult[data.direction];
+    }
   }
 }
 
 class DigitalZMod extends DigitalModBase
 {
-  public function new(name:String)
-  {
-    super(name);
-  }
-
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
+    data.z -= strumResult[data.direction];
     data.z += digitalMath(data.curPos) * (Strumline.STRUMLINE_SIZE / 2.0);
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (currentValue == 0 || offset.value == 0)
+    {
+      strumResult[data.direction] = 0.0;
+    }
+    else
+    {
+      strumResult[data.direction] = digitalMath(data.curPos) * (Strumline.STRUMLINE_SIZE / 2.0);
+      data.z += strumResult[data.direction];
+    }
   }
 }
 
 class DigitalAngleMod extends DigitalModBase
 {
-  public function new(name:String)
-  {
-    super(name);
-  }
-
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
+    data.angleZ -= strumResult[data.direction];
     data.angleZ += digitalMath(data.curPos);
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (currentValue == 0 || offset.value == 0)
+    {
+      strumResult[data.direction] = 0.0;
+    }
+    else
+    {
+      strumResult[data.direction] = digitalMath(data.curPos);
+      data.angleZ += strumResult[data.direction];
+    }
   }
 }
 
 class DigitalAngleXMod extends DigitalModBase
 {
-  public function new(name:String)
-  {
-    super(name);
-  }
-
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
     data.angleX += digitalMath(data.curPos);
   }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (currentValue == 0 || offset.value == 0)
+    {
+      strumResult[data.direction] = 0.0;
+    }
+    else
+    {
+      strumResult[data.direction] = digitalMath(data.curPos);
+      data.angleX += strumResult[data.direction];
+    }
+  }
 }
 
 class DigitalAngleYMod extends DigitalModBase
 {
-  public function new(name:String)
-  {
-    super(name);
-  }
-
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
     data.angleY += digitalMath(data.curPos);
   }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (currentValue == 0 || offset.value == 0)
+    {
+      strumResult[data.direction] = 0.0;
+    }
+    else
+    {
+      strumResult[data.direction] = digitalMath(data.curPos);
+      data.angleY += strumResult[data.direction];
+    }
+  }
 }
 
 class DigitalScaleMod extends DigitalModBase
 {
-  public function new(name:String)
-  {
-    super(name);
-  }
-
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
@@ -138,44 +188,113 @@ class DigitalScaleMod extends DigitalModBase
     data.scaleY += r;
     data.scaleZ += r;
   }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (currentValue == 0 || offset.value == 0)
+    {
+      strumResult[data.direction] = 0.0;
+    }
+    else
+    {
+      strumResult[data.direction] = digitalMath(data.curPos) * 0.01;
+      data.scaleX += strumResult[data.direction];
+      data.scaleY += strumResult[data.direction];
+      data.scaleZ += strumResult[data.direction];
+    }
+  }
+}
+
+class DigitalScaleXMod extends DigitalModBase
+{
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
+  {
+    if (currentValue == 0) return; // skip math if mod is 0
+    data.scaleX += digitalMath(data.curPos) * 0.01;
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (currentValue == 0 || offset.value == 0)
+    {
+      strumResult[data.direction] = 0.0;
+    }
+    else
+    {
+      strumResult[data.direction] = digitalMath(data.curPos) * 0.01;
+      data.scaleX += strumResult[data.direction];
+    }
+  }
+}
+
+class DigitalScaleYMod extends DigitalModBase
+{
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
+  {
+    if (currentValue == 0) return; // skip math if mod is 0
+    data.scaleY += digitalMath(data.curPos) * 0.01;
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (currentValue == 0 || offset.value == 0)
+    {
+      strumResult[data.direction] = 0.0;
+    }
+    else
+    {
+      strumResult[data.direction] = digitalMath(data.curPos) * 0.01;
+      data.scaleY += strumResult[data.direction];
+    }
+  }
 }
 
 class DigitalSkewXMod extends DigitalModBase
 {
-  public function new(name:String)
-  {
-    super(name);
-  }
-
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
     data.skewX += digitalMath(data.curPos);
   }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (currentValue == 0 || offset.value == 0)
+    {
+      strumResult[data.direction] = 0.0;
+    }
+    else
+    {
+      strumResult[data.direction] = digitalMath(data.curPos);
+      data.skewX += strumResult[data.direction];
+    }
+  }
 }
 
 class DigitalSkewYMod extends DigitalModBase
 {
-  public function new(name:String)
-  {
-    super(name);
-  }
-
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
     data.skewY += digitalMath(data.curPos);
   }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (currentValue == 0 || offset.value == 0)
+    {
+      strumResult[data.direction] = 0.0;
+    }
+    else
+    {
+      strumResult[data.direction] = digitalMath(data.curPos);
+      data.skewY += strumResult[data.direction];
+    }
+  }
 }
 
 class DigitalSpeedMod extends DigitalModBase
 {
-  public function new(name:String)
-  {
-    super(name);
-    modPriority = 401;
-  }
-
   override function speedMath(lane:Int, curPos:Float, strumLine, isHoldNote = false):Float
   {
     if (currentValue == 0) return 1; // skip math if mod is 0

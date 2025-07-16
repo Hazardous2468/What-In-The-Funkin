@@ -4,178 +4,285 @@ import funkin.play.notes.Strumline;
 import funkin.play.modchartSystem.modifiers.BaseModifier;
 import funkin.play.modchartSystem.NoteData;
 
-class CircXMod extends Modifier
+class CircModBase extends Modifier
 {
+  var offset:ModifierSubValue;
+  var strumResult:Array<Float> = [0, 0, 0, 0];
+
+  var altCurposSubmod:ModifierSubValue;
+
   public function new(name:String)
   {
     super(name);
+    offset = createSubMod("offset", 0.0);
+    altCurposSubmod = createSubMod("altcurpos", 1.0, ["use_unscaled", "alt_curpos", "type"]);
   }
 
-  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
+  var useUnscaledCurpos(get, never):Bool;
+
+  function get_useUnscaledCurpos():Bool
   {
-    if (currentValue == 0) return; // skip math if mod is 0
-    var curPos2:Float = data.curPos_unscaled * (Preferences.downscroll ? -1 : 1);
-    data.x += curPos2 * curPos2 * currentValue * -0.001;
+    return altCurposSubmod.value >= 0.5;
+  }
+
+  function daMath(curPos:Float):Float
+  {
+    var curPos2:Float = curPos * (Preferences.downscroll ? -1 : 1);
+    curPos2 += offset.value;
+    return (curPos2 * curPos2 * currentValue * -0.001);
   }
 }
 
-class CircYMod extends Modifier
+class CircXMod extends CircModBase
+{
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
+  {
+    if (currentValue == 0) return; // skip math if mod is 0
+    data.x -= strumResult[data.direction];
+    data.x += daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (currentValue == 0 || offset.value == 0)
+    {
+      strumResult[data.direction] = 0.0;
+    }
+    else
+    {
+      strumResult[data.direction] = daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+      data.x += strumResult[data.direction];
+    }
+  }
+}
+
+class CircYMod extends CircModBase
 {
   public var flipForDownscroll:Bool = true;
 
-  public function new(name:String)
-  {
-    super(name);
-  }
-
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
-    var curPos2:Float = data.curPos_unscaled * (Preferences.downscroll ? -1 : 1);
-    var curVal:Float = currentValue;
-    curVal *= (Preferences.downscroll && flipForDownscroll ? -1 : 1);
-    data.y += curPos2 * curPos2 * curVal * -0.001;
+    data.y -= strumResult[data.direction];
+    data.y += daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos) * (Preferences.downscroll && flipForDownscroll ? -1 : 1);
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (currentValue == 0 || offset.value == 0)
+    {
+      strumResult[data.direction] = 0.0;
+    }
+    else
+    {
+      strumResult[data.direction] = daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos) * (Preferences.downscroll && flipForDownscroll ? -1 : 1);
+      data.y += strumResult[data.direction];
+    }
   }
 }
 
-class CircZMod extends Modifier
+class CircZMod extends CircModBase
 {
-  public function new(name:String)
-  {
-    super(name);
-  }
-
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
-    var curPos2:Float = data.curPos_unscaled * (Preferences.downscroll ? -1 : 1);
-    data.z += curPos2 * curPos2 * currentValue * -0.001;
+    data.z -= strumResult[data.direction];
+    data.z += daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (currentValue == 0 || offset.value == 0)
+    {
+      strumResult[data.direction] = 0.0;
+    }
+    else
+    {
+      strumResult[data.direction] = daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+      data.z += strumResult[data.direction];
+    }
   }
 }
 
-class CircAngleMod extends Modifier
+class CircAngleMod extends CircModBase
 {
-  public function new(name:String)
-  {
-    super(name);
-  }
-
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
-    var curPos2:Float = data.curPos_unscaled * (Preferences.downscroll ? -1 : 1);
-    data.angleZ += curPos2 * curPos2 * currentValue * -0.001;
+    data.angleZ -= strumResult[data.direction];
+    data.angleZ += daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (currentValue == 0 || offset.value == 0)
+    {
+      strumResult[data.direction] = 0.0;
+    }
+    else
+    {
+      strumResult[data.direction] = daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+      data.angleZ += strumResult[data.direction];
+    }
   }
 }
 
-class CircAngleYMod extends Modifier
+class CircAngleYMod extends CircModBase
 {
-  public function new(name:String)
-  {
-    super(name);
-  }
-
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
-    var curPos2:Float = data.curPos_unscaled * (Preferences.downscroll ? -1 : 1);
-    data.angleY += curPos2 * curPos2 * currentValue * -0.001;
+    data.angleY += daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (currentValue == 0 || offset.value == 0)
+    {
+      strumResult[data.direction] = 0.0;
+    }
+    else
+    {
+      strumResult[data.direction] = daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+      data.angleY += strumResult[data.direction];
+    }
   }
 }
 
-class CircAngleXMod extends Modifier
+class CircAngleXMod extends CircModBase
 {
-  public function new(name:String)
-  {
-    super(name);
-  }
-
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
-    var curPos2:Float = data.curPos_unscaled * (Preferences.downscroll ? -1 : 1);
-    data.angleX += curPos2 * curPos2 * currentValue * -0.001;
+    data.angleX += daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (currentValue == 0 || offset.value == 0)
+    {
+      strumResult[data.direction] = 0.0;
+    }
+    else
+    {
+      strumResult[data.direction] = daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+      data.angleX += strumResult[data.direction];
+    }
   }
 }
 
-class CircScaleMod extends Modifier
+class CircScaleMod extends CircModBase
 {
-  public function new(name:String)
-  {
-    super(name);
-  }
-
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
-    var curPos2:Float = data.curPos_unscaled * (Preferences.downscroll ? -1 : 1);
-    var result:Float = curPos2 * curPos2 * currentValue * -0.001;
-    data.scaleX += result;
-    data.scaleY += result;
+    var r:Float = daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos) * -0.01;
+    data.scaleY += r;
+    data.scaleX += r;
+    data.scaleZ += r;
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (currentValue == 0 || offset.value == 0)
+    {
+      strumResult[data.direction] = 0.0;
+    }
+    else
+    {
+      strumResult[data.direction] = daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos) * -0.01;
+      data.scaleY += strumResult[data.direction];
+      data.scaleX += strumResult[data.direction];
+      data.scaleZ += strumResult[data.direction];
+    }
   }
 }
 
-class CircScaleXMod extends Modifier
+class CircScaleXMod extends CircModBase
 {
-  public function new(name:String)
-  {
-    super(name);
-  }
-
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
-    var curPos2:Float = data.curPos_unscaled * (Preferences.downscroll ? -1 : 1);
-    var result:Float = curPos2 * curPos2 * currentValue * -0.001;
-    data.scaleX += result;
+    data.scaleX += daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos) * -0.01;
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (currentValue == 0 || offset.value == 0)
+    {
+      strumResult[data.direction] = 0.0;
+    }
+    else
+    {
+      strumResult[data.direction] = daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos) * -0.01;
+      data.scaleX += strumResult[data.direction];
+    }
   }
 }
 
-class CircScaleYMod extends Modifier
+class CircScaleYMod extends CircModBase
 {
-  public function new(name:String)
-  {
-    super(name);
-  }
-
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
-    var curPos2:Float = data.curPos_unscaled * (Preferences.downscroll ? -1 : 1);
-    var result:Float = curPos2 * curPos2 * currentValue * -0.001;
-    data.scaleY += result;
+    data.scaleY += daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos) * -0.01;
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (currentValue == 0 || offset.value == 0)
+    {
+      strumResult[data.direction] = 0.0;
+    }
+    else
+    {
+      strumResult[data.direction] = daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos) * -0.01;
+      data.scaleY += strumResult[data.direction];
+    }
   }
 }
 
-class CircSkewXMod extends Modifier
+class CircSkewXMod extends CircModBase
 {
-  public function new(name:String)
-  {
-    super(name);
-  }
-
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
-    var curPos2:Float = data.curPos_unscaled * (Preferences.downscroll ? -1 : 1);
-    var result:Float = curPos2 * curPos2 * currentValue * -0.001;
-    data.skewX += result;
+    data.skewX += daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (currentValue == 0 || offset.value == 0)
+    {
+      strumResult[data.direction] = 0.0;
+    }
+    else
+    {
+      strumResult[data.direction] = daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+      data.skewX += strumResult[data.direction];
+    }
   }
 }
 
-class CircSkewYMod extends Modifier
+class CircSkewYMod extends CircModBase
 {
-  public function new(name:String)
-  {
-    super(name);
-  }
-
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
-    var curPos2:Float = data.curPos_unscaled * (Preferences.downscroll ? -1 : 1);
-    var result:Float = curPos2 * curPos2 * currentValue * -0.001;
-    data.skewY += result;
+    data.skewY += daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (currentValue == 0 || offset.value == 0)
+    {
+      strumResult[data.direction] = 0.0;
+    }
+    else
+    {
+      strumResult[data.direction] = daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+      data.skewY += strumResult[data.direction];
+    }
   }
 }
 
@@ -185,12 +292,16 @@ class CircSpeedMod extends Modifier
   {
     super(name);
     modPriority = 396;
+    offset = createSubMod("offset", 0.0);
   }
+
+  var offset:ModifierSubValue;
 
   override function speedMath(lane:Int, curPos:Float, strumLine, isHoldNote = false):Float
   {
     var r:Float = 1;
     var curPos2:Float = curPos * (Preferences.downscroll ? -1 : 1);
+    curPos2 += offset.value;
     var result:Float = curPos2 * curPos2 * currentValue * -0.001;
 
     return r + result;

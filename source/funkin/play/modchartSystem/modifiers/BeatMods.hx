@@ -15,12 +15,13 @@ class BeatModBase extends Modifier
   var mult:ModifierSubValue;
   var offset:ModifierSubValue;
   var alternate:ModifierSubValue; // if 0.5 or higher, will alternate. otherwise, the beat will always move in one direction (never from side to side)
-  var cap:ModifierSubValue; // ??
+
+  // var cap:ModifierSubValue; // By default, the speed gets halved if the BPM is too high. However we don't have this behaviour making this obsolete
 
   public function new(name:String)
   {
     super(name, 0);
-    speed = createSubMod("speed", 1.0);
+    speed = createSubMod("speed", 1.0, ["frequency"]);
     mult = createSubMod("mult", 1.0, ["period", "size"]);
     offset = createSubMod("offset", 0.0, ["time_add", "timeadd", "time_offset", "timeoffset"]);
     alternate = createSubMod("alternate", 1.0);
