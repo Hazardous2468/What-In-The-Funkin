@@ -100,6 +100,7 @@ class Strumline extends FlxSpriteGroup
       this.visible = !asleep;
       if (!value) txtActiveMods.visible = wasDebugVisible;
     }
+    this.update(0);
     return asleep;
   }
 

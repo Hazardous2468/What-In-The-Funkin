@@ -108,10 +108,11 @@ class ModEventHandler
     {
       lastReportedbeatTime = beatTime;
       resetMods(); // Just reset everything and let the event handler put everything back.
-      // trace("BACK IN TIME");
     }
-    handleEvents();
+
+    // Make sure "handleEvents()" is called after the tweenManager has been updated to prevent issues.
     tweenManager.update((beatTime - lastReportedbeatTime));
+    handleEvents();
 
     lastReportedSongTime = songTime;
     lastReportedbeatTime = beatTime;
@@ -504,7 +505,6 @@ class ModEventHandler
         modEvent.hasTriggered = true;
         if (!modEvent.persist) continue; // lol
 
-        // trace("==! LATE !   Event Trigger   ! LATE !==");
         switch (modEvent.style)
         {
           case "add":
@@ -569,8 +569,6 @@ class ModEventHandler
       else if (beatTime >= modEvent.startingBeat) // Trigger the event, and set the tween to be at the proper position!
       {
         modEvent.hasTriggered = true;
-        // trace("==   Event Trigger   ==");
-        // trace("Type : " + modEvent.style);
         switch (modEvent.style)
         {
           case "reset":
@@ -589,10 +587,8 @@ class ModEventHandler
             tween = tweenMod(modEvent.target, modEvent.modName, modEvent.gotoValue, modEvent.timeInBeats, modEvent.easeToUse, "value", modEvent.startValue);
 
           case "add":
-            // FunkinSound.playOnce(Paths.sound("pauseEnable"), 1.0);
             tween = tweenAddMod(modEvent.target, modEvent.modName, modEvent.gotoValue, modEvent.timeInBeats, modEvent.easeToUse);
           case "add_old":
-            // FunkinSound.playOnce(Paths.sound("pauseEnable"), 1.0);
             var modToTween;
             if (modEvent.target.modifiers.exists(modEvent.modName))
             {
@@ -644,15 +640,12 @@ class ModEventHandler
                 }
               });
             if (tweenTagged) modchartTweens.set(modEvent.modName.toLowerCase(), tween);
-
-            // trace("funky tween triggered! was tagged? - " + (tweenTagged ? modEvent.modName.toLowerCase() : "nope"));
         }
       }
-      // We add how many seconds have elapsed from the starting beat to move the tween to it's proper position!
+      // We add how many beats have elapsed from the starting beat to move the tween to it's proper position (for if we jump to the middle of a tween)
       if (tween != null)
       {
-        // var addAmount:Float = ((songTime - ModConstants.getTimeFromBeat(modEvent.startingBeat)) * 0.001);
-        var addAmount:Float = ((beatTime - modEvent.startingBeat));
+        var addAmount:Float = (beatTime - modEvent.startingBeat);
         @:privateAccess
         tween._secondsSinceStart += addAmount;
         @:privateAccess

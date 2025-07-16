@@ -101,7 +101,7 @@ class BlackSphereInvertMod extends Modifier
     var reverseMult:Float = FlxMath.remapToRange(reverseModAmount, 0, 1, 1, -1);
 
     var variant:Float = getSubVal("variant");
-    if (variant >= 100)
+    if (variant >= 1.0)
     {
       if (lane % 4 == 1 || lane % 4 == 2) yValue *= -1;
     }
@@ -133,7 +133,7 @@ class BlackSphereInvertMod extends Modifier
     yValue = 0.5 * FlxMath.fastSin(currentValue * Math.PI / 180);
 
     var variant:Float = getSubVal("variant");
-    if (variant >= 100)
+    if (variant >= 1.0)
     {
       if (lane % 4 == 1 || lane % 4 == 2) yValue *= -1;
     }
@@ -172,7 +172,7 @@ class BlackSphereFlipMod extends Modifier
     var speedAffectM:Float = getSubVal("speedaffect");
     var yValue:Float = FlxMath.fastSin(currentValue * Math.PI / 180);
     var variant:Float = getSubVal("variant");
-    if (variant >= 100)
+    if (variant >= 1.0)
     {
       if (lane % 4 == 1 || lane % 4 == 2) yValue *= -1;
     }
@@ -206,7 +206,7 @@ class BlackSphereFlipMod extends Modifier
     yValue = 0.5 * FlxMath.fastSin(currentValue * Math.PI / 180);
 
     var variant:Float = getSubVal("variant");
-    if (variant >= 100)
+    if (variant >= 1.0)
     {
       if (lane % 4 == 1 || lane % 4 == 2) yValue *= -1;
     }

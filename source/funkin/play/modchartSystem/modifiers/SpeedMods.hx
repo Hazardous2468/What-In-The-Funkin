@@ -38,27 +38,49 @@ class ReverseMod extends Modifier
     unknown = false;
     speedMod = true;
     strumsMod = true;
+    createSubMod("type", 1.0);
+  }
+
+  function getCurVal():Float
+  {
+    if (getSubVal("type") < 0.5 && currentValue > 0.0)
+    {
+      // PingPong between 0 -> 1 -> 0 -> 1...
+      // Can not be negative, otherwise use regular behaviour.
+      var curValEdit:Float = currentValue % 1;
+      if (currentValue % 2 > 1)
+      {
+        curValEdit = 1 - currentValue % 1;
+      }
+      return curValEdit;
+    }
+    else
+    {
+      // uncapped regular reverse values.
+      return currentValue;
+    }
   }
 
   override function speedMath(lane:Int, curPos:Float, strumLine, isHoldNote = false):Float
   {
-    return (1 - (currentValue * 2));
+    return (1 - (getCurVal() * 2));
   }
 
   var dif:Null<Float> = null;
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
+    var curVal:Float = getCurVal();
     if (targetLane == -1)
     {
-      data.whichStrumNote.strumExtraModData.reverseMod = currentValue;
+      data.whichStrumNote.strumExtraModData.reverseMod = curVal;
     }
     else
     {
-      data.whichStrumNote.strumExtraModData.reverseModLane = currentValue;
+      data.whichStrumNote.strumExtraModData.reverseModLane = curVal;
     }
 
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (curVal == 0) return; // skip math if mod is 0
 
     // Compute this only once!
     if (dif == null)
@@ -68,7 +90,7 @@ class ReverseMod extends Modifier
       dif = targetY - baseY;
     }
 
-    data.y += dif * currentValue;
+    data.y += dif * curVal;
   }
 }
 
@@ -189,11 +211,13 @@ class WaveMod extends Modifier
     unknown = false;
     speedMod = true;
     createSubMod("mult", 1);
+    createSubMod("offset", 0);
   }
 
   override function speedMath(lane:Int, curPos:Float, strumLine, isHoldNote = false):Float
   {
     var curValue:Float = this.currentValue * 0.58;
+    curValue += this.getSubVal("offset");
     var curPos_Edit:Float = curPos * (Preferences.downscroll ? -1 : 1); // Make it act the same for upscroll and downscroll
     curPos_Edit *= 0.00875; // Slow the curPos right the fuck down to stop the notes from zooming so hard
     curPos_Edit *= this.getSubVal("mult");
