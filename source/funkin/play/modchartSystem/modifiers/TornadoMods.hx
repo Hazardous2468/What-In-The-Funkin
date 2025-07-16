@@ -11,10 +11,14 @@ import flixel.math.FlxMath;
 // :p
 class TornadoModBase extends Modifier
 {
+  var speed:ModifierSubValue;
+  var offset:ModifierSubValue;
+
   public function new(name:String)
   {
     super(name, 0);
-    createSubMod("speed", 3.0);
+    speed = createSubMod("speed", 3.0, ["mult", "period"]);
+    offset = createSubMod("offset", 0.0);
   }
 
   function tornadoMath(lane:Int, curPos:Float):Float
@@ -23,7 +27,7 @@ class TornadoModBase extends Modifier
 
     var playerColumn:Float = lane % Strumline.KEY_COUNT;
     var columnPhaseShift = playerColumn * Math.PI / 3;
-    var phaseShift = (curPos / 135) * getSubVal("speed") * 0.2;
+    var phaseShift = (curPos / 135) * speed.value * 0.2;
     var returnReceptorToZeroOffsetX = (-cos(-columnPhaseShift) + 1) / 2 * swagWidth * 3;
     var offsetX = (-cos((phaseShift - columnPhaseShift)) + 1) / 2 * swagWidth * 3 - returnReceptorToZeroOffsetX;
 
@@ -36,7 +40,7 @@ class TornadoModBase extends Modifier
 
     var playerColumn:Float = lane % Strumline.KEY_COUNT;
     var columnPhaseShift = playerColumn * Math.PI / 3;
-    var phaseShift = (curPos / 135) * getSubVal("speed") * 0.2;
+    var phaseShift = (curPos / 135) * speed.value * 0.2;
     var returnReceptorToZeroOffsetX = (-tan(-columnPhaseShift) + 1) / 2 * swagWidth * 3;
     var offsetX = (-tan((phaseShift - columnPhaseShift)) + 1) / 2 * swagWidth * 3 - returnReceptorToZeroOffsetX;
 

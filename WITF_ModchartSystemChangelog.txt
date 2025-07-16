@@ -43,6 +43,7 @@ All tweens are now handled by beat Position instead of seconds (now fully synced
 You can now use {} for lua functions. Should make eases, sets, etc obsolete
 for example, you can now do add(4, 4, "linear", {1, "drunk", 1, "tipsy"}, {3,4})
 
+Submod aliases finally added. Can now use "period" instead of "mult" for example. Also optimised subMod usage
 
 
 

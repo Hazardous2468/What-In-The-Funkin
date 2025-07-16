@@ -38,12 +38,14 @@ class ReverseMod extends Modifier
     unknown = false;
     speedMod = true;
     strumsMod = true;
-    createSubMod("type", 1.0);
+    typeSubmod = createSubMod("type", 1.0, ["style", "variant"]);
   }
+
+  var typeSubmod:ModifierSubValue;
 
   function getCurVal():Float
   {
-    if (getSubVal("type") < 0.5 && currentValue > 0.0)
+    if (typeSubmod.value < 0.5 && currentValue > 0.0)
     {
       // PingPong between 0 -> 1 -> 0 -> 1...
       // Can not be negative, otherwise use regular behaviour.
@@ -141,19 +143,21 @@ class BrakeMod extends Modifier
 // Notes speed up as they approach the receptors
 class BoostMod extends Modifier
 {
+  var startSubmod:ModifierSubValue;
+
   public function new(name:String)
   {
     super(name, 0);
     unknown = false;
     speedMod = true;
-    createSubMod("start", 900);
+    startSubmod = createSubMod("start", 900, ["begin", "trigger", "threshold"]);
   }
 
   override function speedMath(lane:Int, curPos:Float, strumLine, isHoldNote = false):Float
   {
     var speed:Float = 1.0; // return value
-    var start:Float = this.getSubVal("start");
-    var finalTargetSpeed:Float = 1.0; /*this.getSubVal("target_speed");*/
+    var start:Float = this.startSubmod.value;
+    var finalTargetSpeed:Float = 1.0;
     var div:Float = start * 2;
     var curPosEdit:Float = curPos * (Preferences.downscroll ? -1 : 1);
 
@@ -205,22 +209,25 @@ class OldBoostMod extends Modifier
 // notes slow down and speed up before reaching receptor. Fixed version where the effect doesn't intensify the further notes are.
 class WaveMod extends Modifier
 {
+  var multSubmod:ModifierSubValue;
+  var offsetSubmod:ModifierSubValue;
+
   public function new(name:String)
   {
     super(name, 0);
     unknown = false;
     speedMod = true;
-    createSubMod("mult", 1);
-    createSubMod("offset", 0);
+    multSubmod = createSubMod("mult", 1, ["period"]);
+    offsetSubmod = createSubMod("offset", 0);
   }
 
   override function speedMath(lane:Int, curPos:Float, strumLine, isHoldNote = false):Float
   {
     var curValue:Float = this.currentValue * 0.58;
-    curValue += this.getSubVal("offset");
+    curValue += this.offsetSubmod.value;
     var curPos_Edit:Float = curPos * (Preferences.downscroll ? -1 : 1); // Make it act the same for upscroll and downscroll
     curPos_Edit *= 0.00875; // Slow the curPos right the fuck down to stop the notes from zooming so hard
-    curPos_Edit *= this.getSubVal("mult");
+    curPos_Edit *= this.multSubmod.value;
     var test:Float = curPos_Edit;
     if (test < 1) test = 1;
     return 1 + (this.sin(curPos_Edit) / test * curValue);
@@ -230,12 +237,15 @@ class WaveMod extends Modifier
 // notes slow down and speed up before reaching receptor
 class OldWaveMod extends Modifier
 {
+  var multSubmod:ModifierSubValue;
+
   public function new(name:String)
   {
     super(name, 0);
     unknown = false;
     speedMod = true;
-    createSubMod("mult", 1);
+
+    multSubmod = createSubMod("mult", 1.0, ["period", "size"]);
   }
 
   override function speedMath(lane:Int, curPos:Float, strumLine, isHoldNote = false):Float
@@ -244,7 +254,7 @@ class OldWaveMod extends Modifier
     // some magic numbers found by just messing around with values to get it as close as possible to NotITG
     var curPos_Part1:Float = curPos * (Preferences.downscroll ? -1 : 1); // Make it act the same for upscroll and downscroll
     var curPos_Part2:Float = curPos_Part1; // Slow the curPos right the fuck down to stop the notes from zooming so hard
-    returnVal += currentValue * 0.22 * sin(curPos_Part2 / 38.0 * getSubVal("mult") * 0.2);
+    returnVal += currentValue * 0.22 * sin(curPos_Part2 / 38.0 * multSubmod.value * 0.2);
     return returnVal;
   }
 }

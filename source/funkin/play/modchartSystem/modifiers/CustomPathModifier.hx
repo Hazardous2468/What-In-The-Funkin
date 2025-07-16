@@ -231,6 +231,8 @@ class CustomPathMod extends Modifier
     }
   }
 
+  var blendSubmod:ModifierSubValue;
+
   public function new(name:String)
   {
     super(name, 0);
@@ -242,7 +244,7 @@ class CustomPathMod extends Modifier
     strumsMod = true;
     pathMod = true;
 
-    createSubMod("blend", 1.0);
+    blendSubmod = createSubMod("blend", 1.0);
     loadPath();
   }
 
@@ -290,7 +292,7 @@ class CustomPathMod extends Modifier
     var newPosition2:Vector4 = executePath(beatTime, Math.abs(data.curPos) * -1 / 0.47, data.direction, currentValue, notePosition);
 
     var blend:Float = Math.abs(currentValue);
-    if (getSubVal("blend") < 0.5) blend = 0;
+    if (blendSubmod.value < 0.5) blend = 0;
     blend = FlxMath.bound(blend, 0, 1); // clamp
 
     data.x = notePosition.x + ((newPosition1.x - newPosition2.x) * blend);

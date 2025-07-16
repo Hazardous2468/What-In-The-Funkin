@@ -11,18 +11,23 @@ import flixel.math.FlxMath;
 // :p
 class DigitalModBase extends Modifier
 {
+  var mult:ModifierSubValue;
+  var steps:ModifierSubValue;
+  var offset:ModifierSubValue;
+
   public function new(name:String)
   {
     super(name, 0);
-    createSubMod("mult", 1.0);
-    createSubMod("steps", 4.0);
+    mult = createSubMod("mult", 1.0, ["period", "size"]);
+    steps = createSubMod("steps", 4.0);
+    // offset?
   }
 
   function digitalMath(curPos:Float):Float
   {
-    var s:Float = getSubVal("steps") / 2;
+    var s:Float = steps.value / 2;
 
-    var funny:Float = sin(curPos * Math.PI * getSubVal("mult") / 250) * s;
+    var funny:Float = sin(curPos * Math.PI * mult.value / 250) * s;
     // trace("1: " + funny);
     funny = Math.floor(funny);
     // funny = Math.round(funny); //Why does this not work? no idea :(

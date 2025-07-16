@@ -11,31 +11,35 @@ import flixel.math.FlxMath;
 // :p
 class BumpyModBase extends Modifier
 {
+  var mult:ModifierSubValue;
+  var offset:ModifierSubValue; // ???
+
   public function new(name:String)
   {
     super(name, 0);
-    createSubMod("mult", 1.0);
+    mult = createSubMod("mult", 1.0, ["period", "size"]);
+    offset = createSubMod("offset", 0.0);
   }
 
   function bumpyMath(curPos:Float):Float
   {
     if (currentValue == 0) return 0.0; // skip math if mod is 0
     var scrollSpeed = PlayState.instance?.currentChart?.scrollSpeed ?? 1.0;
-    return currentValue * sin(curPos / (Strumline.STRUMLINE_SIZE / 3.0) / scrollSpeed * getSubVal("mult")) * (Strumline.STRUMLINE_SIZE / 2.0);
+    return currentValue * sin(curPos / (Strumline.STRUMLINE_SIZE / 3.0) / scrollSpeed * mult.value) * (Strumline.STRUMLINE_SIZE / 2.0);
   }
 
   function cosBumpyMath(curPos:Float):Float
   {
     if (currentValue == 0) return 0.0; // skip math if mod is 0
     var scrollSpeed = PlayState.instance?.currentChart?.scrollSpeed ?? 1.0;
-    return currentValue * cos(curPos / (Strumline.STRUMLINE_SIZE / 3.0) / scrollSpeed * getSubVal("mult")) * (Strumline.STRUMLINE_SIZE / 2.0);
+    return currentValue * cos(curPos / (Strumline.STRUMLINE_SIZE / 3.0) / scrollSpeed * mult.value) * (Strumline.STRUMLINE_SIZE / 2.0);
   }
 
   function tanBumpyMath(curPos:Float):Float
   {
     if (currentValue == 0) return 0.0; // skip math if mod is 0
     var scrollSpeed = PlayState.instance?.currentChart?.scrollSpeed ?? 1.0;
-    return currentValue * tan(curPos / (Strumline.STRUMLINE_SIZE / 3.0) / scrollSpeed * getSubVal("mult")) * (Strumline.STRUMLINE_SIZE / 2.0);
+    return currentValue * tan(curPos / (Strumline.STRUMLINE_SIZE / 3.0) / scrollSpeed * mult.value) * (Strumline.STRUMLINE_SIZE / 2.0);
   }
 }
 
@@ -301,7 +305,7 @@ class BumpySpeedMod extends BumpyModBase
   override function speedMath(lane:Int, curPos:Float, strumLine, isHoldNote = false):Float
   {
     if (currentValue == 0) return 1; // skip math if mod is 0
-    var bumpyx_Mult:Float = getSubVal("mult");
+    var bumpyx_Mult:Float = mult.value;
 
     var scrollSpeed = PlayState.instance?.currentChart?.scrollSpeed ?? 1.0;
     var modWouldBe:Float = currentValue * 0.025 * sin(curPos / (Strumline.STRUMLINE_SIZE / 3.0) / scrollSpeed * bumpyx_Mult) * (Strumline.STRUMLINE_SIZE / 2.0);

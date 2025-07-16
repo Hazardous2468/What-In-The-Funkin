@@ -10,15 +10,19 @@ import funkin.play.modchartSystem.NoteData;
 // :p
 class ZigZagBaseMod extends Modifier
 {
+  var mult:ModifierSubValue;
+  var offset:ModifierSubValue;
+
   public function new(name:String)
   {
     super(name, 0);
-    createSubMod("mult", 1.0);
+    mult = createSubMod("mult", 1.0, ["period", "size"]);
+    offset = createSubMod("offset", 0.0);
   }
 
   function ziggyMath(curPos:Float):Float
   {
-    var mult:Float = ModConstants.strumSize * getSubVal("mult");
+    var mult:Float = ModConstants.strumSize * mult.value;
     var mm:Float = mult * 2;
 
     var p:Float = curPos;
@@ -42,20 +46,6 @@ class ZigZagBaseMod extends Modifier
   function mod(a:Float, b:Float):Float
   {
     return (a / b);
-  }
-
-  // math from hitmans?
-  // I think the math is wrong lol, gonna redo later. I rarely use zigzag anyway.
-  function zigZagMath(lane:Int, curPos:Float):Float
-  {
-    var d = getSubVal("amplitude");
-    var c = getSubVal("longitude");
-
-    var a = c * (-1 + 2 * mod(Math.floor((d * curPos)), 2));
-    var b = -c * mod(Math.floor((d * curPos)), 2);
-    var x = ((d * curPos) - Math.floor((d * curPos))) * a + b + (c / 2);
-
-    return x;
   }
 }
 

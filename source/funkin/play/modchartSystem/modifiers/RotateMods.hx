@@ -9,13 +9,17 @@ import lime.math.Vector2;
 // Contains all mods which control strumline rotation!
 class RotateModBase extends Modifier
 {
+  var offsetX:ModifierSubValue;
+  var offsetY:ModifierSubValue;
+  var offsetZ:ModifierSubValue;
+
   public function new(name:String)
   {
     super(name, 0);
     modPriority = 21;
-    createSubMod("offset_x", 1.0);
-    createSubMod("offset_y", 1.0);
-    createSubMod("offset_z", 0.0);
+    offsetX = createSubMod("offset_x", 0.0, ["offsetx", "xoffset", "x_offset"]);
+    offsetY = createSubMod("offset_y", 0.0, ["offsety", "yoffset", "y_offset"]);
+    offsetZ = createSubMod("offset_z", 0.0, ["offsetz", "zoffset", "z_offset"]);
     unknown = false;
     notesMod = true;
     holdsMod = true;
@@ -121,18 +125,18 @@ class RotateModBase extends Modifier
     var r:Float = 0;
     r += strumLine.x + Strumline.INITIAL_OFFSET + (Strumline.NOTE_SPACING * 1.5);
     r += strumLine.getByIndex(data.direction % Strumline.KEY_COUNT).strumExtraModData.noteStyleOffsetX;
-    r += this.getSubVal("offset_x");
+    r += this.offsetX.value;
     return r;
   };
 
   function strumRotateFunc_GetPivotY(data:NoteData, strumLine:Strumline):Float
   {
-    return (FlxG.height / 2) - (data.whichStrumNote.height / 2) + this.getSubVal("offset_y");
+    return (FlxG.height / 2) - (data.whichStrumNote.height / 2) + this.offsetY.value;
   };
 
   function strumRotateFunc_GetPivotZ(data:NoteData, strumLine:Strumline):Float
   {
-    return 0.0 + this.getSubVal("offset_z");
+    return 0.0 + this.offsetZ.value;
   };
 
   function strumRotateFunc(data:NoteData, strumLine:Strumline, variant:String, angle:Null<Float> = null):Void
@@ -339,11 +343,25 @@ class NotesRotateZModifier extends RotateModBase
 
 class RotatingXModifier extends RotateModBase
 {
+  var affectsStrums:ModifierSubValue;
+
   public function new(name:String)
   {
     super(name);
     modPriority = 21 + 9;
-    createSubMod("affect_strum", 0.0);
+    affectsStrums = createSubMod("affect_strum", 0.0, [
+      "affects_strum",
+      "affects_strums",
+      "affect_strums",
+      "affectstrum",
+      "affectstrums",
+      "affectsstrum",
+      "affectsstrums",
+      "strums",
+      "strum",
+      "receptors",
+      "receptor"
+    ]);
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -354,7 +372,7 @@ class RotatingXModifier extends RotateModBase
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (this.currentValue % 360 == 0 || getSubVal("affect_strum") == 0) return;
+    if (this.currentValue % 360 == 0 || affectsStrums.value == 0) return;
     var curVal:Float = currentValue * data.curPos / 180;
     strumRotateFunc(data, strumLine, "x", curVal);
   }
@@ -362,11 +380,25 @@ class RotatingXModifier extends RotateModBase
 
 class RotatingYModifier extends RotateModBase
 {
+  var affectsStrums:ModifierSubValue;
+
   public function new(name:String)
   {
     super(name);
     modPriority = 22 + 9;
-    createSubMod("affect_strum", 0.0);
+    affectsStrums = createSubMod("affect_strum", 0.0, [
+      "affects_strum",
+      "affects_strums",
+      "affect_strums",
+      "affectstrum",
+      "affectstrums",
+      "affectsstrum",
+      "affectsstrums",
+      "strums",
+      "strum",
+      "receptors",
+      "receptor"
+    ]);
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -377,7 +409,7 @@ class RotatingYModifier extends RotateModBase
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (this.currentValue % 360 == 0 || getSubVal("affect_strum") == 0) return;
+    if (this.currentValue % 360 == 0 || affectsStrums.value == 0) return;
     var curVal:Float = currentValue * data.curPos / 180;
     strumRotateFunc(data, strumLine, "y", curVal);
   }
@@ -385,11 +417,25 @@ class RotatingYModifier extends RotateModBase
 
 class RotatingZModifier extends RotateModBase
 {
+  var affectsStrums:ModifierSubValue;
+
   public function new(name:String)
   {
     super(name);
     modPriority = 23 + 9;
-    createSubMod("affect_strum", 0.0);
+    affectsStrums = createSubMod("affect_strum", 0.0, [
+      "affects_strum",
+      "affects_strums",
+      "affect_strums",
+      "affectstrum",
+      "affectstrums",
+      "affectsstrum",
+      "affectsstrums",
+      "strums",
+      "strum",
+      "receptors",
+      "receptor"
+    ]);
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -400,7 +446,7 @@ class RotatingZModifier extends RotateModBase
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (this.currentValue % 360 == 0 || getSubVal("affect_strum") == 0) return;
+    if (this.currentValue % 360 == 0 || affectsStrums.value == 0) return;
     var curVal:Float = currentValue * data.curPos / 180;
     strumRotateFunc(data, strumLine, "z", curVal);
   }

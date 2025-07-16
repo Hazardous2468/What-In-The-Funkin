@@ -11,46 +11,53 @@ import funkin.play.modchartSystem.modifiers.BaseModifier;
 
 class DrunkModBase extends Modifier
 {
+  var speed:ModifierSubValue;
+  var mult:ModifierSubValue;
+  var desync:ModifierSubValue;
+  var time_add:ModifierSubValue;
+  var sine:ModifierSubValue;
+  var timertype:ModifierSubValue;
+
   public function new(name:String)
   {
     super(name, 0);
-    createSubMod("speed", 1.0);
-    createSubMod("mult", 1.0);
-    createSubMod("desync", 0.2);
-    createSubMod("time_add", 0.0);
-    createSubMod("sine", 0.0);
-    createSubMod("timertype", 0.0);
+    speed = createSubMod("speed", 1.0);
+    mult = createSubMod("mult", 1.0, ["period", "size"]);
+    desync = createSubMod("desync", 0.2, ["spacing"]);
+    time_add = createSubMod("time_add", 0.0, ["offset", "timeadd", "time_offset", "timeoffset"]);
+    sine = createSubMod("sine", 0.0, ["usesine", "sin"]);
+    timertype = createSubMod("timertype", 0.0);
   }
 
   function tanDrunkMath(noteDir:Int, curPos:Float):Float
   {
-    var time:Float = (getSubVal("timertype") >= 0.5 ? beatTime : songTime * 0.001);
-    time *= getSubVal("speed");
-    time += getSubVal("time_add");
+    var time:Float = (timertype.value >= 0.5 ? beatTime : songTime * 0.001);
+    time *= speed.value;
+    time += time_add.value;
 
-    var returnValue:Float = currentValue * (tan((time) + (noteDir * getSubVal("desync")) +
-      (curPos * 0.45) * (10.0 / FlxG.height) * getSubVal("mult"))) * (ModConstants.strumSize * 0.5);
+    var returnValue:Float = currentValue * (tan((time) + (noteDir * desync.value) +
+      (curPos * 0.45) * (10.0 / FlxG.height) * mult.value)) * (ModConstants.strumSize * 0.5);
 
     return returnValue;
   }
 
   function drunkMath(noteDir:Int, curPos:Float):Float
   {
-    var time:Float = (getSubVal("timertype") >= 0.5 ? beatTime : songTime * 0.001);
-    time *= getSubVal("speed");
-    time += getSubVal("time_add");
+    var time:Float = (timertype.value >= 0.5 ? beatTime : songTime * 0.001);
+    time *= speed.value;
+    time += time_add.value;
 
     var returnValue:Float = 0.0;
 
-    if (getSubVal("sine") >= 0.5) // Should use sine variant?
+    if (sine.value >= 0.5) // if above 50%, use sine instead of cos.
     {
-      returnValue = currentValue * (sin((time) + (noteDir * getSubVal("desync")) +
-        (curPos * 0.45) * (10.0 / FlxG.height) * getSubVal("mult"))) * (ModConstants.strumSize * 0.5);
+      returnValue = currentValue * (sin((time) + (noteDir * desync.value) +
+        (curPos * 0.45) * (10.0 / FlxG.height) * mult.value)) * (ModConstants.strumSize * 0.5);
     }
     else
     {
-      returnValue = currentValue * (cos((time) + (noteDir * getSubVal("desync")) +
-        (curPos * 0.45) * (10.0 / FlxG.height) * getSubVal("mult"))) * (ModConstants.strumSize * 0.5);
+      returnValue = currentValue * (cos((time) + (noteDir * desync.value) +
+        (curPos * 0.45) * (10.0 / FlxG.height) * mult.value)) * (ModConstants.strumSize * 0.5);
     }
 
     return returnValue;

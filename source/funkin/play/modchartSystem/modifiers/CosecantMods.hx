@@ -15,28 +15,33 @@ class CosecantModifierBase extends Modifier
     return 1 / Math.sin(angle);
   }
 
+  var speed:ModifierSubValue;
+  var mult:ModifierSubValue;
+  var desync:ModifierSubValue;
+  var time_add:ModifierSubValue;
+  var timertype:ModifierSubValue;
+
   public function new(name:String)
   {
     super(name, 0);
-    createSubMod("timertype", 0.0);
-    createSubMod("speed", 1.0);
-    createSubMod("time_add", 0.0);
 
-    createSubMod("mult", 1.0);
-    createSubMod("desync", 0.2);
-    // createSubMod("size", 1.0);
+    speed = createSubMod("speed", 1.0);
+    mult = createSubMod("mult", 1.0, ["period", "size"]);
+    desync = createSubMod("desync", 0.2, ["spacing"]);
+    time_add = createSubMod("time_add", 0.0, ["offset", "timeadd", "time_offset", "timeoffset"]);
+    timertype = createSubMod("timertype", 0.0);
   }
 
   function drunkMath(lane:Int, curPos:Float):Float
   {
-    var time:Float = (getSubVal("timertype") >= 0.5 ? beatTime : songTime * 0.001);
-    time *= getSubVal("speed");
-    time += getSubVal("time_add");
+    var time:Float = (timertype.value >= 0.5 ? beatTime : songTime * 0.001);
+    time *= speed.value;
+    time += time_add.value;
 
     var returnValue:Float = 0.0;
 
-    returnValue += currentValue * (cosecant(((time) + ((lane) * getSubVal("desync")) +
-      (curPos * getSubVal("mult") * (0.225)) * 10 / FlxG.height))) * ModConstants.strumSize * (0.5);
+    returnValue += currentValue * (cosecant(((time) + ((lane) * desync.value) +
+      (curPos * mult.value * (0.225)) * 10 / FlxG.height))) * ModConstants.strumSize * (0.5);
 
     return returnValue;
   }

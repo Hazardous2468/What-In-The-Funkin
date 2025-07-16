@@ -11,21 +11,24 @@ import funkin.play.modchartSystem.modifiers.BaseModifier;
 
 class SquareModBase extends Modifier
 {
+  var multSubmod:ModifierSubValue;
+  var offsetX:ModifierSubValue;
+  var offsetY:ModifierSubValue;
+
   public function new(name:String)
   {
     super(name, 0);
-    createSubMod("xoffset", 0.0);
-    createSubMod("yoffset", 0.0);
-    createSubMod("mult", 1.0);
+    offsetX = createSubMod("offset_x", 0.0, ["offsetx", "xoffset", "x_offset"]);
+    offsetY = createSubMod("offset_y", 0.0, ["offsety", "yoffset", "y_offset", "offset"]);
+    multSubmod = createSubMod("mult", 1.0, ["period", "size"]);
   }
 
   function squareMath(curPos:Float):Float
   {
-    var mult:Float = getSubVal("mult") / (ModConstants.strumSize * 2);
-    var timeOffset:Float = getSubVal("yoffset");
-    var xOffset:Float = getSubVal("xoffset");
+    var mult:Float = multSubmod.value / (ModConstants.strumSize * 2);
+    var timeOffset:Float = offsetY.value;
     var xVal:Float = sin((curPos + timeOffset) * Math.PI * mult);
-    xVal = Math.floor(xVal) + 0.5 + xOffset;
+    xVal = Math.floor(xVal) + 0.5 + offsetX.value;
     return xVal;
   }
 }

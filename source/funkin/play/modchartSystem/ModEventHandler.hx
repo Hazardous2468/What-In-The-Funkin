@@ -266,27 +266,71 @@ class ModEventHandler
     if (isSub)
     {
       var mod:Modifier = target.modifiers.get(subModArr[0]);
-      if (mod != null)
+      if (mod == null)
       {
-        var startPoint:Float = (type == "value" ? startingValue : mod.getSubVal(subModArr[1]));
-        var finishPoint:Float = startPoint + ((newValue - startPoint) * easeToUse(1.0));
-        var tween:FlxTween = tweenManager.num(startPoint, newValue, time,
-          {
-            ease: easeToUse,
-            onComplete: function(twn:FlxTween) {
-              modchartTweens.remove(realTag);
-              mod.setSubVal(subModArr[1], finishPoint);
-            }
-          }, function(v) {
-            mod.setSubVal(subModArr[1], v);
-          });
-
-        modchartTweens.set(realTag, tween);
-        return tween;
+        PlayState.instance.modDebugNotif(subModArr[0] + " is not a valid mod name!", FlxColor.RED);
+        return null;
       }
       else
       {
-        return null;
+        var subModName:String = mod.subModAliasConvert(subModArr[1]);
+        var isPriority:Bool = subModName == "priority";
+        if (isPriority)
+        {
+          var startPoint:Float = (type == "value" ? startingValue : mod.modPriority_additive);
+          var finishPoint:Float = startPoint + ((newValue - startPoint) * easeToUse(1.0));
+          if (time == 0) // no tween required!
+          {
+            mod.modPriority_additive = finishPoint;
+            return null;
+          }
+          var tween:FlxTween = tweenManager.num(startPoint, newValue, time,
+            {
+              ease: easeToUse,
+              onComplete: function(twn:FlxTween) {
+                modchartTweens.remove(realTag);
+                mod.modPriority_additive = finishPoint;
+              }
+            }, function(v) {
+              mod.modPriority_additive = v;
+            });
+
+          modchartTweens.set(realTag, tween);
+          return tween;
+        }
+        else
+        {
+          var subMod:ModifierSubValue;
+          if (mod.subValues.exists(subModName))
+          {
+            subMod = mod.subValues.get(subModName);
+          }
+          else
+          {
+            PlayState.instance.modDebugNotif(subModArr[1] + " is not a valid submod name!", FlxColor.RED);
+            return null;
+          }
+
+          var startPoint:Float = (type == "value" ? startingValue : subMod.value);
+          var finishPoint:Float = startPoint + ((newValue - startPoint) * easeToUse(1.0));
+          if (time == 0) // no tween required!
+          {
+            subMod.value = finishPoint;
+            return null;
+          }
+          var tween:FlxTween = tweenManager.num(startPoint, newValue, time,
+            {
+              ease: easeToUse,
+              onComplete: function(twn:FlxTween) {
+                modchartTweens.remove(realTag);
+                subMod.value = finishPoint;
+              }
+            }, function(v) {
+              subMod.value = v;
+            });
+          modchartTweens.set(realTag, tween);
+          return tween;
+        }
       }
     }
 
@@ -346,16 +390,23 @@ class ModEventHandler
     if (isSub)
     {
       var mod:Modifier = target.modifiers.get(subModArr[0]);
-      if (mod != null)
+      if (mod == null)
       {
-        if (time == 0)
+        PlayState.instance.modDebugNotif(subModArr[0] + " is not a valid mod name!", FlxColor.RED);
+        return null;
+      }
+      else
+      {
+        var subModName:String = mod.subModAliasConvert(subModArr[1]);
+        var isPriority:Bool = subModName == "priority";
+        if (isPriority)
         {
-          var v:Float = addValue * easeToUse(1.0);
-          mod.setSubVal(subModArr[1], mod.getSubVal(subModArr[1]) + (v));
-          return null;
-        }
-        else
-        {
+          if (time == 0) // no tween required!
+          {
+            var v:Float = addValue * easeToUse(1.0);
+            mod.modPriority_additive += v;
+            return null;
+          }
           var lastReportedChange:Float = 0;
           var tween:FlxTween = tweenManager.num(0, 1, time,
             {
@@ -363,22 +414,54 @@ class ModEventHandler
               onComplete: function(twn:FlxTween) {
                 modchartTweens.remove(realTag);
                 var v:Float = addValue * easeToUse(1.0);
-                mod.setSubVal(subModArr[1], mod.getSubVal(subModArr[1]) + (v - lastReportedChange));
+                mod.modPriority_additive += (v - lastReportedChange);
                 lastReportedChange = v;
               }
             }, function(t) {
-              var v:Float = addValue * easeToUse(t); // ???, cuz for some silly reason tweenValue was being set incorrectly by the tween function / manager? I don't know lmfao
-              mod.setSubVal(subModArr[1], mod.getSubVal(subModArr[1]) + (v - lastReportedChange));
+              var v:Float = addValue * easeToUse(t);
+              mod.modPriority_additive += (v - lastReportedChange);
               lastReportedChange = v;
             });
-
           modchartTweens.set(realTag, tween);
           return tween;
         }
-      }
-      else
-      {
-        return null;
+        else
+        {
+          var subMod:ModifierSubValue;
+          if (mod.subValues.exists(subModName))
+          {
+            subMod = mod.subValues.get(subModName);
+          }
+          else
+          {
+            PlayState.instance.modDebugNotif(subModArr[1] + " is not a valid submod name!", FlxColor.RED);
+            return null;
+          }
+
+          if (time == 0) // no tween required!
+          {
+            var v:Float = addValue * easeToUse(1.0);
+            subMod.value += v;
+            return null;
+          }
+          var lastReportedChange:Float = 0;
+          var tween:FlxTween = tweenManager.num(0, 1, time,
+            {
+              ease: FlxEase.linear,
+              onComplete: function(twn:FlxTween) {
+                modchartTweens.remove(realTag);
+                var v:Float = addValue * easeToUse(1.0);
+                subMod.value += (v - lastReportedChange);
+                lastReportedChange = v;
+              }
+            }, function(t) {
+              var v:Float = addValue * easeToUse(t);
+              subMod.value += (v - lastReportedChange);
+              lastReportedChange = v;
+            });
+          modchartTweens.set(realTag, tween);
+          return tween;
+        }
       }
     }
 
@@ -408,7 +491,6 @@ class ModEventHandler
             mod.currentValue = mod.currentValue + (v - lastReportedChange);
             lastReportedChange = v;
           });
-
         modchartTweens.set(realTag, tween);
         return tween;
       }
@@ -417,9 +499,8 @@ class ModEventHandler
     {
       return null;
     }
-  }
+  } // This function will trigger all the functions that need to be called when a reset is triggered!
 
-  // This function will trigger all the functions that need to be called when a reset is triggered!
   public function triggerResetFuncs():Void
   {
     for (resetFunc in modResetFuncs)

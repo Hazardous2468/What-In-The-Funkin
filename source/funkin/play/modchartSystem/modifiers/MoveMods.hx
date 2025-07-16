@@ -149,21 +149,20 @@ class CenteredXMod extends Modifier
 {
   var caluclated:Bool = false;
   var distanceToMove:Float = 0;
+  var shouldAlwaysReCalculate:ModifierSubValue;
 
   public function new(name:String)
   {
     super(name, 0);
     modPriority = -199;
-    // modPriority = -999999; // Apply this mod last so it doesn't fuck with mods like the rotate mods lmfao
-
     unknown = false;
     strumsMod = true;
-    createSubMod("always_calculate", 0.0);
+    shouldAlwaysReCalculate = createSubMod("always_calculate", 0.0, ["alwayscalculate", "always_recalculate", "alwaysrecalculate", "recalculate"]);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (!caluclated || getSubVal("always_calculate") > 0.5)
+    if (!caluclated || shouldAlwaysReCalculate.value > 0.5)
     {
       var beforeCenter:Float = strumLine.x;
       strumLine.screenCenter(X);
@@ -220,12 +219,15 @@ class AlwaysCenterMod extends Modifier
   var caluclated:Bool = false;
   var distanceToMove:Float = 0;
 
+  var shouldAlwaysReCalculate:ModifierSubValue;
+  var useOldMath:ModifierSubValue;
+
   public function new(name:String)
   {
     super(name, 0);
     modPriority = 51;
-    createSubMod("oldmath", 0.0);
-    createSubMod("always_calculate", 1.0);
+    useOldMath = createSubMod("oldmath", 0.0, ["method", "old", "legacy"]);
+    shouldAlwaysReCalculate = createSubMod("always_calculate", 0.0, ["alwayscalculate", "always_recalculate", "alwaysrecalculate", "recalculate"]);
     unknown = false;
     strumsMod = true;
   }
@@ -234,7 +236,7 @@ class AlwaysCenterMod extends Modifier
   {
     if (currentValue == 0) return; // skip math if mod is 0
 
-    if (getSubVal("oldmath") > 0.5)
+    if (useOldMath.value > 0.5)
     {
       var valchange:Float = currentValue * 0.5;
       var height:Float = 112.0;
@@ -250,7 +252,7 @@ class AlwaysCenterMod extends Modifier
     }
     else
     {
-      if (!caluclated || getSubVal("always_calculate") > 0.5)
+      if (!caluclated || shouldAlwaysReCalculate.value > 0.5)
       {
         var screenCenter:Float = (FlxG.height / 2) - (ModConstants.strumSize / 2);
         var differenceBetween:Float = data.y - screenCenter;
@@ -289,21 +291,25 @@ class JumpMod extends Modifier
     unknown = false;
     strumsMod = true;
 
-    createSubMod("beat", 1.0);
-    createSubMod("offset", 0.0);
-    createSubMod("reverse_affect", 1.0);
+    everyBeat = createSubMod("beat", 1.0, ["every", "frequency"]);
+    offset = createSubMod("offset", 0.0, ["time_add", "timeadd", "time_offset", "timeoffset"]);
+    reverseAffect = createSubMod("reverse_affect", 1.0, ["reverse", "reverseaffect"]);
   }
+
+  var everyBeat:ModifierSubValue;
+  var offset:ModifierSubValue;
+  var reverseAffect:ModifierSubValue;
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
 
-    var time:Float = (beatTime + getSubVal("offset")) % getSubVal("beat");
+    var time:Float = (beatTime + offset.value) % everyBeat.value;
     var val:Float = time * Conductor.instance.beatLengthMs;
 
     var reverseModAmount:Float = data.whichStrumNote.strumExtraModData.reverseMod + data.whichStrumNote.strumExtraModData.reverseModLane; // 0 to 1
     var reverseMult:Float = FlxMath.remapToRange(reverseModAmount, 0, 1, 1, -1);
-    reverseMult = FlxMath.lerp(1, reverseMult, getSubVal("reverse_affect"));
+    reverseMult = FlxMath.lerp(1, reverseMult, reverseAffect.value);
 
     var scrollSpeed = PlayState.instance.currentChart.scrollSpeed;
     data.y += Constants.PIXELS_PER_MS * scrollSpeed * (Preferences.downscroll ? -1 : 1) * val * currentValue * reverseMult;
@@ -319,8 +325,10 @@ class DriveMod extends Modifier
     unknown = false;
     strumsMod = true;
     notPercentage = true;
-    createSubMod("reverse_affect", 1.0);
+    reverseAffect = createSubMod("reverse_affect", 1.0, ["reverse", "reverseaffect"]);
   }
+
+  var reverseAffect:ModifierSubValue;
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
@@ -329,7 +337,7 @@ class DriveMod extends Modifier
     // multiply by the reverse amount for this movement
     var reverseModAmount:Float = data.whichStrumNote.strumExtraModData.reverseMod + data.whichStrumNote.strumExtraModData.reverseModLane; // 0 to 1
     var reverseMult:Float = FlxMath.remapToRange(reverseModAmount, 0, 1, 1, -1);
-    reverseMult = FlxMath.lerp(1, reverseMult, getSubVal("reverse_affect"));
+    reverseMult = FlxMath.lerp(1, reverseMult, reverseAffect.value);
 
     var scrollSpeed = PlayState.instance.currentChart.scrollSpeed;
     data.y += Constants.PIXELS_PER_MS * scrollSpeed * (Preferences.downscroll ? -1 : 1) * currentValue * reverseMult;

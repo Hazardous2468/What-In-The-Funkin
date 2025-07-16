@@ -190,12 +190,18 @@ class ModHandler
     {
       if (modifiers.exists(subModArr[0]))
       {
-        modifiers.get(subModArr[0]).setSubVal(subModArr[1], val * mmm);
+        var mod:Modifier = modifiers.get(subModArr[0]);
+        var subModName:String = mod.subModAliasConvert(subModArr[1]);
+        mod.setSubVal(subModName, val * mmm);
       }
       else
       {
         addMod(subModArr[0]); // try and add the mod
-        modifiers.get(subModArr[0]).setSubVal(subModArr[1], val * mmm);
+        PlayState.instance.modDebugNotif(subModArr[0] + " mod doesn't exist!\nTrying to add it now!", FlxColor.ORANGE);
+
+        var mod:Modifier = modifiers.get(subModArr[0]);
+        var subModName:String = mod.subModAliasConvert(subModArr[1]);
+        mod.setSubVal(subModName, val * mmm);
       }
       strum.debugNeedsUpdate = true;
       return;
