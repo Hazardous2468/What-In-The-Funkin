@@ -154,7 +154,7 @@ class ModifierSubValue
   /**
    * The current value of this subMod.
    */
-  public var value:Float = 0.0;
+  public var value(default, set):Float = 0.0;
 
   function set_value(v:Float):Float
   {
