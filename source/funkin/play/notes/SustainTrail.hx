@@ -184,7 +184,7 @@ class SustainTrail extends ZSprite
     }
 
     zoom = 1.0;
-    zoom *= noteStyle.fetchHoldNoteScale();
+    if (!isArrowPath) zoom *= noteStyle.fetchHoldNoteScale(); // arrowpath scale should not be controlled by notestyle hold scale
 
     // CALCULATE SIZE
     graphicWidth = graphic.width / 8 * zoom; // amount of notes * 2
