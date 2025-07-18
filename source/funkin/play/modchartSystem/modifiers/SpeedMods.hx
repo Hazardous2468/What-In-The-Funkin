@@ -22,7 +22,7 @@ class SpeedMod extends Modifier
     this.currentValue = 1;
   }
 
-  override function speedMath(lane:Int, curPos:Float, strumLine, isHoldNote = false):Float
+  override function speedMath(lane:Int, curPos:Float, strumLine:Strumline, isHoldNote:Bool = false):Float
   {
     return currentValue;
   }
@@ -63,7 +63,7 @@ class ReverseMod extends Modifier
     }
   }
 
-  override function speedMath(lane:Int, curPos:Float, strumLine, isHoldNote = false):Float
+  override function speedMath(lane:Int, curPos:Float, strumLine:Strumline, isHoldNote:Bool = false):Float
   {
     return (1 - (getCurVal() * 2));
   }
@@ -106,7 +106,7 @@ class SlowDownMod extends Modifier
     speedMod = true;
   }
 
-  override function speedMath(lane:Int, curPos:Float, strumLine, isHoldNote = false):Float
+  override function speedMath(lane:Int, curPos:Float, strumLine:Strumline, isHoldNote:Bool = false):Float
   {
     if (currentValue == 0) return 1; // skip math if mod is 0
     var retu_val:Float = 1 - currentValue + (((Math.abs(curPos) / 100) * currentValue));
@@ -125,7 +125,7 @@ class BrakeMod extends Modifier
     speedMod = true;
   }
 
-  override function speedMath(lane:Int, curPos:Float, strumLine, isHoldNote = false):Float
+  override function speedMath(lane:Int, curPos:Float, strumLine:Strumline, isHoldNote:Bool = false):Float
   {
     var returnVal:Float = 1.0;
 
@@ -153,7 +153,7 @@ class BoostMod extends Modifier
     startSubmod = createSubMod("start", 900, ["begin", "trigger", "threshold"]);
   }
 
-  override function speedMath(lane:Int, curPos:Float, strumLine, isHoldNote = false):Float
+  override function speedMath(lane:Int, curPos:Float, strumLine:Strumline, isHoldNote:Bool = false):Float
   {
     var speed:Float = 1.0; // return value
     var start:Float = this.startSubmod.value;
@@ -192,7 +192,7 @@ class OldBoostMod extends Modifier
     speedMod = true;
   }
 
-  override function speedMath(lane:Int, curPos:Float, strumLine, isHoldNote = false):Float
+  override function speedMath(lane:Int, curPos:Float, strumLine:Strumline, isHoldNote:Bool = false):Float
   {
     // IT'S THE SAME AS BRAKE, BUT THE CURVALUE IS REVERSED LMAO
     var returnVal:Float = 1.0;
@@ -221,7 +221,7 @@ class WaveMod extends Modifier
     offsetSubmod = createSubMod("offset", 0);
   }
 
-  override function speedMath(lane:Int, curPos:Float, strumLine, isHoldNote = false):Float
+  override function speedMath(lane:Int, curPos:Float, strumLine:Strumline, isHoldNote:Bool = false):Float
   {
     var curValue:Float = this.currentValue * 0.58;
     curValue += this.offsetSubmod.value;
@@ -248,7 +248,7 @@ class OldWaveMod extends Modifier
     multSubmod = createSubMod("mult", 1.0, ["period", "size"]);
   }
 
-  override function speedMath(lane:Int, curPos:Float, strumLine, isHoldNote = false):Float
+  override function speedMath(lane:Int, curPos:Float, strumLine:Strumline, isHoldNote:Bool = false):Float
   {
     var returnVal:Float = 1.0;
     // some magic numbers found by just messing around with values to get it as close as possible to NotITG

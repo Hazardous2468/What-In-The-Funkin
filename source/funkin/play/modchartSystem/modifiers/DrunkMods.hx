@@ -73,7 +73,7 @@ class DrunkXMod extends DrunkModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.noteType == "receptor") return; // skip math if mod is 0
     data.x -= drunkMath(data.direction, data.whichStrumNote?.strumDistance ?? 0); // undo the strum  movement.
     data.x += drunkMath(data.direction, data.curPos); // re apply but now with notePos
   }
@@ -94,7 +94,7 @@ class DrunkYMod extends DrunkModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.noteType == "receptor") return; // skip math if mod is 0
     data.y -= drunkMath(data.direction, data.whichStrumNote?.strumDistance ?? 0); // undo the strum  movement.
     data.y += drunkMath(data.direction, data.curPos); // re apply but now with notePos
   }
@@ -115,7 +115,7 @@ class DrunkZMod extends DrunkModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.noteType == "receptor") return; // skip math if mod is 0
     data.z -= drunkMath(data.direction, data.whichStrumNote?.strumDistance ?? 0); // undo the strum  movement.
     data.z += drunkMath(data.direction, data.curPos); // re apply but now with notePos
   }
@@ -136,7 +136,7 @@ class DrunkAngleMod extends DrunkModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.noteType == "receptor") return; // skip math if mod is 0
     data.angleZ -= drunkMath(data.direction, data.whichStrumNote?.strumDistance ?? 0); // undo the strum  movement.
     data.angleZ += drunkMath(data.direction, data.curPos); // re apply but now with notePos
   }
@@ -157,7 +157,7 @@ class DrunkAngleYMod extends DrunkModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.noteType == "receptor") return; // skip math if mod is 0
     data.angleY -= drunkMath(data.direction, data.whichStrumNote?.strumDistance ?? 0); // undo the strum  movement.
     data.angleY += drunkMath(data.direction, data.curPos); // re apply but now with notePos
   }
@@ -178,7 +178,7 @@ class DrunkAngleXMod extends DrunkModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.noteType == "receptor") return; // skip math if mod is 0
     data.angleX -= drunkMath(data.direction, data.whichStrumNote?.strumDistance ?? 0); // undo the strum  movement.
     data.angleX += drunkMath(data.direction, data.curPos); // re apply but now with notePos
   }
@@ -199,6 +199,7 @@ class DrunkScaleMod extends DrunkModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (currentValue == 0 || data.noteType == "receptor") return; // skip math if mod is 0
     strumMath(data, strumLine);
   }
 
@@ -221,6 +222,7 @@ class DrunkScaleXMod extends DrunkModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (currentValue == 0 || data.noteType == "receptor") return; // skip math if mod is 0
     strumMath(data, strumLine);
   }
 
@@ -241,6 +243,7 @@ class DrunkScaleYMod extends DrunkModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (currentValue == 0 || data.noteType == "receptor") return; // skip math if mod is 0
     strumMath(data, strumLine);
   }
 
@@ -261,6 +264,7 @@ class DrunkSkewXMod extends DrunkModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (currentValue == 0 || data.noteType == "receptor") return; // skip math if mod is 0
     strumMath(data, strumLine);
   }
 
@@ -281,6 +285,7 @@ class DrunkSkewYMod extends DrunkModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (currentValue == 0 || data.noteType == "receptor") return; // skip math if mod is 0
     strumMath(data, strumLine);
   }
 
@@ -317,7 +322,7 @@ class TanDrunkXMod extends DrunkModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.noteType == "receptor") return; // skip math if mod is 0
     data.x -= tanDrunkMath(data.direction, data.whichStrumNote?.strumDistance ?? 0); // undo the strum  movement.
     data.x += tanDrunkMath(data.direction, data.curPos); // re apply but now with notePos
   }
@@ -338,7 +343,7 @@ class TanDrunkYMod extends DrunkModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.noteType == "receptor") return; // skip math if mod is 0
     data.y -= tanDrunkMath(data.direction, data.whichStrumNote?.strumDistance ?? 0); // undo the strum  movement.
     data.y += tanDrunkMath(data.direction, data.curPos); // re apply but now with notePos
   }
@@ -359,7 +364,7 @@ class TanDrunkZMod extends DrunkModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.noteType == "receptor") return; // skip math if mod is 0
     data.z -= tanDrunkMath(data.direction, data.whichStrumNote?.strumDistance ?? 0); // undo the strum  movement.
     data.z += tanDrunkMath(data.direction, data.curPos); // re apply but now with notePos
   }
@@ -380,7 +385,7 @@ class TanDrunkAngleMod extends DrunkModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.noteType == "receptor") return; // skip math if mod is 0
     data.angleZ -= tanDrunkMath(data.direction, data.whichStrumNote?.strumDistance ?? 0); // undo the strum  movement.
     data.angleZ += tanDrunkMath(data.direction, data.curPos); // re apply but now with notePos
   }
@@ -401,6 +406,7 @@ class TanDrunkScaleMod extends DrunkModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (currentValue == 0 || data.noteType == "receptor") return; // skip math if mod is 0
     strumMath(data, strumLine);
   }
 

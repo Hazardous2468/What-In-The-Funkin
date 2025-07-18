@@ -1,4 +1,4 @@
-v0.9.1a:
+v1.0.0a EARLY:
 
 THIS UPDATE WILL REQUIRE MODCHARTS TO BE UPDATED DUE TO MODIFIER MATH CHANGES! (see below)
 
@@ -19,7 +19,8 @@ Changed notesCamera and AFTcamera to be ABOVE the HUD instead of behind for pari
 Metamods script overhaul:
 More modifiers, overhauled menu visuals, now works in StoryMenuState.
 
-Notestyles now have "zCalcMult" variable in data for holdCovers and splashes. Also fixed hold covers zMath
+Notestyles now have "zCalcMult" variable in data for holdCovers and splashes. Applied to pixel notestyle to fix hold covers and notesplashes on the z axis. 
+Fixed hold covers zMath.
 
 Fixed HyperNova for upscroll
 Fixed hurt note splashes and offsets.
@@ -50,11 +51,29 @@ Submod aliases finally added. Can now use "period" instead of "mult" for example
 
 Added "offset" submods to: circ, bumpy, bounce, zigzag, attenuate, digital, saw, spiral, tornado
 
-Added: spiralScaleX, spiralScaleY, attenuateScaleX, attenuateScaleY, attenuateAngleX, attenuateAngleY, digitalScaleX, digitalScaleY antiNegativeScale
+Added: spiralScaleX, spiralScaleY, attenuateScaleX, attenuateScaleY, attenuateAngleX, attenuateAngleY, digitalScaleX, digitalScaleY, antiNegativeScale, mini
 Fixed attenuateY affecting z instead of y (oops)
-
+Tiny modifier math is now divided by 2 (so now 100% is half the size instead of 0 scale)! Update your tiny values!
 Adjusted Spiral and Circ and Linear math
 Spiral and Circ and linear mods now have a "altCurPos" submod that will use unscaled curPos (the old math)
+Orient math tweaked (mainly applies to X and Y)
+
+
+Arrowpaths no longer scale based on hold notestyle scale
+
+
+Modchart breaking changes to be aware of:
+Linear math change (now automatically flips for downscroll)
+Spiral and Circ math change (use "altCurPos" submod to revert to old math style)
+Tiny values have been halved!
+Tweens are handled by beat position now instead of seconds!
+Boost math and wave math overhauled! (use oldWave mod if needed)
+SetDefault fixes
+Blacksphere, Drive, Jump now take reverse modifier into account
+Rotate submods have been renamed
+Note/AFT cameras are now layered ontop of the HUD like vanilla
+OrientX and Y changed
+
 
 
 

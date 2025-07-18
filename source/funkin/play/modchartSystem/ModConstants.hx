@@ -80,7 +80,7 @@ import funkin.play.modchartSystem.modifiers.*; // if only you worked ;_;
 
 class ModConstants
 {
-  public static var orientTimeOffset:Float = 4.0; // in ms
+  public static var orientTimeOffset:Float = -2.0; // in ms
 
   public static final MODCHART_VERSION:String = "EXPERIMENTAL";
 
@@ -1177,6 +1177,9 @@ class ModConstants
         newMod = new ScaleYNotesModifier(tag);
       case "scalehold":
         newMod = new ScaleHoldsModifier(tag);
+
+      case "mini":
+        newMod = new MiniModifier(tag);
 
       case "tiny":
         newMod = new TinyModifier(tag);

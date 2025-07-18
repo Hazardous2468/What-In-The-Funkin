@@ -76,7 +76,7 @@ class BeatXMod extends BeatModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.noteType == "receptor") return; // skip math if mod is 0
     data.x -= beatMath(data.whichStrumNote?.strumDistance ?? 0); // undo the strum  movement.
     data.x += beatMath(data.curPos);
   }
@@ -97,7 +97,7 @@ class BeatYMod extends BeatModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.noteType == "receptor") return; // skip math if mod is 0
     data.y -= beatMath(data.whichStrumNote?.strumDistance ?? 0); // undo the strum  movement.
     data.y += beatMath(data.curPos);
   }
@@ -118,7 +118,7 @@ class BeatZMod extends BeatModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.noteType == "receptor") return; // skip math if mod is 0
     data.z -= beatMath(data.whichStrumNote?.strumDistance ?? 0); // undo the strum  movement.
     data.z += beatMath(data.curPos);
   }
@@ -139,7 +139,7 @@ class BeatAngleMod extends BeatModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.noteType == "receptor") return; // skip math if mod is 0
     data.angleZ -= beatMath(data.whichStrumNote?.strumDistance ?? 0); // undo the strum  movement.
     data.angleZ += beatMath(data.curPos); // re apply but now with notePos
   }
@@ -160,7 +160,7 @@ class BeatAngleXMod extends BeatModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.noteType == "receptor") return; // skip math if mod is 0
     data.angleX -= beatMath(data.whichStrumNote?.strumDistance ?? 0); // undo the strum  movement.
     data.angleX += beatMath(data.curPos); // re apply but now with notePos
   }
@@ -181,7 +181,7 @@ class BeatAngleYMod extends BeatModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.noteType == "receptor") return; // skip math if mod is 0
     data.angleY -= beatMath(data.whichStrumNote?.strumDistance ?? 0); // undo the strum  movement.
     data.angleY += beatMath(data.curPos); // re apply but now with notePos
   }

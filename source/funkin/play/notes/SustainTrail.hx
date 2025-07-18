@@ -184,7 +184,9 @@ class SustainTrail extends ZSprite
     }
 
     zoom = 1.0;
-    if (!isArrowPath) zoom *= noteStyle.fetchHoldNoteScale(); // arrowpath scale should not be controlled by notestyle hold scale
+    if (isArrowPath) zoom *= 0.7; // based of funkin notestyle
+    else
+      zoom *= noteStyle.fetchHoldNoteScale(); // arrowpath scale should not be controlled by notestyle hold scale
 
     // CALCULATE SIZE
     graphicWidth = graphic.width / 8 * zoom; // amount of notes * 2
@@ -292,8 +294,9 @@ class SustainTrail extends ZSprite
     }
 
     zoom = 1.0;
-    zoom *= noteStyle.fetchHoldNoteScale();
-    zoom *= 0.7;
+    if (isArrowPath) zoom *= 0.7; // based of funkin notestyle
+    else
+      zoom *= noteStyle.fetchHoldNoteScale(); // arrowpath scale should not be controlled by notestyle hold scale
 
     // alpha = 0.6;
     alpha = 1.0;
