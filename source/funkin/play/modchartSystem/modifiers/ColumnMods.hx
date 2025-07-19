@@ -100,7 +100,9 @@ class BlackSphereInvertMod extends Modifier
 
     // multiply by the reverse amount for this movement
     var whichStrummy = strumLine.getByIndex(lane);
-    var reverseModAmount:Float = whichStrummy.strumExtraModData.reverseMod + whichStrummy.strumExtraModData.reverseModLane; // 0 to 1
+    // var reverseModAmount:Float = whichStrummy.strumExtraModData.reverseMod + whichStrummy.strumExtraModData.reverseModLane; // 0 to 1
+    var reverseModAmount:Float = whichStrummy.noteModData.getReverse();
+
     var reverseMult:Float = FlxMath.remapToRange(reverseModAmount, 0, 1, 1, -1);
 
     if (variant.value >= 1.0)
@@ -186,7 +188,8 @@ class BlackSphereFlipMod extends Modifier
 
     // multiply by the reverse amount for this movement
     var whichStrummy = strumLine.getByIndex(lane);
-    var reverseModAmount:Float = whichStrummy.strumExtraModData.reverseMod + whichStrummy.strumExtraModData.reverseModLane; // 0 to 1
+    // var reverseModAmount:Float = whichStrummy.strumExtraModData.reverseMod + whichStrummy.strumExtraModData.reverseModLane; // 0 to 1
+    var reverseModAmount:Float = whichStrummy.noteModData.getReverse();
     var reverseMult:Float = FlxMath.remapToRange(reverseModAmount, 0, 1, 1, -1);
 
     if (!Preferences.downscroll) yValue *= -1;

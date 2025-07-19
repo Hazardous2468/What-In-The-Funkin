@@ -136,6 +136,15 @@ class NoteData
     defaultValues();
   }
 
+  // Gets the current reverse modifier amount.
+  public function getReverse():Float
+  {
+    if (whichStrumNote?.strumExtraModData == null) return 0;
+
+    var reverseModAmount:Float = whichStrumNote.strumExtraModData.reverseMod + whichStrumNote.strumExtraModData.reverseModLane;
+    return reverseModAmount;
+  }
+
   public function clearNoteMods():Void
   {
     noteMods = [];

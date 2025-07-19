@@ -2277,17 +2277,11 @@ class PlayState extends MusicBeatSubState
     // IF WE ARE RELOADING THIS MIDSONG!
     if (playerStrumline != null && modchartEventHandler != null)
     {
-      // for (lua in luaArray)
-      // {
-      //  lua.call('setUp', []);
-      // }
-
       modchartEventHandler.clearEvents();
       for (lua in luaArray)
       {
         lua.call('modsTimeline', []);
       }
-      // check if displayNotif already displaying something in case of an error!
       if (showNotif)
       {
         modDebugNotif("Reloaded modchart...");
@@ -2329,6 +2323,8 @@ class PlayState extends MusicBeatSubState
       allStrumSprites.cameras = [camNotes];
       add(allStrumSprites);
       allStrumSprites.visible = false;
+
+      setUpModTXT();
     }
   }
 
@@ -2440,13 +2436,6 @@ class PlayState extends MusicBeatSubState
 
       dispatchEvent(new ScriptEvent(MODCHART_SETUP));
 
-      for (lua in luaArray)
-      {
-        lua.call('modsTimeline', []);
-      }
-
-      dispatchEvent(new ScriptEvent(MODCHART_TIMELINE));
-
       for (strumLine in allStrumLines)
       {
         if (!strumLine.defaultPlayerControl)
@@ -2454,9 +2443,6 @@ class PlayState extends MusicBeatSubState
           strumLine.mods.invertValues = modchartEventHandler.invertForOpponent;
         }
       }
-
-      modchartEventHandler.setupEvents();
-      setUpModTXT();
 
       dispatchEvent(new ScriptEvent(MODCHART_RESET));
     }
@@ -2581,6 +2567,17 @@ class PlayState extends MusicBeatSubState
 
     regenNoteData();
 
+    // Moved from initStrums to here so that the strums have their noteData set for getNoteBeats to work
+    if (modchartEventHandler != null)
+    {
+      for (lua in luaArray)
+      {
+        lua.call('modsTimeline', []);
+      }
+      dispatchEvent(new ScriptEvent(MODCHART_TIMELINE));
+      modchartEventHandler.setupEvents();
+    }
+
     var event:ScriptEvent = new ScriptEvent(CREATE, false);
     ScriptEventDispatcher.callEvent(currentSong, event);
 
@@ -2598,7 +2595,6 @@ class PlayState extends MusicBeatSubState
     Highscore.tallies = new Tallies();
 
     var event:SongLoadScriptEvent = new SongLoadScriptEvent(currentChart.song.id, currentChart.difficulty, currentChart.notes.copy(), currentChart.getEvents());
-
     dispatchEvent(event);
 
     var builtNoteData = event.notes;
@@ -2875,9 +2871,9 @@ class PlayState extends MusicBeatSubState
         {
           if (note == null) continue;
           // TODO: Are offsets being accounted for in the correct direction?
-          var hitWindowStart = note.strumTime + Conductor.instance.inputOffset - Constants.HIT_WINDOW_MS;
+          var hitWindowStart = note.strumTime + Conductor.instance.inputOffset - (Constants.HIT_WINDOW_MS * note.hitWindowMultiplier);
           var hitWindowCenter = note.strumTime + Conductor.instance.inputOffset;
-          var hitWindowEnd = note.strumTime + Conductor.instance.inputOffset + Constants.HIT_WINDOW_MS;
+          var hitWindowEnd = note.strumTime + Conductor.instance.inputOffset + (Constants.HIT_WINDOW_MS * note.hitWindowMultiplier);
           if (Conductor.instance.songPosition > hitWindowEnd)
           {
             if (note.hasMissed || note.hasBeenHit) continue;
@@ -2957,9 +2953,9 @@ class PlayState extends MusicBeatSubState
             continue;
           }
 
-          var hitWindowStart = note.strumTime - Constants.HIT_WINDOW_MS;
+          var hitWindowStart = note.strumTime - (Constants.HIT_WINDOW_MS * note.hitWindowMultiplier);
           var hitWindowCenter = note.strumTime;
-          var hitWindowEnd = note.strumTime + Constants.HIT_WINDOW_MS;
+          var hitWindowEnd = note.strumTime + (Constants.HIT_WINDOW_MS * note.hitWindowMultiplier);
 
           if (Conductor.instance.songPosition > hitWindowEnd)
           {
@@ -3047,9 +3043,9 @@ class PlayState extends MusicBeatSubState
       if (note == null) continue;
 
       // TODO: Are offsets being accounted for in the correct direction?
-      var hitWindowStart = note.strumTime + Conductor.instance.inputOffset - Constants.HIT_WINDOW_MS;
+      var hitWindowStart = note.strumTime + Conductor.instance.inputOffset - (Constants.HIT_WINDOW_MS * note.hitWindowMultiplier);
       var hitWindowCenter = note.strumTime + Conductor.instance.inputOffset;
-      var hitWindowEnd = note.strumTime + Conductor.instance.inputOffset + Constants.HIT_WINDOW_MS;
+      var hitWindowEnd = note.strumTime + Conductor.instance.inputOffset + (Constants.HIT_WINDOW_MS * note.hitWindowMultiplier);
 
       if (Conductor.instance.songPosition > hitWindowEnd)
       {
@@ -3143,9 +3139,9 @@ class PlayState extends MusicBeatSubState
         continue;
       }
 
-      var hitWindowStart = note.strumTime - Constants.HIT_WINDOW_MS;
+      var hitWindowStart = note.strumTime - (Constants.HIT_WINDOW_MS * note.hitWindowMultiplier);
       var hitWindowCenter = note.strumTime;
-      var hitWindowEnd = note.strumTime + Constants.HIT_WINDOW_MS;
+      var hitWindowEnd = note.strumTime + (Constants.HIT_WINDOW_MS * note.hitWindowMultiplier);
 
       if (Conductor.instance.songPosition > hitWindowEnd)
       {
@@ -3294,7 +3290,7 @@ class PlayState extends MusicBeatSubState
     for (note in playerStrumline.notes.members)
     {
       if (note == null || note.hasBeenHit) continue;
-      var hitWindowEnd = note.strumTime + Constants.HIT_WINDOW_MS;
+      var hitWindowEnd = note.strumTime + (Constants.HIT_WINDOW_MS * note.hitWindowMultiplier);
 
       if (Conductor.instance.songPosition > hitWindowEnd)
       {
@@ -3313,26 +3309,6 @@ class PlayState extends MusicBeatSubState
     {
       customStrummer.handleSkippedNotes();
     }
-
-    /*
-            for (customStrummer in customStrumLines)
-            {
-              for (note in customStrummer.notes.members)
-              {
-                if (note == null || note.hasBeenHit) continue;
-                var hitWindowEnd = note.strumTime + Constants.HIT_WINDOW_MS;
-  
-                if (Conductor.instance.songPosition > hitWindowEnd)
-                {
-                  // We have passed this note.
-                  // Flag the note for deletion without actually penalizing the player.
-                  note.handledMiss = true;
-                }
-              }
-  
-        customStrummer.handleSkippedNotes();
-        }
-       */
   }
 
   // same as processInputQueue but for custom strummers. Main difference is that it this version doesn't remove the inputs from the input array.

@@ -20,9 +20,14 @@ class NoteSprite extends ZSprite
 
   static final DIRECTION_COLORS:Array<String> = ['purple', 'blue', 'green', 'red'];
 
+  // The holdNoteSprite attached to this note sprite, if it exists.
   public var holdNoteSprite:SustainTrail;
 
+  // The Hue, Saturation, Value Shader attached to this note sprites. Mainly used for quant coloured note styles
   public var hsvShader:HSVNotesShader;
+
+  // Multiplies the hitWindow size by this amount
+  public var hitWindowMultiplier:Float = 1;
 
   /**
    * The strum time at which the note should be hit, in milliseconds.

@@ -199,7 +199,7 @@ class CenteredMod extends Modifier
     if (currentValue == 0) return; // skip math if mod is 0
 
     // multiply by the reverse amount for this movement
-    var reverseModAmount:Float = data.whichStrumNote.strumExtraModData.reverseMod + data.whichStrumNote.strumExtraModData.reverseModLane; // 0 to 1
+    var reverseModAmount:Float = data.getReverse(); // 0 to 1
     var reverseMult:Float = FlxMath.remapToRange(reverseModAmount, 0, 1, 1, -1);
 
     // Compute this only once!
@@ -307,7 +307,7 @@ class JumpMod extends Modifier
     var time:Float = (beatTime + offset.value) % everyBeat.value;
     var val:Float = time * Conductor.instance.beatLengthMs;
 
-    var reverseModAmount:Float = data.whichStrumNote.strumExtraModData.reverseMod + data.whichStrumNote.strumExtraModData.reverseModLane; // 0 to 1
+    var reverseModAmount:Float = data.getReverse();
     var reverseMult:Float = FlxMath.remapToRange(reverseModAmount, 0, 1, 1, -1);
     reverseMult = FlxMath.lerp(1, reverseMult, reverseAffect.value);
 
@@ -335,7 +335,7 @@ class DriveMod extends Modifier
     if (currentValue == 0) return; // skip math if mod is 0
 
     // multiply by the reverse amount for this movement
-    var reverseModAmount:Float = data.whichStrumNote.strumExtraModData.reverseMod + data.whichStrumNote.strumExtraModData.reverseModLane; // 0 to 1
+    var reverseModAmount:Float = data.getReverse();
     var reverseMult:Float = FlxMath.remapToRange(reverseModAmount, 0, 1, 1, -1);
     reverseMult = FlxMath.lerp(1, reverseMult, reverseAffect.value);
 

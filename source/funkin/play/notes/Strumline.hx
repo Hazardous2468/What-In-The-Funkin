@@ -1918,6 +1918,19 @@ class Strumline extends FlxSpriteGroup
     return result;
   }
 
+  // Edited version of getFirstAvailable that also checks if the noteStyle is matching.
+  function getFirstAvailableHold():SustainTrail
+  {
+    for (basic in this.holdNotes)
+    {
+      if (basic != null && !basic.exists && basic.noteStyleName == this.noteStyle.id)
+      {
+        return basic;
+      }
+    }
+    return null;
+  }
+
   /**
    * Custom recycling behavior for hold note sprites.
    */
@@ -1925,8 +1938,10 @@ class Strumline extends FlxSpriteGroup
   {
     var result:SustainTrail = null;
 
-    // Else, find a note which is inactive so we can revive it.
-    result = this.holdNotes.getFirstAvailable();
+    // Find a note which is inactive so we can revive it.
+
+    result = getFirstAvailableHold();
+    // result = this.holdNotes.getFirstAvailable();
 
     if (result != null)
     {

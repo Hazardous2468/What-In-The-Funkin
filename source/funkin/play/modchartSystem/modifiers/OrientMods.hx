@@ -96,7 +96,7 @@ class OrientModBase extends Modifier
         a = (data.x - data.lastKnownPosition.x);
     }
 
-    if (useAltMathSubmod.value >= 0.5) // Old math
+    if (useAltMathSubmod.value >= 0.5) // Old math. Only allows 180 degrees
     {
       var calculateAngleDif:Float = Math.atan(b / a);
 
@@ -111,13 +111,32 @@ class OrientModBase extends Modifier
       }
       return calculateAngleDif;
     }
-    else
+    else // allows for 360 degrees
     {
       if (Preferences.downscroll)
       {
         a *= -1;
         b *= -1;
       }
+
+      // Fix for Z
+      if (data.noteType != "receptor" && index == 3)
+      {
+        a *= -1;
+        b *= -1;
+      }
+
+      // hardcoded fix for reverse for z variant. Won't bother with fixing other mods though
+      if (index % 3 == 0)
+      {
+        var reverseModAmount:Float = data.getReverse(); // 0 to 1
+        if (reverseModAmount > 0.5)
+        {
+          a *= -1;
+          b *= -1;
+        }
+      }
+
       var calculateAngleDif:Float = FlxAngle.degreesFromOrigin(a, b);
       data.lastKnownOrientAngle[index] = calculateAngleDif;
       return calculateAngleDif;

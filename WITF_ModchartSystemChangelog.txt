@@ -61,6 +61,8 @@ Orient math tweaked (mainly applies to X and Y)
 
 Arrowpaths no longer scale based on hold notestyle scale
 
+Added "hitWindowMultiplier" variable to noteSprites. Used by the hurt note script to decrease the hitWindow size
+
 
 Modchart breaking changes to be aware of:
 Linear math change (now automatically flips for downscroll)

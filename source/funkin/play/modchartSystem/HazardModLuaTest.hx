@@ -146,9 +146,13 @@ class HazardModLuaTest
         bfTarget = true;
       }
 
-      if (PlayState.instance?.currentChart != null)
+      var useStrumlineChart:Bool = true;
+      @:privateAccess
+      var chartData = useStrumlineChart ? (bfTarget ? PlayState.instance?.playerStrumline?.noteData : PlayState.instance?.opponentStrumline?.noteData) : PlayState.instance?.currentChart?.notes;
+
+      if (chartData != null)
       {
-        for (songNote in PlayState.instance.currentChart.notes)
+        for (songNote in chartData)
         {
           var strumTime:Float = songNote.time;
           var noteBeat:Float = Conductor.instance.getTimeInSteps(strumTime) / Constants.STEPS_PER_BEAT;
@@ -194,6 +198,10 @@ class HazardModLuaTest
               }
           }
         }
+      }
+      else
+      {
+        PlayState.instance.modDebugNotif("Chart data was null!", FlxColor.RED);
       }
 
       return arr;
