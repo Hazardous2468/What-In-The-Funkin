@@ -61,7 +61,10 @@ Orient math tweaked (mainly applies to X and Y)
 
 Arrowpaths no longer scale based on hold notestyle scale
 
-Added "hitWindowMultiplier" variable to noteSprites. Used by the hurt note script to decrease the hitWindow size
+Added "hitWindowMultiplier" variable to noteSprites. Used by the hurt note script to decrease the hitWindow size. (Should fix inputs being lost when hurts are around)
+
+getNoteBeats logic moved to ModConstants for easy access in hxScript. (Works the same though).
+
 
 
 Modchart breaking changes to be aware of:
