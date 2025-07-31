@@ -30,6 +30,7 @@ import funkin.audio.FunkinSound; // used for debugging stuff lol
 import funkin.play.modchartSystem.modifiers.BaseModifier;
 import funkin.graphics.ZSprite;
 import flixel.util.FlxColor;
+import funkin.util.GRhythmUtil;
 
 class ModHandler
 {
@@ -638,12 +639,14 @@ class ModHandler
     }
 
     note.x = whichStrumNote.x + getHoldOffsetX(isArrowPath, graphicWidth);
-    var sillyPos:Float = strumLine.calculateNoteYPos(strumTime) * scrollMult;
 
-    var note_heighht:Float = 0.0;
+    var sillyPos:Float = GRhythmUtil.getNoteY(strumTime, strumLine.scrollSpeed, strumLine.isDownscroll, strumLine.conductorInUse) * scrollMult;
+
+    var noteHeight:Float = 0.0;
+
     if (Preferences.downscroll)
     {
-      note.y = (whichStrumNote.y + sillyPos - note_heighht + Strumline.STRUMLINE_SIZE / 2);
+      note.y = (whichStrumNote.y + sillyPos - noteHeight + Strumline.STRUMLINE_SIZE / 2);
     }
     else
     {

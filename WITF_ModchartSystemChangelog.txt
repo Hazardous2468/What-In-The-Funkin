@@ -1,5 +1,7 @@
 v0.9.1a:
 
+Updated to latest version of FNF (v0.7.3)
+
 Re-added 'isPlayer' variable to Strumline.hx to fix scripts which may rely on said variable.
 
 Updated the bold font to now include numbers (taken from Psych lmfao). Now you can actually see the numbers for playback rate in the pause menu.
@@ -38,7 +40,9 @@ NoteSplashes and HoldCovers now copy the strum scale. This behaviour can be disa
 
 Separated the modified HSV shader from the original so any mods that may use the base game HSV shader won't be incorrect.
 
+Added "hitWindowMultiplier" variable to noteSprites. Used by the hurt note script to decrease the hitWindow size. (Should fix inputs being lost when hurts are around)
 
+getNoteBeats logic moved to ModConstants for easy access in hxScript. (Works the same though).
 
 
 

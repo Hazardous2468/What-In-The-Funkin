@@ -236,6 +236,8 @@ class NoteSprite extends ZSprite
 
     noteStyleName = noteStyle.id;
 
+    this.alpha = 1;
+
     setupNoteGraphic(noteStyle);
     vwooshing = false;
   }

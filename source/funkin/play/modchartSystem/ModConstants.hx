@@ -491,9 +491,80 @@ class ModConstants
     return modName;
   }
 
+  // Checks if a modifier should be inverted.
   public static function invertValueCheck(tag:String, invertValues:Bool):Float
   {
     return (ModConstants.dadInvert.contains(tag) && invertValues) ? -1.0 : 1.0;
+  }
+
+  /**
+   * Gets and returns an array of notes between the two specified beats!
+   * @param startBeat The starting beat to start getting notes from. INCLUSIVE!
+   * @param endBeat The ending beat to stop getting notes from. EXCLUSIVE!
+   * @param playerTarget which player to target getting the notes from.
+   * @return The array of notes between the two specified points, formatted as: noteBeat, noteData, noteLength, noteKind
+   */
+  public static function getNoteBeats(startBeat:Float, endBeat:Float, playerTarget:String = "bf"):Array<Array<Dynamic>>
+  {
+    var arr:Array<Array<Dynamic>> = []; // The variable that gets returned.
+    // FNF only has Dad and Boyfriend notes. Until that changes, the target can only point to one or the other.
+    var bfTarget:Bool = false;
+    playerTarget = playerTarget.toLowerCase();
+    if (playerTarget == "bf" || playerTarget == "boyfriend" || playerTarget == "0" || playerTarget == "1")
+    {
+      bfTarget = true;
+    }
+    // Controls whether or not the noteData is gotten straight from the strumline, or the currentChart stored in PlayState.
+    var useStrumlineChart:Bool = true;
+    @:privateAccess
+    var chartData = useStrumlineChart ? (bfTarget ? PlayState.instance?.playerStrumline?.noteData : PlayState.instance?.opponentStrumline?.noteData) : PlayState.instance?.currentChart?.notes;
+    if (chartData != null)
+    {
+      for (songNote in chartData)
+      {
+        var strumTime:Float = songNote.time;
+        var noteBeat:Float = Conductor.instance.getTimeInSteps(strumTime) / Constants.STEPS_PER_BEAT;
+        // if outside of range, skip this note
+        if (!(startBeat <= noteBeat && endBeat > noteBeat))
+        {
+          continue;
+        }
+        var noteData:Int = songNote.getDirection();
+        var kind:String = "default";
+        if (songNote.kind != null)
+        {
+          kind = songNote.kind;
+        }
+        switch (songNote.getStrumlineIndex())
+        {
+          case 0:
+            if (bfTarget)
+            {
+              var a:Array<Dynamic> = [];
+              a.push(noteBeat);
+              a.push(noteData);
+              a.push(songNote.length);
+              a.push(kind);
+              arr.push(a);
+            }
+          case 1:
+            if (!bfTarget)
+            {
+              var a:Array<Dynamic> = [];
+              a.push(noteBeat);
+              a.push(noteData);
+              a.push(songNote.length);
+              a.push(kind);
+              arr.push(a);
+            }
+        }
+      }
+    }
+    else
+    {
+      PlayState.instance.modDebugNotif("Chart data was null!", FlxColor.RED);
+    }
+    return arr;
   }
 
   // Input an ease and this function will return the same ease but flipped horizontally (meaning it'll start at 100% instead of 0%)
@@ -556,6 +627,7 @@ class ModConstants
     return result;
   }
 
+  // A function that converts a string to an ease function.
   public static function getEaseFromString(str:String = "linear"):Null<Float->Float>
   {
     // v0.9a

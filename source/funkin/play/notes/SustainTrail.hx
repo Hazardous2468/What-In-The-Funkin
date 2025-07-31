@@ -1,5 +1,8 @@
 package funkin.play.notes;
 
+import funkin.play.notes.notestyle.NoteStyle;
+import funkin.data.song.SongData.SongNoteData;
+import funkin.mobile.ui.FunkinHitbox.FunkinHitboxControlSchemes;
 import flixel.FlxSprite;
 import flixel.graphics.FlxGraphic;
 import flixel.graphics.tile.FlxDrawTrianglesItem.DrawData;
@@ -93,8 +96,6 @@ class SustainTrail extends ZSprite
    */
   public var colors:DrawData<Int> = null;
 
-  private var processedGraphic:FlxGraphic;
-
   private var zoom:Float = 1;
 
   /**
@@ -161,6 +162,12 @@ class SustainTrail extends ZSprite
     {
       super(0, 0, noteStyle.getHoldNoteAssetPath());
       // setupHoldNoteGraphic(noteStyle);// still need to support this lmfao
+    }
+
+    if (useShader)
+    {
+      hsvShader = new HSVNotesShader();
+      this.shader = hsvShader;
     }
 
     noteStyleOffsets = noteStyle.getHoldNoteOffsets();
@@ -293,11 +300,18 @@ class SustainTrail extends ZSprite
 
     zoom = 1.0;
     zoom *= noteStyle.fetchHoldNoteScale();
-    zoom *= 0.7;
+
+    // CALCULATE SIZE
+    graphicWidth = graphic.width / 8 * zoom; // amount of notes * 2
+    graphicHeight = sustainHeight(sustainLength, parentStrumline?.scrollSpeed ?? 1.0);
+    // instead of scrollSpeed, PlayState.SONG.speed
+
+    flipY = Preferences.downscroll #if mobile
+    || (Preferences.controlsScheme == FunkinHitboxControlSchemes.Arrows
+      && !funkin.mobile.input.ControlsHandler.usingExternalInputDevice) #end;
 
     // alpha = 0.6;
     alpha = 1.0;
-    // calls updateColorTransform(), which initializes processedGraphic!
     updateColorTransform();
 
     updateClipping();
@@ -1460,15 +1474,11 @@ class SustainTrail extends ZSprite
       // else
       getScreenPosition(_point, camera).subtractPoint(offset);
 
-      camera.drawTriangles(processedGraphic, vertices, indices, uvtData, colors, _point, blend, true, antialiasing, colorTransform, hsvShader, cullMode);
-
-      // camera.drawTriangles(graphicToUse, vertices, indices, uvtData, null, _point, blend, textureRepeat, antialiasing,
-      //   spriteGraphic?.colorTransform ?? colorTransform, spriteGraphic?.shader ?? null, c);
+      camera.drawTriangles(graphic, vertices, indices, uvtData, colors, _point, blend, true, antialiasing, colorTransform, shader, cullMode);
+      #if debug
+      if (FlxG.debugger.drawDebug) drawDebug();
+      #end
     }
-
-    #if FLX_DEBUG
-    if (FlxG.debugger.drawDebug) drawDebug();
-    #end
   }
 
   public override function kill():Void
@@ -1505,26 +1515,7 @@ class SustainTrail extends ZSprite
     vertices = null;
     indices = null;
     uvtData = null;
-    if (processedGraphic != null) processedGraphic.destroy();
-
     super.destroy();
-  }
-
-  override function updateColorTransform():Void
-  {
-    super.updateColorTransform();
-
-    // if (processedGraphic != null) processedGraphic.destroy();
-
-    if (processedGraphic == null)
-    {
-      processedGraphic = FlxGraphic.fromGraphic(graphic, true);
-      // processedGraphic.bitmap.colorTransform(processedGraphic.bitmap.rect, colorTransform);
-    }
-    if (useShader && this.hsvShader == null)
-    {
-      this.hsvShader = new HSVNotesShader();
-    }
   }
 
   public function desaturate():Void
