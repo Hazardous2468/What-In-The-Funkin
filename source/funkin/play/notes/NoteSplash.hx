@@ -53,7 +53,7 @@ class NoteSplash extends ZSprite
   {
     if (frames == null) noteStyle.buildSplashSprite(this);
 
-    if (this.animation.getAnimationList().length < 8)
+    if (this.animation.getAnimationList().length < Strumline.KEY_COUNT)
     {
       trace('WARNING: NoteSplash failed to initialize all animations.');
     }

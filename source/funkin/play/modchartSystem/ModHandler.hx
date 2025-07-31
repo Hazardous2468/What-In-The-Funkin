@@ -191,12 +191,18 @@ class ModHandler
     {
       if (modifiers.exists(subModArr[0]))
       {
-        modifiers.get(subModArr[0]).setSubVal(subModArr[1], val * mmm);
+        var mod:Modifier = modifiers.get(subModArr[0]);
+        var subModName:String = mod.subModAliasConvert(subModArr[1]);
+        mod.setSubVal(subModName, val * mmm);
       }
       else
       {
         addMod(subModArr[0]); // try and add the mod
-        modifiers.get(subModArr[0]).setSubVal(subModArr[1], val * mmm);
+        PlayState.instance.modDebugNotif(subModArr[0] + " mod doesn't exist!\nTrying to add it now!", FlxColor.ORANGE);
+
+        var mod:Modifier = modifiers.get(subModArr[0]);
+        var subModName:String = mod.subModAliasConvert(subModArr[1]);
+        mod.setSubVal(subModName, val * mmm);
       }
       strum.debugNeedsUpdate = true;
       return;
@@ -235,12 +241,18 @@ class ModHandler
     {
       if (modifiers.exists(subModArr[0]))
       {
-        modifiers.get(subModArr[0]).setDefaultSubVal(subModArr[1], val * mmm);
+        var mod:Modifier = modifiers.get(subModArr[0]);
+        var subModName:String = mod.subModAliasConvert(subModArr[1]);
+        mod.setDefaultSubVal(subModName, val * mmm);
       }
       else
       {
         addMod(subModArr[0]); // try and add the mod
-        modifiers.get(subModArr[0]).setDefaultSubVal(subModArr[1], val * mmm);
+        // PlayState.instance.modDebugNotif(subModArr[0] + " mod doesn't exist!\nTrying to add it now!", FlxColor.ORANGE);
+
+        var mod:Modifier = modifiers.get(subModArr[0]);
+        var subModName:String = mod.subModAliasConvert(subModArr[1]);
+        mod.setDefaultSubVal(subModName, val * mmm);
       }
       strum.debugNeedsUpdate = true;
       return;
@@ -696,6 +708,10 @@ class ModHandler
    */
   public function setNotePos(note:NoteSprite, orientPass:Bool = false):Void
   {
+    /*
+      Notes DO copy the strums: x, y, z, anglez
+      Notes DO NOT copy the strums: anglex, angley, scalex, scaley, skewx, skewy, skewz (any any other value outside what they do copy)
+     */
     if (!orientPass && (note.noteModData.orient2[0] != 0 || note.noteModData.orient2[1] != 0 || note.noteModData.orient2[2] != 0))
     {
       setNotePos(note, true);

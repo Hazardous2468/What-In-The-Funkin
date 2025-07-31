@@ -21,26 +21,31 @@ class ChartEditorThemeHandler
   // ================================
   static final BACKGROUND_COLOR_LIGHT:FlxColor = 0xFF673AB7;
   static final BACKGROUND_COLOR_DARK:FlxColor = 0xFF361E60;
+  static final BACKGROUND_COLOR_HAZARD:FlxColor = 0xFF292326;
 
   // Color 1 of the grid pattern. Alternates with Color 2.
   static final GRID_COLOR_1_LIGHT:FlxColor = 0xFFE7E6E6;
   static final GRID_COLOR_1_DARK:FlxColor = 0xFF181919;
+  static final GRID_COLOR_1_HAZARD:FlxColor = 0xFF111111;
 
   // Color 2 of the grid pattern. Alternates with Color 1.
   static final GRID_COLOR_2_LIGHT:FlxColor = 0xFFF8F8F8;
   static final GRID_COLOR_2_DARK:FlxColor = 0xFF202020;
+  static final GRID_COLOR_2_HAZARD:FlxColor = 0xFF3C3200;
 
   // Color 3 of the grid pattern. Borders the other colors.
   static final GRID_COLOR_3_LIGHT:FlxColor = 0xFFD9D5D5;
   static final GRID_COLOR_3_DARK:FlxColor = 0xFF262A2A;
   static final GRID_COLOR_3_LIGHTQUANT:FlxColor = 0xFFD9D5D5;
   static final GRID_COLOR_3_DARKQUANT:FlxColor = 0xFF636363;
+  static final GRID_COLOR_3_HAZARD:FlxColor = 0xFF000000;
 
   // Vertical divider between characters.
   static final GRID_STRUMLINE_DIVIDER_COLOR_LIGHT:FlxColor = 0xFF111111;
   static final GRID_STRUMLINE_DIVIDER_COLOR_DARK:FlxColor = 0xFFC4C4C4;
   static final GRID_STRUMLINE_DIVIDER_COLOR_LIGHTQUANT:FlxColor = 0xFF111111;
   static final GRID_STRUMLINE_DIVIDER_COLOR_DARKQUANT:FlxColor = 0xFF111111;
+  static final GRID_STRUMLINE_DIVIDER_COLOR_HAZARD:FlxColor = 0xFFFF0000;
   static final GRID_STRUMLINE_DIVIDER_WIDTH:Float = ChartEditorState.GRID_SELECTION_BORDER_WIDTH;
 
   // Horizontal divider between measures.
@@ -60,12 +65,14 @@ class ChartEditorThemeHandler
   // Border on the square highlighting selected notes.
   static final SELECTION_SQUARE_BORDER_COLOR_LIGHT:FlxColor = 0xFF339933;
   static final SELECTION_SQUARE_BORDER_COLOR_DARK:FlxColor = 0xFF339933;
+  static final SELECTION_SQUARE_BORDER_COLOR_HAZARD:FlxColor = 0xFFFFFF00;
   public static final SELECTION_SQUARE_BORDER_WIDTH:Int = 1;
 
   // Fill on the square highlighting selected notes.
   // Make sure this is transparent so you can see the notes underneath.
   static final SELECTION_SQUARE_FILL_COLOR_LIGHT:FlxColor = 0x4033FF33;
   static final SELECTION_SQUARE_FILL_COLOR_DARK:FlxColor = 0x4033FF33;
+  static final SELECTION_SQUARE_FILL_COLOR_HAZARD:FlxColor = 0x40FFFF00;
 
   static final PLAYHEAD_BLOCK_BORDER_WIDTH:Int = 2;
   static final PLAYHEAD_BLOCK_BORDER_COLOR:FlxColor = 0xFF9D0011;
@@ -74,10 +81,12 @@ class ChartEditorThemeHandler
   // Border on the square over the note preview.
   static final NOTE_PREVIEW_VIEWPORT_BORDER_COLOR_LIGHT = 0xFFF8A657;
   static final NOTE_PREVIEW_VIEWPORT_BORDER_COLOR_DARK = 0xFFF8A657;
+  static final NOTE_PREVIEW_VIEWPORT_BORDER_COLOR_HAZARD = 0xFFF8A657;
 
   // Fill on the square over the note preview.
   static final NOTE_PREVIEW_VIEWPORT_FILL_COLOR_LIGHT = 0x80F8A657;
   static final NOTE_PREVIEW_VIEWPORT_FILL_COLOR_DARK = 0x80F8A657;
+  static final NOTE_PREVIEW_VIEWPORT_FILL_COLOR_HAZARD = 0x80F8A657;
 
   static final TOTAL_COLUMN_COUNT:Int = ChartEditorState.STRUMLINE_SIZE * 2 + 1;
 
@@ -102,13 +111,29 @@ class ChartEditorThemeHandler
   static function updateBackground(state:ChartEditorState):Void
   {
     if (state.menuBG == null) return;
+
     state.menuBG.color = switch (state.currentTheme)
     {
       case ChartEditorTheme.Light: BACKGROUND_COLOR_LIGHT;
       case ChartEditorTheme.Dark: BACKGROUND_COLOR_DARK;
+      case ChartEditorTheme.Hazard: BACKGROUND_COLOR_HAZARD;
       case ChartEditorTheme.LightQuant: BACKGROUND_COLOR_LIGHT;
       case ChartEditorTheme.DarkQuant: BACKGROUND_COLOR_DARK;
       default: BACKGROUND_COLOR_LIGHT;
+    }
+    if (state.currentTheme == ChartEditorTheme.Hazard)
+    {
+      if (state.menuBG_Hazard != null)
+      {
+        state.menuBG_Hazard.visible = true;
+      }
+    }
+    else
+    {
+      if (state.menuBG_Hazard != null)
+      {
+        state.menuBG_Hazard.visible = false;
+      }
     }
   }
 
@@ -122,6 +147,7 @@ class ChartEditorThemeHandler
     {
       case Light: GRID_COLOR_1_LIGHT;
       case Dark: GRID_COLOR_1_DARK;
+      case Hazard: GRID_COLOR_1_HAZARD;
       default: GRID_COLOR_1_LIGHT;
     };
 
@@ -129,6 +155,7 @@ class ChartEditorThemeHandler
     {
       case Light: GRID_COLOR_2_LIGHT;
       case Dark: GRID_COLOR_2_DARK;
+      case Hazard: GRID_COLOR_2_HAZARD;
       default: GRID_COLOR_2_LIGHT;
     };
 
@@ -151,6 +178,7 @@ class ChartEditorThemeHandler
     {
       state.gridBitmap = FlxGridOverlay.createGrid(ChartEditorState.GRID_SIZE, ChartEditorState.GRID_SIZE, gridWidth, gridHeight, true, gridColor1, gridColor2);
     }
+
     // Selection borders
     var selectionBorderColor:FlxColor = switch (state.currentTheme)
     {
@@ -158,6 +186,7 @@ class ChartEditorThemeHandler
       case Dark: GRID_COLOR_3_DARK;
       case DarkQuant: GRID_COLOR_3_DARK;
       case LightQuant: GRID_COLOR_3_LIGHT;
+      case Hazard: GRID_COLOR_3_HAZARD;
       default: GRID_COLOR_3_LIGHT;
     };
 
@@ -245,6 +274,7 @@ class ChartEditorThemeHandler
       case Dark: GRID_STRUMLINE_DIVIDER_COLOR_DARK;
       case DarkQuant: GRID_STRUMLINE_DIVIDER_COLOR_DARKQUANT;
       case LightQuant: GRID_STRUMLINE_DIVIDER_COLOR_LIGHTQUANT;
+      case Hazard: GRID_STRUMLINE_DIVIDER_COLOR_HAZARD;
       default: GRID_STRUMLINE_DIVIDER_COLOR_LIGHT;
     };
 
@@ -353,6 +383,7 @@ class ChartEditorThemeHandler
     {
       case Light: SELECTION_SQUARE_BORDER_COLOR_LIGHT;
       case Dark: SELECTION_SQUARE_BORDER_COLOR_DARK;
+      case Hazard: SELECTION_SQUARE_BORDER_COLOR_HAZARD;
       case DarkQuant: SELECTION_SQUARE_BORDER_COLOR_DARK;
       case LightQuant: SELECTION_SQUARE_BORDER_COLOR_LIGHT;
       default: SELECTION_SQUARE_BORDER_COLOR_LIGHT;
@@ -362,6 +393,7 @@ class ChartEditorThemeHandler
     {
       case Light: SELECTION_SQUARE_FILL_COLOR_LIGHT;
       case Dark: SELECTION_SQUARE_FILL_COLOR_DARK;
+      case Hazard: SELECTION_SQUARE_FILL_COLOR_HAZARD;
       case DarkQuant: SELECTION_SQUARE_FILL_COLOR_DARK;
       case LightQuant: SELECTION_SQUARE_FILL_COLOR_LIGHT;
       default: SELECTION_SQUARE_FILL_COLOR_LIGHT;
@@ -398,6 +430,7 @@ class ChartEditorThemeHandler
       case Dark: NOTE_PREVIEW_VIEWPORT_BORDER_COLOR_DARK;
       case DarkQuant: NOTE_PREVIEW_VIEWPORT_BORDER_COLOR_DARK;
       case LightQuant: NOTE_PREVIEW_VIEWPORT_BORDER_COLOR_LIGHT;
+      case Hazard: NOTE_PREVIEW_VIEWPORT_BORDER_COLOR_HAZARD;
       default: NOTE_PREVIEW_VIEWPORT_BORDER_COLOR_LIGHT;
     };
 
@@ -407,6 +440,7 @@ class ChartEditorThemeHandler
       case Dark: NOTE_PREVIEW_VIEWPORT_FILL_COLOR_DARK;
       case DarkQuant: NOTE_PREVIEW_VIEWPORT_FILL_COLOR_DARK;
       case LightQuant: NOTE_PREVIEW_VIEWPORT_FILL_COLOR_LIGHT;
+      case Hazard: NOTE_PREVIEW_VIEWPORT_FILL_COLOR_HAZARD;
       default: NOTE_PREVIEW_VIEWPORT_FILL_COLOR_LIGHT;
     };
 

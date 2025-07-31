@@ -1,14 +1,12 @@
 package funkin.play.notes;
 
 import funkin.play.notes.notestyle.NoteStyle;
-import funkin.play.notes.NoteDirection;
 import funkin.data.song.SongData.SongNoteData;
-import flixel.util.FlxDirectionFlags;
+import funkin.mobile.ui.FunkinHitbox.FunkinHitboxControlSchemes;
 import flixel.FlxSprite;
 import flixel.graphics.FlxGraphic;
-import flixel.graphics.tile.FlxDrawTrianglesItem;
+import flixel.graphics.tile.FlxDrawTrianglesItem.DrawData;
 import flixel.math.FlxMath;
-import funkin.ui.options.PreferencesMenu;
 
 /**
  * This is based heavily on the `FlxStrip` class. It uses `drawTriangles()` to clip a sustain note
@@ -35,6 +33,11 @@ class SustainTrailVanilla extends FlxSprite
   public var parentStrumline:Strumline;
 
   public var cover:NoteHoldCover = null;
+
+  /**
+   * The Y Offset of the note.
+   */
+  public var yOffset:Float = 0.0;
 
   /**
    * Set to `true` if the user hit the note and is currently holding the sustain.
@@ -70,8 +73,6 @@ class SustainTrailVanilla extends FlxSprite
    */
   public var uvtData:DrawData<Float> = new DrawData<Float>();
 
-  private var processedGraphic:FlxGraphic;
-
   private var zoom:Float = 1;
 
   /**
@@ -86,7 +87,13 @@ class SustainTrailVanilla extends FlxSprite
    */
   public var bottomClip:Float = 0.9;
 
+  /**
+   * Whether the note will recieve custom vertex data
+   */
+  public var customVertexData:Bool = false;
+
   public var isPixel:Bool;
+  public var noteStyleOffsets:Array<Float>;
 
   var graphicWidth:Float = 0;
   var graphicHeight:Float = 0;
@@ -107,10 +114,68 @@ class SustainTrailVanilla extends FlxSprite
     this.noteDirection = noteDirection;
 
     setupHoldNoteGraphic(noteStyle);
+    noteStyleOffsets = noteStyle.getHoldNoteOffsets();
 
-    indices = new DrawData<Int>(12, true, TRIANGLE_VERTEX_INDICES);
+    setIndices(TRIANGLE_VERTEX_INDICES);
 
     this.active = true; // This NEEDS to be true for the note to be drawn!
+  }
+
+  /**
+   * Sets the indices for the triangles.
+   * @param indices The indices to set.
+   */
+  public function setIndices(indices:Array<Int>):Void
+  {
+    if (this.indices.length == indices.length)
+    {
+      for (i in 0...indices.length)
+      {
+        this.indices[i] = indices[i];
+      }
+    }
+    else
+    {
+      this.indices = new DrawData<Int>(indices.length, false, indices);
+    }
+  }
+
+  /**
+   * Sets the vertices for the triangles.
+   * @param vertices The vertices to set.
+   */
+  public function setVertices(vertices:Array<Float>):Void
+  {
+    if (this.vertices.length == vertices.length)
+    {
+      for (i in 0...vertices.length)
+      {
+        this.vertices[i] = vertices[i];
+      }
+    }
+    else
+    {
+      this.vertices = new DrawData<Float>(vertices.length, false, vertices);
+    }
+  }
+
+  /**
+   * Sets the UV data for the triangles.
+   * @param uvtData The UV data to set.
+   */
+  public function setUVTData(uvtData:Array<Float>):Void
+  {
+    if (this.uvtData.length == uvtData.length)
+    {
+      for (i in 0...uvtData.length)
+      {
+        this.uvtData[i] = uvtData[i];
+      }
+    }
+    else
+    {
+      this.uvtData = new DrawData<Float>(uvtData.length, false, uvtData);
+    }
   }
 
   /**
@@ -137,18 +202,18 @@ class SustainTrailVanilla extends FlxSprite
 
     zoom = 1.0;
     zoom *= noteStyle.fetchHoldNoteScale();
-    zoom *= 0.7;
 
     // CALCULATE SIZE
     graphicWidth = graphic.width / 8 * zoom; // amount of notes * 2
     graphicHeight = sustainHeight(sustainLength, parentStrumline?.scrollSpeed ?? 1.0);
     // instead of scrollSpeed, PlayState.SONG.speed
 
-    flipY = Preferences.downscroll;
+    flipY = Preferences.downscroll #if mobile
+    || (Preferences.controlsScheme == FunkinHitboxControlSchemes.Arrows
+      && !funkin.mobile.input.ControlsHandler.usingExternalInputDevice) #end;
 
     // alpha = 0.6;
     alpha = 1.0;
-    // calls updateColorTransform(), which initializes processedGraphic!
     updateColorTransform();
 
     updateClipping();
@@ -202,7 +267,7 @@ class SustainTrailVanilla extends FlxSprite
   {
     width = graphicWidth;
     height = graphicHeight;
-    offset.set(0, 0);
+    offset.set(noteStyleOffsets[0], noteStyleOffsets[1]);
     origin.set(width * 0.5, height * 0.5);
   }
 
@@ -213,7 +278,7 @@ class SustainTrailVanilla extends FlxSprite
    */
   public function updateClipping(songTime:Float = 0):Void
   {
-    if (graphic == null)
+    if (graphic == null || customVertexData)
     {
       return;
     }
@@ -332,7 +397,7 @@ class SustainTrailVanilla extends FlxSprite
       // if (!isOnScreen(camera)) continue; // TODO: Update this code to make it work properly.
 
       getScreenPosition(_point, camera).subtractPoint(offset);
-      camera.drawTriangles(processedGraphic, vertices, indices, uvtData, null, _point, blend, true, antialiasing);
+      camera.drawTriangles(graphic, vertices, indices, uvtData, null, _point, blend, true, antialiasing, colorTransform, shader);
     }
 
     #if FLX_DEBUG
@@ -374,16 +439,7 @@ class SustainTrailVanilla extends FlxSprite
     vertices = null;
     indices = null;
     uvtData = null;
-    processedGraphic.destroy();
 
     super.destroy();
-  }
-
-  override function updateColorTransform():Void
-  {
-    super.updateColorTransform();
-    if (processedGraphic != null) processedGraphic.destroy();
-    processedGraphic = FlxGraphic.fromGraphic(graphic, true);
-    processedGraphic.bitmap.colorTransform(processedGraphic.bitmap.rect, colorTransform);
   }
 }

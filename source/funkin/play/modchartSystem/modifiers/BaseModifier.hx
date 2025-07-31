@@ -151,12 +151,30 @@ class CustomModifier extends Modifier
 // https://github.com/TheZoroForce240/FNF-Modcharting-Tools/blob/main/source/modcharting/Modifier.hx
 class ModifierSubValue
 {
-  public var value:Float = 0.0;
+  /**
+   * The current value of this subMod.
+   */
+  public var value(default, set):Float = 0.0;
+
+  function set_value(v:Float):Float
+  {
+    value = v;
+    if (parentMod?.strumOwner != null) parentMod.strumOwner.debugNeedsUpdate = true;
+    return value;
+  }
+
+  /**
+   * The base value of this subMod. Will reset to this value when reset() is called on it's parent!
+   */
   public var baseValue:Float = 0.0;
+
+  /**
+   * The modifier this subMod belong to.
+   */
+  public var parentMod:Modifier;
 
   public function new(value:Float)
   {
-    // super("submod");
     this.value = value;
     baseValue = value;
   }
@@ -217,7 +235,8 @@ class Modifier
     return currentValue;
   }
 
-  public var subValues:Map<String, ModifierSubValue>;
+  public var subValues:Map<String, ModifierSubValue> = new Map<String, ModifierSubValue>();
+  public var subValuesAliasMap:Map<String, String> = new Map<String, String>(); // for converting an alias to the submods real name
 
   public var targetLane:Int = -1;
   public var modPriority:Float = 100; // 100 is default. higher priority = done first
@@ -234,9 +253,6 @@ class Modifier
 
     this.baseValue = baseValue;
     this.currentValue = this.baseValue;
-
-    subValues = ["dumb_setup" => new ModifierSubValue(0.0)];
-    subValues.remove("dumb_setup");
   }
 
   public function reset():Void
@@ -258,7 +274,8 @@ class Modifier
     }
   }
 
-  public function setSubVal(name, newval):Void
+  // easy helper function for setting subValues. Kind of obsolete now.
+  public function setSubVal(name:String, newval:Float):Void
   {
     if (name == "priority")
     {
@@ -308,12 +325,36 @@ class Modifier
     baseValue = newval;
   }
 
-  public function createSubMod(name:String, startVal:Float):Void
+  // Creates a new subvalue modifier and automatically adds it to the subValues map. Returns the newly created subMod.
+  public function createSubMod(name:String, startVal:Float, ?aliases:Array<String>):ModifierSubValue
   {
-    var newSubMod = new ModifierSubValue(startVal);
+    var newSubMod:ModifierSubValue = new ModifierSubValue(startVal);
     newSubMod.value = startVal;
     newSubMod.baseValue = startVal;
+    newSubMod.parentMod = this;
     subValues.set(name, newSubMod);
+
+    if (aliases != null)
+    {
+      for (alias in aliases)
+      {
+        subValuesAliasMap.set(alias, name);
+      }
+    }
+    return newSubMod;
+  }
+
+  // Converts a submod Name to it's real name.
+  public function subModAliasConvert(inputName:String):String
+  {
+    if (subValuesAliasMap.exists(inputName))
+    {
+      return subValuesAliasMap.get(inputName);
+    }
+    else
+    {
+      return inputName;
+    }
   }
 
   public dynamic function speedMath(lane:Int, curPos:Float, strumLine:Strumline, isHoldNote:Bool = false):Float

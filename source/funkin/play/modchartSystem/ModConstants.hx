@@ -59,7 +59,6 @@ import funkin.play.modchartSystem.modifiers.OffsetMods;
 import funkin.play.modchartSystem.modifiers.LinearMods;
 import funkin.play.modchartSystem.modifiers.CircMods;
 import funkin.play.modchartSystem.modifiers.SpiralMods;
-import funkin.play.modchartSystem.modifiers.SpiralCosMods;
 import funkin.play.modchartSystem.modifiers.TipsyMods;
 import funkin.play.modchartSystem.modifiers.TornadoMods;
 import funkin.play.modchartSystem.modifiers.WaveyMods;
@@ -68,7 +67,7 @@ import funkin.play.modchartSystem.modifiers.SquareMods;
 import funkin.play.modchartSystem.modifiers.DigitalMods;
 import funkin.play.modchartSystem.modifiers.ColorTintMods;
 import funkin.play.modchartSystem.modifiers.SawtoothMods;
-import funkin.play.modchartSystem.modifiers.CosecantMods; // for legacy I guess?
+import funkin.play.modchartSystem.modifiers.CosecantMods;
 import funkin.play.modchartSystem.modifiers.ExtraMods;
 import funkin.play.modchartSystem.modifiers.CullMods;
 import funkin.play.modchartSystem.modifiers.GridFloorMods;
@@ -76,13 +75,14 @@ import funkin.play.modchartSystem.modifiers.CustomPathModifier;
 import funkin.play.modchartSystem.modifiers.HourGlassMods;
 import funkin.play.modchartSystem.modifiers.AngleMods;
 import funkin.play.modchartSystem.modifiers.OrientMods;
+import funkin.play.modchartSystem.modifiers.AttenuateMods;
 import funkin.play.modchartSystem.modifiers.*; // if only you worked ;_;
 
 class ModConstants
 {
-  public static var orientTimeOffset:Float = 4.0; // in ms
+  public static var orientTimeOffset:Float = -2.0; // in ms
 
-  public static final MODCHART_VERSION:String = "v0.9.1a";
+  public static final MODCHART_VERSION:String = "v1.0";
 
   public static var defaultHoldGrain = 75;
   public static var defaultPathGrain = defaultHoldGrain;
@@ -111,9 +111,15 @@ class ModConstants
     "bumpyx",
     "bumpyangle",
     "bumpyangley",
+    "cosbumpyx",
+    "cosbumpyangle",
+    "cosbumpyangley",
     "bouncex",
     "bounceangley",
     "bounceangle",
+    "cosbouncex",
+    "cosbounceangle",
+    "cosbounceangley",
     "digital",
     "digitalangle",
     "digitalangley",
@@ -1084,6 +1090,8 @@ class ModConstants
       case "cullpath":
         newMod = new CullArrowPathModifier(tag);
 
+      case "antinegativescale":
+        newMod = new AntiNegativeScaleMod(tag);
       case "sinclip":
         newMod = new SinClip(tag);
       case "cosclip":
@@ -1241,6 +1249,9 @@ class ModConstants
         newMod = new ScaleYNotesModifier(tag);
       case "scalehold":
         newMod = new ScaleHoldsModifier(tag);
+
+      case "mini":
+        newMod = new MiniModifier(tag);
 
       case "tiny":
         newMod = new TinyModifier(tag);
@@ -1495,6 +1506,20 @@ class ModConstants
         newMod = new CosecantScaleXMod(tag);
 
       // spiral mods
+
+      case "spiralcosx":
+        newMod = new SpiralXMod(tag, true);
+      case "spiralcosy":
+        newMod = new SpiralYMod(tag, true);
+      case "spiralcosz":
+        newMod = new SpiralZMod(tag, true);
+      case "spiralcosangle":
+        newMod = new SpiralAngleZMod(tag, true);
+      case "spiralcosspeed":
+        newMod = new SpiralSpeedMod(tag, true);
+      case "spiralcosscale":
+        newMod = new SpiralScaleMod(tag, true);
+
       case "spiralx":
         newMod = new SpiralXMod(tag);
       case "spiraly":
@@ -1507,19 +1532,6 @@ class ModConstants
         newMod = new SpiralSpeedMod(tag);
       case "spiralscale":
         newMod = new SpiralScaleMod(tag);
-
-      case "spiralcosx":
-        newMod = new SpiralCosXMod(tag);
-      case "spiralcosy":
-        newMod = new SpiralCosYMod(tag);
-      case "spiralcosz":
-        newMod = new SpiralCosZMod(tag);
-      case "spiralcosangle":
-        newMod = new SpiralCosAngleZMod(tag);
-      case "spiralcosspeed":
-        newMod = new SpiralCosSpeedMod(tag);
-      case "spiralcosscale":
-        newMod = new SpiralCosScaleMod(tag);
 
       // tornado mods
       case "tornado":
@@ -1660,6 +1672,10 @@ class ModConstants
         newMod = new DigitalAngleYMod(tag);
       case "digitalscale":
         newMod = new DigitalScaleMod(tag);
+      case "digitalscalex":
+        newMod = new DigitalScaleXMod(tag);
+      case "digitalscaley":
+        newMod = new DigitalScaleYMod(tag);
       case "digitalskewx":
         newMod = new DigitalSkewXMod(tag);
       case "digitalskewy":
@@ -1790,6 +1806,10 @@ class ModConstants
         newMod = new TanBumpyAngleMod(tag);
       case "tanbumpyscale":
         newMod = new TanBumpyScaleMod(tag);
+      case "tanbumpyscalex":
+        newMod = new TanBumpyScaleMod(tag);
+      case "tanbumpyscaley":
+        newMod = new TanBumpyScaleMod(tag);
       case "tanbumpyskewx":
         newMod = new TanBumpySkewXMod(tag);
       case "tanbumpyskewy":
@@ -1806,6 +1826,10 @@ class ModConstants
         newMod = new LinearZMod(tag);
       case "linearangle":
         newMod = new LinearAngleMod(tag);
+      case "linearanglex":
+        newMod = new LinearAngleXMod(tag);
+      case "linearangley":
+        newMod = new LinearAngleYMod(tag);
       case "linearscale":
         newMod = new LinearScaleMod(tag);
       case "linearscalex":
@@ -1855,6 +1879,16 @@ class ModConstants
         newMod = new AttenuateZMod(tag);
       case "attenuateangle":
         newMod = new AttenuateAngleMod(tag);
+      case "attenuateanglex":
+        newMod = new AttenuateAngleXMod(tag);
+      case "attenuateangley":
+        newMod = new AttenuateAngleYMod(tag);
+      case "attenuatescale":
+        newMod = new AttenuateScaleMod(tag);
+      case "attenuatescalex":
+        newMod = new AttenuateScaleXMod(tag);
+      case "attenuatescaley":
+        newMod = new AttenuateScaleYMod(tag);
       case "attenuateskewx":
         newMod = new AttenuateSkewYMod(tag);
       case "attenuateskewy":

@@ -11,31 +11,46 @@ import flixel.math.FlxMath;
 // :p
 class BumpyModBase extends Modifier
 {
+  var mult:ModifierSubValue;
+  var offset:ModifierSubValue;
+
   public function new(name:String)
   {
     super(name, 0);
-    createSubMod("mult", 1.0);
+    mult = createSubMod("mult", 1.0, ["period", "size"]);
+    offset = createSubMod("offset", 0.0);
   }
+
+  function getOffset():Float
+  {
+    return offset.value * (Preferences.downscroll ? -1 : 1);
+  }
+
+  // An array which represents each arrow direction. Used to undo the strum movement for the notes for the offset submod to function
+  var strumResult:Array<Float> = [0, 0, 0, 0];
 
   function bumpyMath(curPos:Float):Float
   {
     if (currentValue == 0) return 0.0; // skip math if mod is 0
+    curPos += getOffset();
     var scrollSpeed = PlayState.instance?.currentChart?.scrollSpeed ?? 1.0;
-    return currentValue * sin(curPos / (Strumline.STRUMLINE_SIZE / 3.0) / scrollSpeed * getSubVal("mult")) * (Strumline.STRUMLINE_SIZE / 2.0);
+    return currentValue * sin(curPos / (Strumline.STRUMLINE_SIZE / 3.0) / scrollSpeed * mult.value) * (Strumline.STRUMLINE_SIZE / 2.0);
   }
 
   function cosBumpyMath(curPos:Float):Float
   {
     if (currentValue == 0) return 0.0; // skip math if mod is 0
+    curPos += getOffset();
     var scrollSpeed = PlayState.instance?.currentChart?.scrollSpeed ?? 1.0;
-    return currentValue * cos(curPos / (Strumline.STRUMLINE_SIZE / 3.0) / scrollSpeed * getSubVal("mult")) * (Strumline.STRUMLINE_SIZE / 2.0);
+    return currentValue * cos(curPos / (Strumline.STRUMLINE_SIZE / 3.0) / scrollSpeed * mult.value) * (Strumline.STRUMLINE_SIZE / 2.0);
   }
 
   function tanBumpyMath(curPos:Float):Float
   {
     if (currentValue == 0) return 0.0; // skip math if mod is 0
+    curPos += getOffset();
     var scrollSpeed = PlayState.instance?.currentChart?.scrollSpeed ?? 1.0;
-    return currentValue * tan(curPos / (Strumline.STRUMLINE_SIZE / 3.0) / scrollSpeed * getSubVal("mult")) * (Strumline.STRUMLINE_SIZE / 2.0);
+    return currentValue * tan(curPos / (Strumline.STRUMLINE_SIZE / 3.0) / scrollSpeed * mult.value) * (Strumline.STRUMLINE_SIZE / 2.0);
   }
 }
 
@@ -48,13 +63,14 @@ class CosBumpyXMod extends BumpyModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    data.x -= cosBumpyMath(data.whichStrumNote?.strumDistance ?? 0);
+    data.x -= strumResult[data.direction];
     data.x += cosBumpyMath(data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    data.x += cosBumpyMath(data.curPos);
+    strumResult[data.direction] = cosBumpyMath(data.curPos);
+    data.x += strumResult[data.direction];
   }
 }
 
@@ -67,13 +83,14 @@ class CosBumpyYMod extends BumpyModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    data.y -= cosBumpyMath(data.whichStrumNote?.strumDistance ?? 0);
+    data.y -= strumResult[data.direction];
     data.y += cosBumpyMath(data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    data.y += cosBumpyMath(data.curPos);
+    strumResult[data.direction] = cosBumpyMath(data.curPos);
+    data.y += strumResult[data.direction];
   }
 }
 
@@ -86,13 +103,14 @@ class CosBumpyZMod extends BumpyModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    data.z -= cosBumpyMath(data.whichStrumNote?.strumDistance ?? 0);
+    data.z -= strumResult[data.direction];
     data.z += cosBumpyMath(data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    data.z += cosBumpyMath(data.curPos);
+    strumResult[data.direction] = cosBumpyMath(data.curPos);
+    data.z += strumResult[data.direction];
   }
 }
 
@@ -105,13 +123,14 @@ class CosBumpyAngleMod extends BumpyModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    data.angleZ -= cosBumpyMath(data.whichStrumNote?.strumDistance ?? 0);
+    data.angleZ -= strumResult[data.direction];
     data.angleZ += cosBumpyMath(data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    data.angleZ += cosBumpyMath(data.curPos);
+    strumResult[data.direction] = cosBumpyMath(data.curPos);
+    data.angleZ += strumResult[data.direction];
   }
 }
 
@@ -124,7 +143,6 @@ class CosBumpyAngleYMod extends BumpyModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    data.angleY -= cosBumpyMath(data.whichStrumNote?.strumDistance ?? 0);
     data.angleY += cosBumpyMath(data.curPos);
   }
 
@@ -143,7 +161,6 @@ class CosBumpyAngleXMod extends BumpyModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    data.angleX -= cosBumpyMath(data.whichStrumNote?.strumDistance ?? 0);
     data.angleX += cosBumpyMath(data.curPos);
   }
 
@@ -162,35 +179,18 @@ class CosBumpyScaleMod extends BumpyModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    data.scaleX -= cosBumpyMath(data.whichStrumNote?.strumDistance ?? 0) * 0.01;
-    data.scaleY -= cosBumpyMath(data.whichStrumNote?.strumDistance ?? 0) * 0.01;
-    data.scaleX += cosBumpyMath(data.curPos) * 0.01;
-    data.scaleY += cosBumpyMath(data.curPos) * 0.01;
+    var r:Float = cosBumpyMath(data.curPos) * 0.01;
+    data.scaleX += r;
+    data.scaleY += r;
+    data.scaleZ += r;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    data.scaleX += cosBumpyMath(data.curPos) * 0.01;
-    data.scaleY += cosBumpyMath(data.curPos) * 0.01;
-  }
-}
-
-class CosBumpyScaleYMod extends BumpyModBase
-{
-  public function new(name:String)
-  {
-    super(name);
-  }
-
-  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
-  {
-    data.scaleY -= cosBumpyMath(data.whichStrumNote?.strumDistance ?? 0) * 0.01;
-    data.scaleY += cosBumpyMath(data.curPos) * 0.01;
-  }
-
-  override function strumMath(data:NoteData, strumLine:Strumline):Void
-  {
-    data.scaleY += cosBumpyMath(data.curPos) * 0.01;
+    strumResult[data.direction] = cosBumpyMath(data.curPos) * 0.01;
+    data.scaleX += strumResult[data.direction];
+    data.scaleY += strumResult[data.direction];
+    data.scaleZ += strumResult[data.direction];
   }
 }
 
@@ -203,13 +203,30 @@ class CosBumpyScaleXMod extends BumpyModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    data.scaleX -= cosBumpyMath(data.whichStrumNote?.strumDistance ?? 0) * 0.01;
     data.scaleX += cosBumpyMath(data.curPos) * 0.01;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
     data.scaleX += cosBumpyMath(data.curPos) * 0.01;
+  }
+}
+
+class CosBumpyScaleYMod extends BumpyModBase
+{
+  public function new(name:String)
+  {
+    super(name);
+  }
+
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
+  {
+    data.scaleY += cosBumpyMath(data.curPos) * 0.01;
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    data.scaleY += cosBumpyMath(data.curPos) * 0.01;
   }
 }
 
@@ -222,7 +239,6 @@ class CosBumpySkewXMod extends BumpyModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    data.skewX -= cosBumpyMath(data.whichStrumNote?.strumDistance ?? 0);
     data.skewX += cosBumpyMath(data.curPos);
   }
 
@@ -241,7 +257,6 @@ class CosBumpySkewYMod extends BumpyModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    data.skewY -= cosBumpyMath(data.whichStrumNote?.strumDistance ?? 0);
     data.skewY += cosBumpyMath(data.curPos);
   }
 
@@ -260,7 +275,21 @@ class BumpyXMod extends BumpyModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    data.x -= strumResult[data.direction];
     data.x += bumpyMath(data.curPos);
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (getOffset() == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = bumpyMath(data.curPos);
+      data.x += strumResult[data.direction];
+    }
   }
 }
 
@@ -273,7 +302,21 @@ class BumpyYMod extends BumpyModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    data.y -= strumResult[data.direction];
     data.y += bumpyMath(data.curPos);
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (getOffset() == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = bumpyMath(data.curPos);
+      data.y += strumResult[data.direction];
+    }
   }
 }
 
@@ -286,7 +329,21 @@ class BumpyZMod extends BumpyModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    data.z -= strumResult[data.direction];
     data.z += bumpyMath(data.curPos);
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (getOffset() == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = bumpyMath(data.curPos);
+      data.z += strumResult[data.direction];
+    }
   }
 }
 
@@ -301,8 +358,8 @@ class BumpySpeedMod extends BumpyModBase
   override function speedMath(lane:Int, curPos:Float, strumLine, isHoldNote = false):Float
   {
     if (currentValue == 0) return 1; // skip math if mod is 0
-    var bumpyx_Mult:Float = getSubVal("mult");
-
+    var bumpyx_Mult:Float = mult.value;
+    curPos += getOffset();
     var scrollSpeed = PlayState.instance?.currentChart?.scrollSpeed ?? 1.0;
     var modWouldBe:Float = currentValue * 0.025 * sin(curPos / (Strumline.STRUMLINE_SIZE / 3.0) / scrollSpeed * bumpyx_Mult) * (Strumline.STRUMLINE_SIZE / 2.0);
     return (modWouldBe + 1);
@@ -318,7 +375,21 @@ class BumpyAngleMod extends BumpyModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    data.angleZ -= strumResult[data.direction];
     data.angleZ += bumpyMath(data.curPos);
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (getOffset() == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = bumpyMath(data.curPos);
+      data.angleZ += strumResult[data.direction];
+    }
   }
 }
 
@@ -333,6 +404,19 @@ class BumpyAngleXMod extends BumpyModBase
   {
     data.angleX += bumpyMath(data.curPos);
   }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (getOffset() == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = bumpyMath(data.curPos);
+      data.angleX += strumResult[data.direction];
+    }
+  }
 }
 
 class BumpyAngleYMod extends BumpyModBase
@@ -346,6 +430,19 @@ class BumpyAngleYMod extends BumpyModBase
   {
     data.angleY += bumpyMath(data.curPos);
   }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (getOffset() == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = bumpyMath(data.curPos);
+      data.angleY += strumResult[data.direction];
+    }
+  }
 }
 
 class BumpyScaleMod extends BumpyModBase
@@ -357,8 +454,25 @@ class BumpyScaleMod extends BumpyModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    data.scaleX += bumpyMath(data.curPos) * 0.01;
-    data.scaleY += bumpyMath(data.curPos) * 0.01;
+    var daBumpyMath:Float = bumpyMath(data.curPos) * 0.01;
+    data.scaleX += daBumpyMath;
+    data.scaleY += daBumpyMath;
+    data.scaleZ += daBumpyMath;
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (getOffset() == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = bumpyMath(data.curPos) * 0.01;
+      data.scaleX += strumResult[data.direction];
+      data.scaleY += strumResult[data.direction];
+      data.scaleZ += strumResult[data.direction];
+    }
   }
 }
 
@@ -373,6 +487,19 @@ class BumpyScaleXMod extends BumpyModBase
   {
     data.scaleX += bumpyMath(data.curPos) * 0.01;
   }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (getOffset() == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = bumpyMath(data.curPos) * 0.01;
+      data.scaleX += strumResult[data.direction];
+    }
+  }
 }
 
 class BumpyScaleYMod extends BumpyModBase
@@ -385,6 +512,19 @@ class BumpyScaleYMod extends BumpyModBase
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     data.scaleY += bumpyMath(data.curPos) * 0.01;
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (getOffset() == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = bumpyMath(data.curPos) * 0.01;
+      data.scaleY += strumResult[data.direction];
+    }
   }
 }
 
@@ -399,6 +539,19 @@ class BumpySkewXMod extends BumpyModBase
   {
     data.skewX += bumpyMath(data.curPos);
   }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (getOffset() == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = bumpyMath(data.curPos);
+      data.skewX += strumResult[data.direction];
+    }
+  }
 }
 
 class BumpySkewYMod extends BumpyModBase
@@ -412,6 +565,19 @@ class BumpySkewYMod extends BumpyModBase
   {
     data.skewY += bumpyMath(data.curPos);
   }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (getOffset() == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = bumpyMath(data.curPos);
+      data.skewY += strumResult[data.direction];
+    }
+  }
 }
 
 class TanBumpyXMod extends BumpyModBase
@@ -423,7 +589,21 @@ class TanBumpyXMod extends BumpyModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    data.x -= strumResult[data.direction];
     data.x += tanBumpyMath(data.curPos);
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (getOffset() == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = tanBumpyMath(data.curPos);
+      data.x += strumResult[data.direction];
+    }
   }
 }
 
@@ -436,7 +616,21 @@ class TanBumpyYMod extends BumpyModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    data.y -= strumResult[data.direction];
     data.y += tanBumpyMath(data.curPos);
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (getOffset() == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = tanBumpyMath(data.curPos);
+      data.y += strumResult[data.direction];
+    }
   }
 }
 
@@ -449,7 +643,21 @@ class TanBumpyZMod extends BumpyModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    data.z -= strumResult[data.direction];
     data.z += tanBumpyMath(data.curPos);
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (getOffset() == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = tanBumpyMath(data.curPos);
+      data.z += strumResult[data.direction];
+    }
   }
 }
 
@@ -462,7 +670,21 @@ class TanBumpyAngleMod extends BumpyModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    data.angleZ -= strumResult[data.direction];
     data.angleZ += tanBumpyMath(data.curPos);
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (getOffset() == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = tanBumpyMath(data.curPos);
+      data.angleZ += strumResult[data.direction];
+    }
   }
 }
 
@@ -475,8 +697,77 @@ class TanBumpyScaleMod extends BumpyModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    data.scaleX += tanBumpyMath(data.curPos);
-    data.scaleY += tanBumpyMath(data.curPos);
+    var daTanBumpy:Float = tanBumpyMath(data.curPos) * 0.01;
+    data.scaleX += daTanBumpy;
+    data.scaleY += daTanBumpy;
+    data.scaleZ += daTanBumpy;
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (getOffset() == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = tanBumpyMath(data.curPos) * 0.01;
+      data.scaleX += strumResult[data.direction];
+      data.scaleY += strumResult[data.direction];
+      data.scaleZ += strumResult[data.direction];
+    }
+  }
+}
+
+class TanBumpyScaleXMod extends BumpyModBase
+{
+  public function new(name:String)
+  {
+    super(name);
+  }
+
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
+  {
+    data.scaleX += tanBumpyMath(data.curPos) * 0.01;
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (getOffset() == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = tanBumpyMath(data.curPos) * 0.01;
+      data.scaleX += strumResult[data.direction];
+    }
+  }
+}
+
+class TanBumpyScaleYMod extends BumpyModBase
+{
+  public function new(name:String)
+  {
+    super(name);
+  }
+
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
+  {
+    data.scaleY += tanBumpyMath(data.curPos) * 0.01;
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (getOffset() == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = tanBumpyMath(data.curPos) * 0.01;
+      data.scaleY += strumResult[data.direction];
+    }
   }
 }
 
@@ -491,6 +782,19 @@ class TanBumpySkewXMod extends BumpyModBase
   {
     data.skewX += tanBumpyMath(data.curPos);
   }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (getOffset() == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = tanBumpyMath(data.curPos);
+      data.skewX += strumResult[data.direction];
+    }
+  }
 }
 
 class TanBumpySkewYMod extends BumpyModBase
@@ -503,5 +807,18 @@ class TanBumpySkewYMod extends BumpyModBase
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     data.skewY += tanBumpyMath(data.curPos);
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (getOffset() == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = tanBumpyMath(data.curPos);
+      data.skewY += strumResult[data.direction];
+    }
   }
 }

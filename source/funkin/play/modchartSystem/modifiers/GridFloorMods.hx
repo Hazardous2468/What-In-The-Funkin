@@ -19,7 +19,6 @@ class GridModBase extends Modifier
   function toGrid(pos:Float):Float
   {
     var returnValue:Float = pos;
-    // var s:Float = getSubVal("size");
     var s:Float = currentValue;
     if (s != 0)
     {

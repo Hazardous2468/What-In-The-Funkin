@@ -73,12 +73,15 @@ class VideoGamesMod extends Modifier
 
 class BlackSphereInvertMod extends Modifier
 {
+  var variant:ModifierSubValue;
+  var speedaffect:ModifierSubValue;
+
   public function new(name:String)
   {
     super(name, 0);
     notPercentage = true;
-    createSubMod("variant", 0.0);
-    createSubMod("speedaffect", 1.0);
+    variant = createSubMod("variant", 0.0);
+    speedaffect = createSubMod("speedaffect", 1.0);
     modPriority = 130;
     unknown = false;
     strumsMod = true;
@@ -92,16 +95,17 @@ class BlackSphereInvertMod extends Modifier
     // current value is in degrees!
 
     var retu_val:Float = 1;
-    var speedAffectM:Float = getSubVal("speedaffect");
+    var speedAffectM:Float = speedaffect.value;
     var yValue:Float = FlxMath.fastSin(currentValue * Math.PI / 180);
 
     // multiply by the reverse amount for this movement
     var whichStrummy = strumLine.getByIndex(lane);
-    var reverseModAmount:Float = whichStrummy.strumExtraModData.reverseMod + whichStrummy.strumExtraModData.reverseModLane; // 0 to 1
+    // var reverseModAmount:Float = whichStrummy.strumExtraModData.reverseMod + whichStrummy.strumExtraModData.reverseModLane; // 0 to 1
+    var reverseModAmount:Float = whichStrummy.noteModData.getReverse();
+
     var reverseMult:Float = FlxMath.remapToRange(reverseModAmount, 0, 1, 1, -1);
 
-    var variant:Float = getSubVal("variant");
-    if (variant >= 100)
+    if (variant.value >= 1.0)
     {
       if (lane % 4 == 1 || lane % 4 == 2) yValue *= -1;
     }
@@ -132,8 +136,7 @@ class BlackSphereInvertMod extends Modifier
 
     yValue = 0.5 * FlxMath.fastSin(currentValue * Math.PI / 180);
 
-    var variant:Float = getSubVal("variant");
-    if (variant >= 100)
+    if (variant.value >= 1.0)
     {
       if (lane % 4 == 1 || lane % 4 == 2) yValue *= -1;
     }
@@ -149,11 +152,14 @@ class BlackSphereInvertMod extends Modifier
 
 class BlackSphereFlipMod extends Modifier
 {
+  var variant:ModifierSubValue;
+  var speedaffect:ModifierSubValue;
+
   public function new(name:String)
   {
     super(name, 0);
-    createSubMod("variant", 0.0);
-    createSubMod("speedaffect", 1.0);
+    variant = createSubMod("variant", 0.0);
+    speedaffect = createSubMod("speedaffect", 1.0);
     modPriority = 130;
     notPercentage = true;
 
@@ -169,10 +175,9 @@ class BlackSphereFlipMod extends Modifier
     // current value is in degrees!
 
     var retu_val:Float = 1;
-    var speedAffectM:Float = getSubVal("speedaffect");
+    var speedAffectM:Float = speedaffect.value;
     var yValue:Float = FlxMath.fastSin(currentValue * Math.PI / 180);
-    var variant:Float = getSubVal("variant");
-    if (variant >= 100)
+    if (variant.value >= 1.0)
     {
       if (lane % 4 == 1 || lane % 4 == 2) yValue *= -1;
     }
@@ -183,7 +188,8 @@ class BlackSphereFlipMod extends Modifier
 
     // multiply by the reverse amount for this movement
     var whichStrummy = strumLine.getByIndex(lane);
-    var reverseModAmount:Float = whichStrummy.strumExtraModData.reverseMod + whichStrummy.strumExtraModData.reverseModLane; // 0 to 1
+    // var reverseModAmount:Float = whichStrummy.strumExtraModData.reverseMod + whichStrummy.strumExtraModData.reverseModLane; // 0 to 1
+    var reverseModAmount:Float = whichStrummy.noteModData.getReverse();
     var reverseMult:Float = FlxMath.remapToRange(reverseModAmount, 0, 1, 1, -1);
 
     if (!Preferences.downscroll) yValue *= -1;
@@ -205,8 +211,7 @@ class BlackSphereFlipMod extends Modifier
 
     yValue = 0.5 * FlxMath.fastSin(currentValue * Math.PI / 180);
 
-    var variant:Float = getSubVal("variant");
-    if (variant >= 100)
+    if (variant.value >= 1.0)
     {
       if (lane % 4 == 1 || lane % 4 == 2) yValue *= -1;
     }

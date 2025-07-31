@@ -10,36 +10,40 @@ import funkin.play.modchartSystem.modifiers.BaseModifier;
 
 class TipsyModBase extends Modifier
 {
+  var speed:ModifierSubValue;
+  var desync:ModifierSubValue;
+  var time_add:ModifierSubValue;
+  var timertype:ModifierSubValue;
+
   public function new(name:String)
   {
     super(name, 0);
-    createSubMod("speed", 1.0);
-    createSubMod("desync", 2.0);
-    createSubMod("time_add", 0.0);
-    createSubMod("timertype", 0.0);
+
+    speed = createSubMod("speed", 1.0, ["frequency"]);
+    desync = createSubMod("desync", 2.0, ["spacing"]);
+    time_add = createSubMod("time_add", 0.0, ["offset", "timeadd", "time_offset", "timeoffset"]);
+    timertype = createSubMod("timertype", 0.0);
+
     unknown = false;
     strumsMod = true;
   }
 
   function tanTipsyMath(lane:Int, curPos:Float = 0):Float
   {
-    var time:Float = (getSubVal("timertype") >= 0.5 ? (beatTime) : (songTime * 0.001 * 1.2));
-    time *= getSubVal("speed");
-    time += getSubVal("time_add");
+    var time:Float = (timertype.value >= 0.5 ? (beatTime) : (songTime * 0.001 * 1.2));
+    time *= speed.value;
+    time += time_add.value;
 
-    return currentValue * (tan((time + (lane) * getSubVal("desync")) * (5) * 1 * 0.2) * ModConstants.strumSize * 0.4);
+    return currentValue * (tan((time + (lane) * desync.value) * (5) * 1 * 0.2) * ModConstants.strumSize * 0.4);
   }
 
   function tipsyMath(lane:Int, curPos:Float = 0):Float
   {
-    var time:Float = (getSubVal("timertype") >= 0.5 ? (beatTime) : (songTime * 0.001 * 1.2));
-    time *= getSubVal("speed");
-    time += getSubVal("time_add");
+    var time:Float = (timertype.value >= 0.5 ? (beatTime) : (songTime * 0.001 * 1.2));
+    time *= speed.value;
+    time += time_add.value;
 
-    return currentValue * (cos((time + (lane) * getSubVal("desync")) * (5) * 1 * 0.2) * ModConstants.strumSize * 0.4);
-
-    // return currentValue * (FlxMath.fastCos(time * 1.2 + lane * getSubVal("desync")) * ModConstants.strumSize * 0.4);
-    // return currentValue * (FlxMath.fastCos(time * tipsyTimeMult * 0.001 * (1.2) + (lane) * (2.0) + tipsyTimeAdd * (0.2)) * (ModConstants.strumSize / 2));
+    return currentValue * (cos((time + (lane) * desync.value) * (5) * 1 * 0.2) * ModConstants.strumSize * 0.4);
   }
 }
 

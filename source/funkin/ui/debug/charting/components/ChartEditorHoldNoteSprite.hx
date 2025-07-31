@@ -1,12 +1,12 @@
 package funkin.ui.debug.charting.components;
 
-import flixel.FlxObject;
-import flixel.math.FlxMath;
-import funkin.data.notestyle.NoteStyleRegistry;
-import funkin.data.song.SongData.SongNoteData;
 import funkin.play.notes.Strumline;
-import funkin.play.notes.SustainTrailVanilla;
+import funkin.data.notestyle.NoteStyleRegistry;
 import funkin.play.notes.notestyle.NoteStyle;
+import flixel.FlxObject;
+import funkin.play.notes.SustainTrailVanilla;
+import funkin.data.song.SongData.SongNoteData;
+import flixel.math.FlxMath;
 
 /**
  * A sprite that can be used to display the trail of a hold note in a chart.
@@ -124,7 +124,7 @@ class ChartEditorHoldNoteSprite extends SustainTrailVanilla
     width = ChartEditorState.GRID_SIZE;
     height = graphicHeight;
 
-    var xOffset:Float = (ChartEditorState.GRID_SIZE - graphicWidth) / 2;
+    var xOffset = (ChartEditorState.GRID_SIZE - graphicWidth) / 2;
     offset.set(-xOffset, 0);
     origin.set(width * 0.5, height * 0.5);
   }

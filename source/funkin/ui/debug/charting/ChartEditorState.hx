@@ -2155,6 +2155,9 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
    */
   var menuBG:Null<FlxSprite> = null;
 
+  // Copy of menuBG but uses a different custom graphic for Hazard theme
+  var menuBG_Hazard:Null<FlxSprite> = null;
+
   /**
    * The sprite group containing the note graphics.
    * Only displays a subset of the data from `currentSongChartNoteData`,
@@ -2502,6 +2505,15 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
     menuBG.screenCenter();
     menuBG.scrollFactor.set(0, 0);
     menuBG.zIndex = -100;
+
+    menuBG_Hazard = new FlxSprite().loadGraphic(Paths.image('menuHaz'));
+    add(menuBG_Hazard);
+    menuBG_Hazard.setGraphicSize(Std.int(menuBG_Hazard.width * 1.1));
+    menuBG_Hazard.updateHitbox();
+    menuBG_Hazard.screenCenter();
+    menuBG_Hazard.scrollFactor.set(0, 0);
+    menuBG_Hazard.zIndex = -99;
+    menuBG_Hazard.visible = false;
   }
 
   var oppSpectogram:PolygonSpectogram;
@@ -3092,6 +3104,7 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
     menubarItemDifficultyUp.onClick = _ -> incrementDifficulty(1);
     menubarItemDifficultyDown.onClick = _ -> incrementDifficulty(-1);
 
+    // Themes!
     menuBarItemThemeLight.onChange = function(event:UIEvent) {
       if (event.target.value) currentTheme = ChartEditorTheme.Light;
     };
@@ -3102,11 +3115,15 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
     };
     menuBarItemThemeDark.selected = currentTheme == ChartEditorTheme.Dark;
 
-    // QUANT
     menuBarItemThemeLightQuant.onChange = function(event:UIEvent) {
       if (event.target.value) currentTheme = ChartEditorTheme.LightQuant;
     };
     menuBarItemThemeLightQuant.selected = currentTheme == ChartEditorTheme.LightQuant;
+
+    menuBarItemThemeHazard.onChange = function(event:UIEvent) {
+      if (event.target.value) currentTheme = ChartEditorTheme.Hazard;
+    };
+    menuBarItemThemeHazard.selected = currentTheme == ChartEditorTheme.Hazard;
 
     menuBarItemThemeDarkQuant.onChange = function(event:UIEvent) {
       if (event.target.value) currentTheme = ChartEditorTheme.DarkQuant;
@@ -3992,7 +4009,7 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
   function handleScrollKeybinds():Void
   {
     // Don't scroll when the user is interacting with the UI, unless a playbar button (the << >> ones) is pressed.
-    if ((isHaxeUIFocused || isHaxeUIDialogOpen) && playbarButtonPressed == null) return;
+    if ((isHaxeUIFocused || isCursorOverHaxeUI) && playbarButtonPressed == null) return;
 
     var scrollAmount:Float = 0; // Amount to scroll the grid.
     var playheadAmount:Float = 0; // Amount to scroll the playhead relative to the grid.
@@ -4736,15 +4753,12 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
 
               dragLengthCurrent = dragLengthSteps;
             }
-            // https://github.com/FunkinCrew/Funkin/pull/5026/commits/20551db224ca48bfcc856eff8b5649a67d94fd58
-            if (!gridGhostHoldNote.visible)
-            {
-              gridGhostHoldNote.visible = true;
-              gridGhostHoldNote.noteData = currentPlaceNoteData;
-              gridGhostHoldNote.noteDirection = currentPlaceNoteData.getDirection();
-              gridGhostHoldNote.noteStyle = NoteKindManager.getNoteStyleId(currentPlaceNoteData.kind, currentSongNoteStyle) ?? currentSongNoteStyle;
-            }
+
+            gridGhostHoldNote.visible = true;
+            gridGhostHoldNote.noteData = currentPlaceNoteData;
+            gridGhostHoldNote.noteDirection = currentPlaceNoteData.getDirection();
             gridGhostHoldNote.setHeightDirectly(dragLengthPixels, true);
+            gridGhostHoldNote.noteStyle = NoteKindManager.getNoteStyleId(currentPlaceNoteData.kind, currentSongNoteStyle) ?? currentSongNoteStyle;
             gridGhostHoldNote.updateHoldNotePosition(renderedHoldNotes);
           }
           else
@@ -5177,7 +5191,7 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
 
       var variationMetadata:Null<SongMetadata> = songMetadata.get(selectedVariation);
       if (variationMetadata != null)
-      variationMetadata.playData.difficulties.sort(SortUtil.defaultsThenAlphabetically.bind(Constants.DEFAULT_DIFFICULTY_LIST_FULL));
+        variationMetadata.playData.difficulties.sort(SortUtil.defaultsThenAlphabetically.bind(Constants.DEFAULT_DIFFICULTY_LIST_FULL));
 
       var difficultyToolbox:ChartEditorDifficultyToolbox = cast this.getToolbox(CHART_EDITOR_TOOLBOX_DIFFICULTY_LAYOUT);
       if (difficultyToolbox == null) return;
@@ -6310,7 +6324,8 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
   {
     currentScrollEase = Math.max(0, targetScrollPosition);
     currentScrollEase = Math.min(currentScrollEase, songLengthInPixels);
-    scrollPositionInPixels = MathUtil.snap(MathUtil.smoothLerpPrecision(scrollPositionInPixels, currentScrollEase, FlxG.elapsed, SCROLL_EASE_DURATION, 1 / 1000), currentScrollEase, 1 / 1000);
+    scrollPositionInPixels = MathUtil.snap(MathUtil.smoothLerpPrecision(scrollPositionInPixels, currentScrollEase, FlxG.elapsed, SCROLL_EASE_DURATION,
+      1 / 1000), currentScrollEase, 1 / 1000);
     moveSongToScrollPosition();
   }
 
@@ -6760,5 +6775,13 @@ enum abstract ChartEditorTheme(String)
    */
   var DarkQuant;
 
+  /**
+   * Same as DarkQuant but with lighter colours instead.
+   */
   var LightQuant;
+
+  /**
+   * Custom Hazard skin.
+   */
+  var Hazard;
 }

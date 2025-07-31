@@ -15,28 +15,33 @@ class CosecantModifierBase extends Modifier
     return 1 / Math.sin(angle);
   }
 
+  var speed:ModifierSubValue;
+  var mult:ModifierSubValue;
+  var desync:ModifierSubValue;
+  var time_add:ModifierSubValue;
+  var timertype:ModifierSubValue;
+
   public function new(name:String)
   {
     super(name, 0);
-    createSubMod("timertype", 0.0);
-    createSubMod("speed", 1.0);
-    createSubMod("time_add", 0.0);
 
-    createSubMod("mult", 1.0);
-    createSubMod("desync", 0.2);
-    // createSubMod("size", 1.0);
+    speed = createSubMod("speed", 1.0, ["frequency"]);
+    mult = createSubMod("mult", 1.0, ["period", "size"]);
+    desync = createSubMod("desync", 0.2, ["spacing"]);
+    time_add = createSubMod("time_add", 0.0, ["offset", "timeadd", "time_offset", "timeoffset"]);
+    timertype = createSubMod("timertype", 0.0);
   }
 
   function drunkMath(lane:Int, curPos:Float):Float
   {
-    var time:Float = (getSubVal("timertype") >= 0.5 ? beatTime : songTime * 0.001);
-    time *= getSubVal("speed");
-    time += getSubVal("time_add");
+    var time:Float = (timertype.value >= 0.5 ? beatTime : songTime * 0.001);
+    time *= speed.value;
+    time += time_add.value;
 
     var returnValue:Float = 0.0;
 
-    returnValue += currentValue * (cosecant(((time) + ((lane) * getSubVal("desync")) +
-      (curPos * getSubVal("mult") * (0.225)) * 10 / FlxG.height))) * ModConstants.strumSize * (0.5);
+    returnValue += currentValue * (cosecant(((time) + ((lane) * desync.value) +
+      (curPos * mult.value * (0.225)) * 10 / FlxG.height))) * ModConstants.strumSize * (0.5);
 
     return returnValue;
   }
@@ -51,7 +56,7 @@ class CosecantXMod extends CosecantModifierBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.noteType == "receptor") return; // skip math if mod is 0
     data.x -= drunkMath(data.direction, data.whichStrumNote?.strumDistance ?? 0); // undo the strum  movement.
     data.x += drunkMath(data.direction, data.curPos); // re apply but now with notePos
   }
@@ -72,7 +77,7 @@ class CosecantYMod extends CosecantModifierBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.noteType == "receptor") return; // skip math if mod is 0
     data.y -= drunkMath(data.direction, data.whichStrumNote?.strumDistance ?? 0); // undo the strum  movement.
     data.y += drunkMath(data.direction, data.curPos); // re apply but now with notePos
   }
@@ -93,7 +98,7 @@ class CosecantZMod extends CosecantModifierBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.noteType == "receptor") return; // skip math if mod is 0
     data.z -= drunkMath(data.direction, data.whichStrumNote?.strumDistance ?? 0); // undo the strum  movement.
     data.z += drunkMath(data.direction, data.curPos); // re apply but now with notePos
   }
@@ -114,7 +119,7 @@ class CosecantAngleMod extends CosecantModifierBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.noteType == "receptor") return; // skip math if mod is 0
     data.angleZ -= drunkMath(data.direction, data.whichStrumNote?.strumDistance ?? 0); // undo the strum  movement.
     data.angleZ += drunkMath(data.direction, data.curPos); // re apply but now with notePos
   }
@@ -135,7 +140,7 @@ class CosecantScaleMod extends CosecantModifierBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.noteType == "receptor") return; // skip math if mod is 0
     data.scaleX -= drunkMath(data.direction, data.whichStrumNote?.strumDistance ?? 0) * 0.01; // undo the strum  movement.
     data.scaleX += drunkMath(data.direction, data.curPos) * 0.01; // re apply but now with notePos
     data.scaleY -= drunkMath(data.direction, data.whichStrumNote?.strumDistance ?? 0) * 0.01;
@@ -159,7 +164,7 @@ class CosecantScaleXMod extends CosecantModifierBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.noteType == "receptor") return; // skip math if mod is 0
     data.scaleX -= drunkMath(data.direction, data.whichStrumNote?.strumDistance ?? 0) * 0.01; // undo the strum  movement.
     data.scaleX += drunkMath(data.direction, data.curPos) * 0.01; // re apply but now with notePos
   }
@@ -180,7 +185,7 @@ class CosecantScaleYMod extends CosecantModifierBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.noteType == "receptor") return; // skip math if mod is 0
     data.scaleY -= drunkMath(data.direction, data.whichStrumNote?.strumDistance ?? 0) * 0.01; // undo the strum  movement.
     data.scaleY += drunkMath(data.direction, data.curPos) * 0.01; // re apply but now with notePos
   }

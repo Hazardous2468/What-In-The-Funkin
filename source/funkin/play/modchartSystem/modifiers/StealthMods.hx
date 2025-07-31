@@ -115,7 +115,6 @@ class StrumStealthMod extends Modifier
     modPriority = 120;
     strumsMod = true;
     unknown = false;
-    createSubMod("no_alpha", 0.0);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -130,15 +129,18 @@ class StrumStealthMod extends Modifier
   }
 }
 
-// Notes fade to white and then fade out of existence
+// Notes fade to white and then fade out
 class StealthMod extends Modifier
 {
+  var noGlowSubmod:ModifierSubValue;
+  var stealthPastSubmod:ModifierSubValue;
+
   public function new(name:String)
   {
     super(name, 0);
     modPriority = 120;
-    createSubMod("noglow", 0.0);
-    createSubMod("stealthpastreceptors", 1.0);
+    noGlowSubmod = createSubMod("noglow", 0.0);
+    stealthPastSubmod = createSubMod("stealthpastreceptors", 1.0);
     unknown = false;
     notesMod = true;
     holdsMod = true;
@@ -156,14 +158,14 @@ class StealthMod extends Modifier
       // if ((Preferences.downscroll && curPos2 > 0) || (!Preferences.downscroll && curPos2 < 0))
       if (curPos2 < 0)
       {
-        pastReceptors = getSubVal("stealthpastreceptors");
+        pastReceptors = stealthPastSubmod.value;
       }
 
-      if (getSubVal("noglow") >= 1.0) // If 1.0 -> just control alpha
+      if (noGlowSubmod.value >= 1.0) // If 1.0 -> just control alpha
       {
         data.alpha -= FlxMath.bound(currentValue * pastReceptors, 0, 1); // clamp
       }
-      else if (getSubVal("noglow") >= 0.5) // if 0.5 -> same logic, just no stealthglow applied
+      else if (noGlowSubmod.value >= 0.5) // if 0.5 -> same logic, just no stealthglow applied
       {
         var subtractAlpha:Float = (currentValue - 0.5) * 2;
         subtractAlpha = FlxMath.bound(subtractAlpha * pastReceptors, 0, 1); // clamp
@@ -185,15 +187,27 @@ class StealthMod extends Modifier
 
 class SuddenMod extends Modifier
 {
+  var noGlowSubmod:ModifierSubValue;
+
+  // var stealthPastSubmod:ModifierSubValue;
+  // The point where the notes start fading in
+  var start:ModifierSubValue;
+
+  // The point where the notes finish fading in
+  var end:ModifierSubValue;
+
+  // Offsets the start and end points by this amount
+  var offset:ModifierSubValue;
+
   public function new(name:String)
   {
     super(name, 0);
     modPriority = 119;
-    createSubMod("noglow", 0.0);
-    createSubMod("start", 500.0);
-    createSubMod("end", 300.0);
-    createSubMod("offset", 0.0);
-    createSubMod("stealthpastreceptors", 1.0);
+    noGlowSubmod = createSubMod("noglow", 0.0);
+    start = createSubMod("start", 500.0);
+    end = createSubMod("end", 300.0);
+    offset = createSubMod("offset", 0.0);
+    // stealthPastSubmod = createSubMod("stealthpastreceptors", 1.0); // is pretty much unused for sudden
     unknown = false;
     notesMod = true;
     holdsMod = true;
@@ -205,9 +219,9 @@ class SuddenMod extends Modifier
   {
     var whichStrum:StrumlineNote = strumLine.getByIndex(data.direction);
     whichStrum.strumExtraModData.suddenModAmount = currentValue;
-    whichStrum.strumExtraModData.suddenStart = getSubVal("start") + getSubVal("offset");
-    whichStrum.strumExtraModData.suddenEnd = getSubVal("end") + getSubVal("offset");
-    whichStrum.strumExtraModData.sudden_noGlow = getSubVal("noglow");
+    whichStrum.strumExtraModData.suddenStart = start.value + offset.value;
+    whichStrum.strumExtraModData.suddenEnd = end.value + offset.value;
+    whichStrum.strumExtraModData.sudden_noGlow = noGlowSubmod.value;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -220,13 +234,13 @@ class SuddenMod extends Modifier
     // Don't do anything if we're past receptors! Maybe disable this if we want stealth past receptors?
     // if (curPos2 < 0) return;
 
-    var a:Float = FlxMath.remapToRange(curPos2, getSubVal("start") + getSubVal("offset"), getSubVal("end") + getSubVal("offset"), 1, 0);
+    var a:Float = FlxMath.remapToRange(curPos2, start.value + offset.value, end.value + offset.value, 1, 0);
 
     // var a = FlxMath.remapToRange(curPos * -1, 500, 300, 0, 1); // scale
 
     a = FlxMath.bound(a, 0, 1); // clamp
 
-    if (getSubVal("noglow") >= 2.0) // If 2.0 -> just control alpha
+    if (noGlowSubmod.value >= 2.0) // If 2.0 -> just control alpha
     {
       data.alpha -= a * currentValue;
       return;
@@ -234,10 +248,10 @@ class SuddenMod extends Modifier
 
     a *= currentValue;
 
-    if (getSubVal("noglow") < 1) // if below 0, then we apply stealth glow.
+    if (noGlowSubmod.value < 1) // if below 0, then we apply stealth glow.
     {
       var stealthGlow:Float = a * 2; // so it reaches max at 0.5
-      data.stealth += FlxMath.bound(stealthGlow, 0, 1) * (1.0 - getSubVal("noglow")); // clamp
+      data.stealth += FlxMath.bound(stealthGlow, 0, 1) * (1.0 - noGlowSubmod.value); // clamp
     }
 
     // extra math so alpha doesn't start fading until 0.5
@@ -248,15 +262,30 @@ class SuddenMod extends Modifier
 
 class HiddenMod extends Modifier
 {
+  // Disables the stealthGlow behaviour.
+  var noGlowSubmod:ModifierSubValue;
+
+  // If greater then 0, notes will reappear when passing the strumlineNotes
+  var stealthPastSubmod:ModifierSubValue;
+
+  // The point where the notes start fading out
+  var start:ModifierSubValue;
+
+  // The point where the notes finish fading out (fully invisible)
+  var end:ModifierSubValue;
+
+  // Offsets the start and end points by this amount
+  var offset:ModifierSubValue;
+
   public function new(name:String)
   {
     super(name, 0);
     modPriority = 118;
-    createSubMod("noglow", 0.0);
-    createSubMod("start", 500.0);
-    createSubMod("end", 300.0);
-    createSubMod("offset", 0.0);
-    createSubMod("stealthpastreceptors", 1.0);
+    noGlowSubmod = createSubMod("noglow", 0.0);
+    start = createSubMod("start", 500.0);
+    end = createSubMod("end", 300.0);
+    offset = createSubMod("offset", 0.0);
+    stealthPastSubmod = createSubMod("stealthpastreceptors", 1.0);
     unknown = false;
     notesMod = true;
     holdsMod = true;
@@ -268,9 +297,9 @@ class HiddenMod extends Modifier
   {
     var whichStrum:StrumlineNote = strumLine.getByIndex(data.direction);
     whichStrum.strumExtraModData.hiddenModAmount = currentValue;
-    whichStrum.strumExtraModData.hiddenStart = getSubVal("start") + getSubVal("offset");
-    whichStrum.strumExtraModData.hiddenEnd = getSubVal("end") + getSubVal("offset");
-    whichStrum.strumExtraModData.hidden_noGlow = getSubVal("noglow");
+    whichStrum.strumExtraModData.hiddenStart = start.value + offset.value;
+    whichStrum.strumExtraModData.hiddenEnd = end.value + offset.value;
+    whichStrum.strumExtraModData.hidden_noGlow = noGlowSubmod.value;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -281,26 +310,26 @@ class HiddenMod extends Modifier
     var curPos2:Float = data.curPos_unscaled - (data.whichStrumNote?.noteModData?.curPos_unscaled ?? 0);
     curPos2 *= Preferences.downscroll ? -1 : 1;
 
-    // Don't do anything if we're past receptors! Maybe disable this if we want stealth past receptors?
-    if (getSubVal("stealthpastreceptors") <= 0)
+    // Don't do anything if we're past receptors!
+    if (stealthPastSubmod.value <= 0)
     {
       if (curPos2 < 0) return;
     }
 
-    var a:Float = FlxMath.remapToRange(curPos2, getSubVal("start") + getSubVal("offset"), getSubVal("end") + getSubVal("offset"), 0, 1);
+    var a:Float = FlxMath.remapToRange(curPos2, start.value + offset.value, end.value + offset.value, 0, 1);
     a = FlxMath.bound(a, 0, 1); // clamp
 
-    if (getSubVal("noglow") >= 2.0) // If 2.0 -> just control alpha
+    if (noGlowSubmod.value >= 2.0) // If 2.0 -> just control alpha
     {
       data.alpha -= a * currentValue;
       return;
     }
     a *= currentValue;
 
-    if (getSubVal("noglow") < 1) // if below 1 -> then we apply stealth glow.
+    if (noGlowSubmod.value < 1) // if below 1 -> then we apply stealth glow.
     {
       var stealthGlow:Float = a * 2; // so it reaches max at 0.5
-      data.stealth += FlxMath.bound(stealthGlow, 0, 1) * (1.0 - getSubVal("noglow")); // clamp
+      data.stealth += FlxMath.bound(stealthGlow, 0, 1) * (1.0 - noGlowSubmod.value); // clamp
     }
 
     // extra math so alpha doesn't start fading until 0.5
@@ -311,16 +340,34 @@ class HiddenMod extends Modifier
 
 class VanishMod extends Modifier
 {
+  // Disables the stealthGlow behaviour.
+  var noGlowSubmod:ModifierSubValue;
+
+  // If greater then 0, notes will reappear when passing the strumlineNotes
+  var stealthPastSubmod:ModifierSubValue;
+
+  // The point where the notes start fading out (?)
+  var start:ModifierSubValue;
+
+  // The size of the hidden region (?)
+  var size:ModifierSubValue;
+
+  // The point where the notes fade back in (?)
+  var end:ModifierSubValue;
+
+  // Offsets the entire effect region by this amount
+  var offset:ModifierSubValue;
+
   public function new(name:String)
   {
     super(name, 0);
     modPriority = 117;
-    createSubMod("noglow", 0.0);
-    createSubMod("start", 475.0);
-    createSubMod("size", 195.0);
-    createSubMod("end", 125.0);
-    createSubMod("offset", 0.0);
-    createSubMod("stealthpastreceptors", 1.0);
+    noGlowSubmod = createSubMod("noglow", 0.0);
+    start = createSubMod("start", 475.0);
+    size = createSubMod("size", 195.0);
+    end = createSubMod("end", 125.0);
+    offset = createSubMod("offset", 0.0);
+    stealthPastSubmod = createSubMod("stealthpastreceptors", 1.0);
     unknown = false;
     notesMod = true;
     holdsMod = true;
@@ -333,17 +380,16 @@ class VanishMod extends Modifier
     var whichStrum:StrumlineNote = strumLine.getByIndex(data.direction);
     whichStrum.strumExtraModData.vanishModAmount = currentValue;
 
-    var sizeThingy:Float = getSubVal("size") / 2;
-    var midPoint:Float = getSubVal("start") + getSubVal("end");
-    midPoint /= 2;
+    var sizeThingy:Float = size.value / 2;
+    var midPoint:Float = (start.value + end.value) / 2;
 
-    whichStrum.strumExtraModData.vanish_HiddenStart = getSubVal("start") + getSubVal("offset");
-    whichStrum.strumExtraModData.vanish_HiddenEnd = midPoint + sizeThingy + getSubVal("offset");
+    whichStrum.strumExtraModData.vanish_HiddenStart = start.value + offset.value;
+    whichStrum.strumExtraModData.vanish_HiddenEnd = midPoint + sizeThingy + offset.value;
 
-    whichStrum.strumExtraModData.vanish_SuddenStart = midPoint - sizeThingy + getSubVal("offset");
-    whichStrum.strumExtraModData.vanish_SuddenEnd = getSubVal("end") + getSubVal("offset");
+    whichStrum.strumExtraModData.vanish_SuddenStart = midPoint - sizeThingy + offset.value;
+    whichStrum.strumExtraModData.vanish_SuddenEnd = end.value + offset.value;
 
-    whichStrum.strumExtraModData.vanish_noGlow = getSubVal("noglow");
+    whichStrum.strumExtraModData.vanish_noGlow = noGlowSubmod.value;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -354,21 +400,25 @@ class VanishMod extends Modifier
     var curPos2:Float = data.curPos_unscaled - (data.whichStrumNote?.noteModData?.curPos_unscaled ?? 0);
     curPos2 *= Preferences.downscroll ? -1 : 1;
 
-    var midPoint:Float = getSubVal("start") + getSubVal("end");
-    midPoint /= 2;
+    // Don't do anything if we're past receptors!
+    if (stealthPastSubmod.value <= 0)
+    {
+      if (curPos2 < 0) return;
+    }
 
-    var sizeThingy:Float = getSubVal("size") / 2;
+    var midPoint:Float = (start.value + end.value) / 2;
+    var sizeThingy:Float = size.value / 2;
 
-    var a:Float = FlxMath.remapToRange(curPos2, getSubVal("start") + getSubVal("offset"), midPoint + sizeThingy + getSubVal("offset"), 0, 1);
+    var a:Float = FlxMath.remapToRange(curPos2, start.value + offset.value, midPoint + sizeThingy + offset.value, 0, 1);
 
     a = FlxMath.bound(a, 0, 1); // clamp
 
-    var b:Float = FlxMath.remapToRange(curPos2, midPoint - sizeThingy + getSubVal("offset"), getSubVal("end") + getSubVal("offset"), 0, 1);
+    var b:Float = FlxMath.remapToRange(curPos2, midPoint - sizeThingy + offset.value, end.value + offset.value, 0, 1);
 
     b = FlxMath.bound(b, 0, 1); // clamp
     var result:Float = a - b;
 
-    if (getSubVal("noglow") >= 2.0) // If 2.0 -> just control alpha
+    if (noGlowSubmod.value >= 2.0) // If 2.0 -> just control alpha
     {
       data.alpha -= result * currentValue;
       return;
@@ -376,10 +426,10 @@ class VanishMod extends Modifier
 
     result *= currentValue;
 
-    if (getSubVal("noglow") < 1) // if below 1, then we apply stealth glow.
+    if (noGlowSubmod.value < 1) // if below 1, then we apply stealth glow.
     {
       var stealthGlow:Float = result * 2; // so it reaches max at 0.5
-      data.stealth += FlxMath.bound(stealthGlow, 0, 1) * (1.0 - getSubVal("noglow")); // clamp
+      data.stealth += FlxMath.bound(stealthGlow, 0, 1) * (1.0 - noGlowSubmod.value); // clamp
     }
 
     // extra math so alpha doesn't start fading until 0.5
@@ -390,14 +440,28 @@ class VanishMod extends Modifier
 
 class BlinkMod extends Modifier
 {
+  // Disables the stealthGlow behaviour.
+  var noGlowSubmod:ModifierSubValue;
+
+  // If greater then 0, notes will reappear when passing the strumlineNotes
+  var stealthPastSubmod:ModifierSubValue;
+
+  // Offsets the blink timing
+  var offset:ModifierSubValue;
+
+  // How quickly the blinking is
+  var speed:ModifierSubValue;
+
   public function new(name:String)
   {
     super(name, 0);
     modPriority = 116;
-    createSubMod("noglow", 0.0);
-    createSubMod("offset", 0.0);
-    createSubMod("speed", 1.0);
-    createSubMod("stealthpastreceptors", 1.0);
+
+    noGlowSubmod = createSubMod("noglow", 0.0);
+    stealthPastSubmod = createSubMod("stealthpastreceptors", 1.0);
+    offset = createSubMod("offset", 0.0);
+    speed = createSubMod("speed", 1.0);
+
     unknown = false;
     notesMod = true;
     holdsMod = true;
@@ -408,23 +472,29 @@ class BlinkMod extends Modifier
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (isArrowPath || data.noteType == "receptor") return;
+    // Don't do anything if we're past receptors!
+    if (stealthPastSubmod.value <= 0)
+    {
+      var curPos2:Float = data.curPos_unscaled - (data.whichStrumNote?.noteModData?.curPos_unscaled ?? 0);
+      curPos2 *= Preferences.downscroll ? -1 : 1;
+      if (curPos2 < 0) return;
+    }
 
-    var a:Float = sin((beatTime + getSubVal("offset")) * getSubVal("speed") * Math.PI) * 2;
-    // f = Quantize(f, 0.3333 f);
-    // var a:Float = FlxMath.remapToRange(f, 0, 1, -1, 0);
+    var a:Float = sin((beatTime + offset.value) * speed.value * Math.PI) * 2;
+
     a = FlxMath.bound(a, 0, 1); // clamp
 
-    if (getSubVal("noglow") >= 2.0) // If 2.0 -> just control alpha
+    if (noGlowSubmod.value >= 2.0) // If 2.0 -> just control alpha
     {
       data.alpha -= a * currentValue;
       return;
     }
     a *= currentValue;
 
-    if (getSubVal("noglow") < 1) // if below 0.5 -> then we apply stealth glow.
+    if (noGlowSubmod.value < 1) // if below 0.5 -> then we apply stealth glow.
     {
       var stealthGlow:Float = a * 2; // so it reaches max at 0.5
-      data.stealth += FlxMath.bound(stealthGlow, 0, 1) * (1.0 - getSubVal("noglow")); // clamp
+      data.stealth += FlxMath.bound(stealthGlow, 0, 1) * (1.0 - noGlowSubmod.value); // clamp
     }
 
     // extra math so alpha doesn't start fading until 0.5
@@ -433,15 +503,21 @@ class BlinkMod extends Modifier
   }
 }
 
-// Notes fade to white and then fade out of existence
+// Notes fade to white and then fade out
 class StealthHoldsMod extends Modifier
 {
+  // Disables the stealthGlow behaviour.
+  var noGlowSubmod:ModifierSubValue;
+
+  // If greater then 0, notes will reappear when passing the strumlineNotes
+  var stealthPastSubmod:ModifierSubValue;
+
   public function new(name:String)
   {
     super(name, 0);
     modPriority = 120;
-    createSubMod("noglow", 0.0);
-    createSubMod("stealthpastreceptors", 1.0);
+    noGlowSubmod = createSubMod("noglow", 0.0);
+    stealthPastSubmod = createSubMod("stealthpastreceptors", 1.0);
     unknown = false;
     notesMod = false;
     holdsMod = true;
@@ -459,14 +535,14 @@ class StealthHoldsMod extends Modifier
       // if ((Preferences.downscroll && curPos2 > 0) || (!Preferences.downscroll && curPos2 < 0))
       if (curPos2 < 0)
       {
-        pastReceptors = getSubVal("stealthpastreceptors");
+        pastReceptors = stealthPastSubmod.value;
       }
 
-      if (getSubVal("noglow") >= 1.0) // If 1.0 -> just control alpha
+      if (noGlowSubmod.value >= 1.0) // If 1.0 -> just control alpha
       {
         data.alpha -= FlxMath.bound(currentValue * pastReceptors, 0, 1); // clamp
       }
-      else if (getSubVal("noglow") >= 0.5) // if 0.5 -> same logic, just no stealthglow applied
+      else if (noGlowSubmod.value >= 0.5) // if 0.5 -> same logic, just no stealthglow applied
       {
         var subtractAlpha:Float = (currentValue - 0.5) * 2;
         subtractAlpha = FlxMath.bound(subtractAlpha * pastReceptors, 0, 1); // clamp

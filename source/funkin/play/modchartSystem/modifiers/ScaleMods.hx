@@ -251,29 +251,40 @@ class ZoomModifier extends Modifier
   }
 }
 
-// Not finished
+// Not perfect but close enough
 class MiniModifier extends Modifier
 {
   public function new(name:String)
   {
     super(name, 0);
-    modPriority += 2; // apply before tiny
+    modPriority -= 5; // apply a bit later(after column stuff)
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0 || data.noteType == "receptor") return;
-    data.scaleX = FlxMath.lerp(data.scaleX, 0.0, currentValue);
-    data.scaleY = FlxMath.lerp(data.scaleY, 0.0, currentValue);
-    data.scaleZ = FlxMath.lerp(data.scaleZ, 0.0, currentValue);
+    var tinyVal:Float = currentValue * 0.5;
+    data.scaleX = FlxMath.lerp(data.scaleX, 0.0, tinyVal);
+    data.scaleY = FlxMath.lerp(data.scaleY, 0.0, tinyVal);
+    data.scaleZ = FlxMath.lerp(data.scaleZ, 0.0, tinyVal);
+  }
+
+  override function speedMath(lane:Int, curPos:Float, strumLine:Strumline, isHoldNote = false):Float
+  {
+    return 1 - currentValue / 2;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
     if (currentValue == 0) return;
-    data.scaleX = FlxMath.lerp(data.scaleX, 0.0, currentValue);
-    data.scaleY = FlxMath.lerp(data.scaleY, 0.0, currentValue);
-    data.scaleZ = FlxMath.lerp(data.scaleZ, 0.0, currentValue);
+    var tinyVal:Float = currentValue * 0.5;
+
+    var scalePointX:Float = (1.5 * Strumline.NOTE_SPACING) + strumLine.x;
+    data.x = FlxMath.lerp(data.x, scalePointX, tinyVal);
+
+    data.scaleX = FlxMath.lerp(data.scaleX, 0.0, tinyVal);
+    data.scaleY = FlxMath.lerp(data.scaleY, 0.0, tinyVal);
+    data.scaleZ = FlxMath.lerp(data.scaleZ, 0.0, tinyVal);
   }
 }
 
@@ -289,17 +300,17 @@ class TinyModifier extends Modifier
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (isArrowPath || currentValue == 0 || data.noteType == "receptor") return;
-    data.scaleX = FlxMath.lerp(data.scaleX, 0.0, currentValue);
-    data.scaleY = FlxMath.lerp(data.scaleY, 0.0, currentValue);
-    data.scaleZ = FlxMath.lerp(data.scaleZ, 0.0, currentValue);
+    data.scaleX = FlxMath.lerp(data.scaleX, 0.0, currentValue / 2);
+    data.scaleY = FlxMath.lerp(data.scaleY, 0.0, currentValue / 2);
+    data.scaleZ = FlxMath.lerp(data.scaleZ, 0.0, currentValue / 2);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
     if (currentValue == 0) return;
-    data.scaleX = FlxMath.lerp(data.scaleX, 0.0, currentValue);
-    data.scaleY = FlxMath.lerp(data.scaleY, 0.0, currentValue);
-    data.scaleZ = FlxMath.lerp(data.scaleZ, 0.0, currentValue);
+    data.scaleX = FlxMath.lerp(data.scaleX, 0.0, currentValue / 2);
+    data.scaleY = FlxMath.lerp(data.scaleY, 0.0, currentValue / 2);
+    data.scaleZ = FlxMath.lerp(data.scaleZ, 0.0, currentValue / 2);
   }
 }
 
@@ -313,13 +324,13 @@ class TinyXModifier extends Modifier
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (isArrowPath || currentValue == 0 || data.noteType == "receptor") return;
-    data.scaleX = FlxMath.lerp(data.scaleX, 0.0, currentValue);
+    data.scaleX = FlxMath.lerp(data.scaleX, 0.0, currentValue / 2);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
     if (currentValue == 0) return;
-    data.scaleX = FlxMath.lerp(data.scaleX, 0.0, currentValue);
+    data.scaleX = FlxMath.lerp(data.scaleX, 0.0, currentValue / 2);
   }
 }
 
@@ -333,13 +344,13 @@ class TinyYModifier extends Modifier
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (isArrowPath || currentValue == 0 || data.noteType == "receptor") return;
-    data.scaleY = FlxMath.lerp(data.scaleY, 0.0, currentValue);
+    data.scaleY = FlxMath.lerp(data.scaleY, 0.0, currentValue / 2);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
     if (currentValue == 0) return;
-    data.scaleY = FlxMath.lerp(data.scaleY, 0.0, currentValue);
+    data.scaleY = FlxMath.lerp(data.scaleY, 0.0, currentValue / 2);
   }
 }
 
@@ -353,13 +364,13 @@ class TinyZModifier extends Modifier
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (isArrowPath || currentValue == 0 || data.noteType == "receptor") return;
-    data.scaleZ = FlxMath.lerp(data.scaleZ, 0.0, currentValue);
+    data.scaleZ = FlxMath.lerp(data.scaleZ, 0.0, currentValue / 2);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
     if (currentValue == 0) return;
-    data.scaleZ = FlxMath.lerp(data.scaleZ, 0.0, currentValue);
+    data.scaleZ = FlxMath.lerp(data.scaleZ, 0.0, currentValue / 2);
   }
 }
 
@@ -375,9 +386,9 @@ class TinyHoldsModifier extends Modifier
     if (isArrowPath || currentValue == 0 || data.noteType == "receptor") return;
     if (isHoldNote)
     {
-      data.scaleX = FlxMath.lerp(data.scaleX, 0.0, currentValue);
-      data.scaleY = FlxMath.lerp(data.scaleY, 0.0, currentValue);
-      data.scaleZ = FlxMath.lerp(data.scaleZ, 0.0, currentValue);
+      data.scaleX = FlxMath.lerp(data.scaleX, 0.0, currentValue / 2);
+      data.scaleY = FlxMath.lerp(data.scaleY, 0.0, currentValue / 2);
+      data.scaleZ = FlxMath.lerp(data.scaleZ, 0.0, currentValue / 2);
     }
   }
 }
@@ -392,9 +403,9 @@ class TinyStrumModifier extends Modifier
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
     if (currentValue == 0) return;
-    data.scaleX = FlxMath.lerp(data.scaleX, 0.0, currentValue);
-    data.scaleY = FlxMath.lerp(data.scaleY, 0.0, currentValue);
-    data.scaleZ = FlxMath.lerp(data.scaleZ, 0.0, currentValue);
+    data.scaleX = FlxMath.lerp(data.scaleX, 0.0, currentValue / 2);
+    data.scaleY = FlxMath.lerp(data.scaleY, 0.0, currentValue / 2);
+    data.scaleZ = FlxMath.lerp(data.scaleZ, 0.0, currentValue / 2);
   }
 }
 
@@ -408,7 +419,7 @@ class TinyStrumXModifier extends Modifier
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
     if (currentValue == 0) return;
-    data.scaleX = FlxMath.lerp(data.scaleX, 0.0, currentValue);
+    data.scaleX = FlxMath.lerp(data.scaleX, 0.0, currentValue / 2);
   }
 }
 
@@ -422,7 +433,7 @@ class TinyStrumYModifier extends Modifier
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
     if (currentValue == 0) return;
-    data.scaleY = FlxMath.lerp(data.scaleY, 0.0, currentValue);
+    data.scaleY = FlxMath.lerp(data.scaleY, 0.0, currentValue / 2);
   }
 }
 
@@ -436,7 +447,7 @@ class TinyStrumZModifier extends Modifier
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
     if (currentValue == 0) return;
-    data.scaleZ = FlxMath.lerp(data.scaleZ, 0.0, currentValue);
+    data.scaleZ = FlxMath.lerp(data.scaleZ, 0.0, currentValue / 2);
   }
 }
 
@@ -450,9 +461,9 @@ class TinyNotesModifier extends Modifier
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (isArrowPath || currentValue == 0 || data.noteType == "receptor") return;
-    data.scaleX = FlxMath.lerp(data.scaleX, 0.0, currentValue);
-    data.scaleY = FlxMath.lerp(data.scaleY, 0.0, currentValue);
-    data.scaleZ = FlxMath.lerp(data.scaleZ, 0.0, currentValue);
+    data.scaleX = FlxMath.lerp(data.scaleX, 0.0, currentValue / 2);
+    data.scaleY = FlxMath.lerp(data.scaleY, 0.0, currentValue / 2);
+    data.scaleZ = FlxMath.lerp(data.scaleZ, 0.0, currentValue / 2);
   }
 }
 
@@ -466,7 +477,7 @@ class TinyNotesXModifier extends Modifier
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (isArrowPath || currentValue == 0 || data.noteType == "receptor") return;
-    data.scaleX = FlxMath.lerp(data.scaleX, 0.0, currentValue);
+    data.scaleX = FlxMath.lerp(data.scaleX, 0.0, currentValue / 2);
   }
 }
 
@@ -480,7 +491,7 @@ class TinyNotesYModifier extends Modifier
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (isArrowPath || currentValue == 0 || data.noteType == "receptor") return;
-    data.scaleY = FlxMath.lerp(data.scaleY, 0.0, currentValue);
+    data.scaleY = FlxMath.lerp(data.scaleY, 0.0, currentValue / 2);
   }
 }
 
@@ -494,6 +505,6 @@ class TinyNotesZModifier extends Modifier
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (isArrowPath || currentValue == 0 || data.noteType == "receptor") return;
-    data.scaleZ = FlxMath.lerp(data.scaleZ, 0.0, currentValue);
+    data.scaleZ = FlxMath.lerp(data.scaleZ, 0.0, currentValue / 2);
   }
 }

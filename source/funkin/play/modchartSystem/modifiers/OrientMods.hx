@@ -6,6 +6,7 @@ import funkin.play.modchartSystem.NoteData;
 import funkin.play.modchartSystem.modifiers.BaseModifier;
 import funkin.play.PlayState;
 import flixel.math.FlxMath;
+import flixel.math.FlxAngle;
 
 // Notes angle themselves towards direction of travel
 // A little bit more on the experimental side. Probably breaks when having active overlapping orient mods.
@@ -25,7 +26,14 @@ class OrientModBase extends Modifier
     notesMod = true;
     strumsMod = true;
     specialMod = true;
+
+    // default to old math if angleZ to avoid breaking older modfiles (and because the old method meant it would work for up and down scroll)
+    useAltMathSubmod = createSubMod("alt", (i % 3 == 0 ? 1.0 : 0.0), ["type", "old", "other", "variant", "varient"]);
   }
+
+  var useAltMathSubmod:ModifierSubValue;
+
+  var strumResult:Array<Float> = [0, 0, 0, 0];
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
@@ -33,16 +41,15 @@ class OrientModBase extends Modifier
     {
       data.orient2[index - 3] = currentValue;
     }
-
     if (currentValue == 0 || isArrowPath || data.noteType == "receptor") return;
 
     switch (index % 3)
     {
       case 0:
         data.angleZ += (getOrientAngle(data) * currentValue);
-        data.angleZ -= data.whichStrumNote.strumExtraModData.orientStrumAngle[index]; // undo the mother fucking strum rotation for orient XD
+        data.angleZ -= strumResult[data.direction];
       case 1:
-        data.angleX += (getOrientAngle(data) * currentValue);
+        data.angleX += ((getOrientAngle(data) + 180) * currentValue);
       case 2:
         data.angleY += (getOrientAngle(data) * currentValue);
     }
@@ -51,7 +58,7 @@ class OrientModBase extends Modifier
   override function specialMath(lane:Int, strumLine:Strumline):Void
   {
     var whichStrum:StrumlineNote = strumLine.getByIndex(lane);
-    whichStrum.strumExtraModData.orientExtraMath[4] = currentValue;
+    whichStrum.strumExtraModData.orientExtraMath[index] = currentValue;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -67,12 +74,13 @@ class OrientModBase extends Modifier
       case 2:
         data.angleY += orientAngleAmount;
     }
+    strumResult[data.direction] = orientAngleAmount;
     data.whichStrumNote.strumExtraModData.orientStrumAngle[index] = orientAngleAmount;
   }
 
+  // Returns the angle between the current position and lastKnownPosition in degrees.
   function getOrientAngle(data:NoteData):Float
   {
-    // Oh hey, same math for spiral hold shit lmfao
     var a:Float = 0.0; // height
     var b:Float = 0.0; // length
     switch (index % 3)
@@ -87,19 +95,52 @@ class OrientModBase extends Modifier
         b = (data.z - data.lastKnownPosition.z) * -1;
         a = (data.x - data.lastKnownPosition.x);
     }
-    var calculateAngleDif:Float = Math.atan(b / a);
 
-    if (Math.isNaN(calculateAngleDif))
+    if (useAltMathSubmod.value >= 0.5) // Old math. Only allows 180 degrees
     {
-      calculateAngleDif = data.lastKnownOrientAngle[index]; // TODO -> Make this less likely to be a NaN in the first place lol
+      var calculateAngleDif:Float = Math.atan(b / a);
+
+      if (Math.isNaN(calculateAngleDif))
+      {
+        calculateAngleDif = data.lastKnownOrientAngle[index]; // TODO -> Make this less likely to be a NaN in the first place lol
+      }
+      else
+      {
+        calculateAngleDif *= FlxAngle.TO_DEG;
+        data.lastKnownOrientAngle[index] = calculateAngleDif;
+      }
+      return calculateAngleDif;
     }
-    else
+    else // allows for 360 degrees
     {
-      calculateAngleDif *= (180 / Math.PI);
+      if (Preferences.downscroll)
+      {
+        a *= -1;
+        b *= -1;
+      }
+
+      // Fix for Z
+      if (data.noteType != "receptor" && index == 3)
+      {
+        a *= -1;
+        b *= -1;
+      }
+
+      // hardcoded fix for reverse for z variant. Won't bother with fixing other mods though
+      if (index % 3 == 0)
+      {
+        var reverseModAmount:Float = data.getReverse(); // 0 to 1
+        if (reverseModAmount > 0.5)
+        {
+          a *= -1;
+          b *= -1;
+        }
+      }
+
+      var calculateAngleDif:Float = FlxAngle.degreesFromOrigin(a, b);
       data.lastKnownOrientAngle[index] = calculateAngleDif;
+      return calculateAngleDif;
     }
-
-    return calculateAngleDif;
   }
 }
 

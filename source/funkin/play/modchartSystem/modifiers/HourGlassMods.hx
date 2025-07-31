@@ -11,12 +11,21 @@ import flixel.math.FlxMath;
 // Custom mod made by me (Hazard24)!
 class HourGlassModBase extends Modifier
 {
+  // The point where the notes start moving
+  var start:ModifierSubValue;
+
+  // The point where the notes finish moving
+  var end:ModifierSubValue;
+
+  // Offsets the start and end points by this amount
+  var offset:ModifierSubValue;
+
   public function new(name:String)
   {
     super(name, 0);
-    createSubMod("start", 420.0);
-    createSubMod("end", 135.0);
-    createSubMod("offset", 0.0);
+    start = createSubMod("start", 420.0);
+    end = createSubMod("end", 135.0);
+    offset = createSubMod("offset", 0.0);
   }
 
   // Basically just a copy of Sudden math with an extra step (b and c)
@@ -28,7 +37,7 @@ class HourGlassModBase extends Modifier
     // var curPos2:Float = data.curPos_unscaled - (data.whichStrumNote?.noteModData?.curPos_unscaled ?? 0);
 
     // Copy of Sudden math
-    var a:Float = FlxMath.remapToRange(pos, getSubVal("start") + getSubVal("offset"), getSubVal("end") + getSubVal("offset"), 1, 0);
+    var a:Float = FlxMath.remapToRange(pos, start.value + offset.value, end.value + offset.value, 1, 0);
     a = FlxMath.bound(a, 0, 1); // clamp
 
     var b:Float = 1 - a;

@@ -7,8 +7,6 @@ Fork specific issues (V0.9.1a):
 
 - Offsets (input / visual) aren't properly tested
 
-- non 4/4 time signatures untested
-
 - flxStrip ignores camera alpha (this affects sustains and 3D notes)
 
 - If zsort is enabled earlier then beat -5, then the strums appear invisible.
@@ -42,6 +40,8 @@ Fork specific issues (V0.9.1a):
 
 
 V-Slice v0.6.4 issues:
+
+- non 4/4 time signatures don't work
 
 - Memory leaks and bad performance x.x (especially with FlxText!!!)
 

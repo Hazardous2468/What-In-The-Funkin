@@ -490,12 +490,11 @@ class Preferences
     if (show)
     {
       // Enable the debug display.
-      FlxG.game.parent.addChild(Main.fpsCounter);
       FlxG.game.parent.addChild(Main.fpsVar_Shadow);
-
+      FlxG.game.parent.addChild(Main.fpsCounter);
       #if !html5
-      FlxG.game.parent.addChild(Main.memoryCounter);
       FlxG.game.parent.addChild(Main.memoryCounter_Shadow);
+      FlxG.game.parent.addChild(Main.memoryCounter);
       #end
     }
     else

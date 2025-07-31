@@ -8,40 +8,6 @@ import funkin.play.PlayState;
 import flixel.math.FlxMath;
 
 // Contains all mods which are unique or have debug purposes!
-// WTF?!
-class BangarangMod extends Modifier
-{
-  public function new(name:String)
-  {
-    super(name, 0);
-    modPriority = -50;
-    unknown = false;
-    notesMod = true;
-    holdsMod = true;
-    pathMod = true;
-  }
-
-  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
-  {
-    if (currentValue == 0) return;
-
-    var yOffset:Float = 0;
-
-    var speed = PlayState.instance?.currentChart?.scrollSpeed ?? 1.0;
-
-    var curpos:Float = data.curPos;
-
-    var fYOffset = -curpos / speed;
-    var fEffectHeight = FlxG.height;
-    var fScale = FlxMath.remapToRange(fYOffset, 0, fEffectHeight, 0, 1); // scale
-    var fNewYOffset = fYOffset * fScale;
-    var fBrakeYAdjust = currentValue * (fNewYOffset - fYOffset);
-    fBrakeYAdjust = FlxMath.bound(fBrakeYAdjust, -400, 400); // clamp
-
-    yOffset -= fBrakeYAdjust * speed;
-    data.y += curpos + yOffset;
-  }
-}
 
 class SinClip extends Modifier
 {

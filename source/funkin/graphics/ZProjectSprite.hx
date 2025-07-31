@@ -27,6 +27,10 @@ class ZProjectSprite extends ZSprite
   // Makes the mesh all wobbly!
   public var vibrateEffect:Float = 0.0;
 
+  public var vertOffsetX:Array<Float> = [];
+  public var vertOffsetY:Array<Float> = [];
+  public var vertOffsetZ:Array<Float> = [];
+
   // If set, will reference this sprites graphic! Very useful for animations!
   public var spriteGraphic(default, set):FlxSprite;
 
@@ -48,6 +52,11 @@ class ZProjectSprite extends ZSprite
   public var angleX:Float = 0;
   public var angleY:Float = 0;
   public var angleZ:Float = 0;
+
+  // for group shit
+  public var angleX2:Float = 0;
+  public var angleY2:Float = 0;
+  public var angleZ2:Float = 0;
 
   public var scaleX:Float = 1;
   public var scaleY:Float = 1;
@@ -79,6 +88,8 @@ class ZProjectSprite extends ZSprite
   // public var bottomright:Vector3D = new Vector3D(1, 1, 0);
   // public var middlePoint:Vector3D = new Vector3D(0.5, 0.5, 0);
   public var fov:Float = 90;
+
+  public var depth:Float = 0;
 
   /**
    * A `Vector` of floats where each pair of numbers is treated as a coordinate location (an x, y pair).
@@ -206,25 +217,19 @@ class ZProjectSprite extends ZSprite
     {
       for (y in 0...subdivisions + 2) // y
       {
+        // Setup point
         var point2D:Vector2;
         var point3D:Vector3D = new Vector3D(0, 0, 0);
         point3D.x = (w / (subdivisions + 1)) * x;
         point3D.y = (h / (subdivisions + 1)) * y;
 
-        // skew funny
         var xPercent:Float = x / (subdivisions + 1);
         var yPercent:Float = y / (subdivisions + 1);
-        // For some reason, we need a 0.5 offset for this???????????????????
-        var xPercent_SkewOffset:Float = xPercent - skewY_offset - 0.5;
-        var yPercent_SkewOffset:Float = yPercent - skewX_offset - 0.5;
-        // Keep math the same as skewedsprite for parity reasons.
-        if (skewX != 0) // Small performance boost from this if check to avoid the tan math lol?
-          point3D.x += yPercent_SkewOffset * Math.tan(skewX * FlxAngle.TO_RAD) * h;
-        if (skewY != 0) //
-          point3D.y += xPercent_SkewOffset * Math.tan(skewY * FlxAngle.TO_RAD) * w;
-        if (skewZ != 0) //
-          point3D.z += yPercent_SkewOffset * Math.tan(skewZ * FlxAngle.TO_RAD) * h;
 
+        var newWidth:Float = (scaleX - 1) * (xPercent - 0.5);
+        var newHeight:Float = (scaleY - 1) * (yPercent - 0.5);
+
+        // Apply vibrate effect
         if (vibrateEffect != 0)
         {
           point3D.x += FlxG.random.float(-1, 1) * vibrateEffect;
@@ -232,12 +237,45 @@ class ZProjectSprite extends ZSprite
           point3D.z += FlxG.random.float(-1, 1) * vibrateEffect;
         }
 
-        // scale
-        var newWidth:Float = (scaleX - 1) * (xPercent - 0.5);
-        point3D.x += (newWidth) * w;
-        newWidth = (scaleY - 1) * (yPercent - 0.5);
-        point3D.y += (newWidth) * h;
+        // Apply curVertOffsets
+        var curVertOffsetX:Float = 0;
+        var curVertOffsetY:Float = 0;
+        var curVertOffsetZ:Float = 0;
 
+        if (i < vertOffsetX.length)
+        {
+          curVertOffsetX = vertOffsetX[i];
+        }
+        if (i < vertOffsetY.length)
+        {
+          curVertOffsetY = vertOffsetY[i];
+        }
+        if (i < vertOffsetZ.length)
+        {
+          curVertOffsetZ = vertOffsetZ[i];
+        }
+
+        point3D.x += curVertOffsetX;
+        point3D.y += curVertOffsetY;
+        point3D.z += curVertOffsetZ;
+
+        // scale
+        point3D.x += (newWidth) * w;
+        point3D.y += (newHeight) * h;
+
+        point3D = applyRotation(point3D, xPercent, yPercent);
+
+        point3D = applyRotation(point3D, xPercent, yPercent, ["z2", "y2", "x2"]);
+
+        point3D.x += moveX;
+        point3D.y += moveY;
+        point3D.z += moveZ;
+
+        point3D = applySkew(point3D, xPercent, yPercent, w, h);
+
+        // Apply offset here before it gets affected by z projection!
+        point3D.x -= offset.x;
+        point3D.y -= offset.y;
         point2D = applyPerspective(point3D, xPercent, yPercent);
 
         if (originalWidthHeight != null && autoOffset)
@@ -372,10 +410,21 @@ class ZProjectSprite extends ZSprite
 
   public var doUpdateColorTransform:Bool = false;
 
+  // since updateColorTransform isn't public lol?
+  public function updateCol():Void
+  {
+    updateColorTransform();
+  }
+
   // DON'T UPDATE THIS SHIT
   override function updateColorTransform():Void
   {
     super.updateColorTransform();
+    if (originalWidthHeight == null && spriteGraphic != null)
+    {
+      originalWidthHeight = new Vector2(spriteGraphic.frameWidth, spriteGraphic.frameHeight);
+    }
+
     if (!doUpdateColorTransform && processedGraphic != null) return;
 
     if (processedGraphic != null) processedGraphic.destroy();
@@ -393,41 +442,124 @@ class ZProjectSprite extends ZSprite
     }
   }
 
+  public var offsetBeforeRotation:FlxPoint = new FlxPoint(0, 0);
+
+  public var preRotationMoveX:Float = 0;
+  public var preRotationMoveY:Float = 0;
+  public var preRotationMoveZ:Float = 0;
+
+  var skewOffsetFix:Float = 0.5;
+
+  public function applySkew(pos:Vector3D, xPercent:Float, yPercent:Float, w:Float, h:Float):Vector3D
+  {
+    var point3D:Vector3D = new Vector3D(pos.x, pos.y, pos.z);
+
+    var skewPosX:Float = this.x + moveX - offset.x;
+    var skewPosY:Float = this.y + moveY - offset.y;
+
+    skewPosX += (w) / 2;
+    skewPosY += (h) / 2;
+
+    var rotateModPivotPoint:Vector2 = new Vector2(0.5, 0.5); // to skew from center
+    var thing:Vector2 = ModConstants.rotateAround(rotateModPivotPoint, new Vector2(xPercent, yPercent), angleZ); // to fix incorrect skew when rotated
+
+    // For some reason, we need a 0.5 offset for this for it to be centered???????????????????
+    var xPercent_SkewOffset:Float = thing.x - skewY_offset - skewOffsetFix;
+    var yPercent_SkewOffset:Float = thing.y - skewX_offset - skewOffsetFix;
+    // Keep math the same as skewedsprite for parity reasons.
+    if (skewX != 0) // Small performance boost from this if check to avoid the tan math lol?
+      point3D.x += yPercent_SkewOffset * Math.tan(skewX * FlxAngle.TO_RAD) * h * scaleY;
+    if (skewY != 0) //
+      point3D.y += xPercent_SkewOffset * Math.tan(skewY * FlxAngle.TO_RAD) * w * scaleX;
+
+    // z SKEW ?
+
+    if (skewZ != 0) point3D.z += yPercent_SkewOffset * Math.tan(skewZ * FlxAngle.TO_RAD) * h * scaleY;
+
+    return point3D;
+  }
+
+  function applyRotX(pos:Vector3D, xPercent, yPercent, w:Float, h:Float, angle:Float, includeFlip:Bool = true):Vector3D
+  {
+    var rotateModPivotPoint:Vector2 = new Vector2(0, h / 2);
+    rotateModPivotPoint.x += pivotOffsetZ;
+    rotateModPivotPoint.y += pivotOffsetY;
+    var angleX_withFlip:Float = angle + (includeFlip ? (flipY ? 180 : 0) : 0);
+    var thing:Vector2 = ModConstants.rotateAround(rotateModPivotPoint, new Vector2(pos.z, pos.y), angleX_withFlip);
+    pos.z = thing.x;
+    pos.y = thing.y;
+    return pos;
+  }
+
+  function applyRotY(pos:Vector3D, xPercent, yPercent, w:Float, h:Float, angle:Float, includeFlip:Bool = true):Vector3D
+  {
+    var rotateModPivotPoint:Vector2 = new Vector2(w / 2, 0);
+    rotateModPivotPoint.x += pivotOffsetX;
+    rotateModPivotPoint.y += pivotOffsetZ;
+    var angleY_withFlip:Float = angle + (flipX ? 180 : 0);
+    var thing:Vector2 = ModConstants.rotateAround(rotateModPivotPoint, new Vector2(pos.x, pos.z), angleY_withFlip);
+    pos.x = thing.x;
+    pos.z = thing.y;
+    return pos;
+  }
+
+  function applyRotZ(pos:Vector3D, xPercent, yPercent, w:Float, h:Float, angle:Float):Vector3D
+  {
+    var rotateModPivotPoint:Vector2 = new Vector2(w / 2, h / 2);
+    rotateModPivotPoint.x += pivotOffsetX;
+    rotateModPivotPoint.y += pivotOffsetY;
+    var thing:Vector2 = ModConstants.rotateAround(rotateModPivotPoint, new Vector2(pos.x, pos.y), angle);
+    pos.x = thing.x;
+    pos.y = thing.y;
+    return pos;
+  }
+
+  // EDIT THIS ARRAY TO CHANGE HOW ROTATION IS APPLIED!
+  public var rotationOrder:Array<String> = ["z", "y", "x"];
+
+  public function applyRotation(pos:Vector3D, xPercent:Float = 0, yPercent:Float = 0, rotationOrder:Array<String> = null):Vector3D
+  {
+    if (rotationOrder == null) rotationOrder = this.rotationOrder;
+    var w:Float = spriteGraphic?.frameWidth ?? frameWidth;
+    var h:Float = spriteGraphic?.frameHeight ?? frameHeight;
+
+    var pos_modified:Vector3D = new Vector3D(pos.x, pos.y, pos.z);
+
+    pos_modified.x -= offsetBeforeRotation.x;
+    pos_modified.y -= offsetBeforeRotation.y;
+    pos_modified.x += preRotationMoveX;
+    pos_modified.y += preRotationMoveY;
+    pos_modified.z += preRotationMoveZ;
+
+    for (i in 0...rotationOrder.length)
+    {
+      switch (rotationOrder[i])
+      {
+        case "x2":
+          pos_modified = applyRotX(pos_modified, xPercent, yPercent, w, h, angleX2, false);
+        case "y2":
+          pos_modified = applyRotY(pos_modified, xPercent, yPercent, w, h, angleY2, false);
+        case "z2":
+          pos_modified = applyRotZ(pos_modified, xPercent, yPercent, w, h, angleZ2);
+
+        case "x":
+          pos_modified = applyRotX(pos_modified, xPercent, yPercent, w, h, angleX);
+        case "y":
+          pos_modified = applyRotY(pos_modified, xPercent, yPercent, w, h, angleY);
+        case "z":
+          pos_modified = applyRotZ(pos_modified, xPercent, yPercent, w, h, angleZ);
+      }
+    }
+
+    return pos_modified;
+  }
+
   public function applyPerspective(pos:Vector3D, xPercent:Float = 0, yPercent:Float = 0):Vector2
   {
     var w:Float = spriteGraphic?.frameWidth ?? frameWidth;
     var h:Float = spriteGraphic?.frameHeight ?? frameHeight;
 
     var pos_modified:Vector3D = new Vector3D(pos.x, pos.y, pos.z);
-
-    var rotateModPivotPoint:Vector2 = new Vector2(w / 2, h / 2);
-    rotateModPivotPoint.x += pivotOffsetX;
-    rotateModPivotPoint.y += pivotOffsetY;
-    var thing:Vector2 = ModConstants.rotateAround(rotateModPivotPoint, new Vector2(pos_modified.x, pos_modified.y), angleZ);
-    pos_modified.x = thing.x;
-    pos_modified.y = thing.y;
-
-    rotateModPivotPoint = new Vector2(w / 2, 0);
-    rotateModPivotPoint.x += pivotOffsetX;
-    rotateModPivotPoint.y += pivotOffsetZ;
-    thing = ModConstants.rotateAround(rotateModPivotPoint, new Vector2(pos_modified.x, pos_modified.z), angleY);
-    pos_modified.x = thing.x;
-    pos_modified.z = thing.y;
-
-    rotateModPivotPoint = new Vector2(0, h / 2);
-    rotateModPivotPoint.x += pivotOffsetZ;
-    rotateModPivotPoint.y += pivotOffsetY;
-    thing = ModConstants.rotateAround(rotateModPivotPoint, new Vector2(pos_modified.z, pos_modified.y), angleX);
-    pos_modified.z = thing.x;
-    pos_modified.y = thing.y;
-
-    // Apply offset here before it gets affected by z projection!
-    pos_modified.x -= offset.x;
-    pos_modified.y -= offset.y;
-
-    pos_modified.x += moveX;
-    pos_modified.y += moveY;
-    pos_modified.z += moveZ;
 
     if (projectionEnabled)
     {
@@ -447,11 +579,7 @@ class ZProjectSprite extends ZSprite
 
       pos_modified.x -= fovOffsetX;
       pos_modified.y -= fovOffsetY;
-      return new Vector2(pos_modified.x, pos_modified.y);
     }
-    else
-    {
-      return new Vector2(pos_modified.x, pos_modified.y);
-    }
+    return new Vector2(pos_modified.x, pos_modified.y);
   }
 }
