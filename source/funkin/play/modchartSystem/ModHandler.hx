@@ -904,7 +904,7 @@ class ModHandler
   {
     if (note.strumDistance != 0 || timeOffset != 0)
     {
-      note.noteModData.strumTime = Conductor.instance?.songPosition ?? 0;
+      note.noteModData.strumTime = ModConstants.getSongPosition();
       note.noteModData.strumTime += note.noteModData.strumPosition + timeOffset;
 
       note.noteModData.curPos_unscaled = strum.calculateNoteYPos(note.noteModData.strumTime) * -1;

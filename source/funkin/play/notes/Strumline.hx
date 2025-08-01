@@ -331,8 +331,11 @@ class Strumline extends FlxSpriteGroup
    */
   public function calculateNoteYPos(strumTime:Float):Float
   {
-    // return GRhythmUtil.getNoteY(strumTime, scrollSpeed, isDownscroll, conductorInUse);
+    #if FEATURE_WITF_USE_TIME_DELTA
+    return GRhythmUtil.getNoteY(strumTime, scrollSpeed, isDownscroll, conductorInUse);
+    #else
     return Constants.PIXELS_PER_MS * (conductorInUse.songPosition - strumTime) * scrollSpeed * (isDownscroll ? 1 : -1);
+    #end
   }
 
   function arrowPathSetup():Void
@@ -671,7 +674,7 @@ class Strumline extends FlxSpriteGroup
       var length:Float = (whichStrumNote.strumExtraModData.arrowpathLength + whichStrumNote.strumExtraModData.arrowpathBackwardsLength) / (pathPieces);
       note.fullSustainLength = note.sustainLength = length;
 
-      note.strumTime = Conductor.instance?.songPosition ?? 0;
+      note.strumTime = ModConstants.getSongPosition();
       note.strumTime -= whichStrumNote?.strumExtraModData?.arrowpathBackwardsLength ?? 0;
       note.strumTime += length * note.piece;
       note.updateClipping();

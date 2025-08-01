@@ -2,6 +2,7 @@ v1.0.0a EARLY:
 
 THIS UPDATE WILL REQUIRE MODCHARTS TO BE UPDATED DUE TO MODIFIER MATH CHANGES! (see below)
 
+Updated to version v0.7.3 of FNF
 
 Re-added 'isPlayer' variable to Strumline.hx to fix scripts which may rely on said variable.
 

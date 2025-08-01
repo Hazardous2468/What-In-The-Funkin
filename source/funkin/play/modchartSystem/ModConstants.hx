@@ -497,6 +497,22 @@ class ModConstants
     return modName;
   }
 
+  public static function getSongPosition():Float
+  {
+    #if FEATURE_WITF_USE_TIME_DELTA
+    return Conductor.instance?.getTimeWithDelta() ?? 0;
+    #else
+    return Conductor.instance?.songPosition ?? 0;
+    #end
+  }
+
+  public static function getBeatPositionWithDelta():Float
+  {
+    if (Conductor.instance == null) return 0.0;
+    var timeWithDelta:Float = Conductor.instance.getTimeWithDelta();
+    return Conductor.instance.getTimeInSteps(timeWithDelta) / Constants.STEPS_PER_BEAT;
+  }
+
   // Checks if a modifier should be inverted.
   public static function invertValueCheck(tag:String, invertValues:Bool):Float
   {

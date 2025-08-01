@@ -301,6 +301,14 @@ class Project extends HXProject
   static final FEATURE_DISCORD_RPC:FeatureFlag = "FEATURE_DISCORD_RPC";
 
   /**
+   * `-DFEATURE_WITF_USE_TIME_DELTA`
+   * If this flag is enabled, WITF will use time with delta (which should make the notes move smoother at higher framerates).
+   * Otherwise, will default to using the raw conductor values instead.
+   * Disabled by default due to breaking driven drops and looking very stuttery in some cases (like with wave modifier)
+   */
+  static final FEATURE_WITF_USE_TIME_DELTA:FeatureFlag = "FEATURE_WITF_USE_TIME_DELTA";
+
+  /**
    * `-DFEATURE_FILE_DROP`
    * If this flag is enabled, the game will support dragging and dropping files onto it for various features.
    * Disabled on MacOS.
@@ -801,6 +809,8 @@ class Project extends HXProject
     FEATURE_OPEN_URL.apply(this, true);
     FEATURE_PARTIAL_SOUNDS.apply(this, true);
     FEATURE_POLYMOD_MODS.apply(this, true);
+
+    FEATURE_WITF_USE_TIME_DELTA.apply(this, false);
 
     // Video playback should be enabled on desktop, web, and mobile.
     // HXCPP has trouble with iOS simulator builds though...

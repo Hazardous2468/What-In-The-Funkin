@@ -186,14 +186,19 @@ class Modifier
 
   function get_beatTime():Float
   {
+    #if FEATURE_WITF_USE_TIME_DELTA
+    return ModConstants.getBeatPositionWithDelta();
+    #else
     return Conductor.instance?.currentBeatTime ?? 0.0;
+    #end
   }
 
   var songTime(get, never):Float;
 
   function get_songTime():Float
   {
-    return Conductor.instance?.songPosition ?? 0.0;
+    return ModConstants.getSongPosition();
+    // return Conductor.instance?.songPosition ?? 0.0;
   }
 
   function sin(r:Float):Float

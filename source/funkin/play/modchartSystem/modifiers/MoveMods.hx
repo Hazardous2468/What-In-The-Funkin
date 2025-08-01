@@ -293,7 +293,7 @@ class JumpMod extends Modifier
 
     everyBeat = createSubMod("beat", 1.0, ["every", "frequency"]);
     offset = createSubMod("offset", 0.0, ["time_add", "timeadd", "time_offset", "timeoffset"]);
-    reverseAffect = createSubMod("reverse_affect", 1.0, ["reverse", "reverseaffect"]);
+    reverseAffect = createSubMod("reverse_affected", 1.0, ["reverse", "reversable", "reverseaffect", "reverseaffected", "reverse_affect"]);
   }
 
   var everyBeat:ModifierSubValue;
@@ -304,7 +304,10 @@ class JumpMod extends Modifier
   {
     if (currentValue == 0) return; // skip math if mod is 0
 
-    var time:Float = (beatTime + offset.value) % everyBeat.value;
+    // var time:Float = (beatTime + offset.value) % everyBeat.value;
+
+    var time:Float = ModConstants.mod((beatTime + offset.value), everyBeat.value);
+
     var val:Float = time * Conductor.instance.beatLengthMs;
 
     var reverseModAmount:Float = data.getReverse();

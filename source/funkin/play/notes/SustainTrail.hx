@@ -790,7 +790,7 @@ class SustainTrail extends ZSprite
     if (fakeNote == null) fakeNote = new ZSprite();
 
     grain = isArrowPath ? (whichStrumNote?.strumExtraModData?.pathGrain ?? ModConstants.defaultPathGrain) : (whichStrumNote?.strumExtraModData?.holdGrain ?? ModConstants.defaultHoldGrain);
-    var songTimmy:Float = (Conductor?.instance?.songPosition ?? songTime);
+    var songTimmy:Float = (ModConstants.getSongPosition());
 
     var longHolds:Float = 0;
     if (!isArrowPath)
