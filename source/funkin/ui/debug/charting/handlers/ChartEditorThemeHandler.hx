@@ -53,6 +53,7 @@ class ChartEditorThemeHandler
   static final GRID_MEASURE_DIVIDER_COLOR_DARK:FlxColor = 0xFFC4C4C4;
   static final GRID_MEASURE_DIVIDER_COLOR_LIGHTQUANT:FlxColor = 0xFF111111;
   static final GRID_MEASURE_DIVIDER_COLOR_DARKQUANT:FlxColor = 0xFF111111;
+  static final GRID_MEASURE_DIVIDER_COLOR_HAZARD:FlxColor = 0xFFC4C4C4;
   static final GRID_MEASURE_DIVIDER_WIDTH:Float = ChartEditorState.GRID_SELECTION_BORDER_WIDTH;
 
   // Horizontal divider between beats.
@@ -60,6 +61,7 @@ class ChartEditorThemeHandler
   static final GRID_BEAT_DIVIDER_COLOR_DARK:FlxColor = 0xFF848484;
   static final GRID_BEAT_DIVIDER_COLOR_LIGHTQUANT:FlxColor = 0xFFC1C1C1;
   static final GRID_BEAT_DIVIDER_COLOR_DARKQUANT:FlxColor = 0xFF151414;
+  static final GRID_BEAT_DIVIDER_COLOR_HAZARD:FlxColor = 0xFFC1C1C1;
   static final GRID_BEAT_DIVIDER_WIDTH:Float = ChartEditorState.GRID_SELECTION_BORDER_WIDTH;
 
   // Border on the square highlighting selected notes.
@@ -234,6 +236,8 @@ class ChartEditorThemeHandler
       case Dark: GRID_MEASURE_DIVIDER_COLOR_DARK;
       case DarkQuant: GRID_MEASURE_DIVIDER_COLOR_DARKQUANT;
       case LightQuant: GRID_MEASURE_DIVIDER_COLOR_LIGHTQUANT;
+      case Hazard: GRID_MEASURE_DIVIDER_COLOR_HAZARD;
+
       default: GRID_MEASURE_DIVIDER_COLOR_LIGHT;
     };
 
@@ -251,6 +255,7 @@ class ChartEditorThemeHandler
       case Dark: GRID_BEAT_DIVIDER_COLOR_DARK;
       case DarkQuant: GRID_BEAT_DIVIDER_COLOR_DARKQUANT;
       case LightQuant: GRID_BEAT_DIVIDER_COLOR_LIGHTQUANT;
+      case Hazard: GRID_BEAT_DIVIDER_COLOR_HAZARD;
       default: GRID_BEAT_DIVIDER_COLOR_LIGHT;
     };
 

@@ -322,19 +322,17 @@ class Strumline extends FlxSpriteGroup
 
   static final BACKGROUND_PAD:Int = 16;
 
-  // REMOVE THIS!!!!
-
   /**
    * For a note's strumTime, calculate its Y position relative to the strumline.
    * NOTE: Assumes Conductor and PlayState are both initialized.
+   * NOTE 2: While this function was removed in FNF V0.7, it remains for WITF to function properly. It also uses songPosition instead of songPositionWithDelta.
    * @param strumTime The strumtime of the note.
    * @return The Y position of the note.
    */
   public function calculateNoteYPos(strumTime:Float):Float
   {
-    return GRhythmUtil.getNoteY(strumTime, scrollSpeed, isDownscroll, conductorInUse);
-    // return
-    // Constants.PIXELS_PER_MS * (conductorInUse.songPosition - strumTime - Conductor.instance.inputOffset) * scrollSpeed * (Preferences.downscroll ? 1 : -1);
+    // return GRhythmUtil.getNoteY(strumTime, scrollSpeed, isDownscroll, conductorInUse);
+    return Constants.PIXELS_PER_MS * (conductorInUse.songPosition - strumTime) * scrollSpeed * (isDownscroll ? 1 : -1);
   }
 
   function arrowPathSetup():Void
@@ -659,6 +657,8 @@ class Strumline extends FlxSpriteGroup
       return;
     }
 
+    var stitchEnds:Bool = true;
+
     arrowPaths.forEach(function(note:SustainTrail) {
       note.x = ModConstants.holdNoteJankX;
       note.y = ModConstants.holdNoteJankY;
@@ -676,10 +676,12 @@ class Strumline extends FlxSpriteGroup
       note.strumTime += length * note.piece;
       note.updateClipping();
 
+      // note.x += 112 / 2 * note.piece;
+
       // UH OH, SCUFFED CODE ALERT
       // We sow the end of the arrowpath to the start of the new piece. This is so that we don't have any gaps. Mainly occurs with spiral holds lol
       // MY NAME IS EDWIN
-      if (note.previousPiece != null)
+      if (note.previousPiece != null && stitchEnds)
       {
         // I made the mimic
         var v_prev:Array<Float> = note.previousPiece.vertices_array;

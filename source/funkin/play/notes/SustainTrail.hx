@@ -47,7 +47,6 @@ class SustainTrail extends ZSprite
   public var noteData:Null<SongNoteData>;
   public var parentStrumline:Strumline;
 
-  // public var z:Float = 0;
   public var cover:NoteHoldCover = null;
 
   /**
@@ -92,7 +91,7 @@ class SustainTrail extends ZSprite
   public var uvtData:DrawData<Float> = new DrawData<Float>();
 
   /**
-   * A `Vector` of magic for color magic, IDFK
+   * A `Vector` representing each vertex colour. Doesn't work though :(
    */
   public var colors:DrawData<Int> = null;
 
@@ -138,6 +137,7 @@ class SustainTrail extends ZSprite
    */
   public function new(noteDirection:NoteDirection, sustainLength:Float, noteStyle:NoteStyle, isArrowPath:Bool = false, ?parentStrum:Strumline)
   {
+    super(0, 0);
     this.isArrowPath = isArrowPath;
     this.parentStrumline = parentStrum;
 
@@ -145,80 +145,13 @@ class SustainTrail extends ZSprite
     this.fullSustainLength = sustainLength;
     this.noteDirection = noteDirection;
 
-    if (isArrowPath)
-    {
-      if (parentStrum != null)
-      {
-        super(0, 0, Paths.image(parentStrum.arrowPathFileName));
-        // trace("pathpath: " + parentStrum.arrowPathFileName);
-      }
-      else
-      {
-        super(0, 0, Paths.image('NOTE_ArrowPath'));
-      }
-      useShader = false; // Don't use the hsv shader for arrowpaths cuz by default they should be white so they can easily be tinted instead of relying on a shader.
-    }
-    else
-    {
-      super(0, 0, noteStyle.getHoldNoteAssetPath());
-      // setupHoldNoteGraphic(noteStyle);// still need to support this lmfao
-    }
-
-    if (useShader)
-    {
-      hsvShader = new HSVNotesShader();
-      this.shader = hsvShader;
-    }
-
-    noteStyleOffsets = noteStyle.getHoldNoteOffsets();
-
     noteModData = new NoteData();
 
-    noteStyleName = noteStyle.id;
-
-    antialiasing = true;
-
-    this.isPixel = noteStyle.isHoldNotePixel();
-    if (isPixel)
-    {
-      endOffset = bottomClip = 1;
-      antialiasing = false;
-    }
-    else
-    {
-      endOffset = 0.5;
-      bottomClip = 0.9;
-    }
-
-    zoom = 1.0;
-    if (isArrowPath) zoom *= 0.7; // based of funkin notestyle
-    else
-      zoom *= noteStyle.fetchHoldNoteScale(); // arrowpath scale should not be controlled by notestyle hold scale
-
-    // CALCULATE SIZE
-    graphicWidth = graphic.width / 8 * zoom; // amount of notes * 2
-    graphicHeight = sustainHeight(sustainLength, parentStrumline?.scrollSpeed ?? 1.0);
-    // instead of scrollSpeed, PlayState.SONG.speed
-
-    if (parentStrum != null)
-    {
-      if (parentStrum.sustainGraphicWidth == null && !isArrowPath)
-      {
-        parentStrum.sustainGraphicWidth = graphicWidth;
-      }
-    }
-    flipY = Preferences.downscroll;
-
-    // indices = new DrawData<Int>(12, true, TRIANGLE_VERTEX_INDICES);
     setIndices(TRIANGLE_VERTEX_INDICES);
+    noteStyleOffsets = noteStyle.getHoldNoteOffsets();
+    setupHoldNoteGraphic(noteStyle);
+
     this.active = true; // This NEEDS to be true for the note to be drawn!
-
-    // alpha = 0.6;
-    alpha = 1.0;
-    // calls updateColorTransform(), which initializes processedGraphic!
-    updateColorTransform();
-
-    updateClipping();
   }
 
   /**
@@ -284,7 +217,22 @@ class SustainTrail extends ZSprite
    */
   public function setupHoldNoteGraphic(noteStyle:NoteStyle):Void
   {
-    loadGraphic(noteStyle.getHoldNoteAssetPath());
+    if (isArrowPath)
+    {
+      if (parentStrumline != null)
+      {
+        loadGraphic(Paths.image(parentStrumline.arrowPathFileName));
+      }
+      else
+      {
+        loadGraphic(Paths.image('NOTE_ArrowPath'));
+      }
+    }
+    else
+    {
+      loadGraphic(noteStyle.getHoldNoteAssetPath());
+    }
+
     noteStyleName = noteStyle.id;
     antialiasing = true;
 
@@ -310,6 +258,14 @@ class SustainTrail extends ZSprite
     graphicHeight = sustainHeight(sustainLength, parentStrumline?.scrollSpeed ?? 1.0);
     // instead of scrollSpeed, PlayState.SONG.speed
 
+    if (parentStrumline != null)
+    {
+      if (parentStrumline.sustainGraphicWidth == null && !isArrowPath)
+      {
+        parentStrumline.sustainGraphicWidth = graphicWidth;
+      }
+    }
+
     flipY = Preferences.downscroll #if mobile
     || (Preferences.controlsScheme == FunkinHitboxControlSchemes.Arrows
       && !funkin.mobile.input.ControlsHandler.usingExternalInputDevice) #end;
@@ -317,6 +273,12 @@ class SustainTrail extends ZSprite
     // alpha = 0.6;
     alpha = 1.0;
     updateColorTransform();
+
+    if (useHSVShader)
+    {
+      if (hsvShader == null) hsvShader = new HSVNotesShader();
+      this.shader = hsvShader;
+    }
 
     updateClipping();
   }
@@ -361,9 +323,9 @@ class SustainTrail extends ZSprite
   function triggerRedraw():Void
   {
     graphicHeight = sustainHeight(sustainLength, parentStrumline?.scrollSpeed ?? 1.0);
-    updateHitbox();
     if (!usingHazModHolds) // Don't update cuz we updateClipping every frame anyway in Strumline.hx
       updateClipping(); // Commenting this out = holds don't render for 1 frame when being hit. Keeping this means the hold renders incorrectly... what?
+    updateHitbox();
   }
 
   public override function updateHitbox():Void
@@ -396,10 +358,11 @@ class SustainTrail extends ZSprite
     {
       return;
     }
+
     if (parentStrumline == null || parentStrumline.mods == null)
     {
       // trace("AW FUCK, THERE IS NO WAY TO SAMPLE MOD DATA!");
-      updateClipping_Legacy(songTime);
+      updateClipping_Vanilla(songTime);
       usingHazModHolds = false;
       return;
     }
@@ -410,7 +373,7 @@ class SustainTrail extends ZSprite
     }
     else
     {
-      updateClipping_Legacy(songTime);
+      updateClipping_Vanilla(songTime);
     }
   }
 
@@ -476,6 +439,12 @@ class SustainTrail extends ZSprite
 
   function updateStealthGlowV2():Void
   {
+    if (isArrowPath)
+    {
+      this.hsvShader.setFloat('_holdHeight', holdResolution);
+      return;
+    }
+
     this.hsvShader.setFloat('_stealthSustainSuddenAmount', 0.0);
     this.hsvShader.setFloat('_stealthSustainHiddenAmount', 0.0);
     this.hsvShader.setFloat('_stealthSustainVanishAmount', 0.0);
@@ -504,7 +473,7 @@ class SustainTrail extends ZSprite
     this.hsvShader.setBool('_isHold', true);
     this.hsvShader.setFloat('_holdHeight', holdResolution);
 
-    var holdPosFromReceptor:Float = (distanceFromReceptor_unscaledpos - (whichStrumNote?.noteModData?.curPos_unscaled ?? 0)) * (Preferences.downscroll ? -1 : 1);
+    var holdPosFromReceptor:Float = (distanceFromReceptor_unscaledpos - (whichStrumNote?.noteModData?.curPos_unscaled ?? 0)) * (flipY ? -1 : 1);
 
     // 1.125 works really well for 2.5 scroll speed so let's go from there
     // 2.5 = 1.125
@@ -576,7 +545,7 @@ class SustainTrail extends ZSprite
         && whichStrumNote.strumExtraModData.noHoldMathShortcut < 0.5
         && hitNote
         && !missedNote
-        && ((notePos < 0.5 && !Preferences.downscroll) || (notePos > -0.5 && Preferences.downscroll))))
+        && ((notePos < 0.5 && !flipY) || (notePos > -0.5 && flipY))))
     {
       // if (noteDirection == 0) trace("skipped!");
       return;
@@ -603,7 +572,7 @@ class SustainTrail extends ZSprite
 
     noteModData.x = whichStrumNote.x + parentStrumline.mods.getHoldOffsetX(isArrowPath, graphicWidth);
     var sillyPos:Float = parentStrumline.calculateNoteYPos(noteModData.strumTime) * scrollMult;
-    if (Preferences.downscroll)
+    if (flipY)
     {
       noteModData.y = (whichStrumNote.y + sillyPos + Strumline.STRUMLINE_SIZE / 2);
     }
@@ -639,7 +608,7 @@ class SustainTrail extends ZSprite
     noteModData.y -= noteStyleOffsets[1];
 
     fakeNote.applyNoteData(noteModData, !is3D);
-    if (Preferences.downscroll) fakeNote.y += 27; // fix gap for downscroll lol Moved from verts so it is applied before perspective fucks it up!
+    if (flipY) fakeNote.y += 27; // fix gap for downscroll lol Moved from verts so it is applied before perspective fucks it up!
 
     tempVec2.x = fakeNote.x;
     tempVec2.y = fakeNote.y;
@@ -974,7 +943,7 @@ class SustainTrail extends ZSprite
     this.alpha = fakeNote.alpha;
     this.z = fakeNote.z; // for z ordering
 
-    if (useShader && this.hsvShader != null)
+    if (useHSVShader && this.hsvShader != null)
     {
       this.hsvShader.stealthGlow = fakeNote.stealthGlow;
       this.hsvShader.stealthGlowBlue = fakeNote.stealthGlowBlue;
@@ -1359,7 +1328,7 @@ class SustainTrail extends ZSprite
    * If flipY is true, top and bottom bounds swap places.
    * @param songTime	The time to clip the note at, in milliseconds.
    */
-  public function updateClipping_Legacy(songTime:Float = 0):Void
+  public function updateClipping_Vanilla(songTime:Float = 0):Void
   {
     var clipHeight:Float = FlxMath.bound(sustainHeight(sustainLength - (songTime - strumTime), parentStrumline?.scrollSpeed ?? 1.0), 0, graphicHeight);
     if (clipHeight <= 0.1)
@@ -1474,15 +1443,14 @@ class SustainTrail extends ZSprite
       if (!camera.visible || !camera.exists) continue;
       // if (!isOnScreen(camera)) continue; // TODO: Update this code to make it work properly.
 
-      // if (is3D) getScreenPosition(_point, camera)
-      // else
       getScreenPosition(_point, camera).subtractPoint(offset);
 
       camera.drawTriangles(graphic, vertices, indices, uvtData, colors, _point, blend, true, antialiasing, colorTransform, shader, cullMode);
-      #if debug
-      if (FlxG.debugger.drawDebug) drawDebug();
-      #end
     }
+
+    #if debug
+    if (FlxG.debugger.drawDebug) drawDebug();
+    #end
   }
 
   public override function kill():Void
@@ -1532,7 +1500,7 @@ class SustainTrail extends ZSprite
     this.hsvShader.hue = hue;
   }
 
-  var useShader:Bool = true;
+  var useHSVShader:Bool = true;
 
   public var hsvShader:HSVNotesShader = null;
 }
