@@ -804,7 +804,7 @@ class Project extends HXProject
     //
 
     FEATURE_FUNKVIS.apply(this, true);
-    FEATURE_LOG_TRACE.apply(this, true);
+    FEATURE_LOG_TRACE.apply(this, false);
     FEATURE_NAUGHTYNESS.apply(this, true);
     FEATURE_OPEN_URL.apply(this, true);
     FEATURE_PARTIAL_SOUNDS.apply(this, true);
@@ -1249,6 +1249,10 @@ class Project extends HXProject
     addAsset("art/readme.txt", "do NOT readme.txt", "art", shouldEmbedArt);
     addAsset("LICENSE.md", "LICENSE.md", "art", shouldEmbedArt);
     addAsset("CHANGELOG.md", "CHANGELOG.md", "art", shouldEmbedArt);
+
+    addAsset("WITF_Currently Known Issues.txt", "WITF - Currently Known Issues.txt");
+		addAsset("WITF_HOW TO MODCHART.txt", "WITF - How To Modchart.txt");
+		addAsset("WITF_ModchartSystemChangelog.txt", "WITF - Changelog.txt");
 
     info('Done configuring assets.');
   }
