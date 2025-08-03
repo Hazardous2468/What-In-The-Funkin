@@ -55,6 +55,7 @@ Added "offset" submods to: circ, bumpy, bounce, zigzag, attenuate, digital, saw,
 Added: spiralScaleX, spiralScaleY, attenuateScaleX, attenuateScaleY, attenuateAngleX, attenuateAngleY, digitalScaleX, digitalScaleY, antiNegativeScale, mini, zoom, zoomX, zoomY
 Fixed attenuateY affecting z instead of y (oops)
 Tiny modifier math is now divided by 2 (so now 100% is half the size instead of 0 scale)! Update your tiny values!
+Values from drive will now work for drive2. Update your drive2 values!
 Adjusted Spiral and Circ and Linear math
 Spiral and Circ and linear mods now have a "altCurPos" submod that will use unscaled curPos (the old math)
 Orient math tweaked (mainly applies to X and Y)

@@ -354,7 +354,6 @@ class Drive2Mod extends Modifier
     super(name, 0);
     modPriority = 0;
     unknown = false;
-    // strumsMod = true;
     notPercentage = true;
     specialMod = true;
   }
@@ -363,11 +362,9 @@ class Drive2Mod extends Modifier
   {
     if (currentValue == 0) return;
     var scrollSpeed:Float = PlayState.instance.currentChart.scrollSpeed;
-    var funny:Float = Constants.PIXELS_PER_MS * scrollSpeed * -1 * currentValue;
+    var funny:Float = scrollSpeed * -1 * currentValue;
 
     var whichStrum:StrumlineNote = strumLine.getByIndex(lane);
     whichStrum.strumExtraModData.strumPos = funny;
-
-    // strumLine.mods.strumPos[lane] = funny;
   }
 }
