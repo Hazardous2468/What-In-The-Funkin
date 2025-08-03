@@ -4,6 +4,7 @@ import funkin.play.notes.Strumline;
 import funkin.play.modchartSystem.NoteData;
 import funkin.play.modchartSystem.modifiers.BaseModifier;
 import flixel.math.FlxMath;
+import funkin.play.modchartSystem.modifiers.RotateMods; // for scaleFrom modifier
 
 // Contains all the mods related to scale!
 class ScaleModifier extends Modifier
@@ -205,49 +206,6 @@ class ScaleHoldsModifier extends Modifier
       data.scaleY += currentValue;
       data.scaleZ += currentValue;
     }
-  }
-}
-
-class ZoomModifier extends Modifier
-{
-  public function new(name:String)
-  {
-    super(name, 0);
-    modPriority -= 10; // apply AFTER tiny
-    this.baseValue = 1;
-    this.currentValue = 1;
-  }
-
-  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
-  {
-    if (currentValue == 1 || data.noteType == "receptor") return;
-
-    data.scaleX *= currentValue;
-    data.scaleY *= currentValue;
-    data.scaleZ *= currentValue;
-
-    data.x = data.x = FlxMath.lerp(data.x, data.whichStrumNote?.strumExtraModData?.playfieldX ?? FlxG.width / 2, 1 - currentValue);
-    data.y = data.y = FlxMath.lerp(data.y, data.whichStrumNote?.strumExtraModData?.playfieldY ?? FlxG.height / 2, 1 - currentValue);
-    data.x -= strumMathX;
-    data.y -= strumMathY;
-    // data.z = data.z = FlxMath.lerp(data.x, data.whichStrumNote.strumExtraModData.playfieldZ, v);
-  }
-
-  var strumMathX:Float = 0;
-  var strumMathY:Float = 0;
-
-  override function strumMath(data:NoteData, strumLine:Strumline):Void
-  {
-    if (currentValue == 1) return;
-    data.scaleX *= currentValue;
-    data.scaleY *= currentValue;
-    data.scaleZ *= currentValue;
-    strumMathX = data.x;
-    strumMathY = data.y;
-    data.x = data.x = FlxMath.lerp(data.x, data.whichStrumNote?.strumExtraModData?.playfieldX ?? FlxG.width / 2, 1 - currentValue);
-    data.y = data.y = FlxMath.lerp(data.y, data.whichStrumNote?.strumExtraModData?.playfieldY ?? FlxG.height / 2, 1 - currentValue);
-    strumMathX = data.x - strumMathX;
-    strumMathY = data.y - strumMathY;
   }
 }
 
@@ -506,5 +464,122 @@ class TinyNotesZModifier extends Modifier
   {
     if (isArrowPath || currentValue == 0 || data.noteType == "receptor") return;
     data.scaleZ = FlxMath.lerp(data.scaleZ, 0.0, currentValue / 2);
+  }
+}
+
+// Has the additional functionality of allowing you to move the scale point around (works the same as rotate mods!)
+class ZoomModifier extends RotateModBase
+{
+  var doX:Bool = true;
+  var doY:Bool = true;
+
+  public function new(name:String)
+  {
+    super(name);
+    // Apply AFTER pixel move mods to avoid breaking
+    modPriority = -9999;
+    modPriority -= 10;
+    this.baseValue = 1;
+    this.currentValue = 1;
+    notPercentage = false;
+  }
+
+  var strumResultX:Array<Float> = [0, 0, 0, 0];
+  var strumResultY:Array<Float> = [0, 0, 0, 0];
+
+  function getScalePivot_X(data:NoteData, strumLine:Strumline):Float
+  {
+    var r:Float = 0;
+    if (data.noteType == "hold" || data.noteType == "path")
+    {
+      r += strumRotateFunc_GetPivotX(data, data.whichStrumNote.weBelongTo);
+      r += strumLine.mods.getHoldOffsetX(data.noteType == "path");
+      r -= data.whichStrumNote.strumExtraModData.noteStyleOffsetX;
+    }
+    else
+    {
+      r += strumRotateFunc_GetPivotX(data, data.whichStrumNote.weBelongTo);
+    }
+    return r;
+  }
+
+  function getScalePivot_Y(data:NoteData, strumLine:Strumline):Float
+  {
+    var r:Float = 0;
+    if (data.noteType == "hold" || data.noteType == "path")
+    {
+      r += strumRotateFunc_GetPivotY(data, data.whichStrumNote.weBelongTo);
+      if (Preferences.downscroll)
+      {
+        r += (Strumline.STRUMLINE_SIZE / 2);
+      }
+      else
+      {
+        r += (Strumline.STRUMLINE_SIZE / 2) - Strumline.INITIAL_OFFSET;
+      }
+      r -= data.whichStrumNote.strumExtraModData.noteStyleOffsetY;
+    }
+    else
+    {
+      r += strumRotateFunc_GetPivotY(data, data.whichStrumNote.weBelongTo);
+    }
+    return r;
+  }
+
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
+  {
+    if (currentValue == 1) return;
+    var curVal:Float = (1 - this.currentValue);
+    if (doX)
+    {
+      data.x += strumResultX[data.direction];
+      data.x = FlxMath.lerp(data.x, getScalePivot_X(data, strumLine), curVal);
+      data.scaleX = FlxMath.lerp(data.scaleX, 0.0, curVal);
+    }
+    if (doY)
+    {
+      data.y += strumResultY[data.direction];
+      data.y = FlxMath.lerp(data.y, getScalePivot_Y(data, strumLine), curVal);
+      data.scaleY = FlxMath.lerp(data.scaleY, 0.0, curVal);
+    }
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (currentValue == 1) return;
+    var curVal:Float = (1 - this.currentValue);
+    if (doX)
+    {
+      var memoryX:Float = data.x;
+      data.x = FlxMath.lerp(data.x, getScalePivot_X(data, strumLine), curVal);
+      strumResultX[data.direction] = memoryX - data.x;
+      data.scaleX = FlxMath.lerp(data.scaleX, 0.0, curVal);
+    }
+    if (doY)
+    {
+      var memoryY:Float = data.y;
+      data.y = FlxMath.lerp(data.y, getScalePivot_Y(data, strumLine), curVal);
+      strumResultY[data.direction] = memoryY - data.y;
+      data.scaleY = FlxMath.lerp(data.scaleY, 0.0, curVal);
+      data.scaleZ = FlxMath.lerp(data.scaleZ, 0.0, curVal);
+    }
+  }
+}
+
+class ZoomXModifier extends ZoomModifier
+{
+  public function new(name:String)
+  {
+    super(name);
+    this.doY = false;
+  }
+}
+
+class ZoomYModifier extends ZoomModifier
+{
+  public function new(name:String)
+  {
+    super(name);
+    this.doX = false;
   }
 }

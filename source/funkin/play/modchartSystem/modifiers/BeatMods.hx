@@ -11,9 +11,9 @@ import funkin.play.modchartSystem.NoteData;
 
 class BeatModBase extends Modifier
 {
-  var speed:ModifierSubValue;
-  var mult:ModifierSubValue;
-  var offset:ModifierSubValue;
+  var speed:ModifierSubValue; // Controls the speed / frequency of the effect (higher means faster)
+  var mult:ModifierSubValue; // Controls the period / size of the effect
+  var offset:ModifierSubValue; // The effect time offset (in beats)
   var alternate:ModifierSubValue; // if 0.5 or higher, will alternate. otherwise, the beat will always move in one direction (never from side to side)
 
   // var cap:ModifierSubValue; // By default, the speed gets halved if the BPM is too high. However we don't have this behaviour making this obsolete
@@ -25,12 +25,18 @@ class BeatModBase extends Modifier
     mult = createSubMod("mult", 1.0, ["period", "size"]);
     offset = createSubMod("offset", 0.0, ["time_add", "timeadd", "time_offset", "timeoffset"]);
     alternate = createSubMod("alternate", 1.0);
+    fAccelTimeSubmod = createSubMod("accel", 0.2);
+    fTotalTimeSubmod = createSubMod("total", 0.5);
   }
+
+  // Control the acceleration and modifier timings:
+  var fAccelTimeSubmod:ModifierSubValue;
+  var fTotalTimeSubmod:ModifierSubValue;
 
   function beatMath(curPos:Float):Float
   {
-    var fAccelTime = 0.2;
-    var fTotalTime = 0.5;
+    var fAccelTime = fAccelTimeSubmod.value;
+    var fTotalTime = fTotalTimeSubmod.value;
 
     var timmy:Float = (beatTime + offset.value) * speed.value;
 

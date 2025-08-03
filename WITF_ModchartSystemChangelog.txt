@@ -52,13 +52,13 @@ Submod aliases finally added. Can now use "period" instead of "mult" for example
 
 Added "offset" submods to: circ, bumpy, bounce, zigzag, attenuate, digital, saw, spiral, tornado
 
-Added: spiralScaleX, spiralScaleY, attenuateScaleX, attenuateScaleY, attenuateAngleX, attenuateAngleY, digitalScaleX, digitalScaleY, antiNegativeScale, mini
+Added: spiralScaleX, spiralScaleY, attenuateScaleX, attenuateScaleY, attenuateAngleX, attenuateAngleY, digitalScaleX, digitalScaleY, antiNegativeScale, mini, zoom, zoomX, zoomY
 Fixed attenuateY affecting z instead of y (oops)
 Tiny modifier math is now divided by 2 (so now 100% is half the size instead of 0 scale)! Update your tiny values!
 Adjusted Spiral and Circ and Linear math
 Spiral and Circ and linear mods now have a "altCurPos" submod that will use unscaled curPos (the old math)
 Orient math tweaked (mainly applies to X and Y)
-
+Beat modifier now has "accel" and "total" submods that control the timing math.
 
 Arrowpaths no longer scale based on hold notestyle scale
 

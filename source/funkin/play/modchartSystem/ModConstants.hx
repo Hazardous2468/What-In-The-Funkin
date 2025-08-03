@@ -1238,8 +1238,11 @@ class ModConstants
 
       // scale mods
       case "zoom":
-        if (PlayState.instance != null && notif) PlayState.instance.modDebugNotif("Zoom mod math is not finished!", FlxColor.ORANGE);
         newMod = new ZoomModifier(tag);
+      case "zoomx":
+        newMod = new ZoomXModifier(tag);
+      case "zoomy":
+        newMod = new ZoomYModifier(tag);
 
       case "scale":
         newMod = new ScaleModifier(tag);
