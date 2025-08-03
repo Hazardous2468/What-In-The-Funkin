@@ -732,6 +732,13 @@ class ModHandler
       if (mod.targetLane != -1 && note.noteModData.direction != mod.targetLane) continue;
       note.noteModData.speedMod *= mod.speedMath(note.noteModData.direction, note.noteModData.curPos_unscaled, strum, false);
     }
+
+    for (mod in note.noteModData.noteMods)
+    {
+      if (mod.targetLane != -1 && note.noteModData.direction != mod.targetLane) continue;
+      note.noteModData.speedMod *= mod.speedMath(note.noteModData.direction, note.noteModData.curPos_unscaled, strum, false);
+    }
+
     note.noteModData.curPos = strum.calculateNoteYPos(timmy) * note.noteModData.speedMod;
 
     if (strum.dumbTempScaleTargetThing == null) strum.dumbTempScaleTargetThing = note.targetScale;

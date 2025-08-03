@@ -1389,7 +1389,8 @@ class PlayState extends MusicBeatSubState
       // Note scrolling is less smooth on mobile without these arguments!!!
       Conductor.instance.update(Conductor.instance.songPosition + elapsed * 1000 * playbackRate, false);
       #else
-      Conductor.instance.update(); // Normal conductor update.
+      Conductor.instance.update(Conductor.instance.songPosition + elapsed * 1000, false); // Normal conductor update.
+      // Conductor.instance.update(); // Normal conductor update.
       #end
 
       // If, after updating the conductor, the instrumental has finished, end the song immediately.

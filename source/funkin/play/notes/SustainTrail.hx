@@ -568,6 +568,11 @@ class SustainTrail extends ZSprite
       if (mod.targetLane != -1 && noteModData.direction != mod.targetLane) continue;
       scrollMult *= mod.speedMath(noteModData.direction, noteModData.curPos_unscaled, parentStrumline, true);
     }
+    for (mod in noteModData.noteMods)
+    {
+      if (mod.targetLane != -1 && noteModData.direction != mod.targetLane) continue;
+      scrollMult *= mod.speedMath(noteModData.direction, noteModData.curPos_unscaled, parentStrumline, true);
+    }
     noteModData.speedMod = scrollMult;
 
     noteModData.x = whichStrumNote.x + parentStrumline.mods.getHoldOffsetX(isArrowPath, graphicWidth);
