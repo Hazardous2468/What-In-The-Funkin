@@ -149,7 +149,7 @@ class ModConstants
     "arrowpathred",
     "arrowpathgreen",
     "arrowpathblue",
-    "spiralholds",
+    "holdtype",
     "grain",
     "arrowpathgrain",
     "pathgrain",
@@ -165,41 +165,6 @@ class ModConstants
     "arrowpathwidth",
     "noholdmathshortcut",
     "mathcutoff"
-  ];
-
-  public static var specialMods:Array<String> = [
-    "showsubmods",
-    "showzerovalue",
-    "debugx",
-    "debugy",
-    "showlanemods",
-    "showallmods",
-    "showextra",
-    "noholdmathshortcut",
-    "invertmodvalues",
-    "mathcutoff",
-    "strumx",
-    "strumy",
-    "strumz",
-    "zsort",
-    "drive2",
-    "spiralholds",
-    "grain",
-    "arrowpath",
-    "arrowpath_notitg",
-    "arrowpathbacklength",
-    "arrowpathlength",
-    "arrowpathgrain",
-    "pathgrain",
-    "zsort",
-    "invertmodvalues",
-    "drawdistance",
-    "drawdistanceback",
-    "straightholds",
-    "longholds",
-    "strumx",
-    "strumy",
-    "strumz"
   ];
 
   // Sets the REAL hold note to this position - X.
@@ -303,6 +268,10 @@ class ModConstants
     modName = StringTools.replace(modName, " ", "");
 
     // trace("in goes: " + modName);
+
+    modName = StringTools.replace(modName, "spiralholds", "holdtype");
+    modName = StringTools.replace(modName, "spiralpaths", "arrowpathtype");
+    modName = StringTools.replace(modName, "pathstype", "arrowpathtype");
 
     modName = StringTools.replace(modName, "autodriven", "jump");
     modName = StringTools.replace(modName, "autodrive", "jump");
@@ -1141,8 +1110,8 @@ class ModConstants
       // hold mods
       case "old3dholds":
         newMod = new Old3DHoldsMod(tag);
-      case "spiralholds":
-        newMod = new SpiralHoldsMod(tag);
+      case "holdtype":
+        newMod = new HoldTypeMod(tag);
       case "longholds":
         newMod = new LongHoldsMod(tag);
       case "straightholds":
@@ -2009,7 +1978,7 @@ class ModConstants
         newMod = new MeshSkewOffsetZ(tag);
 
       // arowpath mods
-      case "spiralpaths":
+      case "arrowpathtype":
         newMod = new SpiralPathsMod(tag);
       case "arrowpath":
         newMod = new ArrowpathMod(tag);

@@ -1743,7 +1743,7 @@ class Strumline extends FlxSpriteGroup
       cover.glow.y = cover.y;
       cover.glow.z = whichStrumNote.z;
       cover.glow.alpha = ay;
-      var spiralHolds:Bool = whichStrumNote.strumExtraModData?.spiralHolds ?? false;
+      var spiralHolds:Bool = whichStrumNote.strumExtraModData?.usingSpiralHolds(false) ?? false;
       if (spiralHolds && holdCoverRotate)
       {
         cover.glow.angle = cover.holdNote.baseAngle;

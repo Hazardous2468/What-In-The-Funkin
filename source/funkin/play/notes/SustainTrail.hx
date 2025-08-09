@@ -627,6 +627,8 @@ class SustainTrail extends ZSprite
     var scaleX = FlxMath.remapToRange(fakeNote.scale.x, 0, isArrowPath ? ModConstants.arrowPathScale : ModConstants.noteScale, 0, 1);
     var scaleY = FlxMath.remapToRange(fakeNote.scale.y, 0, isArrowPath ? ModConstants.arrowPathScale : ModConstants.noteScale, 0, 1);
 
+    var forwardHolds:Bool = whichStrumNote.strumExtraModData?.usingForwardHolds(isArrowPath);
+
     if (isRoot)
     {
       if (previousPiece != null)
@@ -650,6 +652,20 @@ class SustainTrail extends ZSprite
     }
     else
     {
+      if (forwardHolds) // Prevents holds from going backwards
+      {
+        var flipThingy:Bool = flipY;
+        if (noteModData.getReverse() > 0.5)
+        {
+          flipThingy = !flipThingy;
+        }
+
+        if ((flipThingy && fakeNote.y > holdRootY) || (!flipThingy && fakeNote.y < holdRootY))
+        {
+          fakeNote.y = FlxMath.lerp(fakeNote.y, holdRootY, 1.0);
+        }
+      }
+
       if (straightHoldsModAmount != 0)
       {
         fakeNote.x = FlxMath.lerp(fakeNote.x, holdRootX, straightHoldsModAmount);
@@ -825,8 +841,8 @@ class SustainTrail extends ZSprite
     var holdNoteJankX:Float = ModConstants.holdNoteJankX * -1;
     var holdNoteJankY:Float = ModConstants.holdNoteJankY * -1;
 
-    // var spiralHolds:Bool = parentStrumline?.mods?.spiralHolds[noteDirection % 4] ?? false;
-    var spiralHolds:Bool = (isArrowPath ? (whichStrumNote.strumExtraModData?.spiralPaths ?? false) : (whichStrumNote.strumExtraModData?.spiralHolds ?? false));
+    // Renders the holds to face the direction of travel.
+    var spiralHolds:Bool = whichStrumNote.strumExtraModData?.usingSpiralHolds(isArrowPath);
 
     var testCol:Array<Int> = [];
     var vertices:Array<Float> = [];

@@ -22,7 +22,7 @@ class Old3DHoldsMod extends Modifier
   }
 }
 
-class SpiralHoldsMod extends Modifier
+class HoldTypeMod extends Modifier
 {
   public function new(name:String)
   {
@@ -33,9 +33,8 @@ class SpiralHoldsMod extends Modifier
 
   override function specialMath(lane:Int, strumLine:Strumline):Void
   {
-    // strumLine.mods.spiralHolds[lane] = (currentValue > 0.5 ? true : false);
     var whichStrum:StrumlineNote = strumLine.getByIndex(lane);
-    whichStrum.strumExtraModData.spiralHolds = (currentValue > 0.5 ? true : false);
+    whichStrum.strumExtraModData.holdType = currentValue;
   }
 }
 
@@ -53,8 +52,6 @@ class HoldGrainMod extends Modifier
   {
     var whichStrum:StrumlineNote = strumLine.getByIndex(lane);
     whichStrum.strumExtraModData.holdGrain = currentValue;
-
-    // strumLine.mods.holdGrain_Lane[lane] = currentValue;
   }
 }
 
@@ -71,7 +68,6 @@ class LongHoldsMod extends Modifier
   {
     var whichStrum:StrumlineNote = strumLine.getByIndex(lane);
     whichStrum.strumExtraModData.longHolds = currentValue;
-    // strumLine.mods.longHolds[lane] = currentValue;
   }
 }
 
@@ -88,6 +84,5 @@ class StraightHoldsMod extends Modifier
   {
     var whichStrum:StrumlineNote = strumLine.getByIndex(lane);
     whichStrum.strumExtraModData.straightHolds = currentValue;
-    // strumLine.mods.straightHolds[lane] = currentValue;
   }
 }

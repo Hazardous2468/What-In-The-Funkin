@@ -43,7 +43,7 @@ class SpiralPathsMod extends Modifier
   override function specialMath(lane:Int, strumLine:Strumline):Void
   {
     var whichStrum:StrumlineNote = strumLine.getByIndex(lane);
-    whichStrum.strumExtraModData.spiralPaths = (currentValue > 0.5 ? true : false);
+    whichStrum.strumExtraModData.pathType = currentValue;
   }
 }
 
@@ -148,7 +148,6 @@ class ArrowpathBackLengthMod extends Modifier
 
   override function specialMath(lane:Int, strumLine:Strumline):Void
   {
-    // strumLine.arrowpathBackwardsLength[lane] = currentValue;
     var whichStrum:StrumlineNote = strumLine.getByIndex(lane);
     whichStrum.strumExtraModData.arrowpathBackwardsLength = currentValue;
   }
@@ -166,7 +165,6 @@ class ArrowpathFrontLengthMod extends Modifier
 
   override function specialMath(lane:Int, strumLine:Strumline):Void
   {
-    // strumLine.arrowpathLength[lane] = currentValue;
     var whichStrum:StrumlineNote = strumLine.getByIndex(lane);
     whichStrum.strumExtraModData.arrowpathLength = currentValue;
   }
@@ -183,7 +181,6 @@ class ArrowpathStraightHoldMod extends Modifier
 
   override function specialMath(lane:Int, strumLine:Strumline):Void
   {
-    // strumLine.mods.arrowpathStraightHold[lane] = currentValue;
     var whichStrum:StrumlineNote = strumLine.getByIndex(lane);
     whichStrum.strumExtraModData.arrowpathStraightHold = currentValue;
   }
@@ -203,6 +200,5 @@ class ArrowpathGrainMod extends Modifier
   {
     var whichStrum:StrumlineNote = strumLine.getByIndex(lane);
     whichStrum.strumExtraModData.pathGrain = currentValue;
-    // strumLine.mods.pathGrain_Lane[lane] = currentValue;
   }
 }

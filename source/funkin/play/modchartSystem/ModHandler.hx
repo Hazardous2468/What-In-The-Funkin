@@ -346,14 +346,11 @@ class ModHandler
 
   function isSpecialMod(m:Modifier):Bool
   {
-    // m.specialMath(0, this.strum);
     if (!m.unknown) return m.specialMod;
-
-    return ModConstants.specialMods.contains(m.tag.toLowerCase());
+    return false;
   }
 
   var fakeNote:NoteData;
-
   var sampleModVals:Array<Float> = [-200, -144, -1, -0.5, 0, 0.5, 1, 2, 79, 133, 555];
 
   function propeModMath_Speed(m:Modifier):Bool

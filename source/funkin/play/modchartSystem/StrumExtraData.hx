@@ -95,11 +95,28 @@ class StrumExtraData
   // multiplier on the drawdistance! Note that it acts like NotITG where 0 is default, 1 is double, -1 is mutliplied by 0 (no draw distance)
   public var drawdistanceBack:Float = 0;
 
-  // If set to true, will alter how the hold is rendered (rotates the sustain to always face direction of travel)
-  public var spiralHolds:Bool = false;
+  /**
+   * Determines the hold render method:
+   * Above 0.5 is spiral holds (rotates the sustain to always face direction of travel).
+   * Below 0 will prevent holds from going backwards, kind of like NotITG.
+   * Otherwise, will default to the usual method.
+   */
+  public var holdType:Float = 0;
 
-  // If set to true, will alter how the hold is rendered (rotates the sustain to always face direction of travel)
-  public var spiralPaths:Bool = false;
+  // Duplicate of holdType but for paths instead.
+  public var pathType:Float = 0;
+
+  // Returns true if spiralPaths should be used.
+  public function usingSpiralHolds(isArrowPath:Bool = false):Bool
+  {
+    return (isArrowPath ? pathType >= 0.5 : holdType >= 0.5);
+  }
+
+  // Returns true if holdType is below 0
+  public function usingForwardHolds(isArrowPath:Bool = false):Bool
+  {
+    return (isArrowPath ? pathType < 0.0 : holdType < 0.0);
+  }
 
   // Makes holds straight lol. negative makes them less straight FOR ARROW PATH
   public var arrowpathStraightHold:Float = 0;
@@ -220,12 +237,12 @@ class StrumExtraData
     drawdistanceBack = 0;
 
     holdGrain = 82;
-    spiralHolds = false;
+    holdType = 0;
     straightHolds = 0;
     longHolds = 0;
     noHoldMathShortcut = 0;
 
-    spiralPaths = false;
+    pathType = 0;
     pathGrain = 95;
     arrowPathAlpha = 0;
     arrowpathLength = 1500;

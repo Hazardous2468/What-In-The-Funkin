@@ -257,7 +257,6 @@ class DisableHoldMathShortCutMod extends Modifier
   {
     var whichStrum:StrumlineNote = strumLine.getByIndex(lane);
     whichStrum.strumExtraModData.noHoldMathShortcut = currentValue;
-    // strumLine.mods.noHoldMathShortcut[lane] = currentValue;
   }
 }
 
@@ -274,7 +273,6 @@ class DrawDistanceBackMod extends Modifier
   {
     var whichStrum = strumLine.getByIndex(lane);
     whichStrum.strumExtraModData.drawdistanceBack = currentValue;
-    // strumLine.mods.drawdistanceBack_Lane[lane] = currentValue;
   }
 }
 
@@ -291,7 +289,6 @@ class DrawDistanceMod extends Modifier
   {
     var whichStrum = strumLine.getByIndex(lane);
     whichStrum.strumExtraModData.drawdistanceForward = currentValue;
-    // strumLine.mods.drawdistanceForward_Lane[lane] = currentValue;
   }
 }
 
