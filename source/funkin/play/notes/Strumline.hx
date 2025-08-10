@@ -697,7 +697,8 @@ class Strumline extends FlxSpriteGroup
         v[0] = v_prev[v_prev.length - 4];
 
         // but unfortunately, something went so wrong.
-        note.vertices = new DrawData<Float>(v.length, true, v);
+        @:privateAccess
+        note.setVerts(v);
       }
     });
   }

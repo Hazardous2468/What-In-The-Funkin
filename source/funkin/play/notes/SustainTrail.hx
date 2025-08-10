@@ -718,7 +718,6 @@ class SustainTrail extends ZSprite
       // Currently doesn't work when the sustain moves on the z axis!
       var xPercent_SkewOffset:Float = tempVec2.x - fakeNote.x - (graphicWidth / 2 * (perspectiveShift.z)); // this is dumb but at least for the time being, it makes the disconnect less bad.
       if (fakeNote.skew.y != 0) tempVec2.y += xPercent_SkewOffset * Math.tan(fakeNote.skew.y * FlxAngle.TO_RAD);
-
       return tempVec2;
     }
     else
@@ -734,9 +733,9 @@ class SustainTrail extends ZSprite
 
       tempVec2.setTo(tempVec3.x, tempVec3.z);
       var rotateModPivotPoint:Vector2 = new Vector2(rotatePivot.x, tempVec3.z);
-      var thing:Vector2 = ModConstants.rotateAround(rotateModPivotPoint, tempVec2, angleY);
-      tempVec3.x = thing.x;
-      tempVec3.z = thing.y;
+      tempVec2 = ModConstants.rotateAround(rotateModPivotPoint, tempVec2, angleY);
+      tempVec3.x = tempVec2.x;
+      tempVec3.z = tempVec2.y;
 
       // v0.8.0a -> playfield skewing
       var playfieldSkewOffset_Y:Float = pos.x - (whichStrumNote?.strumExtraModData?.playfieldX ?? FlxG.width / 2);
@@ -1304,11 +1303,19 @@ class SustainTrail extends ZSprite
       else
       {
         vertices[k] += holdNoteJankX;
+
+        if (this.angle != 0 && vertices.length % 2 == 0)
+        {
+          // assume +1 means we access the y vert
+          tempVec2.setTo(vertices[k], vertices[k + 1]);
+          var rotateModPivotPoint:Vector2 = new Vector2(holdRootX, holdRootY); // TEMP FOR NOW
+          tempVec2 = ModConstants.rotateAround(rotateModPivotPoint, tempVec2, this.angle);
+          vertices[k] = tempVec2.x;
+          vertices[k + 1] = tempVec2.y;
+        }
       }
     }
-
-    this.vertices_array = vertices;
-    this.vertices = new DrawData<Float>(vertices.length - 0, true, vertices);
+    setVerts(vertices);
     this.indices = new DrawData<Int>(noteIndices.length - 0, true, noteIndices);
     this.colors = new DrawData<Int>(testCol.length - 0, true, testCol);
 
@@ -1339,6 +1346,12 @@ class SustainTrail extends ZSprite
     testCol = null;
     noteIndices = null;
     vertices = null;
+  }
+
+  function setVerts(vertices):Void
+  {
+    this.vertices_array = vertices;
+    this.vertices = new DrawData<Float>(vertices.length - 0, true, vertices);
   }
 
   public var uvScale:Vector2 = new Vector2(1.0, 1.0);
