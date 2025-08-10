@@ -348,46 +348,56 @@ class ZProjectSprite extends ZSprite
   @:access(flixel.FlxCamera)
   override public function draw():Void
   {
-    var c = TriangleCulling.NONE;
-    switch (cullMode)
+    if (drawFunc != null && !doingDrawFunc)
     {
-      case "positive" | "front":
-        c = TriangleCulling.POSITIVE;
-      case "negative" | "back":
-        c = TriangleCulling.NEGATIVE;
-      case "always":
-        culled = true;
-    }
-    if (culled || alpha == 0 || graphic == null || vertices == null || indices == null || processedGraphic == null)
-    {
-      return;
+      doingDrawFunc = true;
+      drawFunc();
+      doingDrawFunc = false;
     }
 
-    var graphicToUse:FlxGraphic;
-    if (doUpdateColorTransform)
+    if (doingDrawFunc || drawFunc == null)
     {
-      graphicToUse = processedGraphic;
-    }
-    else
-    {
-      graphicToUse = this.graphic;
-    }
+      var c = TriangleCulling.NONE;
+      switch (cullMode)
+      {
+        case "positive" | "front":
+          c = TriangleCulling.POSITIVE;
+        case "negative" | "back":
+          c = TriangleCulling.NEGATIVE;
+        case "always":
+          culled = true;
+      }
+      if (culled || alpha == 0 || graphic == null || vertices == null || indices == null || processedGraphic == null)
+      {
+        return;
+      }
 
-    if (spriteGraphic != null) spriteGraphic.updateFramePixels();
+      var graphicToUse:FlxGraphic;
+      if (doUpdateColorTransform)
+      {
+        graphicToUse = processedGraphic;
+      }
+      else
+      {
+        graphicToUse = this.graphic;
+      }
 
-    for (camera in cameras)
-    {
-      if (!camera.visible || !camera.exists) continue;
-      // if (!isOnScreen(camera)) continue; // TODO: Update this code to make it work properly.
+      if (spriteGraphic != null) spriteGraphic.updateFramePixels();
 
-      getScreenPosition(_point, camera).subtractPoint(offset);
-      // camera.drawTriangles(processedGraphic, vertices, indices, uvtData, null, _point, blend, true, antialiasing, spriteGraphic?.shader ?? null, c);
+      for (camera in cameras)
+      {
+        if (!camera.visible || !camera.exists) continue;
+        // if (!isOnScreen(camera)) continue; // TODO: Update this code to make it work properly.
 
-      camera.drawTriangles(processedGraphic, vertices, indices, uvtData, null, _point, blend, textureRepeat, antialiasing,
-        spriteGraphic?.colorTransform ?? this.colorTransform, spriteGraphic?.shader ?? null, c);
+        getScreenPosition(_point, camera).subtractPoint(offset);
+        // camera.drawTriangles(processedGraphic, vertices, indices, uvtData, null, _point, blend, true, antialiasing, spriteGraphic?.shader ?? null, c);
 
-      // camera.drawTriangles(processedGraphic, vertices, indices, uvtData, null, _point, blend, true, antialiasing);
-      // trace("we do be drawin... something?\n verts: \n" + vertices);
+        camera.drawTriangles(processedGraphic, vertices, indices, uvtData, null, _point, blend, textureRepeat, antialiasing,
+          spriteGraphic?.colorTransform ?? this.colorTransform, spriteGraphic?.shader ?? null, c);
+
+        // camera.drawTriangles(processedGraphic, vertices, indices, uvtData, null, _point, blend, true, antialiasing);
+        // trace("we do be drawin... something?\n verts: \n" + vertices);
+      }
     }
 
     #if FLX_DEBUG

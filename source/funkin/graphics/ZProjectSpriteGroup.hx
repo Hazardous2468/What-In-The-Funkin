@@ -13,6 +13,7 @@ import funkin.play.modchartSystem.ModConstants;
 
 /**
  * A group for ZProjectSprites which contains helper functions for creating 3D shapes. Automatically sorts the sprites based on their z posiiton plus z index!
+ * Currently experimental / WIP
  */
 class ZProjectSpriteGroup extends FlxTypedSpriteGroup<ZProjectSprite>
 {
@@ -189,6 +190,25 @@ class ZProjectSpriteGroup extends FlxTypedSpriteGroup<ZProjectSprite>
 
   // Creates a triangle. Automatically adds it to this group and returns the created tri.
   public function createTri() {}
+
+  // WITF Draw Function logic
+  public var drawFunc:Null<Void->Void>;
+
+  private var doingDrawFunc:Bool = false;
+
+  override public function draw():Void
+  {
+    if (drawFunc != null && !doingDrawFunc)
+    {
+      doingDrawFunc = true;
+      drawFunc();
+      doingDrawFunc = false;
+    }
+    else
+    {
+      super.draw();
+    }
+  }
 }
 
 class CubeSpriteGroup extends FlxTypedSpriteGroup<ZProjectSprite>

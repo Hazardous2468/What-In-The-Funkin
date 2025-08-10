@@ -808,18 +808,47 @@ class Stage extends FlxSpriteGroup implements IPlayStateScriptedClass implements
     return Sprite;
   }
 
+  // WITF Draw Function logic
+  public var drawFunc:Null<Void->Void>;
+
+  private var doingDrawFunc:Bool = false;
+
   override function draw():Void
   {
-    if (frameBufferMan != null)
+    if (drawFunc == null)
     {
-      frameBufferMan.lock();
+      if (frameBufferMan != null)
+      {
+        frameBufferMan.lock();
+      }
+      super.draw();
+      if (frameBufferMan != null)
+      {
+        frameBufferMan.unlock();
+      }
+      frameBuffersUpdated();
     }
-    super.draw();
-    if (frameBufferMan != null)
+    else
     {
-      frameBufferMan.unlock();
+      if (!doingDrawFunc)
+      {
+        if (frameBufferMan != null)
+        {
+          frameBufferMan.lock();
+        }
+        doingDrawFunc = true;
+        drawFunc();
+        doingDrawFunc = false;
+        if (frameBufferMan != null)
+        {
+          frameBufferMan.unlock();
+        }
+      }
+      else
+      {
+        super.draw();
+      }
     }
-    frameBuffersUpdated();
   }
 
   /**

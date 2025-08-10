@@ -6,6 +6,7 @@ import funkin.play.notes.StrumlineNote;
 import flixel.addons.effects.FlxSkewedSprite;
 import flixel.FlxSprite;
 import funkin.graphics.ZSprite;
+import funkin.graphics.FunkinSkewedSprite;
 import funkin.play.notes.NoteSprite;
 import openfl.geom.Vector3D;
 import funkin.play.modchartSystem.modifiers.BaseModifier;
@@ -178,6 +179,20 @@ class NoteData
     this.alpha = spr.alpha;
   }
 
+  // call this to set the values from an already existing sprite!
+  public function setValuesFromFunkinSkewSprite(spr:FunkinSkewedSprite):Void
+  {
+    this.x = spr.x;
+    this.y = spr.y;
+
+    this.angleZ = spr.angle;
+    this.scaleX = spr.scale.x;
+    this.scaleY = spr.scale.y;
+    this.skewX = spr.skew.x;
+    this.skewY = spr.skew.y;
+    this.alpha = spr.alpha;
+  }
+
   // call this to set the values from an already existing sprite! FOR ZSPRITE
   public function setValuesFromZSprite(spr:ZSprite):Void
   {
@@ -187,7 +202,7 @@ class NoteData
     this.stealthGlowGreen = spr.stealthGlowGreen;
     this.stealthGlowRed = spr.stealthGlowRed;
     this.hueShift = spr.hueShift;
-    setValuesFromSkewSprite(spr);
+    setValuesFromFunkinSkewSprite(spr);
   }
 
   // call this to set the values from an already existing sprite! FOR NOTES

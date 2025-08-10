@@ -67,6 +67,13 @@ Added "hitWindowMultiplier" variable to noteSprites. Used by the hurt note scrip
 
 getNoteBeats logic moved to ModConstants for easy access in hxScript. (Works the same though).
 
+Added drawFuncs! You can now add a custom drawFunction to the following:
+Any FunkinSprite that doesn't have it's draw function overriden
+ZSprites
+ZProjectSprites
+Strumline
+Stage
+
 
 
 Modchart breaking changes to be aware of:

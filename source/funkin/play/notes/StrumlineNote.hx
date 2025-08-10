@@ -98,20 +98,6 @@ class StrumlineNote extends ZSprite
     updateStealthGlow();
   }
 
-  // PPFFFFFF HAHJAHAHAHAHAHAHAA COPIED FROM FUNKINSPRITE CUZ THIS USES ZSPRITE XDXDXDXD
-
-  /**
-   * @param id The animation ID to check.
-   * @return Whether the animation is dynamic (has multiple frames). `false` for static, one-frame animations.
-   */
-  public function isAnimationDynamic(id:String):Bool
-  {
-    if (this.animation == null) return false;
-    var animData = this.animation.getByName(id);
-    if (animData == null) return false;
-    return animData.numFrames > 1;
-  }
-
   // Call this to create a mesh
   public function setupMesh():Void
   {

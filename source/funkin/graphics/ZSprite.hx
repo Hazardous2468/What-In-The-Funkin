@@ -1,6 +1,5 @@
 package funkin.graphics;
 
-import flixel.addons.effects.FlxSkewedSprite;
 import flixel.FlxSprite;
 // import lime.math.Vector2;
 import openfl.geom.Vector3D;
@@ -9,7 +8,7 @@ import funkin.play.notes.Strumline;
 import funkin.play.modchartSystem.NoteData;
 import flixel.math.FlxMath;
 
-class ZSprite extends FlxSkewedSprite // class ZSprite extends FlxSprite
+class ZSprite extends FunkinSkewedSprite
 {
   // This sprites z position. Used for perspective math.
   public var z:Float = 0.0;
@@ -40,7 +39,8 @@ class ZSprite extends FlxSkewedSprite // class ZSprite extends FlxSprite
 
   public function new(?x:Float = 0, ?y:Float = 0, ?simpleGraphic:FlxGraphicAsset)
   {
-    super(x, y, simpleGraphic);
+    super(x, y);
+    if (simpleGraphic != null) loadGraphic(simpleGraphic);
     lastKnownPosition = new Vector3D(x, y, z);
     stealthGlow = 0.0;
     stealthGlowRed = 1.0;

@@ -2322,4 +2322,23 @@ class Strumline extends FlxSpriteGroup
     }
     return value;
   }
+
+  // WITF Draw Function logic
+  public var drawFunc:Null<Void->Void>;
+
+  private var doingDrawFunc:Bool = false;
+
+  override public function draw():Void
+  {
+    if (drawFunc != null && !doingDrawFunc)
+    {
+      doingDrawFunc = true;
+      drawFunc();
+      doingDrawFunc = false;
+    }
+    else
+    {
+      super.draw();
+    }
+  }
 }
