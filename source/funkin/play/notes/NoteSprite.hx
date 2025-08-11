@@ -213,6 +213,8 @@ class NoteSprite extends ZSprite
         mesh.playfieldSkewCenterY = (noteModData?.whichStrumNote?.strumExtraModData?.playfieldY ?? FlxG.height / 2);
         mesh.playfieldSkewCenterZ = (noteModData?.whichStrumNote?.strumExtraModData?.playfieldZ ?? 0);
 
+        mesh.perspectiveOffset = noteModData.perspectiveOffset;
+
         mesh.offset = this.offset;
         mesh.cameras = this.cameras;
       }

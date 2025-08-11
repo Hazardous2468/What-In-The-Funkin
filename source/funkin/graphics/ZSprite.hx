@@ -1,7 +1,7 @@
 package funkin.graphics;
 
 import flixel.FlxSprite;
-// import lime.math.Vector2;
+import lime.math.Vector2;
 import openfl.geom.Vector3D;
 import flixel.system.FlxAssets.FlxGraphicAsset;
 import funkin.play.notes.Strumline;
@@ -48,6 +48,9 @@ class ZSprite extends FunkinSkewedSprite
     stealthGlowBlue = 1.0;
   }
 
+  // Offset the perspective math center by this amount!
+  public var perspectiveOffset:Vector2 = new Vector2(0, 0);
+
   // Feed a noteData into this function to apply all of it's parameters to this sprite!
   public function applyNoteData(data:NoteData, applyFake3D:Bool = false):Void
   {
@@ -60,7 +63,8 @@ class ZSprite extends FunkinSkewedSprite
     this.scale.x = data.scaleX;
     this.scale.y = data.scaleY;
 
-    // temp for now
+    this.perspectiveOffset = data.perspectiveOffset;
+
     if (applyFake3D || data.whichStrumNote?.strumExtraModData?.threeD ?? false == false)
     {
       this.scale.x *= FlxMath.fastCos(data.angleY * (Math.PI / 180));

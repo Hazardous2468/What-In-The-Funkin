@@ -93,6 +93,9 @@ class NoteData
   public var meshOffsets_PivotY:Float = 0;
   public var meshOffsets_PivotZ:Float = 0;
 
+  // Offset the perspective math center by this amount!
+  public var perspectiveOffset:Vector2 = new Vector2(0, 0);
+
   // The red colour! Is a float value between 0 - 1
   public var red:Float = 1;
   // The green colour! Is a float value between 0 - 1
@@ -217,6 +220,7 @@ class NoteData
   // Call this function to reset all values back to default!
   public function defaultValues():Void
   {
+    perspectiveOffset.setTo(0, 0);
     speedMod = 1;
     strumPosition = 0;
 

@@ -18,6 +18,7 @@ import flixel.util.FlxStringUtil;
 import flixel.math.FlxMath;
 import funkin.util.SortUtil;
 import flixel.util.FlxSort;
+import lime.math.Vector2;
 // extra
 import funkin.graphics.FunkinSprite;
 import flixel.FlxSprite;
@@ -34,14 +35,19 @@ import funkin.util.GRhythmUtil;
 
 class ModHandler
 {
+  // The amount in pixels to offset the debug text on the x axis
   public var debugTxtOffsetX:Float = 0;
+  // The amount in pixels to offset the debug text on the y axis
   public var debugTxtOffsetY:Float = 0;
+
+  // If true, any mods in the ModConstants.dadInvert will have their values inverted.
   public var invertValues:Bool = false;
   public var isDad:Bool = false;
 
-  public var modifiers:Map<String, Modifier>;
+  // A map containing all the modifiers.
+  public var modifiers:Map<String, Modifier> = new Map<String, Modifier>();
 
-  // public var mods_SORTED:Array<Modifier> = [];
+  // A series of arrays that contain all the modifiers in each catagory. This is what is used to apply the math!
   public var mods_all:Array<Modifier> = [];
   public var mods_arrowpath:Array<Modifier> = [];
   public var mods_strums:Array<Modifier> = [];
@@ -57,16 +63,12 @@ class ModHandler
 
   public function new(daddy:Bool = false)
   {
-    // this is so fucking stupid lmao
-    modifiers = ["dumb_setup" => null];
-    modifiers.remove("dumb_setup");
-
     if (daddy)
     {
       isDad = daddy;
     }
-
-    addMod('speedmod', 1);
+    // Speedmod is always added by default
+    // addMod('speedmod', 1);
   }
 
   public var sinClip:Float = 1;
@@ -115,9 +117,15 @@ class ModHandler
     strum.debugNeedsUpdate = true;
   }
 
+  // Offset the perspective math center by this amount! Added ontop of the one in NoteData.
+  // Currently doesn't do anything though lol
+  public var perspectiveOffset:Vector2 = new Vector2(0, 0);
+
   public function resetModValues():Void
   {
     trace("Mod Values Reset - " + customTweenerName);
+
+    perspectiveOffset.setTo(0, 0);
 
     for (mod in mods_all)
     {

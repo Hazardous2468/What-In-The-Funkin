@@ -145,6 +145,8 @@ class StrumlineNote extends ZSprite
       mesh.playfieldSkewCenterY = strumExtraModData.playfieldY;
       mesh.playfieldSkewCenterZ = strumExtraModData.playfieldZ;
 
+      mesh.perspectiveOffset = noteModData.perspectiveOffset;
+
       mesh.offset = this.offset;
       mesh.cameras = this.cameras;
 

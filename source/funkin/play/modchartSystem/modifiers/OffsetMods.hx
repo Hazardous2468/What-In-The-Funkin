@@ -4,7 +4,67 @@ import funkin.play.notes.Strumline;
 import funkin.play.modchartSystem.NoteData;
 import funkin.play.modchartSystem.modifiers.BaseModifier;
 
-// Contains all the mods related to skewing!
+// Contains all the mods related to offset!
+
+class PerspectiveCenterOffsetXModifier extends Modifier
+{
+  public function new(name:String)
+  {
+    super(name, 0);
+    modPriority = 9999;
+    notPercentage = true;
+    unknown = false;
+    pathMod = true;
+    notesMod = true;
+    holdsMod = true;
+    strumsMod = true;
+  }
+
+  function applyThing(data:NoteData):Void
+  {
+    data.perspectiveOffset.x = currentValue;
+  }
+
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
+  {
+    applyThing(data);
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    applyThing(data);
+  }
+}
+
+class PerspectiveCenterOffsetYModifier extends Modifier
+{
+  public function new(name:String)
+  {
+    super(name, 0);
+    modPriority = 9999;
+    notPercentage = true;
+    unknown = false;
+    pathMod = true;
+    notesMod = true;
+    holdsMod = true;
+    strumsMod = true;
+  }
+
+  function applyThing(data:NoteData):Void
+  {
+    data.perspectiveOffset.y = currentValue;
+  }
+
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
+  {
+    applyThing(data);
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    applyThing(data);
+  }
+}
 
 class NoteOffsetXMod extends Modifier
 {

@@ -942,7 +942,7 @@ class PauseSubState extends MusicBeatSubState
     FreeplayState.rememberedDifficulty = difficulty;
 
     PlayState.instance.needsReset = true;
-    
+
     PlayState.instance.scanForModchart(false);
 
     #if FEATURE_MOBILE_ADVERTISEMENTS

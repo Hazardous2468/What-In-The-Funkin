@@ -52,7 +52,7 @@ Submod aliases finally added. Can now use "period" instead of "mult" for example
 
 Added "offset" submods to: circ, bumpy, bounce, zigzag, attenuate, digital, saw, spiral, tornado
 
-Added: spiralScaleX, spiralScaleY, attenuateScaleX, attenuateScaleY, attenuateAngleX, attenuateAngleY, digitalScaleX, digitalScaleY, antiNegativeScale, mini, zoom, zoomX, zoomY
+Added: spiralScaleX, spiralScaleY, attenuateScaleX, attenuateScaleY, attenuateAngleX, attenuateAngleY, digitalScaleX, digitalScaleY, antiNegativeScale, mini, zoom, zoomX, zoomY, perspectiveOffsetX, perspectiveOffsetY
 Fixed attenuateY affecting z instead of y (oops)
 Tiny modifier math is now divided by 2 (so now 100% is half the size instead of 0 scale)! Update your tiny values!
 Values from drive will now work for drive2. Update your drive2 values!
@@ -67,13 +67,16 @@ Added "hitWindowMultiplier" variable to noteSprites. Used by the hurt note scrip
 
 getNoteBeats logic moved to ModConstants for easy access in hxScript. (Works the same though).
 
-Added drawFuncs! You can now add a custom drawFunction to the following:
+Added drawFuncs! This experimental change allows you to add a custom drawFunction to the following:
 Any FunkinSprite that doesn't have it's draw function overriden
-ZSprites
-ZProjectSprites
-Strumline
-Stage
+ZSprites (untested)
+ZProjectSprites (untested)
+Strumline (3d render mode doesn't work)
+Stage (untested)
 
+
+Cat now has the doodle note skin (ported from Inhuman)
+Emergency Reset now has the Inhuman pause music
 
 
 Modchart breaking changes to be aware of:

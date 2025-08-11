@@ -618,7 +618,8 @@ class SustainTrail extends ZSprite
     tempVec2.x = fakeNote.x;
     tempVec2.y = fakeNote.y;
 
-    if (old3Dholds || !is3D) perspectiveShift.z = ModConstants.applyPerspective_returnScale(fakeNote, graphicWidth, 8 /*dumbHeight*/);
+    if (old3Dholds || !is3D) perspectiveShift.z = ModConstants.applyPerspective_returnScale(fakeNote, graphicWidth, 8 /*dumbHeight*/,
+      noteModData.perspectiveOffset);
 
     // caluclate diff
     perspectiveShift.x = fakeNote.x - tempVec2.x;
@@ -748,7 +749,7 @@ class SustainTrail extends ZSprite
       if (noteModData.skewZ_playfield != 0) tempVec3.z += playfieldSkewOffset_Z * Math.tan(noteModData.skewZ_playfield * FlxAngle.TO_RAD);
 
       tempVec3.z *= 0.001;
-      var thisNotePos:Vector3D = ModConstants.perspectiveMath(tempVec3, 0, 0);
+      var thisNotePos:Vector3D = ModConstants.perspectiveMath(tempVec3, 0, 0, noteModData.perspectiveOffset);
       return new Vector2(thisNotePos.x, thisNotePos.y);
     }
   }

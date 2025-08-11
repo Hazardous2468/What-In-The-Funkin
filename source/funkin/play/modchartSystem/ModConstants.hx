@@ -878,13 +878,13 @@ class ModConstants
   static var pos:Vector3D = new Vector3D();
 
   // Call this on a ZSprite to apply it's perspective! MAKE SURE IT'S SCALE AND X AND Y IS RESET BEFORE DOING THIS CUZ THIS OVERRIDES THOSE VALUES
-  public static function applyPerspective(note:ZSprite, ?noteWidth:Float, ?noteHeight:Float):Void
+  public static function applyPerspective(note:ZSprite, ?noteWidth:Float, ?noteHeight:Float, ?perspectiveOffset:Vector2):Void
   {
     if (note.z == 0 || Math.isNaN(note.z)) return; // do fuck all if no z
     if (noteWidth == null) noteWidth = note.width;
     if (noteHeight == null) noteHeight = note.height;
     pos.setTo(note.x + (noteWidth * 0.5), note.y + (noteHeight * 0.5), note.z * 0.001);
-    var thisNotePos:Vector3D = perspectiveMath(pos, -(noteWidth * 0.5), -(noteHeight * 0.5));
+    var thisNotePos:Vector3D = perspectiveMath(pos, -(noteWidth * 0.5), -(noteHeight * 0.5), perspectiveOffset);
     note.x = thisNotePos.x;
     note.y = thisNotePos.y;
     if (thisNotePos.z != 0)
@@ -895,7 +895,7 @@ class ModConstants
   }
 
   // Same as applyPerspective but returns the scale modifier thingy?
-  public static function applyPerspective_returnScale(note:ZSprite, ?noteWidth:Float, ?noteHeight:Float):Float
+  public static function applyPerspective_returnScale(note:ZSprite, ?noteWidth:Float, ?noteHeight:Float, ?perspectiveOffset:Vector2):Float
   {
     var r:Float = 1;
 
@@ -904,7 +904,7 @@ class ModConstants
 
     pos.setTo(note.x + (noteWidth / 2), note.y + (noteHeight / 2), note.z * 0.001);
 
-    var thisNotePos:Vector3D = perspectiveMath(pos, -(noteWidth * 0.5), -(noteHeight * 0.5));
+    var thisNotePos:Vector3D = perspectiveMath(pos, -(noteWidth * 0.5), -(noteHeight * 0.5), perspectiveOffset);
 
     note.x = thisNotePos.x;
     note.y = thisNotePos.y;
@@ -933,7 +933,7 @@ class ModConstants
   public static var FOV:Float = 90;
 
   // https://github.com/TheZoroForce240/FNF-Modcharting-Tools/blob/main/source/modcharting/ModchartUtil.hx
-  public static function perspectiveMath(pos:Vector3D, offsetX:Float = 0, offsetY:Float = 0):Vector3D
+  public static function perspectiveMath(pos:Vector3D, offsetX:Float = 0, offsetY:Float = 0, ?perspectiveOffset:Vector2):Vector3D
   {
     // Math isn't perfect (mainly with lack of FOV support), but it's good enough. -Haz
     try
@@ -962,8 +962,11 @@ class ModConstants
       var zRange:Float = zNear - zFar;
       var tanHalfFOV:Float = fastTan(_FOV * 0.5);
 
-      var xOffsetToCenter:Float = pos.x - (FlxG.width * 0.5); // so the perspective focuses on the center of the screen
-      var yOffsetToCenter:Float = pos.y - (FlxG.height * 0.5);
+      var screenCenterX:Float = (FlxG.width * 0.5) + (perspectiveOffset?.x ?? 0.0);
+      var screenCenterY:Float = (FlxG.height * 0.5) + (perspectiveOffset?.y ?? 0.0);
+
+      var xOffsetToCenter:Float = pos.x - screenCenterX; // so the perspective focuses on the center of the screen
+      var yOffsetToCenter:Float = pos.y - screenCenterY;
 
       var zPerspectiveOffset:Float = (newz + (2 * zFar * zNear / zRange));
 
@@ -977,8 +980,8 @@ class ModConstants
       xPerspective /= -zPerspectiveOffset;
       yPerspective /= -zPerspectiveOffset;
 
-      pos.x = xPerspective + (FlxG.width * 0.5); // offset it back to normal
-      pos.y = yPerspective + (FlxG.height * 0.5);
+      pos.x = xPerspective + screenCenterX; // offset it back to normal
+      pos.y = yPerspective + screenCenterY;
       pos.z = zPerspectiveOffset;
 
       return pos;
@@ -1970,6 +1973,11 @@ class ModConstants
         newMod = new MeshSkewOffsetY(tag);
       case "meshskewoffsetz":
         newMod = new MeshSkewOffsetZ(tag);
+
+      case "perspectiveoffsetx":
+        newMod = new PerspectiveCenterOffsetXModifier(tag);
+      case "perspectiveoffsety":
+        newMod = new PerspectiveCenterOffsetYModifier(tag);
 
       // arowpath mods
       case "arrowpathtype":

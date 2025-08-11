@@ -91,6 +91,9 @@ class FunkinSound extends FlxSound implements ICloneable<FunkinSound>
     return this.playing || this._shouldPlay;
   }
 
+  // If true, will automatically be paused when opening substate. I literally made this just for the fucking pause sound effect to play properly for Emergency Reset x.x
+  public var shouldAutoPause:Bool = true;
+
   /**
    * Waveform data for this sound.
    * This is lazily loaded, so it will be built the first time it is accessed.

@@ -396,7 +396,6 @@ class ZProjectSprite extends ZSprite
           spriteGraphic?.colorTransform ?? this.colorTransform, spriteGraphic?.shader ?? null, c);
 
         // camera.drawTriangles(processedGraphic, vertices, indices, uvtData, null, _point, blend, true, antialiasing);
-        // trace("we do be drawin... something?\n verts: \n" + vertices);
       }
     }
 
@@ -581,7 +580,7 @@ class ZProjectSprite extends ZSprite
       pos_modified.y += fovOffsetY;
       pos_modified.z *= 0.001;
 
-      pos_modified = ModConstants.perspectiveMath(pos_modified, 0, 0);
+      pos_modified = ModConstants.perspectiveMath(pos_modified, 0, 0, perspectiveOffset);
 
       pos_modified.x -= this.x;
       pos_modified.y -= this.y;

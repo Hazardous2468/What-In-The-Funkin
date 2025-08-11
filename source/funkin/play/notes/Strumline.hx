@@ -715,27 +715,29 @@ class Strumline extends FlxSpriteGroup
     }
 
     strumlineNotes.forEach(function(note:StrumlineNote) {
-      ModConstants.applyPerspective(note);
+      ModConstants.applyPerspective(note, note.perspectiveOffset);
     });
 
     for (note in notes)
     {
-      if (!(note.noteModData?.whichStrumNote?.strumExtraModData?.threeD ?? false)) ModConstants.applyPerspective(note);
+      if (!(note.noteModData?.whichStrumNote?.strumExtraModData?.threeD ?? false)) ModConstants.applyPerspective(note, note.perspectiveOffset);
     }
     for (cover in noteHoldCovers)
     {
       if (cover.alive)
       {
+        var whichStrumNote:StrumlineNote = getByIndex(cover.holdNoteDir % KEY_COUNT);
         var o = noteStyle.getHoldCoverZCalcOffsetMultipliers();
-        ModConstants.applyPerspective(cover.glow, cover.glow.width * o[0], cover.glow.height * o[1]);
+        ModConstants.applyPerspective(cover.glow, cover.glow.width * o[0], cover.glow.height * o[1], cover.glow.perspectiveOffset);
       }
     }
     for (splash in noteSplashes)
     {
       if (splash.alive)
       {
+        var whichStrumNote:StrumlineNote = getByIndex(splash.DIRECTION % KEY_COUNT);
         var o = noteStyle.getSplashZCalcOffsetMultipliers();
-        ModConstants.applyPerspective(splash, splash.width / 2.2 * o[0], splash.height / 2.2 * o[1]);
+        ModConstants.applyPerspective(splash, splash.width / 2.2 * o[0], splash.height / 2.2 * o[1], splash.perspectiveOffset);
       }
     }
   }
@@ -1771,6 +1773,8 @@ class Strumline extends FlxSpriteGroup
           cover.glow.skew.y += whichStrumNote.noteModData.skewY_playfield;
         }
       }
+
+      cover.glow.perspectiveOffset = whichStrumNote.noteModData.perspectiveOffset;
     }
   }
 
@@ -1819,6 +1823,8 @@ class Strumline extends FlxSpriteGroup
       splash.skew.x += whichStrumNote.noteModData.skewX_playfield;
       splash.skew.y += whichStrumNote.noteModData.skewY_playfield;
     }
+
+    splash.perspectiveOffset = whichStrumNote.noteModData.perspectiveOffset;
   }
 
   /**

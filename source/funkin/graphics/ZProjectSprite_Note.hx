@@ -470,26 +470,6 @@ class ZProjectSprite_Note extends FlxSprite
 
         point2D = applyPerspective(point3D, xPercent, yPercent);
 
-        /* Commented out for now cuz... it don't work / is worse then the current cull method
-          if (i > 0)
-          {
-            if (point2D.x < cullCheckX)
-            {
-              culled = !culled;
-            }
-            if (point2D.y < cullCheckY)
-            {
-              culled = !culled;
-            }
-          }
-
-
-          cullCheckX = point2D.x;
-          cullCheckY = point2D.y;
-
-          if (culled) break; // Don't bother with any more vert updates, we already know the rest will be culled...
-         */
-
         if (originalWidthHeight != null && autoOffset)
         {
           point2D.x += (originalWidthHeight.x - spriteGraphic.frameWidth) / 2;
@@ -507,7 +487,6 @@ class ZProjectSprite_Note extends FlxSprite
     flipX = false;
     flipY = false;
 
-    // TODO -> change this so that it instead just breaks out of the function if it detects a difference between two points as being negative!
     switch (cullMode)
     {
       case "always_positive" | "always_negative":
@@ -853,6 +832,9 @@ class ZProjectSprite_Note extends FlxSprite
     return pos_modified;
   }
 
+  // Offset the perspective math center by this amount!
+  public var perspectiveOffset:Vector2 = new Vector2(0, 0);
+
   public function applyPerspective(pos:Vector3D, xPercent:Float = 0, yPercent:Float = 0):Vector2
   {
     var w:Float = spriteGraphic?.frameWidth ?? frameWidth;
@@ -870,7 +852,7 @@ class ZProjectSprite_Note extends FlxSprite
       pos_modified.y += fovOffsetY;
       pos_modified.z *= 0.001;
 
-      pos_modified = ModConstants.perspectiveMath(pos_modified, 0, 0);
+      pos_modified = ModConstants.perspectiveMath(pos_modified, 0, 0, perspectiveOffset);
 
       pos_modified.x -= this.x;
       pos_modified.y -= this.y;

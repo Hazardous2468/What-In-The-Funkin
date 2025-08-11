@@ -1769,7 +1769,11 @@ class PlayState extends MusicBeatSubState
             if (Std.isOfType(sound, FunkinSound))
             {
               var funkinSound:FunkinSound = cast sound;
-              if (funkinSound != null && !funkinSound.isPlaying) return;
+              if (funkinSound != null)
+              {
+                if (!funkinSound.isPlaying) return;
+                if (!funkinSound.shouldAutoPause) return;
+              }
             }
             if (!sound.playing && sound.time >= 0) return;
             sound.pause();

@@ -88,7 +88,7 @@ class ModEventHandler
       strum.asleep = false;
       strum.mods.resetModValues();
       strum.mods.clearMods();
-      strum.mods.addMod('speedmod', 1); // Every strum ALWAYS has this modifier by default.
+      // strum.mods.addMod('speedmod', 1); // Every strum ALWAYS has this modifier by default.
     }
   }
 
