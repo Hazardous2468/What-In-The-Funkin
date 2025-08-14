@@ -637,7 +637,7 @@ class SustainTrail extends ZSprite
         holdRootX = previousPiece.holdRootX;
         holdRootY = previousPiece.holdRootY;
         holdRootZ = previousPiece.holdRootZ;
-        holdRootAngle = previousPiece.holdRootAngle;
+        // holdRootAngle = previousPiece.holdRootAngle;
         holdRootScaleX = previousPiece.holdRootScaleX;
         holdRootScaleY = previousPiece.holdRootScaleY;
       }
@@ -646,7 +646,6 @@ class SustainTrail extends ZSprite
         holdRootX = fakeNote.x;
         holdRootY = fakeNote.y;
         holdRootZ = fakeNote.z;
-        holdRootAngle = fakeNote.angle;
         holdRootScaleX = scaleX;
         holdRootScaleY = scaleY;
       }
@@ -670,9 +669,7 @@ class SustainTrail extends ZSprite
       if (straightHoldsModAmount != 0)
       {
         fakeNote.x = FlxMath.lerp(fakeNote.x, holdRootX, straightHoldsModAmount);
-        // fakeNote.y = FlxMath.lerp(fakeNote.y, holdRootY, straightHoldsModAmount);
         fakeNote.z = FlxMath.lerp(fakeNote.z, holdRootZ, straightHoldsModAmount);
-        fakeNote.angle = FlxMath.lerp(fakeNote.x, holdRootAngle, straightHoldsModAmount);
         scaleX = FlxMath.lerp(scaleX, holdRootScaleX, straightHoldsModAmount);
         scaleY = FlxMath.lerp(scaleY, holdRootScaleY, straightHoldsModAmount);
       }
@@ -761,7 +758,7 @@ class SustainTrail extends ZSprite
   private var holdRootX:Float = 0.0;
   private var holdRootY:Float = 0.0;
   private var holdRootZ:Float = 0.0;
-  private var holdRootAngle:Float = 0.0;
+  // private var holdRootAngle:Float = 0.0;
   // private var holdRootAlpha:Float = 0.0;
   private var holdRootScaleX:Float = 0.0;
   private var holdRootScaleY:Float = 0.0;
