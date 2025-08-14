@@ -412,7 +412,6 @@ class ZProjectSprite_Note extends FlxSprite
       for (y in 0...subdivisions + 2) // y
       {
         // Setup point
-        var point2D:Vector2;
         var point3D:Vector3D = new Vector3D(0, 0, 0);
         point3D.x = (w / (subdivisions + 1)) * x;
         point3D.y = (h / (subdivisions + 1)) * y;
