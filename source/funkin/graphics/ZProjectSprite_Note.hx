@@ -864,6 +864,6 @@ class ZProjectSprite_Note extends FlxSprite
       pos_modified.x -= fovOffsetX;
       pos_modified.y -= fovOffsetY;
     }
-    return new Vector3D(pos_modified.x, pos_modified.y);
+    return new Vector3D(pos_modified.x, pos_modified.y, pos_modified.z);
   }
 }
