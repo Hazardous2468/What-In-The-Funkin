@@ -838,7 +838,7 @@ class ZProjectSprite_Note extends FlxSprite
   // Offset the perspective math center by this amount!
   public var perspectiveOffset:Vector2 = new Vector2(0, 0);
 
-  public function applyPerspective(pos:Vector3D, xPercent:Float = 0, yPercent:Float = 0):Vector2
+  public function applyPerspective(pos:Vector3D, xPercent:Float = 0, yPercent:Float = 0):Vector3D
   {
     var w:Float = spriteGraphic?.frameWidth ?? frameWidth;
     var h:Float = spriteGraphic?.frameHeight ?? frameHeight;
