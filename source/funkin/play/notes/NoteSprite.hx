@@ -7,15 +7,14 @@ import flixel.graphics.frames.FlxFrame;
 import funkin.data.song.SongData.NoteParamData;
 import funkin.data.song.SongData.SongNoteData;
 import funkin.graphics.FunkinSprite;
-import funkin.graphics.ZProjectSprite_Note;
+import funkin.graphics.ZSpriteProjected;
 import funkin.graphics.ZSprite;
 import funkin.graphics.shaders.HSVNotesShader;
 import funkin.play.modchartSystem.NoteData;
 import funkin.play.notes.notestyle.NoteStyle;
 
-class NoteSprite extends ZSprite
+class NoteSprite extends ZSpriteProjected
 {
-  public var mesh:ZProjectSprite_Note;
   public var noteModData:NoteData;
 
   static final DIRECTION_COLORS:Array<String> = ['purple', 'blue', 'green', 'red'];
@@ -162,20 +161,6 @@ class NoteSprite extends ZSprite
    */
   public var handledMiss:Bool;
 
-  // Call this to create a mesh
-  public function setupMesh():Void
-  {
-    if (mesh == null)
-    {
-      mesh = new ZProjectSprite_Note();
-      mesh.graphicCacheSuffix = noteStyleName;
-      mesh.spriteGraphic = this;
-      mesh.doDraw = false;
-      mesh.copySpriteGraphic = false;
-    }
-    mesh.setUp();
-  }
-
   public var vwooshing:Bool = false;
 
   @:access(flixel.FlxCamera)
@@ -185,48 +170,12 @@ class NoteSprite extends ZSprite
     {
       return;
     }
-
-    if (mesh != null && noteModData?.whichStrumNote?.strumExtraModData?.threeD ?? false)
-    {
-      if (!vwooshing)
-      {
-        mesh.x = noteModData.x;
-        mesh.y = noteModData.y;
-        mesh.z = noteModData.z;
-
-        mesh.angleX = noteModData.angleX;
-        mesh.angleY = noteModData.angleY;
-        mesh.angleZ = noteModData.angleZ;
-
-        mesh.scaleX = noteModData.scaleX;
-        mesh.scaleY = noteModData.scaleY;
-        mesh.scaleZ = noteModData.scaleZ;
-
-        mesh.skewX = noteModData.skewX;
-        mesh.skewY = noteModData.skewY;
-        mesh.skewZ = noteModData.skewZ;
-        mesh.skewX_playfield = noteModData.skewX_playfield;
-        mesh.skewY_playfield = noteModData.skewY_playfield;
-        mesh.skewZ_playfield = noteModData.skewZ_playfield;
-
-        mesh.playfieldSkewCenterX = (noteModData?.whichStrumNote?.strumExtraModData?.playfieldX ?? FlxG.width / 2);
-        mesh.playfieldSkewCenterY = (noteModData?.whichStrumNote?.strumExtraModData?.playfieldY ?? FlxG.height / 2);
-        mesh.playfieldSkewCenterZ = (noteModData?.whichStrumNote?.strumExtraModData?.playfieldZ ?? 0);
-
-        mesh.perspectiveOffset = noteModData.perspectiveOffset;
-
-        mesh.offset = this.offset;
-        mesh.cameras = this.cameras;
-      }
-
-      mesh.updateTris();
-      mesh.graphicCacheSuffix = noteStyleName;
-      mesh.drawManual(this.graphic);
-    }
-    else
-    {
-      super.draw();
-    }
+    var strumExtraModData = noteModData?.whichStrumNote?.strumExtraModData ?? null;
+    projectionEnabled = strumExtraModData?.threeD ?? false;
+    playfieldSkewCenterX = (strumExtraModData?.playfieldX ?? FlxG.width / 2);
+    playfieldSkewCenterY = (strumExtraModData?.playfieldY ?? FlxG.height / 2);
+    playfieldSkewCenterZ = (strumExtraModData?.playfieldZ ?? 0);
+    super.draw();
   }
 
   // for identifying what noteStyle this notesprite is using in hxScript or even lua
@@ -265,8 +214,6 @@ class NoteSprite extends ZSprite
     stealthGlowGreen = 1.0;
     stealthGlowRed = 1.0;
     updateStealthGlow();
-    if (mesh != null) mesh.updateCol();
-
     targetScale = this.scale.x;
 
     // `false` disables the update() function for performance.
@@ -343,8 +290,6 @@ class NoteSprite extends ZSprite
     this.hsvShader.hue = 1.0;
     this.hsvShader.saturation = 1.0;
     this.hsvShader.value = 1.0;
-
-    if (mesh != null) mesh.updateCol();
 
     resetStealthGlow();
   }

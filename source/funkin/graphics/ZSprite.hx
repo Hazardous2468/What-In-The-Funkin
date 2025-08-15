@@ -8,6 +8,7 @@ import funkin.play.modchartSystem.NoteData;
 import flixel.math.FlxMath;
 import flixel.math.FlxPoint;
 import flixel.FlxCamera;
+import funkin.play.modchartSystem.ModConstants;
 
 class ZSprite extends FunkinSkewedSprite
 {
@@ -62,7 +63,47 @@ class ZSprite extends FunkinSkewedSprite
   }
 
   // Offset the perspective math center by this amount!
-  public var perspectiveOffset:Vector2 = new Vector2(0, 0);
+  public var perspectiveCenterOffset:Vector2 = new Vector2(0, 0);
+
+  // The value provided to the applyPerspective function for noteWidth parameter.
+  public var perspectiveWidth:Null<Float> = null;
+  // The value provided to the applyPerspective function for noteHeight parameter.
+  public var perspectiveHeight:Null<Float> = null;
+
+  // If set to true, will automatically calculate this sprites perspective to emulate 3D in every draw() call
+  public var autoCalculatePerspective:Bool = true;
+
+  override public function draw():Void
+  {
+    if (!autoCalculatePerspective || getZ() == 0) // Draw like a regular sprite if the z value is 0, or we have autoCalculate disabled
+    {
+      super.draw();
+    }
+    else
+    {
+      var wasScaleX:Float = scale.x;
+      var wasScaleY:Float = scale.y;
+      var wasX:Float = this.x;
+      var wasY:Float = this.y;
+      var wasX2:Float = this.x2;
+      var wasY2:Float = this.y2;
+
+      this.x = this.x + this.x2;
+      this.y = this.y + this.y2;
+      this.x2 = 0;
+      this.y2 = 0;
+
+      ModConstants.applyPerspective(this, perspectiveWidth, perspectiveHeight, perspectiveCenterOffset);
+      super.draw();
+
+      this.x = wasX;
+      this.y = wasY;
+      this.x2 = wasX2;
+      this.y2 = wasY2;
+      this.scale.x = wasScaleX;
+      this.scale.y = wasScaleY;
+    }
+  }
 
   // Feed a noteData into this function to apply all of it's parameters to this sprite!
   public function applyNoteData(data:NoteData, applyFake3D:Bool = false):Void
@@ -76,7 +117,7 @@ class ZSprite extends FunkinSkewedSprite
     this.scale.x = data.scaleX;
     this.scale.y = data.scaleY;
 
-    this.perspectiveOffset = data.perspectiveOffset;
+    this.perspectiveCenterOffset = data.perspectiveOffset;
 
     if (applyFake3D || data.whichStrumNote?.strumExtraModData?.threeD ?? false == false)
     {

@@ -36,6 +36,15 @@ class NoteSplash extends ZSprite
     this.shader = hsvShader;
   }
 
+  override public function draw():Void
+  {
+    var o = noteStyle.getSplashZCalcOffsetMultipliers();
+    this.perspectiveWidth = this.width / 2.2 * o[0];
+    this.perspectiveHeight = this.height / 2.2 * o[1];
+
+    super.draw();
+  }
+
   public function setHSV(hue:Float, sat:Float, val:Float):Void
   {
     if (hsvShader != null)

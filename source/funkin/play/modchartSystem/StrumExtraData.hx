@@ -16,9 +16,9 @@ class StrumExtraData
 
   function set_cullMode(value:String):String
   {
-    if (whichStrumNote?.mesh != null)
+    if (whichStrumNote != null)
     {
-      whichStrumNote.mesh.cullMode = value;
+      whichStrumNote.cullMode = value;
     }
     this.cullMode = value;
     return this.cullMode;

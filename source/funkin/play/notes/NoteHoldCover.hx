@@ -22,10 +22,11 @@ class NoteHoldCover extends FlxTypedSpriteGroup<ZSprite>
 
   var hsvShader:HSVNotesShader;
 
+  var noteStyle:NoteStyle;
+
   public function new(noteStyle:NoteStyle)
   {
     super(0, 0);
-
     setupHoldNoteCover(noteStyle);
     this.hsvShader = new HSVNotesShader();
     this.shader = hsvShader;
@@ -46,6 +47,8 @@ class NoteHoldCover extends FlxTypedSpriteGroup<ZSprite>
    */
   function setupHoldNoteCover(noteStyle:NoteStyle):Void
   {
+    this.noteStyle = noteStyle;
+
     glow = new ZSprite();
     add(glow);
 
@@ -71,6 +74,9 @@ class NoteHoldCover extends FlxTypedSpriteGroup<ZSprite>
 
   public override function update(elapsed):Void
   {
+    var o = noteStyle.getHoldCoverZCalcOffsetMultipliers();
+    glow.perspectiveWidth = glow.width * o[0];
+    glow.perspectiveHeight = glow.height * o[1];
     super.update(elapsed);
   }
 

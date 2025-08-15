@@ -114,8 +114,6 @@ class Strumline extends FlxSpriteGroup
 
   public function requestMeshCullUpdateForPaths():Void
   {
-    if (!createdNoteMeshes) return;
-
     arrowPaths.forEach(function(note:SustainTrail) {
       note.cullMode = note.whichStrumNote?.strumExtraModData?.cullModeArrowpath ?? "none";
     });
@@ -123,24 +121,22 @@ class Strumline extends FlxSpriteGroup
 
   public function requestMeshCullUpdateForNotes(forNotes:Bool = false):Void
   {
-    if (!createdNoteMeshes) return;
-
     if (forNotes)
     {
       for (note in notes.members)
       {
-        if (note?.mesh != null)
+        if (note != null)
         {
           var c:String = note.noteModData?.whichStrumNote?.strumExtraModData?.cullModeNotes ?? "none";
-          note.mesh.cullMode = c;
+          note.cullMode = c;
         }
       }
       for (note in notesVwoosh.members)
       {
-        if (note?.mesh != null)
+        if (note != null)
         {
           var c:String = note.noteModData?.whichStrumNote?.strumExtraModData?.cullModeNotes ?? "none";
-          note.mesh.cullMode = c;
+          note.cullMode = c;
         }
       }
     }
@@ -155,28 +151,6 @@ class Strumline extends FlxSpriteGroup
         if (note != null && note.alive) note.cullMode = note.whichStrumNote?.strumExtraModData?.cullModeSustain ?? "none";
       }
     }
-  }
-
-  public var createdNoteMeshes:Bool = false;
-
-  public function requestNoteMeshCreation():Void
-  {
-    if (createdNoteMeshes) return;
-
-    for (note in notes.members)
-    {
-      if (note == null) continue;
-      if (note.alive) note.setupMesh();
-    }
-    for (note in notesVwoosh.members)
-    {
-      if (note == null) continue;
-      if (note.alive) note.setupMesh();
-    }
-    strumlineNotes.forEach(function(note:StrumlineNote) {
-      note.setupMesh();
-    });
-    createdNoteMeshes = true;
   }
 
   public var arrowPaths:FlxTypedSpriteGroup<SustainTrail>;
@@ -713,33 +687,6 @@ class Strumline extends FlxSpriteGroup
     {
       note.updateClipping();
     }
-
-    strumlineNotes.forEach(function(note:StrumlineNote) {
-      ModConstants.applyPerspective(note, note.perspectiveOffset);
-    });
-
-    for (note in notes)
-    {
-      if (!(note.noteModData?.whichStrumNote?.strumExtraModData?.threeD ?? false)) ModConstants.applyPerspective(note, note.perspectiveOffset);
-    }
-    for (cover in noteHoldCovers)
-    {
-      if (cover.alive)
-      {
-        var whichStrumNote:StrumlineNote = getByIndex(cover.holdNoteDir % KEY_COUNT);
-        var o = noteStyle.getHoldCoverZCalcOffsetMultipliers();
-        ModConstants.applyPerspective(cover.glow, cover.glow.width * o[0], cover.glow.height * o[1], cover.glow.perspectiveOffset);
-      }
-    }
-    for (splash in noteSplashes)
-    {
-      if (splash.alive)
-      {
-        var whichStrumNote:StrumlineNote = getByIndex(splash.DIRECTION % KEY_COUNT);
-        var o = noteStyle.getSplashZCalcOffsetMultipliers();
-        ModConstants.applyPerspective(splash, splash.width / 2.2 * o[0], splash.height / 2.2 * o[1], splash.perspectiveOffset);
-      }
-    }
   }
 
   /**
@@ -938,15 +885,6 @@ class Strumline extends FlxSpriteGroup
 
       var targetY:Float = FlxG.height + note.y;
       if (isDownscroll) targetY = 0 - note.height;
-
-      // check for 3D
-      if (note.mesh != null)
-      {
-        FlxTween.tween(note.mesh, {y: targetY}, vwooshTime,
-          {
-            ease: FlxEase.expoIn
-          });
-      }
 
       FlxTween.tween(note, {y: targetY}, vwooshTime,
         {
@@ -1774,7 +1712,7 @@ class Strumline extends FlxSpriteGroup
         }
       }
 
-      cover.glow.perspectiveOffset = whichStrumNote.noteModData.perspectiveOffset;
+      cover.glow.perspectiveCenterOffset = whichStrumNote.noteModData.perspectiveOffset;
     }
   }
 
@@ -1824,7 +1762,7 @@ class Strumline extends FlxSpriteGroup
       splash.skew.y += whichStrumNote.noteModData.skewY_playfield;
     }
 
-    splash.perspectiveOffset = whichStrumNote.noteModData.perspectiveOffset;
+    splash.perspectiveCenterOffset = whichStrumNote.noteModData.perspectiveOffset;
   }
 
   /**
@@ -1911,12 +1849,7 @@ class Strumline extends FlxSpriteGroup
       noteSprite.x -= NUDGE;
       noteSprite.y = -9999;
 
-      if (noteSprite.mesh == null && createdNoteMeshes) noteSprite.setupMesh();
-
-      if (noteSprite.mesh != null)
-      {
-        noteSprite.mesh.cullMode = getByIndex(noteSprite.direction).strumExtraModData?.cullModeNotes ?? "none";
-      }
+      noteSprite.cullMode = getByIndex(noteSprite.direction).strumExtraModData?.cullModeNotes ?? "none";
     }
 
     return noteSprite;

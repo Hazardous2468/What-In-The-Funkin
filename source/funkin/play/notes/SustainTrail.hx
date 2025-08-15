@@ -1470,15 +1470,19 @@ class SustainTrail extends ZSprite
   {
     if (alpha == 0 || graphic == null || vertices == null || !this.alive) return;
 
+    var alphaMemory:Float = this.alpha;
     for (camera in cameras)
     {
       if (!camera.visible || !camera.exists) continue;
       // if (!isOnScreen(camera)) continue; // TODO: Update this code to make it work properly.
 
+      alpha = alphaMemory * camera.alpha; // Fix for drawTriangles not fading with camera
+
       getScreenPosition(_point, camera).subtractPoint(offset);
 
       camera.drawTriangles(graphic, vertices, indices, uvtData, colors, _point, blend, true, antialiasing, colorTransform, shader, cullMode);
     }
+    this.alpha = alphaMemory;
 
     #if debug
     if (FlxG.debugger.drawDebug) drawDebug();

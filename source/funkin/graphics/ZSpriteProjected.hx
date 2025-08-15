@@ -33,6 +33,9 @@ class ZSpriteProjected extends ZSprite
   // If enabled, will apply 3D projection to this sprite. If disabled, renders like a normal sprite.
   public var projectionEnabled:Bool = true;
 
+  // If true, will correct the texture distortion created when transforming in 3D
+  public var doPerspectiveCorrection:Bool = true;
+
   // If true, will repeat the texture in the draw call. Otherwise texture will be clamped
   public var textureRepeat:Bool = false;
 
@@ -57,6 +60,11 @@ class ZSpriteProjected extends ZSprite
     this.angle = n;
     return this.angle;
   }
+
+  // for group shit
+  public var angleX2:Float = 0;
+  public var angleY2:Float = 0;
+  public var angleZ2:Float = 0;
 
   public var scaleZ:Float = 1;
 
@@ -139,7 +147,7 @@ class ZSpriteProjected extends ZSprite
   public var fov:Float = 90;
 
   // custom setter to prevent values below 0, cuz otherwise we'll devide by 0!
-  public var subdivisions(default, set):Int = 0;
+  public var subdivisions(default, set):Int = 2;
 
   function set_subdivisions(value:Int):Int
   {
@@ -219,11 +227,15 @@ class ZSpriteProjected extends ZSprite
   public function updateTris():Void
   {
     if (destroying) return;
-    var wasAlreadyFlipped_X:Bool = flipX;
-    var wasAlreadyFlipped_Y:Bool = flipY;
 
-    var w:Float = frameWidth;
-    var h:Float = frameHeight;
+    var w:Float = this.frame.frame.width;
+    var h:Float = this.frame.frame.height;
+
+    var offsetX:Float = this.frame.offset.x * scaleX;
+    var offsetScaledX:Float = (frameWidth - w) * (scaleX - 1) / 2;
+
+    var offsetY:Float = this.frame.offset.y * scaleY;
+    var offsetScaledY:Float = (frameHeight - h) * (scaleY - 1) / 2;
 
     culled = false;
 
@@ -236,6 +248,10 @@ class ZSpriteProjected extends ZSprite
         var point3D:Vector3D = new Vector3D(0, 0, 0);
         point3D.x = (w / (subdivisions + 1)) * x;
         point3D.y = (h / (subdivisions + 1)) * y;
+
+        // Animation frame offset stuff
+        point3D.x += offsetX - offsetScaledX;
+        point3D.y += offsetY - offsetScaledY;
 
         var xPercent:Float = x / (subdivisions + 1);
         var yPercent:Float = y / (subdivisions + 1);
@@ -277,6 +293,7 @@ class ZSpriteProjected extends ZSprite
         point3D.x += (newWidth) * w;
         point3D.y += (newHeight) * h;
 
+        point3D = applyFlip(point3D, xPercent, yPercent);
         point3D = applyRotation(point3D, xPercent, yPercent);
 
         point3D = applySkew(point3D, xPercent, yPercent, w, h);
@@ -284,6 +301,7 @@ class ZSpriteProjected extends ZSprite
         // Apply offset here before it gets affected by z projection!
         point3D.x -= offset.x;
         point3D.y -= offset.y;
+        var test:Float = point3D.z;
         point3D = applyPerspective(point3D, xPercent, yPercent);
 
         vertices[i * 2] = point3D.x;
@@ -316,20 +334,25 @@ class ZSpriteProjected extends ZSprite
         // map it
         uvtData[i * 3] = uvX; // u
         uvtData[i * 3 + 1] = uvY; // v
-        uvtData[i * 3 + 2] = 1 / Math.max(0.0001, -point3D.z); // t
+        uvtData[i * 3 + 2] = (doPerspectiveCorrection ? 1 / Math.max(0.0001, -point3D.z) : 1.0); // t
 
         i++;
       }
     }
 
-    flipX = false;
-    flipY = false;
+    return;
 
+    // TODO: How to apply this?
+    var wasAlreadyFlipped_X:Bool = flipX;
+    var wasAlreadyFlipped_Y:Bool = flipY;
+
+    var needsFlipX:Bool = false;
+    var needsFlipY:Bool = false;
     switch (cullMode)
     {
       case "always_positive" | "always_negative":
-        flipX = cullMode == "always_positive" ? true : false;
-        flipY = cullMode == "always_positive" ? true : false;
+        needsFlipX = cullMode == "always_positive" ? true : false;
+        needsFlipY = cullMode == "always_positive" ? true : false;
 
         var xFlipCheck_vertTopLeftX = vertices[0];
         var xFlipCheck_vertBottomRightX = vertices[vertices.length - 1 - 1];
@@ -337,14 +360,14 @@ class ZSpriteProjected extends ZSprite
         {
           if (xFlipCheck_vertTopLeftX >= xFlipCheck_vertBottomRightX)
           {
-            flipX = !flipX;
+            needsFlipX = !needsFlipX;
           }
         }
         else
         {
           if (xFlipCheck_vertTopLeftX < xFlipCheck_vertBottomRightX)
           {
-            flipX = !flipX;
+            needsFlipX = !needsFlipX;
           }
         }
         // y check
@@ -354,7 +377,7 @@ class ZSpriteProjected extends ZSprite
           xFlipCheck_vertBottomRightX = vertices[vertices.length - 1];
           if (xFlipCheck_vertTopLeftX >= xFlipCheck_vertBottomRightX)
           {
-            flipY = !flipY;
+            needsFlipY = !needsFlipY;
           }
         }
         else
@@ -363,7 +386,7 @@ class ZSpriteProjected extends ZSprite
           xFlipCheck_vertBottomRightX = vertices[vertices.length - 1];
           if (xFlipCheck_vertTopLeftX < xFlipCheck_vertBottomRightX)
           {
-            flipY = !flipY;
+            needsFlipY = !needsFlipY;
           }
         }
     }
@@ -382,6 +405,11 @@ class ZSpriteProjected extends ZSprite
     setUp();
     return Frames;
   }
+
+  /**
+   * A `Vector` representing each vertex colour. Doesn't do anything though but is needed to avoid a crash when changing colors
+   */
+  public var colors:DrawData<Int> = new DrawData<Int>();
 
   var culled:Bool = false;
 
@@ -420,7 +448,7 @@ class ZSpriteProjected extends ZSprite
         alpha = alphaMemory * camera.alpha; // Fix for drawTriangles not fading with camera
         // getScreenPosition(_point, camera).subtractPoint(offset);
         getScreenPosition(_point, camera);
-        camera.drawTriangles(graphic, vertices, indices, uvtData, null, _point, blend, textureRepeat, antialiasing, colorTransform, shader, culling);
+        camera.drawTriangles(graphic, vertices, indices, uvtData, colors, _point, blend, textureRepeat, antialiasing, colorTransform, shader, culling);
       }
       this.alpha = alphaMemory;
 
@@ -500,38 +528,53 @@ class ZSpriteProjected extends ZSprite
     return point3D;
   }
 
-  function applyRotX(pos:Vector3D, xPercent, yPercent, w:Float, h:Float, includeFlip:Bool = true):Vector3D
+  function applyRotX(pos:Vector3D, xPercent, yPercent, w:Float, h:Float, degrees:Float):Vector3D
   {
     var rotateModPivotPoint:Vector2 = new Vector2(0, h / 2);
     rotateModPivotPoint.x += pivotOffsetZ;
     rotateModPivotPoint.y += pivotOffsetY;
-    var angleX_withFlip:Float = angleX + (includeFlip ? (flipY ? 180 : 0) : 0);
-    var thing:Vector2 = ModConstants.rotateAround(rotateModPivotPoint, new Vector2(pos.z, pos.y), angleX_withFlip);
+    var thing:Vector2 = ModConstants.rotateAround(rotateModPivotPoint, new Vector2(pos.z, pos.y), degrees);
     pos.z = thing.x;
     pos.y = thing.y;
     return pos;
   }
 
-  function applyRotY(pos:Vector3D, xPercent, yPercent, w:Float, h:Float, includeFlip:Bool = true):Vector3D
+  function applyRotY(pos:Vector3D, xPercent, yPercent, w:Float, h:Float, degrees:Float):Vector3D
   {
     var rotateModPivotPoint:Vector2 = new Vector2(w / 2, 0);
     rotateModPivotPoint.x += pivotOffsetX;
     rotateModPivotPoint.y += pivotOffsetZ;
-    var angleY_withFlip:Float = angleY + (flipX ? 180 : 0);
-    var thing:Vector2 = ModConstants.rotateAround(rotateModPivotPoint, new Vector2(pos.x, pos.z), angleY_withFlip);
+    var thing:Vector2 = ModConstants.rotateAround(rotateModPivotPoint, new Vector2(pos.x, pos.z), degrees);
     pos.x = thing.x;
     pos.z = thing.y;
     return pos;
   }
 
-  function applyRotZ(pos:Vector3D, xPercent, yPercent, w:Float, h:Float, includeFlip:Bool = true):Vector3D
+  function applyRotZ(pos:Vector3D, xPercent, yPercent, w:Float, h:Float, degrees:Float):Vector3D
   {
     var rotateModPivotPoint:Vector2 = new Vector2(w / 2, h / 2);
     rotateModPivotPoint.x += pivotOffsetX;
     rotateModPivotPoint.y += pivotOffsetY;
-    var thing:Vector2 = ModConstants.rotateAround(rotateModPivotPoint, new Vector2(pos.x, pos.y), angleZ);
+    var thing:Vector2 = ModConstants.rotateAround(rotateModPivotPoint, new Vector2(pos.x, pos.y), degrees);
     pos.x = thing.x;
     pos.y = thing.y;
+    return pos;
+  }
+
+  public function applyFlip(pos:Vector3D, xPercent:Float = 0, yPercent:Float = 0):Vector3D
+  {
+    var w:Float = frameWidth;
+    var h:Float = frameHeight;
+
+    if (flipX)
+    {
+      pos = applyRotY(pos, xPercent, yPercent, w, h, 180);
+    }
+    if (flipY)
+    {
+      pos = applyRotX(pos, xPercent, yPercent, w, h, 180);
+    }
+
     return pos;
   }
 
@@ -556,11 +599,18 @@ class ZSpriteProjected extends ZSprite
       switch (rotationOrder[i])
       {
         case "x":
-          pos_modified = applyRotX(pos_modified, xPercent, yPercent, w, h);
+          pos_modified = applyRotX(pos_modified, xPercent, yPercent, w, h, angleX);
         case "y":
-          pos_modified = applyRotY(pos_modified, xPercent, yPercent, w, h);
+          pos_modified = applyRotY(pos_modified, xPercent, yPercent, w, h, angleY);
         case "z":
-          pos_modified = applyRotZ(pos_modified, xPercent, yPercent, w, h);
+          pos_modified = applyRotZ(pos_modified, xPercent, yPercent, w, h, angleZ);
+
+        case "x2":
+          pos_modified = applyRotX(pos_modified, xPercent, yPercent, w, h, angleX2);
+        case "y2":
+          pos_modified = applyRotY(pos_modified, xPercent, yPercent, w, h, angleY2);
+        case "z2":
+          pos_modified = applyRotZ(pos_modified, xPercent, yPercent, w, h, angleZ2);
       }
     }
 
@@ -580,7 +630,7 @@ class ZSpriteProjected extends ZSprite
       pos_modified.y += fovOffsetY;
       pos_modified.z *= 0.001;
 
-      pos_modified = ModConstants.perspectiveMath(pos_modified, 0, 0, perspectiveOffset);
+      pos_modified = ModConstants.perspectiveMath(pos_modified, 0, 0, perspectiveCenterOffset);
 
       pos_modified.x -= this.x + this.x2;
       pos_modified.y -= this.y + this.y2;

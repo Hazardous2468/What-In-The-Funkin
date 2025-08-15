@@ -119,13 +119,13 @@ class ModHandler
 
   // Offset the perspective math center by this amount! Added ontop of the one in NoteData.
   // Currently doesn't do anything though lol
-  public var perspectiveOffset:Vector2 = new Vector2(0, 0);
+  public var perspectiveCenterOffset:Vector2 = new Vector2(0, 0);
 
   public function resetModValues():Void
   {
     trace("Mod Values Reset - " + customTweenerName);
 
-    perspectiveOffset.setTo(0, 0);
+    perspectiveCenterOffset.setTo(0, 0);
 
     for (mod in mods_all)
     {
@@ -306,13 +306,6 @@ class ModHandler
     mod.strumOwner = strum;
 
     modifiers.set(mod.tag, mod);
-
-    // If a 3D mod is spotted, then we need to make sure meshes are created for when it gets enabled!!!
-    // Otherwise, meshes are never created for performance reasons if a song never uses the 3D mode.
-    if (nameOfMod == "3d")
-    {
-      strum.requestNoteMeshCreation();
-    }
   }
 
   public function addCustomMod(modIn:CustomModifier, makeCopy:Bool = false):Void
@@ -798,16 +791,12 @@ class ModHandler
       note.skew.y += note.noteModData.skewY_playfield;
     }
 
-    // for mesh shenaniguns
-    if (note.mesh != null)
-    {
-      note.mesh.pivotOffsetX = note.noteModData.meshOffsets_PivotX;
-      note.mesh.pivotOffsetY = note.noteModData.meshOffsets_PivotY;
-      note.mesh.pivotOffsetZ = note.noteModData.meshOffsets_PivotZ;
-      note.mesh.skewX_offset = note.noteModData.meshOffsets_SkewX;
-      note.mesh.skewY_offset = note.noteModData.meshOffsets_SkewY;
-      note.mesh.skewZ_offset = note.noteModData.meshOffsets_SkewZ;
-    }
+    note.pivotOffsetX = note.noteModData.meshOffsets_PivotX;
+    note.pivotOffsetY = note.noteModData.meshOffsets_PivotY;
+    note.pivotOffsetZ = note.noteModData.meshOffsets_PivotZ;
+    note.skewX_offset = note.noteModData.meshOffsets_SkewX;
+    note.skewY_offset = note.noteModData.meshOffsets_SkewY;
+    note.skewZ_offset = note.noteModData.meshOffsets_SkewZ;
 
     note.updateStealthGlow();
     // perspective applied in applyperspective part of update routine
@@ -979,16 +968,12 @@ class ModHandler
       note.skew.y += note.noteModData.skewY_playfield;
     }
 
-    // for mesh shenaniguns
-    if (note.mesh != null)
-    {
-      note.mesh.pivotOffsetX = note.noteModData.meshOffsets_PivotX;
-      note.mesh.pivotOffsetY = note.noteModData.meshOffsets_PivotY;
-      note.mesh.pivotOffsetZ = note.noteModData.meshOffsets_PivotZ;
-      note.mesh.skewX_offset = note.noteModData.meshOffsets_SkewX;
-      note.mesh.skewY_offset = note.noteModData.meshOffsets_SkewY;
-      note.mesh.skewZ_offset = note.noteModData.meshOffsets_SkewZ;
-    }
+    note.pivotOffsetX = note.noteModData.meshOffsets_PivotX;
+    note.pivotOffsetY = note.noteModData.meshOffsets_PivotY;
+    note.pivotOffsetZ = note.noteModData.meshOffsets_PivotZ;
+    note.skewX_offset = note.noteModData.meshOffsets_SkewX;
+    note.skewY_offset = note.noteModData.meshOffsets_SkewY;
+    note.skewZ_offset = note.noteModData.meshOffsets_SkewZ;
   }
 
   /**

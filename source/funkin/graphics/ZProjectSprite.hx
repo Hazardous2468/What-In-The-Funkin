@@ -585,7 +585,7 @@ class ZProjectSprite extends ZSprite
       pos_modified.y += fovOffsetY;
       pos_modified.z *= 0.001;
 
-      pos_modified = ModConstants.perspectiveMath(pos_modified, 0, 0, perspectiveOffset);
+      pos_modified = ModConstants.perspectiveMath(pos_modified, 0, 0, perspectiveCenterOffset);
 
       pos_modified.x -= this.x;
       pos_modified.y -= this.y;

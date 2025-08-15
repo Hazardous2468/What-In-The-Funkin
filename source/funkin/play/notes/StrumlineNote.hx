@@ -9,7 +9,6 @@ import funkin.graphics.ZSpriteProjected;
 import funkin.graphics.shaders.HSVNotesShader;
 import funkin.play.modchartSystem.NoteData;
 import funkin.play.modchartSystem.StrumExtraData;
-import funkin.graphics.ZProjectSprite_Note;
 import flixel.graphics.frames.FlxFrame;
 import flixel.FlxBasic;
 import lime.math.Vector2;
@@ -19,8 +18,6 @@ import lime.math.Vector2;
  */
 class StrumlineNote extends ZSpriteProjected
 {
-  public var mesh:ZProjectSprite_Note;
-
   var hsvShader:HSVNotesShader;
 
   public var noteModData:NoteData;
@@ -99,20 +96,6 @@ class StrumlineNote extends ZSpriteProjected
     updateStealthGlow();
   }
 
-  // Call this to create a mesh
-  public function setupMesh():Void
-  {
-    if (mesh == null)
-    {
-      mesh = new ZProjectSprite_Note();
-      mesh.graphicCacheSuffix = noteStyleName;
-      mesh.spriteGraphic = this;
-      mesh.doDraw = false;
-      mesh.copySpriteGraphic = false;
-    }
-    mesh.setUp();
-  }
-
   @:access(flixel.FlxCamera)
   override public function draw():Void
   {
@@ -121,45 +104,12 @@ class StrumlineNote extends ZSpriteProjected
       return;
     }
 
-    if (false && mesh != null && strumExtraModData?.threeD ?? false)
-    {
-      mesh.x = noteModData.x;
-      mesh.y = noteModData.y;
-      mesh.z = noteModData.z;
+    this.playfieldSkewCenterX = strumExtraModData.playfieldX;
+    this.playfieldSkewCenterY = strumExtraModData.playfieldY;
+    this.playfieldSkewCenterZ = strumExtraModData.playfieldZ;
 
-      mesh.angleX = noteModData.angleX;
-      mesh.angleY = noteModData.angleY;
-      mesh.angleZ = noteModData.angleZ;
-
-      mesh.scaleX = noteModData.scaleX;
-      mesh.scaleY = noteModData.scaleY;
-      mesh.scaleZ = noteModData.scaleZ;
-
-      mesh.skewX = noteModData.skewX;
-      mesh.skewY = noteModData.skewY;
-      mesh.skewZ = noteModData.skewZ;
-      mesh.skewX_playfield = noteModData.skewX_playfield;
-      mesh.skewY_playfield = noteModData.skewY_playfield;
-      mesh.skewZ_playfield = noteModData.skewZ_playfield;
-
-      mesh.playfieldSkewCenterX = strumExtraModData.playfieldX;
-      mesh.playfieldSkewCenterY = strumExtraModData.playfieldY;
-      mesh.playfieldSkewCenterZ = strumExtraModData.playfieldZ;
-
-      mesh.perspectiveOffset = noteModData.perspectiveOffset;
-
-      mesh.offset = this.offset;
-      mesh.cameras = this.cameras;
-
-      mesh.updateTris();
-      mesh.graphicCacheSuffix = noteStyleName;
-      mesh.drawManual(this.graphic);
-    }
-    else
-    {
-      projectionEnabled = strumExtraModData?.threeD ?? false;
-      super.draw();
-    }
+    projectionEnabled = strumExtraModData?.threeD ?? false;
+    super.draw();
   }
 
   // call this to reset stealthGlow back to default values
@@ -245,7 +195,6 @@ class StrumlineNote extends ZSpriteProjected
 
     centerOffsets();
     centerOrigin();
-    if (mesh != null) mesh.updateCol();
   }
 
   public function playStatic():Void
