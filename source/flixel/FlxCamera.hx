@@ -651,6 +651,7 @@ class FlxCamera extends FlxBasic
       && _headTriangles.antialiasing == smoothing
       && _headTriangles.colored == isColored
       && _headTriangles.cullMode == cullMode
+      && _headTriangles.repeat == repeat
       && _headTriangles.blending == blendInt
       && _headTriangles.blend == blend #if !flash
       && _headTriangles.hasColorOffsets == hasColorOffsets
