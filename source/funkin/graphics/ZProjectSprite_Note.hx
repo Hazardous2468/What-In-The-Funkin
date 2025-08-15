@@ -21,6 +21,7 @@ import openfl.geom.Vector3D;
 import flixel.util.FlxColor;
 import funkin.play.PlayState;
 
+@:deprecated("'ZProjectSprite_Note' is deprecated and will be removed. Use ZSpriteProjected!")
 class ZProjectSprite_Note extends FlxSprite
 {
   // Makes the mesh all wobbly!
@@ -478,9 +479,9 @@ class ZProjectSprite_Note extends FlxSprite
         vertices[i * 2] = point3D.x;
         vertices[i * 2 + 1] = point3D.y;
 
-        uvtData[i * 3] = xPercent;          				 	          // u
-    		uvtData[i * 3 + 1] = yPercent;       					          // v
-    		uvtData[i * 3 + 2] = 1 / Math.max(0.0001, -point3D.z); 	// t
+        uvtData[i * 3] = xPercent; // u
+        uvtData[i * 3 + 1] = yPercent; // v
+        uvtData[i * 3 + 2] = 1 / Math.max(0.0001, -point3D.z); // t
         i++;
       }
     }

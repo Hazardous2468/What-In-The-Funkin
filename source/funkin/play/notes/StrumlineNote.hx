@@ -5,6 +5,7 @@ import flixel.graphics.frames.FlxAtlasFrames;
 import funkin.graphics.FunkinSprite;
 import funkin.play.notes.NoteSprite;
 import funkin.graphics.ZSprite;
+import funkin.graphics.ZSpriteProjected;
 import funkin.graphics.shaders.HSVNotesShader;
 import funkin.play.modchartSystem.NoteData;
 import funkin.play.modchartSystem.StrumExtraData;
@@ -16,7 +17,7 @@ import lime.math.Vector2;
 /**
  * The actual receptor that you see on screen.
  */
-class StrumlineNote extends ZSprite
+class StrumlineNote extends ZSpriteProjected
 {
   public var mesh:ZProjectSprite_Note;
 
@@ -120,7 +121,7 @@ class StrumlineNote extends ZSprite
       return;
     }
 
-    if (mesh != null && strumExtraModData?.threeD ?? false)
+    if (false && mesh != null && strumExtraModData?.threeD ?? false)
     {
       mesh.x = noteModData.x;
       mesh.y = noteModData.y;
@@ -156,6 +157,7 @@ class StrumlineNote extends ZSprite
     }
     else
     {
+      projectionEnabled = strumExtraModData?.threeD ?? false;
       super.draw();
     }
   }

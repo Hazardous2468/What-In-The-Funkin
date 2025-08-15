@@ -22,6 +22,7 @@ import openfl.display.TriangleCulling;
 import openfl.geom.Vector3D;
 import flixel.util.FlxColor;
 
+@:deprecated("'ZProjectSprite' class is deprecated and will be removed. Use ZSpriteProjected!")
 class ZProjectSprite extends ZSprite
 {
   // Makes the mesh all wobbly!
@@ -194,9 +195,9 @@ class ZProjectSprite extends ZSprite
         uvY += uvOffset.y;
 
         // map it
-        uvtData[i * 3] = uvX;      // u coord
-        uvtData[i * 3 + 1] = uvY;  // v coord
-        uvtData[i * 3 + 2] = 1;    // t coord
+        uvtData[i * 3] = uvX; // u coord
+        uvtData[i * 3 + 1] = uvY; // v coord
+        uvtData[i * 3 + 2] = 1; // t coord
         i++;
       }
     }
@@ -287,9 +288,9 @@ class ZProjectSprite extends ZSprite
         vertices[i * 2] = point3D.x;
         vertices[i * 2 + 1] = point3D.y;
 
-        uvtData[i * 3] = xPercent;          				 	// u
-		uvtData[i * 3 + 1] = yPercent;       					// v
-		uvtData[i * 3 + 2] = 1 / Math.max(0.0001, -point3D.z); 	// t
+        uvtData[i * 3] = xPercent; // u
+        uvtData[i * 3 + 1] = yPercent; // v
+        uvtData[i * 3 + 2] = 1 / Math.max(0.0001, -point3D.z); // t
         i++;
       }
     }

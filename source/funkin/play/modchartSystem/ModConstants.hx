@@ -880,10 +880,10 @@ class ModConstants
   // Call this on a ZSprite to apply it's perspective! MAKE SURE IT'S SCALE AND X AND Y IS RESET BEFORE DOING THIS CUZ THIS OVERRIDES THOSE VALUES
   public static function applyPerspective(note:ZSprite, ?noteWidth:Float, ?noteHeight:Float, ?perspectiveOffset:Vector2):Void
   {
-    if (note.z == 0 || Math.isNaN(note.z)) return; // do fuck all if no z
+    if (note.getZ() == 0 || Math.isNaN(note.getZ())) return; // do fuck all if no z
     if (noteWidth == null) noteWidth = note.width;
     if (noteHeight == null) noteHeight = note.height;
-    pos.setTo(note.x + (noteWidth * 0.5), note.y + (noteHeight * 0.5), note.z * 0.001);
+    pos.setTo(note.x + (noteWidth * 0.5), note.y + (noteHeight * 0.5), note.getZ() * 0.001);
     var thisNotePos:Vector3D = perspectiveMath(pos, -(noteWidth * 0.5), -(noteHeight * 0.5), perspectiveOffset);
     note.x = thisNotePos.x;
     note.y = thisNotePos.y;
@@ -902,7 +902,7 @@ class ModConstants
     if (noteWidth == null) noteWidth = note.width;
     if (noteHeight == null) noteHeight = note.height;
 
-    pos.setTo(note.x + (noteWidth / 2), note.y + (noteHeight / 2), note.z * 0.001);
+    pos.setTo(note.x + (noteWidth / 2), note.y + (noteHeight / 2), note.getZ() * 0.001);
 
     var thisNotePos:Vector3D = perspectiveMath(pos, -(noteWidth * 0.5), -(noteHeight * 0.5), perspectiveOffset);
 
