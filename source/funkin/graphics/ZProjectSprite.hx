@@ -194,8 +194,9 @@ class ZProjectSprite extends ZSprite
         uvY += uvOffset.y;
 
         // map it
-        uvtData[i * 2] = uvX;
-        uvtData[i * 2 + 1] = uvY;
+        uvtData[i * 3] = uvX;      // u coord
+        uvtData[i * 3 + 1] = uvY;  // v coord
+        uvtData[i * 3 + 2] = 1;    // t coord
         i++;
       }
     }
@@ -218,7 +219,6 @@ class ZProjectSprite extends ZSprite
       for (y in 0...subdivisions + 2) // y
       {
         // Setup point
-        var point2D:Vector2;
         var point3D:Vector3D = new Vector3D(0, 0, 0);
         point3D.x = (w / (subdivisions + 1)) * x;
         point3D.y = (h / (subdivisions + 1)) * y;
@@ -276,16 +276,20 @@ class ZProjectSprite extends ZSprite
         // Apply offset here before it gets affected by z projection!
         point3D.x -= offset.x;
         point3D.y -= offset.y;
-        point2D = applyPerspective(point3D, xPercent, yPercent);
+        point3D = applyPerspective(point3D, xPercent, yPercent);
 
         if (originalWidthHeight != null && autoOffset)
         {
-          point2D.x += (originalWidthHeight.x - spriteGraphic?.frameWidth ?? frameWidth) / 2;
-          point2D.y += (originalWidthHeight.y - spriteGraphic?.frameHeight ?? frameHeight) / 2;
+          point3D.x += (originalWidthHeight.x - spriteGraphic?.frameWidth ?? frameWidth) / 2;
+          point3D.y += (originalWidthHeight.y - spriteGraphic?.frameHeight ?? frameHeight) / 2;
         }
 
-        vertices[i * 2] = point2D.x;
-        vertices[i * 2 + 1] = point2D.y;
+        vertices[i * 2] = point3D.x;
+        vertices[i * 2 + 1] = point3D.y;
+
+        uvtData[i * 3] = xPercent;          				 	// u
+		uvtData[i * 3 + 1] = yPercent;       					// v
+		uvtData[i * 3 + 2] = 1 / Math.max(0.0001, -point3D.z); 	// t
         i++;
       }
     }
@@ -563,7 +567,7 @@ class ZProjectSprite extends ZSprite
     return pos_modified;
   }
 
-  public function applyPerspective(pos:Vector3D, xPercent:Float = 0, yPercent:Float = 0):Vector2
+  public function applyPerspective(pos:Vector3D, xPercent:Float = 0, yPercent:Float = 0):Vector3D
   {
     var w:Float = spriteGraphic?.frameWidth ?? frameWidth;
     var h:Float = spriteGraphic?.frameHeight ?? frameHeight;
@@ -589,6 +593,6 @@ class ZProjectSprite extends ZSprite
       pos_modified.x -= fovOffsetX;
       pos_modified.y -= fovOffsetY;
     }
-    return new Vector2(pos_modified.x, pos_modified.y);
+    return new Vector3D(pos_modified.x, pos_modified.y, pos_modified.z);
   }
 }
