@@ -23,6 +23,7 @@ class DebugNotification extends FlxText
   public function displayText(txtToShow:String = "", color:FlxColor = FlxColor.WHITE, howManySeconds:Float = 5, fadeInSeconds:Float = 0.25,
       fadeOutSeconds:Float = 1):Void
   {
+    if (destroying) return;
     this.text = txtToShow;
     this.color = color;
 
@@ -59,6 +60,7 @@ class DebugNotification extends FlxText
 
   public override function update(elapsed:Float):Void
   {
+    if (destroying) return;
     super.update(elapsed);
     age += elapsed;
   }
@@ -80,8 +82,11 @@ class DebugNotification extends FlxText
     age = 0;
   }
 
+  var destroying:Bool = false;
+
   public override function destroy():Void
   {
+    destroying = true;
     if (alphaTween != null) alphaTween.cancel();
     if (timer != null) timer.cancel();
     timer = null;

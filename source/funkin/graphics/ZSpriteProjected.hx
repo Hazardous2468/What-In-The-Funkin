@@ -228,6 +228,55 @@ class ZSpriteProjected extends ZSprite
   {
     if (destroying) return;
 
+    // TODO: Improve how this gets applied!
+    var wasAlreadyFlipped_X:Bool = flipX;
+    var wasAlreadyFlipped_Y:Bool = flipY;
+
+    var needsFlipX:Bool = false;
+    var needsFlipY:Bool = false;
+    switch (cullMode)
+    {
+      case "always_positive" | "always_negative":
+        needsFlipX = cullMode == "always_positive" ? true : false;
+        needsFlipY = cullMode == "always_positive" ? true : false;
+
+        var xFlipCheck_vertTopLeftX = vertices[0];
+        var xFlipCheck_vertBottomRightX = vertices[vertices.length - 1 - 1];
+        if (!wasAlreadyFlipped_X)
+        {
+          if (xFlipCheck_vertTopLeftX >= xFlipCheck_vertBottomRightX)
+          {
+            needsFlipX = !needsFlipX;
+          }
+        }
+        else
+        {
+          if (xFlipCheck_vertTopLeftX < xFlipCheck_vertBottomRightX)
+          {
+            needsFlipX = !needsFlipX;
+          }
+        }
+        // y check
+        if (!wasAlreadyFlipped_Y)
+        {
+          xFlipCheck_vertTopLeftX = vertices[1];
+          xFlipCheck_vertBottomRightX = vertices[vertices.length - 1];
+          if (xFlipCheck_vertTopLeftX >= xFlipCheck_vertBottomRightX)
+          {
+            needsFlipY = !needsFlipY;
+          }
+        }
+        else
+        {
+          xFlipCheck_vertTopLeftX = vertices[1];
+          xFlipCheck_vertBottomRightX = vertices[vertices.length - 1];
+          if (xFlipCheck_vertTopLeftX < xFlipCheck_vertBottomRightX)
+          {
+            needsFlipY = !needsFlipY;
+          }
+        }
+    }
+
     var w:Float = this.frame.frame.width;
     var h:Float = this.frame.frame.height;
 
@@ -301,11 +350,19 @@ class ZSpriteProjected extends ZSprite
         // Apply offset here before it gets affected by z projection!
         point3D.x -= offset.x;
         point3D.y -= offset.y;
-        var test:Float = point3D.z;
         point3D = applyPerspective(point3D, xPercent, yPercent);
 
         vertices[i * 2] = point3D.x;
         vertices[i * 2 + 1] = point3D.y;
+
+        if (needsFlipX)
+        {
+          xPercent = 1 - xPercent;
+        }
+        if (needsFlipY)
+        {
+          yPercent = 1 - yPercent;
+        }
 
         /* Updating the UV mapping! */
         var uvX:Float = xPercent;
@@ -338,57 +395,6 @@ class ZSpriteProjected extends ZSprite
 
         i++;
       }
-    }
-
-    return;
-
-    // TODO: How to apply this?
-    var wasAlreadyFlipped_X:Bool = flipX;
-    var wasAlreadyFlipped_Y:Bool = flipY;
-
-    var needsFlipX:Bool = false;
-    var needsFlipY:Bool = false;
-    switch (cullMode)
-    {
-      case "always_positive" | "always_negative":
-        needsFlipX = cullMode == "always_positive" ? true : false;
-        needsFlipY = cullMode == "always_positive" ? true : false;
-
-        var xFlipCheck_vertTopLeftX = vertices[0];
-        var xFlipCheck_vertBottomRightX = vertices[vertices.length - 1 - 1];
-        if (!wasAlreadyFlipped_X)
-        {
-          if (xFlipCheck_vertTopLeftX >= xFlipCheck_vertBottomRightX)
-          {
-            needsFlipX = !needsFlipX;
-          }
-        }
-        else
-        {
-          if (xFlipCheck_vertTopLeftX < xFlipCheck_vertBottomRightX)
-          {
-            needsFlipX = !needsFlipX;
-          }
-        }
-        // y check
-        if (!wasAlreadyFlipped_Y)
-        {
-          xFlipCheck_vertTopLeftX = vertices[1];
-          xFlipCheck_vertBottomRightX = vertices[vertices.length - 1];
-          if (xFlipCheck_vertTopLeftX >= xFlipCheck_vertBottomRightX)
-          {
-            needsFlipY = !needsFlipY;
-          }
-        }
-        else
-        {
-          xFlipCheck_vertTopLeftX = vertices[1];
-          xFlipCheck_vertBottomRightX = vertices[vertices.length - 1];
-          if (xFlipCheck_vertTopLeftX < xFlipCheck_vertBottomRightX)
-          {
-            needsFlipY = !needsFlipY;
-          }
-        }
     }
   }
 
@@ -488,7 +494,7 @@ class ZSpriteProjected extends ZSprite
   public var preRotationMoveY:Float = 0;
   public var preRotationMoveZ:Float = 0;
 
-  var skewOffsetFix:Float = 0.0;
+  var skewOffsetFix:Float = 0.5;
 
   public function applySkew(pos:Vector3D, xPercent:Float, yPercent:Float, w:Float, h:Float):Vector3D
   {

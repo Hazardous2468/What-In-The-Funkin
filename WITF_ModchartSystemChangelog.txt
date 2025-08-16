@@ -1,9 +1,5 @@
 v1.0.0a EARLY:
 
-WIP:
-ZProjectSprite deprecated. Use ZSpriteProjected instead!
-ZSprites and ZSpriteProjected now auto apply their perspective. No more manually calling applyPerspective to each ZSprite.
-
 THIS UPDATE WILL REQUIRE MODCHARTS TO BE UPDATED DUE TO MODIFIER MATH CHANGES! (see below)
 
 Updated to version v0.7.3 of FNF
@@ -81,6 +77,9 @@ Stage (untested)
 
 Cat now has the doodle note skin (ported from Inhuman)
 Emergency Reset now has the Inhuman pause music
+
+ZProjectSprite deprecated. Use ZSpriteProjected instead!
+ZSprites and ZSpriteProjected now auto apply their perspective. No more manually calling applyPerspective to each ZSprite.
 
 
 Modchart breaking changes to be aware of:
