@@ -297,9 +297,9 @@ class NotesRotateXModifier extends RotateModBase
     pathMod = true;
   }
 
-  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    strumRotateFunc(data, strumLine, "x");
+    noteRotateFunc(data, strumLine, "x");
   }
 }
 

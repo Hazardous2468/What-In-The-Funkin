@@ -499,6 +499,9 @@ class ModConstants
     {
       bfTarget = true;
     }
+
+    if (ModConstants.invertStrumlineTarget) bfTarget = !bfTarget;
+
     // Controls whether or not the noteData is gotten straight from the strumline, or the currentChart stored in PlayState.
     var useStrumlineChart:Bool = true;
     @:privateAccess
@@ -844,17 +847,20 @@ class ModConstants
     return a - b * Math.floor(a / b);
   }
 
+  // Used by the metaMods script to invert which character gets targetted by mods.
+  static var invertStrumlineTarget:Bool = false;
+
   public static function grabStrumModTarget(playerTarget:String = "bf"):ModHandler
   {
     var modsTarget:ModHandler = PlayState.instance.playerStrumline.mods;
     if (playerTarget == "dad" || playerTarget == "opponent" || playerTarget == "2")
     {
-      modsTarget = PlayState.instance.opponentStrumline.mods;
+      modsTarget = invertStrumlineTarget ? PlayState.instance.playerStrumline.mods : PlayState.instance.opponentStrumline.mods;
       return modsTarget;
     }
     else if (playerTarget == "bf" || playerTarget == "boyfriend" || playerTarget == "1")
     {
-      modsTarget = PlayState.instance.playerStrumline.mods;
+      modsTarget = invertStrumlineTarget ? PlayState.instance.opponentStrumline.mods : PlayState.instance.playerStrumline.mods;
       return modsTarget;
     }
 
