@@ -24,6 +24,16 @@ class NoteHoldCover extends FlxTypedSpriteGroup<ZSprite>
 
   var noteStyle:NoteStyle;
 
+  // Custom position logic added by WITF that positions holdCovers at the ends of holds (where they get clipped) instead of at the strumNote.
+  public var holdPositioned(default, set):Bool;
+
+  function set_holdPositioned(value:Bool):Bool
+  {
+    if (glow != null) glow.autoCalculatePerspective = !value;
+    holdPositioned = value;
+    return holdPositioned;
+  }
+
   public function new(noteStyle:NoteStyle)
   {
     super(0, 0);
@@ -50,6 +60,8 @@ class NoteHoldCover extends FlxTypedSpriteGroup<ZSprite>
     this.noteStyle = noteStyle;
 
     glow = new ZSprite();
+    glow.isHoldCover = true;
+    glow.coverBehindStrums = noteStyle.holdCoversBehindStrums();
     add(glow);
 
     // TODO: null check here like how NoteSplash does
@@ -62,28 +74,37 @@ class NoteHoldCover extends FlxTypedSpriteGroup<ZSprite>
       trace('WARNING: NoteHoldCover failed to initialize all animations.');
     }
 
-    // TODO -> MAKE THIS WORK PROPERLY FOR DIFFERENT HOLD COVERS!
-
-    @:privateAccess
-    var assetPath:String = noteStyle.getHoldCoverDirectionAssetPath(holdNoteDir, true);
-    if (!StringTools.contains(assetPath, "pixelNoteHoldCover"))
+    var holdOrigin = noteStyle.getHoldCoverOrigin();
+    if (holdOrigin == null)
     {
-      glow.origin.set(160.5, 150); // Magic numbers which make it rotate from the center properly!
+      autoOrigin = true;
+    }
+    else
+    {
+      if (holdOrigin.length >= 2 && holdOrigin[2] >= 1)
+      {
+        autoOrigin = true;
+      }
+      else
+      {
+        autoOrigin = false;
+        this.glow.origin.set(holdOrigin[0], holdOrigin[1]); // Magic numbers which make it rotate from the center properly!
+      }
     }
   }
 
+  public var autoOrigin:Bool = false;
+
   public override function update(elapsed):Void
   {
-    var o = noteStyle.getHoldCoverZCalcOffsetMultipliers();
-    glow.perspectiveWidth = glow.width * o[0];
-    glow.perspectiveHeight = glow.height * o[1];
+    if (autoOrigin) glow.centerOrigin();
+    if (!holdPositioned)
+    {
+      var o = noteStyle.getHoldCoverZCalcOffsetMultipliers();
+      glow.perspectiveWidth = glow.width * o[0];
+      glow.perspectiveHeight = glow.height * o[1];
+    }
     super.update(elapsed);
-  }
-
-  public function applyPerspective()
-  {
-    if (glow != null) ModConstants.applyPerspective(glow);
-    if (sparks != null) ModConstants.applyPerspective(sparks);
   }
 
   public function playStart():Void
@@ -104,8 +125,7 @@ class NoteHoldCover extends FlxTypedSpriteGroup<ZSprite>
 
   public function playEnd():Void
   {
-    var direction:NoteDirection = holdNote.noteDirection;
-    holdNoteDir = holdNote.noteDirection;
+    var direction:NoteDirection = holdNote?.noteDirection ?? holdNoteDir;
     glow.animation.play('holdCoverEnd${direction.colorName.toTitleCase()}');
     glow.shader = hsvShader;
   }
@@ -116,7 +136,7 @@ class NoteHoldCover extends FlxTypedSpriteGroup<ZSprite>
 
     this.visible = false;
 
-    holdNote.cover = null;
+    if (holdNote != null) holdNote.cover = null;
 
     if (glow != null) glow.visible = false;
     if (sparks != null) sparks.visible = false;

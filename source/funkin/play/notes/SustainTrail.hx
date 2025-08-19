@@ -1501,6 +1501,12 @@ class SustainTrail extends ZSprite
 
     hitNote = false;
     missedNote = false;
+
+    if (cover != null)
+    {
+      cover.holdNote = null;
+      this.cover = null;
+    }
   }
 
   public override function revive():Void

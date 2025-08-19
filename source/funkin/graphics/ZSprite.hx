@@ -155,4 +155,10 @@ class ZSprite extends FunkinSkewedSprite
       lastKnownPosition.z = this.z + this.z2;
     }
   }
+
+  // Dumb silly way of identifying whether this is a holdCover or not as holdCovers don't use a special class
+  public var isHoldCover:Bool = false;
+
+  // ditto but for whether it's meant to be behind strums (for zsort)
+  public var coverBehindStrums:Bool = false;
 }

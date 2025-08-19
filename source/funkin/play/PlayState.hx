@@ -60,6 +60,8 @@ import funkin.play.notes.NoteSprite;
 import funkin.play.notes.Strumline;
 import funkin.play.notes.StrumlineNote;
 import funkin.play.notes.SustainTrail;
+import funkin.play.notes.NoteHoldCover;
+import funkin.play.notes.NoteSplash;
 import funkin.play.notes.notekind.NoteKindManager;
 import funkin.play.notes.notestyle.NoteStyle;
 import funkin.play.notes.NoteVibrationsHandler;
@@ -720,9 +722,43 @@ class PlayState extends MusicBeatSubState
     return FlxSort.byValues(order, a?.z + ((a?.zIndex ?? 0) * 0.01), b?.z + ((b?.zIndex ?? 0) * 0.01));
   }
 
+  // Offset for paths in zSort mode
   public var zSortMod_PathOffset:Float = -10000; // paths should always try and render below the notes!
-  public var zSortMod_SustainOffset:Float = -1.33333;
+  // Offset for sustains in zSort mode
+  public var zSortMod_SustainOffset:Float = -15;
+  // Offset for strumlineNotes in zSort mode
   public var zSortMod_StrumNoteOffset:Float = -0.4;
+  // Offset for note splashes in zSort mode
+  public var zSortMod_SplashOffset:Float = 3;
+  // Offset for hold covers in zSort mode
+  public var zSortMod_CoverOffset:Float = 3;
+  // Offset for hold covers in zSort mode IF set to behind strums
+  public var zSortMod_CoverBehindOffset:Float = -11.5;
+
+  function offsetValueBasedOnType(a):Float
+  {
+    if (a.isHoldCover)
+    {
+      return a.coverBehindStrums ? zSortMod_CoverBehindOffset : zSortMod_CoverOffset;
+    }
+    else if (Std.isOfType(a, SustainTrail))
+    {
+      var pcheck:SustainTrail = cast(a, SustainTrail);
+      return pcheck.isArrowPath ? zSortMod_PathOffset : zSortMod_SustainOffset;
+    }
+    else if (Std.isOfType(a, StrumlineNote))
+    {
+      return zSortMod_StrumNoteOffset;
+    }
+    else if (Std.isOfType(a, NoteSplash))
+    {
+      return zSortMod_SplashOffset;
+    }
+    else
+    {
+      return 0;
+    }
+  }
 
   function compareZSprites_playfields(order:Int, a:ZSprite, b:ZSprite):Int
   {
@@ -730,25 +766,10 @@ class PlayState extends MusicBeatSubState
     var b_value:Float = b.z;
 
     // push the sustain and strumlinenotes back a bit to try and keep their correct layering. Note they can still layer over each other with a big enough z difference.
-    // Set the offset variables to extremely high values to prevent this from ever occuring (also keep the sustains at the far back for example)
-    if (Std.isOfType(a, SustainTrail))
-    {
-      var pcheck:SustainTrail = cast(a, SustainTrail);
-      a_value += pcheck.isArrowPath ? zSortMod_PathOffset : zSortMod_SustainOffset;
-    }
-    if (Std.isOfType(b, SustainTrail))
-    {
-      var pcheck:SustainTrail = cast(b, SustainTrail);
-      b_value += pcheck.isArrowPath ? zSortMod_PathOffset : zSortMod_SustainOffset;
-    }
-    if (Std.isOfType(a, StrumlineNote))
-    {
-      a_value += zSortMod_StrumNoteOffset;
-    }
-    if (Std.isOfType(b, StrumlineNote))
-    {
-      b_value += zSortMod_StrumNoteOffset;
-    }
+    // Set the offset variables to extremely high values to prevent this from ever occuring (like keep the sustains at the far back for example)
+
+    a_value += offsetValueBasedOnType(a);
+    b_value += offsetValueBasedOnType(b);
 
     if (a_value == b_value) // If they are equal, try and use zIndex to break the tie.
     {
@@ -778,6 +799,8 @@ class PlayState extends MusicBeatSubState
         strumLine.holdNotes.visible = !v;
         strumLine.strumlineNotes.visible = !v;
         strumLine.arrowPaths.visible = !v;
+        strumLine.noteSplashes.visible = !v;
+        strumLine.noteHoldCovers.visible = !v;
 
         // Grab everything and throw it into the spritegroup!
         if (noteRenderMode)
@@ -791,8 +814,13 @@ class PlayState extends MusicBeatSubState
           strumLine.holdNotes.forEach(function(note:ZSprite) {
             allStrumSprites.add(note);
           });
-          strumLine.arrowPaths.forEach(function(note:ZSprite) {
+
+          strumLine.noteSplashes.forEach(function(note:ZSprite) {
             allStrumSprites.add(note);
+          });
+
+          strumLine.noteHoldCovers.forEach(function(note:NoteHoldCover) {
+            allStrumSprites.add(note.glow);
           });
         }
         else

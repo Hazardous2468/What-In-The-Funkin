@@ -394,6 +394,16 @@ class NoteStyle implements IRegistryEntry<NoteStyleData>
     return _data?.assets?.holdNote?.data?.behindStrums ?? fallback?.holdsBehindStrums() ?? false;
   }
 
+  public function holdCoversBehindStrums():Bool
+  {
+    return _data?.assets?.holdNoteCover?.data?.behindStrums ?? fallback?.holdCoversBehindStrums() ?? false;
+  }
+
+  public function holdCoverVanillaPositionLogic():Bool
+  {
+    return !(_data?.assets?.holdNoteCover?.data?.holdPositioned ?? fallback?.holdCoverVanillaPositionLogic() ?? false);
+  }
+
   public function isHoldNoteCoverEnabled():Bool
   {
     return _data?.assets?.holdNoteCover?.data?.enabled ?? fallback?.isHoldNoteCoverEnabled() ?? false;
@@ -1242,6 +1252,11 @@ class NoteStyle implements IRegistryEntry<NoteStyleData>
   public function getHoldCoverOffsets():Array<Float>
   {
     return _data?.assets?.holdNoteCover?.offsets ?? fallback?.getHoldCoverOffsets() ?? [0.0, 0.0];
+  }
+
+  public function getHoldCoverOrigin():Null<Array<Float>>
+  {
+    return _data?.assets?.holdNoteCover?.data?.origin ?? fallback?.getHoldCoverOrigin() ?? [0.0, 0.0, 1.0];
   }
 
   public function destroy():Void {}

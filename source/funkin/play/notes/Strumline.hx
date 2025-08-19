@@ -292,8 +292,6 @@ class Strumline extends FlxSpriteGroup
 
   var heldKeys:Array<Bool> = [];
 
-  var holdsBehindStrums:Bool = false;
-
   static final BACKGROUND_PAD:Int = 16;
 
   /**
@@ -325,6 +323,40 @@ class Strumline extends FlxSpriteGroup
     this.add(notitgPathSprite);
   }
 
+  function setupNoteGroup(groupStr:String, index:Int)
+  {
+    var group:Dynamic;
+    switch (groupStr)
+    {
+      case "holdNotesVwoosh":
+        group = new FlxTypedSpriteGroup<SustainTrail>();
+        this.holdNotesVwoosh = group;
+      case "holdNotes":
+        group = new FlxTypedSpriteGroup<SustainTrail>();
+        this.holdNotes = group;
+      case "notesVwoosh":
+        group = new FlxTypedSpriteGroup<NoteSprite>();
+        this.notesVwoosh = group;
+      case "notes":
+        group = new FlxTypedSpriteGroup<NoteSprite>();
+        this.notes = group;
+      case "strumlineNotes":
+        group = new FlxTypedSpriteGroup<StrumlineNote>();
+        this.strumlineNotes = group;
+      case "noteHoldCovers":
+        group = new FlxTypedSpriteGroup<NoteHoldCover>(0, 0, 4);
+        this.noteHoldCovers = group;
+      case "noteSplashes":
+        group = new FlxTypedSpriteGroup<NoteSplash>(0, 0, NOTE_SPLASH_CAP);
+        this.noteSplashes = group;
+      default:
+        return null;
+    }
+    group.zIndex = index;
+    this.add(group);
+    return group;
+  }
+
   public function new(noteStyle:NoteStyle, isPlayer:Bool, modchartSong:Bool = false)
   {
     super();
@@ -334,11 +366,13 @@ class Strumline extends FlxSpriteGroup
     this.defaultPlayerControl = isPlayer;
     this.noteStyle = noteStyle;
 
-    holdsBehindStrums = noteStyle.holdsBehindStrums();
-    if (noteStyle.id.toLowerCase() == "pixel")
-    {
-      holdCoverRotate = false; // Because pixel hold covers are fucked
-    }
+    var holdsBehindStrums:Bool = noteStyle.holdsBehindStrums();
+    var holdCoversBehindStrums:Bool = noteStyle.holdCoversBehindStrums();
+
+    // if (noteStyle.id.toLowerCase() == "pixel")
+    // {
+    //  holdCoverRotate = false; // Because pixel hold covers are fucked
+    // }
 
     if (modchartSong)
     {
@@ -347,50 +381,31 @@ class Strumline extends FlxSpriteGroup
 
     if (holdsBehindStrums)
     {
-      // Hold notes are added first so they render behind regular notes.
-      this.holdNotes = new FlxTypedSpriteGroup<SustainTrail>();
-      this.holdNotes.zIndex = 8;
-      this.add(this.holdNotes);
-
-      this.holdNotesVwoosh = new FlxTypedSpriteGroup<SustainTrail>();
-      this.holdNotesVwoosh.zIndex = 9;
-      this.add(this.holdNotesVwoosh);
-
-      this.strumlineNotes = new FlxTypedSpriteGroup<StrumlineNote>();
-      this.strumlineNotes.zIndex = 10;
-      this.add(this.strumlineNotes);
+      setupNoteGroup("holdNotes", 8);
+      setupNoteGroup("holdNotesVwoosh", 9);
     }
-    else
+
+    if (holdCoversBehindStrums)
     {
-      this.strumlineNotes = new FlxTypedSpriteGroup<StrumlineNote>();
-      this.strumlineNotes.zIndex = 10;
-      this.add(this.strumlineNotes);
+      setupNoteGroup("noteHoldCovers", 10);
+    }
+    setupNoteGroup("strumlineNotes", 11);
 
-      // Hold notes are added first so they render behind regular notes.
-      this.holdNotes = new FlxTypedSpriteGroup<SustainTrail>();
-      this.holdNotes.zIndex = 20;
-      this.add(this.holdNotes);
-
-      this.holdNotesVwoosh = new FlxTypedSpriteGroup<SustainTrail>();
-      this.holdNotesVwoosh.zIndex = 21;
-      this.add(this.holdNotesVwoosh);
+    if (!holdsBehindStrums)
+    {
+      setupNoteGroup("holdNotes", 20);
+      setupNoteGroup("holdNotesVwoosh", 21);
     }
 
-    this.notes = new FlxTypedSpriteGroup<NoteSprite>();
-    this.notes.zIndex = 30;
-    this.add(this.notes);
+    setupNoteGroup("notes", 30);
+    setupNoteGroup("notesVwoosh", 31);
 
-    this.notesVwoosh = new FlxTypedSpriteGroup<NoteSprite>();
-    this.notesVwoosh.zIndex = 31;
-    this.add(this.notesVwoosh);
+    if (!holdCoversBehindStrums)
+    {
+      setupNoteGroup("noteHoldCovers", 40);
+    }
 
-    this.noteHoldCovers = new FlxTypedSpriteGroup<NoteHoldCover>(0, 0, 4);
-    this.noteHoldCovers.zIndex = 40;
-    this.add(this.noteHoldCovers);
-
-    this.noteSplashes = new FlxTypedSpriteGroup<NoteSplash>(0, 0, NOTE_SPLASH_CAP);
-    this.noteSplashes.zIndex = 50;
-    this.add(this.noteSplashes);
+    setupNoteGroup("noteSplashes", 50);
 
     if (modchartSong)
     {
@@ -1644,15 +1659,77 @@ class Strumline extends FlxSpriteGroup
 
   function noteCoverSetPos(cover:NoteHoldCover):Void
   {
-    var whichStrumNote:StrumlineNote = getByIndex(cover.holdNoteDir % KEY_COUNT);
+    if (cover.glow == null) return;
 
     var noteStyleScale:Float = noteStyle.getHoldCoverScale();
+    var whichStrumNote:StrumlineNote = getByIndex(cover.holdNoteDir % KEY_COUNT);
+    var spiralHolds:Bool = whichStrumNote.strumExtraModData?.usingSpiralHolds(false) ?? false;
 
-    var ay:Float = whichStrumNote.alpha;
-    ay -= whichStrumNote.strumExtraModData.alphaHoldCoverMod;
-
-    if (cover.glow != null)
+    if (cover.holdPositioned)
     {
+      if (cover.holdNote != null)
+      {
+        var daHold:SustainTrail = cover.holdNote;
+
+        var v:Array<Float> = daHold.vertices_array;
+
+        // v[0] = first x pos
+        // v[2] = second x pos
+        // +1 for y
+
+        var holdX:Float = v[0] + ((v[2] - v[0]) / 2);
+        var holdY:Float = v[0 + 1] + ((v[2 + 1] - v[0 + 1]) / 2);
+
+        @:privateAccess var holdZ:Float = daHold.holdRootZ;
+        @:privateAccess var holdScaleX:Float = daHold.holdRootScaleX;
+        @:privateAccess var holdScaleY:Float = daHold.holdRootScaleY;
+
+        cover.x = holdX;
+        cover.y = holdY;
+
+        cover.glow.scale.set(noteStyleScale * noteStyle._data?.assets?.holdNoteCover?.data?.scaleX ?? 1.0, noteStyleScale);
+        cover.glow.scale.x *= holdScaleX;
+        cover.glow.scale.y *= holdScaleY;
+
+        // todo, rotate this offset based on angle
+        var offsetX:Float = noteStyle.getHoldCoverOffsets()[0] * cover.scale.x;
+        var offsetY:Float = noteStyle.getHoldCoverOffsets()[1] * cover.scale.y;
+        var daAngle:Float = 0;
+        if (spiralHolds && holdCoverRotate)
+        {
+          if (cover.holdNote != null) daAngle = cover.holdNote.baseAngle;
+        }
+
+        cover.x += offsetX;
+        cover.y += offsetY;
+
+        cover.x -= cover.glow.width / 2;
+        cover.y -= cover.glow.height / 2;
+
+        cover.glow.x = cover.x;
+        cover.glow.y = cover.y;
+        cover.glow.z = holdZ;
+
+        cover.glow.alpha = daHold.alpha - whichStrumNote.strumExtraModData.alphaHoldCoverMod;
+
+        if (holdCoverSkew)
+        {
+          cover.glow.skew.x = whichStrumNote.skew.x;
+          cover.glow.skew.y = whichStrumNote.skew.y;
+          cover.glow.skew.x += whichStrumNote.noteModData.skewX_playfield;
+          cover.glow.skew.y += whichStrumNote.noteModData.skewY_playfield;
+        }
+
+        ModConstants.applyPerspective(cover.glow, cover.glow.width, cover.glow.height);
+        cover.glow.x = cover.x;
+        cover.glow.y = cover.y;
+      }
+    }
+    else
+    {
+      var ay:Float = whichStrumNote.alpha;
+      ay -= whichStrumNote.strumExtraModData.alphaHoldCoverMod;
+
       cover.glow.scale.set(noteStyleScale, noteStyleScale);
 
       if (whichStrumNote.strumExtraModData.holdCoverCopyStrumScale)
@@ -1679,20 +1756,11 @@ class Strumline extends FlxSpriteGroup
       var strumStartY:Float = this.y + noteStyle.getStrumlineOffsets()[1];
       cover.x += (whichStrumNote.x - strumStartX);
       cover.y += (whichStrumNote.y - strumStartY);
+      cover.glow.alpha = ay;
 
       cover.glow.x = cover.x;
       cover.glow.y = cover.y;
       cover.glow.z = whichStrumNote.z;
-      cover.glow.alpha = ay;
-      var spiralHolds:Bool = whichStrumNote.strumExtraModData?.usingSpiralHolds(false) ?? false;
-      if (spiralHolds && holdCoverRotate)
-      {
-        cover.glow.angle = cover.holdNote.baseAngle;
-      }
-      else // Fix for if spiral holds get disabled, the covers stay rotated.
-      {
-        cover.glow.angle = 0;
-      }
 
       if (holdCoverSkew)
       {
@@ -1711,9 +1779,18 @@ class Strumline extends FlxSpriteGroup
           cover.glow.skew.y += whichStrumNote.noteModData.skewY_playfield;
         }
       }
-
-      cover.glow.perspectiveCenterOffset = whichStrumNote.noteModData.perspectiveOffset;
     }
+
+    if (spiralHolds && holdCoverRotate)
+    {
+      if (cover.holdNote != null) cover.glow.angle = cover.holdNote.baseAngle;
+    }
+    else // Fix for if spiral holds get disabled, the covers stay rotated.
+    {
+      cover.glow.angle = 0;
+    }
+
+    cover.glow.perspectiveCenterOffset = whichStrumNote.noteModData.perspectiveOffset;
   }
 
   function noteSplashSetPos(splash:NoteSplash, direction:Int):Void
@@ -1788,6 +1865,8 @@ class Strumline extends FlxSpriteGroup
       {
         cover.setHSV(holdNote.hsvShader.hue, holdNote.hsvShader.saturation, holdNote.hsvShader.value);
       }
+
+      cover.holdPositioned = !noteStyle.holdCoverVanillaPositionLogic();
 
       if (mods != null)
       {
@@ -1921,6 +2000,14 @@ class Strumline extends FlxSpriteGroup
       result = new NoteSplash(noteStyle);
       this.noteSplashes.add(result);
       result.weBelongTo = this;
+
+      if (PlayState.instance != null)
+      {
+        if (PlayState.instance.allStrumSprites != null && PlayState.instance.noteRenderMode)
+        {
+          PlayState.instance.allStrumSprites.add(result);
+        }
+      }
     }
     else
     {
@@ -1954,7 +2041,15 @@ class Strumline extends FlxSpriteGroup
     {
       // Create a new note hold cover.
       result = new NoteHoldCover(noteStyle);
+      result.glow.weBelongTo = this;
       this.noteHoldCovers.add(result);
+      if (PlayState.instance != null)
+      {
+        if (PlayState.instance.allStrumSprites != null && PlayState.instance.noteRenderMode && result.glow != null)
+        {
+          PlayState.instance.allStrumSprites.add(result.glow);
+        }
+      }
     }
     else
     {
@@ -2047,6 +2142,7 @@ class Strumline extends FlxSpriteGroup
       // We have to create a new note.
       result = new SustainTrail(0, 0, noteStyle, false, this);
       this.holdNotes.add(result);
+      result.weBelongTo = this;
       if (PlayState.instance != null)
       {
         if (PlayState.instance.allStrumSprites != null && PlayState.instance.noteRenderMode)

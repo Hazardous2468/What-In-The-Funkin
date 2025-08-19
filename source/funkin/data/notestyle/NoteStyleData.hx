@@ -334,7 +334,40 @@ typedef NoteStyleData_HoldNoteCover =
   var copyHSV:Bool;
 
   /**
-   * Use to adjust the width and height in the zPerspective Calcs. Note that this is a multiplier!
+   * If true, the cover is rendered behind the strums / receptors!
+   * @default Covers are rendered in front by default!
+   */
+  @:optional
+  @:default(false)
+  var behindStrums:Bool;
+
+  /**
+   * If true, the cover is positioned ontop of the strumline notes like default.
+   * If false, the cover is positioned at the very end of the hold note instead (where it is being clipped).
+   * @default Default vanilla behaviour
+   */
+  @:optional
+  @:default(false)
+  var holdPositioned:Bool;
+
+  /**
+   * Scale Multiplier on the x axis to stretch a hold cover for wider hold note sprites
+   * @default 1.0
+   */
+  @:default(1.0)
+  @:optional
+  var scaleX:Null<Float>;
+
+  /**
+   * Use to mark the origin point of the sprite (in pixels)
+   * @default The 3rd slot refers to whether autoOrigin should be enabled or not. (origin[2] >= 1 means enabled)
+   */
+  @:optional
+  @:default([0.0, 0.0, 1])
+  var origin:Null<Array<Float>>;
+
+  /**
+   * Use to adjust the width and height in the zPerspective Calcs. Note that this is a multiplier based on the width / height!
    * Default values based on making funkin notestyle work.
    * @default [1.08, 0.75]
    */
