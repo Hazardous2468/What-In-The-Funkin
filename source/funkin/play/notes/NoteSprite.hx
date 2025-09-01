@@ -19,7 +19,9 @@ class NoteSprite extends ZSpriteProjected
 
   static final DIRECTION_COLORS:Array<String> = ['purple', 'blue', 'green', 'red'];
 
-  // The holdNoteSprite attached to this note sprite, if it exists.
+  /**
+   * The hold note sprite for this note.
+   */
   public var holdNoteSprite:SustainTrail;
 
   // The Hue, Saturation, Value Shader attached to this note sprites. Mainly used for quant coloured note styles
@@ -109,8 +111,23 @@ class NoteSprite extends ZSpriteProjected
     return this.direction;
   }
 
+  /**
+   * The note data associated with this note sprite.
+   * This is used to store the strum time, length, and other properties.
+   */
   public var noteData:SongNoteData;
 
+  /**
+   * If this note kind is scoreable (i.e., counted towards score and accuracy)
+   * Only accessible in scripts
+   * Defaults to true
+   */
+  public var scoreable:Bool = true;
+
+  /**
+   * Whether this note is a hold note.
+   * This is true if the length is greater than 0.
+   */
   public var isHoldNote(get, never):Bool;
 
   function get_isHoldNote():Bool
@@ -214,6 +231,7 @@ class NoteSprite extends ZSpriteProjected
     stealthGlowGreen = 1.0;
     stealthGlowRed = 1.0;
     updateStealthGlow();
+
     targetScale = this.scale.x;
 
     // `false` disables the update() function for performance.
@@ -268,11 +286,13 @@ class NoteSprite extends ZSpriteProjected
   public function desaturate():Void
   {
     this.hsvShader.saturation = 0.2;
+    this.shader = this.hsvShader;
   }
 
   public function setHue(hue:Float):Void
   {
     this.hsvShader.hue = hue;
+    if (hue != 1.0) this.shader = this.hsvShader;
   }
 
   public override function revive():Void
@@ -285,8 +305,12 @@ class NoteSprite extends ZSpriteProjected
     this.hasBeenHit = false;
     this.mayHit = false;
     this.hasMissed = false;
-    vwooshing = false;
+    this.handledMiss = false;
+    this.holdNoteSprite = null;
 
+    // The hsvShader should only be applied when it's necessary.
+    // Otherwise, it should be turned off to keep note batching.
+    this.shader = null;
     this.hsvShader.hue = 1.0;
     this.hsvShader.saturation = 1.0;
     this.hsvShader.value = 1.0;

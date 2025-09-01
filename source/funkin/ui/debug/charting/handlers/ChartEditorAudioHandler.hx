@@ -140,6 +140,8 @@ class ChartEditorAudioHandler
     result = playVocals(state, DAD, opponentId, instId);
     // if (!result) return false;
 
+    state.postLoadVocals();
+
     state.hardRefreshOffsetsToolbox();
 
     state.hardRefreshFreeplayToolbox();

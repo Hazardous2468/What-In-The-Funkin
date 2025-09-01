@@ -26,7 +26,7 @@ import funkin.Highscore.Tallies;
 import funkin.api.newgrounds.Events;
 import funkin.audio.FunkinSound;
 import funkin.audio.VoicesGroup;
-import funkin.data.dialogue.conversation.ConversationRegistry;
+import funkin.data.dialogue.ConversationRegistry;
 import funkin.data.event.SongEventRegistry;
 import funkin.data.notestyle.NoteStyleRegistry;
 import funkin.data.song.SongData.SongCharacterData;
@@ -56,6 +56,8 @@ import funkin.play.modchartSystem.HazardModLuaTest;
 import funkin.play.modchartSystem.ModEventHandler;
 import funkin.play.modchartSystem.ModHandler;
 import funkin.play.notes.NoteDirection;
+import funkin.play.notes.notekind.NoteKindManager;
+import funkin.play.notes.notekind.NoteKind;
 import funkin.play.notes.NoteSprite;
 import funkin.play.notes.Strumline;
 import funkin.play.notes.StrumlineNote;
@@ -164,6 +166,7 @@ typedef PlayStateParams =
  * The gameplay state, where all the rhythm gaming happens.
  * SubState so it can be loaded as a child of the chart editor.
  */
+@:nullSafety
 class PlayState extends MusicBeatSubState
 {
   /**
@@ -175,13 +178,13 @@ class PlayState extends MusicBeatSubState
    * The currently active PlayState.
    * There should be only one PlayState in existance at a time, we can use a singleton.
    */
-  public static var instance:PlayState = null;
+  public static var instance:Null<PlayState>;
 
   /**
    * This sucks. We need this because FlxG.resetState(); assumes the constructor has no arguments.
    * @see https://github.com/HaxeFlixel/flixel/issues/2541
    */
-  static var lastParams:PlayStateParams = null;
+  static var lastParams:Null<PlayStateParams>;
 
   /**
    * PUBLIC INSTANCE VARIABLES
@@ -191,7 +194,7 @@ class PlayState extends MusicBeatSubState
   /**
    * The currently selected stage.
    */
-  public var currentSong:Song = null;
+  public var currentSong:Song;
 
   /**
    * The currently selected difficulty.
@@ -212,7 +215,7 @@ class PlayState extends MusicBeatSubState
   /**
    * The currently active Stage. This is the object containing all the props.
    */
-  public var currentStage:Stage = null;
+  public var currentStage:Null<Stage> = null;
 
   /**
    * Gets set to true when the PlayState needs to reset (player opted to restart or died).
@@ -268,12 +271,12 @@ class PlayState extends MusicBeatSubState
    * An FlxTween that tweens the camera to the follow point.
    * Only used when tweening the camera manually, rather than tweening via follow.
    */
-  public var cameraFollowTween:FlxTween;
+  public var cameraFollowTween:Null<FlxTween>;
 
   /**
    * An FlxTween that zooms the camera to the desired amount.
    */
-  public var cameraZoomTween:FlxTween;
+  public var cameraZoomTween:Null<FlxTween>;
 
   /**
    * An FlxTween that changes the additive speed to the desired amount.
@@ -284,7 +287,7 @@ class PlayState extends MusicBeatSubState
    * The camera follow point from the last stage.
    * Used to persist the position of the `cameraFollowPosition` between levels.
    */
-  public var previousCameraFollowPoint:FlxPoint = null;
+  public var previousCameraFollowPoint:Null<FlxPoint>;
 
   /**
    * The current camera zoom level without any modifiers applied.
@@ -336,6 +339,13 @@ class PlayState extends MusicBeatSubState
    * @default One camera zoom per measure (four beats).
    */
   public var cameraZoomRate:Int = Constants.DEFAULT_ZOOM_RATE;
+
+  /**
+   * How many beats (quarter notes) the zoom rate is offset.
+   * For if you want the zoom to happen off-beat.
+   * @default Zero beats (on-beat).
+   */
+  public var cameraZoomRateOffset:Int = Constants.DEFAULT_ZOOM_OFFSET;
 
   /**
    * Whether the game is currently in the countdown before the song resumes.
@@ -398,7 +408,7 @@ class PlayState extends MusicBeatSubState
   /**
    * The current dialogue.
    */
-  public var currentConversation:Conversation;
+  public var currentConversation:Null<Conversation>;
 
   /**
    * Key press inputs which have been received but not yet processed.
@@ -418,6 +428,11 @@ class PlayState extends MusicBeatSubState
   var justUnpaused:Bool = false;
 
   /**
+   * The current note style used by the song.
+   */
+  var noteStyle:NoteStyle;
+
+  /**
    * PRIVATE INSTANCE VARIABLES
    * Private instance variables should be used for information that must be reset or dereferenced
    * every time the state is reset, but should not be accessed externally.
@@ -426,7 +441,7 @@ class PlayState extends MusicBeatSubState
    * The Array containing the upcoming song events.
    * The `update()` function regularly shifts these out to trigger events.
    */
-  var songEvents:Array<SongEventData>;
+  var songEvents:Array<SongEventData> = [];
 
   /**
    * If true, the player is allowed to pause the game.
@@ -485,7 +500,7 @@ class PlayState extends MusicBeatSubState
   /**
    * A group of audio tracks, used to play the song's vocals.
    */
-  public var vocals:VoicesGroup;
+  public var vocals:Null<VoicesGroup>;
 
   #if FEATURE_DISCORD_RPC
   // Discord RPC variables
@@ -516,12 +531,12 @@ class PlayState extends MusicBeatSubState
   /**
    * The health icon representing the player.
    */
-  public var iconP1:HealthIcon;
+  public var iconP1:Null<HealthIcon>;
 
   /**
    * The health icon representing the opponent.
    */
-  public var iconP2:HealthIcon;
+  public var iconP2:Null<HealthIcon>;
 
   /**
    * The sprite group containing active player's strumline notes.
@@ -612,9 +627,9 @@ class PlayState extends MusicBeatSubState
    * Data for the current difficulty for the current song.
    * Includes chart data, scroll speed, and other information.
    */
-  public var currentChart(get, never):SongDifficulty;
+  public var currentChart(get, never):Null<SongDifficulty>;
 
-  function get_currentChart():SongDifficulty
+  function get_currentChart():Null<SongDifficulty>
   {
     if (currentSong == null || currentDifficulty == null) return null;
     return currentSong.getDifficulty(currentDifficulty, currentVariation);
@@ -628,8 +643,8 @@ class PlayState extends MusicBeatSubState
 
   function get_currentStageId():String
   {
-    if (currentChart == null || currentChart.stage == null || currentChart.stage == '') return Constants.DEFAULT_STAGE;
-    return currentChart.stage;
+    var stage:String = currentChart?.stage ?? '';
+    return stage == '' ? Constants.DEFAULT_STAGE : stage;
   }
 
   /**
@@ -639,7 +654,7 @@ class PlayState extends MusicBeatSubState
 
   function get_currentSongLengthMs():Float
   {
-    return FlxG?.sound?.music?.length;
+    return FlxG.sound.music?.length ?? 0;
   }
 
   // HAZARD MODCHART VARS
@@ -984,6 +999,17 @@ class PlayState extends MusicBeatSubState
    */
   static final RESYNC_THRESHOLD:Float = 40;
 
+  /**
+   * The threshold for how much the conductor lerp can drift from the music.
+   * If the conductor song position deviate from the music by more than this amount, then a normal conductor update is triggered.
+   */
+  static final CONDUCTOR_DRIFT_THRESHOLD:Float = 65;
+
+  /**
+   * The ratio for easing the song positon for smoother notes scrolling.
+   */
+  static final MUSIC_EASE_RATIO:Float = 42;
+
   // TODO: Refactor or document
   var generatedMusic:Bool = false;
 
@@ -996,27 +1022,20 @@ class PlayState extends MusicBeatSubState
    * @param params The parameters used to initialize the PlayState.
    *   Includes information about what song to play and more.
    */
-  public function new(params:PlayStateParams)
+  public function new(?params:PlayStateParams)
   {
     super();
 
     // Validate parameters.
-    if (params == null && lastParams == null)
-    {
-      throw 'PlayState constructor called with no available parameters.';
-    }
-    else if (params == null)
-    {
-      trace('WARNING: PlayState constructor called with no parameters. Reusing previous parameters.');
-      params = lastParams;
-    }
-    else
-    {
-      lastParams = params;
-    }
+    var params:PlayStateParams = params ??
+      {
+        trace('WARNING: PlayState constructor called with no parameters. Reusing previous parameters.');
+        lastParams ?? throw 'PlayState constructor called with no available parameters.';
+      }
+    lastParams = params;
 
     // Apply parameters.
-    currentSong = params.targetSong;
+    currentSong = params.targetSong ?? throw "targetSong should not be null";
     if (params.targetDifficulty != null) currentDifficulty = params.targetDifficulty;
     previousDifficulty = currentDifficulty;
     if (params.targetVariation != null) currentVariation = params.targetVariation;
@@ -1029,26 +1048,7 @@ class PlayState extends MusicBeatSubState
     overrideMusic = params.overrideMusic ?? false;
     previousCameraFollowPoint = params.cameraFollowPoint;
 
-    // Don't do anything else here! Wait until create() when we attach to the camera.
-  }
-
-  /**
-   * Called when the PlayState is switched to.
-   */
-  public override function create():Void
-  {
-    if (instance != null)
-    {
-      // TODO: Do something in this case? IDK.
-      trace('WARNING: PlayState instance already exists. This should not happen.');
-    }
-    instance = this;
-    #if !mobile
-    // TODO: Figure out how to do the flair for charting mode!! I can't figure it out for the love of god. -Zack
-    if (!isChartingMode) FlxG.autoPause = false;
-    #end
-
-    if (!assertChartExists()) return;
+    // Basic object initialization
 
     // TODO: Add something to toggle this on!
     if (false)
@@ -1066,11 +1066,61 @@ class PlayState extends MusicBeatSubState
       cameraFollowPoint = new FlxObject(0, 0);
     }
 
+    // Cameras
+    camGame = new FunkinCamera('playStateCamGame');
+    camHUD = new FlxCamera();
+    camCutscene = new FlxCamera();
+    camCutouts = new FlxCamera();
+
+    var currentChart = currentSong.getDifficulty(currentDifficulty, currentVariation);
+    var noteStyleId:Null<String> = currentChart?.noteStyle;
+    var nulNoteStyle:Null<NoteStyle> = NoteStyleRegistry.instance.fetchEntry(noteStyleId ?? Constants.DEFAULT_NOTE_STYLE);
+    if (nulNoteStyle == null) throw "Failed to retrieve both note style and default note style. This shouldn't happen!";
+    noteStyle = nulNoteStyle;
+
+    // Strumlines
+    // playerStrumline = new Strumline(noteStyle, !isBotPlayMode, currentChart?.scrollSpeed);
+    // opponentStrumline = new Strumline(noteStyle, false, currentChart?.scrollSpeed);
+
+    // Healthbar
+    healthBarBG = FunkinSprite.create(0, 0, 'healthBar');
+    healthBar = new FlxBar(0, 0, RIGHT_TO_LEFT, Std.int(healthBarBG.width - 8), Std.int(healthBarBG.height - 8), null, 0, 2);
+    scoreText = new FlxText(0, 0, 0, '', 20);
+
+    // Combo & Pop Up
+    comboPopUps = new PopUpStuff(noteStyle);
+
+    // Pause sprites
+    #if mobile
+    pauseButton = FunkinSprite.createSparrow(0, 0, "pauseButton");
+    pauseCircle = FunkinSprite.create(0, 0, 'pauseCircle');
+    #end
+
+    // Don't do anything else here! Wait until create() when we attach to the camera.
+  }
+
+  /**
+   * Called when the PlayState is switched to.
+   */
+  @:nullSafety(Off)
+  public override function create():Void
+  {
+    if (instance != null)
+    {
+      // TODO: Do something in this case? IDK.
+      trace('WARNING: PlayState instance already exists. This should not happen.');
+    }
+    instance = this;
+    #if !mobile
+    // TODO: Figure out how to do the flair for charting mode!! I can't figure it out for the love of god. -Zack
+    if (!isChartingMode) FlxG.autoPause = false;
+    #end
+
+    if (!assertChartExists()) return;
+
     #if mobile
     // Force allowScreenTimeout to be disabled
     lime.system.System.allowScreenTimeout = false;
-    // TODO: For some reason the touch pointer's positioning gets weird in playstate, find a way to fix it! -Zack
-    funkin.util.plugins.TouchPointerPlugin.enabled = false;
     #end
 
     // This state receives update() even when a substate is active.
@@ -1079,11 +1129,11 @@ class PlayState extends MusicBeatSubState
     this.persistentDraw = true;
 
     // Stop any pre-existing music.
-    if (!overrideMusic && FlxG.sound.music != null) FlxG.sound.music.stop();
-
-    // Prepare the current song's instrumental and vocals to be played.
-    if (!overrideMusic && currentChart != null)
+    if (!overrideMusic)
     {
+      if (FlxG.sound.music != null) FlxG.sound.music.stop();
+
+      // Prepare the current song's instrumental and vocals to be played.
       currentChart.cacheInst(currentInstrumental);
       currentChart.cacheVocals();
     }
@@ -1126,13 +1176,16 @@ class PlayState extends MusicBeatSubState
     {
       // Initialize the hitbox for mobile controls
       addHitbox(false);
-      hitbox.isPixel = currentChart.noteStyle == "pixel";
-
-      if (Preferences.controlsScheme == FunkinHitboxControlSchemes.Arrows)
+      if (hitbox != null)
       {
-        for (direction in Strumline.DIRECTIONS)
+        hitbox.isPixel = currentChart.noteStyle == "pixel";
+
+        if (Preferences.controlsScheme == FunkinHitboxControlSchemes.Arrows)
         {
-          hitbox.getFirstHintByDirection(direction).follow(playerStrumline.getByDirection(direction));
+          for (direction in Strumline.DIRECTIONS)
+          {
+            hitbox.getFirstHintByDirection(direction).follow(playerStrumline.getByDirection(direction));
+          }
         }
       }
     }
@@ -1165,7 +1218,7 @@ class PlayState extends MusicBeatSubState
     startingSong = true;
 
     // TODO: We hardcoded the transition into Winter Horrorland. Do this with a ScriptedSong instead.
-    if ((currentSong?.id ?? '').toLowerCase() == 'winter-horrorland')
+    if ((currentSong.id ?? '').toLowerCase() == 'winter-horrorland')
     {
       // VanillaCutscenes will call startCountdown later.
       VanillaCutscenes.playHorrorStartCutscene();
@@ -1180,31 +1233,7 @@ class PlayState extends MusicBeatSubState
 
     // Create the pause button.
     #if mobile
-    pauseButton = FunkinSprite.createSparrow(0, 0, "pauseButton");
-    pauseButton.animation.addByIndices('idle', 'back', [0], "", 24, false);
-    pauseButton.animation.addByIndices('hold', 'back', [5], "", 24, false);
-    pauseButton.animation.addByIndices('confirm', 'back', [
-      6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32
-    ], "", 24, false);
-    pauseButton.scale.set(0.8, 0.8);
-    pauseButton.updateHitbox();
-    pauseButton.animation.play("idle");
-    pauseButton.setPosition((FlxG.width - pauseButton.width) - 35, 35);
-    pauseButton.cameras = [camControls];
-
-    pauseCircle = FunkinSprite.create(0, 0, 'pauseCircle');
-    pauseCircle.scale.set(0.84, 0.8);
-    pauseCircle.updateHitbox();
-    pauseCircle.cameras = [camControls];
-    pauseCircle.x = ((pauseButton.x + (pauseButton.width / 2)) - (pauseCircle.width / 2));
-    pauseCircle.y = ((pauseButton.y + (pauseButton.height / 2)) - (pauseCircle.height / 2));
-    pauseCircle.alpha = 0.1;
-
-    add(pauseCircle);
-    add(pauseButton);
-    hitbox?.forEachAlive(function(hint:FunkinHint) {
-      hint.deadZones.push(pauseButton);
-    });
+    initPauseSprites();
     #end
 
     // Do this last to prevent beatHit from being called before create() is done.
@@ -1239,7 +1268,7 @@ class PlayState extends MusicBeatSubState
   function assertChartExists():Bool
   {
     // Returns null if the song failed to load or doesn't have the selected difficulty.
-    if (currentSong == null || currentChart == null || currentChart.notes == null)
+    if (currentSong == null || currentChart == null || currentChart?.notes == null)
     {
       // We have encountered a critical error. Prevent Flixel from trying to run any gameplay logic.
       criticalFailure = true;
@@ -1258,13 +1287,13 @@ class PlayState extends MusicBeatSubState
       {
         message = 'There was a critical error retrieving data for this song on "$currentDifficulty" difficulty with variation "$currentVariation". Click OK to return to the main menu.';
       }
-      else if (currentChart.notes == null)
+      else if (currentChart?.notes == null)
       {
         message = 'There was a critical error retrieving note data for this song on "$currentDifficulty" difficulty with variation "$currentVariation". Click OK to return to the main menu.';
       }
 
       // Display a popup. This blocks the application until the user clicks OK.
-      lime.app.Application.current.window.alert(message, 'Error loading PlayState');
+      funkin.util.WindowUtil.showError('Error loading PlayState', message);
 
       // Force the user back to the main menu.
       if (isSubState)
@@ -1273,7 +1302,7 @@ class PlayState extends MusicBeatSubState
       }
       else
       {
-        this.remove(currentStage);
+        if (currentStage != null) this.remove(currentStage);
         FlxG.switchState(() -> new MainMenuState());
       }
       return false;
@@ -1322,26 +1351,31 @@ class PlayState extends MusicBeatSubState
         FlxG.sound.music.pitch = playbackRate;
       }
 
-      if (!overrideMusic)
+      if (!overrideMusic && vocals != null)
       {
         // Stop the vocals if they already exist.
-        if (vocals != null) vocals.stop();
-        vocals = currentChart.buildVocals(currentInstrumental);
+        vocals.stop();
+        vocals = currentChart?.buildVocals(currentInstrumental);
 
-        if (vocals.members.length == 0)
+        if (vocals?.members?.length == 0)
         {
           trace('WARNING: No vocals found for this song.');
         }
       }
-      vocals.pause();
-      vocals.time = startTimestamp - Conductor.instance.instrumentalOffset;
 
       if (FlxG.sound.music != null) FlxG.sound.music.volume = 1;
-      vocals.volume = 1;
-      vocals.playerVolume = 1;
-      vocals.opponentVolume = 1;
 
-      if (currentStage != null) currentStage.resetStage();
+      if (vocals != null)
+      {
+        vocals.pause();
+        vocals.time = startTimestamp - Conductor.instance.instrumentalOffset;
+
+        vocals.volume = 1;
+        vocals.playerVolume = 1;
+        vocals.opponentVolume = 1;
+      }
+
+      currentStage?.resetStage();
 
       for (strumLine in allStrumLines)
       {
@@ -1413,19 +1447,28 @@ class PlayState extends MusicBeatSubState
         Conductor.instance.formatOffset = 0.0;
       }
 
-      #if mobile
-      // Note scrolling is less smooth on mobile without these arguments!!!
-      Conductor.instance.update(Conductor.instance.songPosition + elapsed * 1000 * playbackRate, false);
-      #else
-      Conductor.instance.update(Conductor.instance.songPosition + elapsed * 1000, false); // Normal conductor update.
-      // Conductor.instance.update(); // Normal conductor update.
-      #end
-
-      // If, after updating the conductor, the instrumental has finished, end the song immediately.
-      // This helps prevent a major bug where the level suddenly loops back to the start or middle.
-      if (Conductor.instance.songPosition >= (FlxG.sound.music.endTime ?? FlxG.sound.music.length))
+      // Lime has some precision loss when getting the sound current position
+      // Since the notes scrolling is dependant on the sound time that caused it to appear "stuttery" for some people
+      // As a workaround for that, we lerp the conductor position to the music time to fill the gap in this lost precision making the scrolling smoother
+      // The previous method where it "guessed" the song position based on the elapsed time had some flaws
+      // Somtimes the songPosition would exceed the music length causing issues in other places
+      // And it was frame dependant which we don't like!!
+      if (FlxG.sound.music.playing)
       {
-        if (mayPauseGame && !isSongEnd) endSong(skipEndingTransition);
+        final audioDiff:Float = Math.round(Math.abs(FlxG.sound.music.time - (Conductor.instance.songPosition - Conductor.instance.combinedOffset)));
+        if (audioDiff <= CONDUCTOR_DRIFT_THRESHOLD)
+        {
+          // Only do neat & smooth lerps as long as the lerp doesn't fuck up and go WAY behind the music time triggering false resyncs
+          final easeRatio:Float = 1.0 - Math.exp(-(MUSIC_EASE_RATIO * playbackRate) * elapsed);
+          Conductor.instance.update(FlxMath.lerp(Conductor.instance.songPosition, FlxG.sound.music.time + Conductor.instance.combinedOffset, easeRatio), false);
+        }
+        else
+        {
+          // Fallback to properly update the conductor incase the lerp messed up
+          // Shouldn't be fallen back to unless you're lagging alot
+          trace('[WARNING] Normal Conductor Update!! are you lagging?');
+          Conductor.instance.update();
+        }
       }
     }
 
@@ -1502,7 +1545,7 @@ class PlayState extends MusicBeatSubState
 
       if (health <= Constants.HEALTH_MIN && !isPracticeMode && !isPlayerDying)
       {
-        vocals.pause();
+        vocals?.pause();
 
         if (FlxG.sound.music != null) FlxG.sound.music.pause();
 
@@ -1588,21 +1631,19 @@ class PlayState extends MusicBeatSubState
     #end
   }
 
-  function pause(?mode:PauseMode = Standard):Void
+  function pause(mode:PauseMode = Standard):Void
   {
-    if (!mayPauseGame || justUnpaused || isGamePaused) return;
+    if (!mayPauseGame || justUnpaused || isGamePaused || isPlayerDying) return;
 
     switch (mode)
     {
       case Conversation:
-        currentConversation.pauseMusic();
         preparePauseUI();
-        openPauseSubState(Conversation, FullScreenScaleMode.hasFakeCutouts ? camCutouts : camCutscene);
+        openPauseSubState(Conversation, FullScreenScaleMode.hasFakeCutouts ? camCutouts : camCutscene, () -> currentConversation?.pauseMusic());
 
       case Cutscene:
-        VideoCutscene.pauseVideo();
         preparePauseUI();
-        openPauseSubState(Cutscene, FullScreenScaleMode.hasFakeCutouts ? camCutouts : camCutscene);
+        openPauseSubState(Cutscene, FullScreenScaleMode.hasFakeCutouts ? camCutouts : camCutscene, () -> VideoCutscene.pauseVideo());
 
       default: // also known as standard
         if (!isInCountdown || isInCutscene) return;
@@ -1620,7 +1661,7 @@ class PlayState extends MusicBeatSubState
 
           if (!isSubState && event.gitaroo)
           {
-            this.remove(currentStage);
+            if (currentStage != null) this.remove(currentStage);
             FlxG.switchState(() -> new GitarooPause(lastParams));
           }
           else
@@ -1660,9 +1701,9 @@ class PlayState extends MusicBeatSubState
     #end
   }
 
-  function openPauseSubState(mode:PauseMode, cam:FlxCamera):Void
+  function openPauseSubState(mode:PauseMode, cam:FlxCamera, ?onPause:Void->Void):Void
   {
-    final pauseSubState = new PauseSubState({mode: mode});
+    final pauseSubState = new PauseSubState({mode: mode}, onPause);
     FlxTransitionableState.skipNextTransIn = true;
     FlxTransitionableState.skipNextTransOut = true;
     pauseSubState.camera = cam;
@@ -1694,8 +1735,8 @@ class PlayState extends MusicBeatSubState
 
     if (!isMinimalMode)
     {
-      if (iconP1 != null) iconP1.updatePosition();
-      if (iconP2 != null) iconP2.updatePosition();
+      iconP1?.updatePosition();
+      iconP2?.updatePosition();
     }
 
     // Transition to the game over substate.
@@ -1713,7 +1754,7 @@ class PlayState extends MusicBeatSubState
   {
     // Query and activate song events.
     // TODO: Check that these work appropriately even when songPosition is less than 0, to play events during countdown.
-    if (songEvents != null && songEvents.length > 0)
+    if (songEvents.length > 0)
     {
       var songEventsToActivate:Array<SongEventData> = SongEventRegistry.queryEvents(songEvents, Conductor.instance.songPosition);
 
@@ -1873,7 +1914,9 @@ class PlayState extends MusicBeatSubState
         musicPausedBySubState = false;
       }
 
-      forEachPausedSound((s) -> needsReset ? s.destroy() : s.resume());
+      // The logic here is that if this sound doesn't auto-destroy
+      // then it's gonna be reused somewhere, so we just stop it instead.
+      forEachPausedSound(s -> needsReset ? (s.autoDestroy ? s.destroy() : s.stop()) : s.resume());
 
       // Resume camera tweens if we paused any.
       for (camTween in cameraTweensPausedBySubState)
@@ -2030,7 +2073,12 @@ class PlayState extends MusicBeatSubState
     instance = this;
 
     funkin.modding.PolymodHandler.forceReloadAssets();
-    lastParams.targetSong = SongRegistry.instance.fetchEntry(currentSong.id);
+    if (lastParams == null)
+    {
+      throw "No lastParams to refer to";
+    }
+    lastParams.targetSong = SongRegistry.instance.fetchEntry(currentSong.id,
+      {variation: currentVariation}) ?? throw "Could not load current song from ID. This shouldn't happen!";
     LoadingState.loadPlayState(lastParams);
   }
 
@@ -2043,8 +2091,8 @@ class PlayState extends MusicBeatSubState
 
     if (isGamePaused) return false;
 
-    if (iconP1 != null) iconP1.onStepHit(Std.int(Conductor.instance.currentStep));
-    if (iconP2 != null) iconP2.onStepHit(Std.int(Conductor.instance.currentStep));
+    iconP1?.onStepHit(Std.int(Conductor.instance.currentStep));
+    iconP2?.onStepHit(Std.int(Conductor.instance.currentStep));
 
     for (lua in luaArray)
     {
@@ -2076,17 +2124,17 @@ class PlayState extends MusicBeatSubState
       var correctSync:Float = Math.min(FlxG.sound.music.length, Math.max(0, Conductor.instance.songPosition - Conductor.instance.combinedOffset));
       var playerVoicesError:Float = 0;
       var opponentVoicesError:Float = 0;
-
       if (vocals != null && vocals.playing)
       {
+        @:nullSafety(Off)
         @:privateAccess // todo: maybe make the groups public :thinking:
         {
-          vocals.playerVoices.forEachAlive(function(voice:FunkinSound) {
+          vocals.playerVoices?.forEachAlive(function(voice:FunkinSound) {
             var currentRawVoiceTime:Float = voice.time + vocals.playerVoicesOffset;
             if (Math.abs(currentRawVoiceTime - correctSync) > Math.abs(playerVoicesError)) playerVoicesError = currentRawVoiceTime - correctSync;
           });
 
-          vocals.opponentVoices.forEachAlive(function(voice:FunkinSound) {
+          vocals.opponentVoices?.forEachAlive(function(voice:FunkinSound) {
             var currentRawVoiceTime:Float = voice.time + vocals.opponentVoicesOffset;
             if (Math.abs(currentRawVoiceTime - correctSync) > Math.abs(opponentVoicesError)) opponentVoicesError = currentRawVoiceTime - correctSync;
           });
@@ -2116,7 +2164,7 @@ class PlayState extends MusicBeatSubState
     if (Preferences.zoomCamera
       && FlxG.camera.zoom < (1.35 * FlxCamera.defaultZoom)
       && cameraZoomRate > 0
-      && Conductor.instance.currentBeat % cameraZoomRate == 0)
+      && (Conductor.instance.currentBeat + cameraZoomRateOffset) % cameraZoomRate == 0)
     {
       // Set zoom multiplier for camera bop.
       cameraBopMultiplier = cameraBopIntensity;
@@ -2145,7 +2193,6 @@ class PlayState extends MusicBeatSubState
     #if mobile
     // Syncing allowScreenTimeout with Preferences option.
     lime.system.System.allowScreenTimeout = Preferences.screenTimeout;
-    funkin.util.plugins.TouchPointerPlugin.enabled = true;
     #end
 
     #if !mobile
@@ -2169,13 +2216,11 @@ class PlayState extends MusicBeatSubState
      */
   function initCameras():Void
   {
-    camGame = new FunkinCamera('playStateCamGame');
     camGame.bgColor = BACKGROUND_COLOR; // Show a pink background behind the stage.
-    camHUD = new FlxCamera();
     camHUD.bgColor.alpha = 0; // Show the game scene behind the camera.
-    camCutscene = new FlxCamera();
     camCutscene.bgColor.alpha = 0; // Show the game scene behind the camera.
-    camCutouts = new FlxCamera((FlxG.width - FlxG.initialWidth) / 2, (FlxG.height - FlxG.initialHeight) / 2, FlxG.initialWidth, FlxG.initialHeight);
+    camCutouts.setPosition((FlxG.width - FlxG.initialWidth) / 2, (FlxG.height - FlxG.initialHeight) / 2);
+    camCutouts.setSize(FlxG.initialWidth, FlxG.initialHeight);
     camCutouts.bgColor.alpha = 0; // Show the game scene behind the camera.
 
     if (isModchartSong)
@@ -2222,14 +2267,16 @@ class PlayState extends MusicBeatSubState
       && !ControlsHandler.usingExternalInputDevice) healthBarYPos = FlxG.height * 0.1;
     #end
 
-    healthBarBG = FunkinSprite.create(0, healthBarYPos, 'healthBar');
+    healthBarBG.y = healthBarYPos;
     healthBarBG.screenCenter(X);
     healthBarBG.scrollFactor.set(0, 0);
     healthBarBG.zIndex = 800;
     add(healthBarBG);
 
-    healthBar = new FlxBar(healthBarBG.x + 4, healthBarBG.y + 4, RIGHT_TO_LEFT, Std.int(healthBarBG.width - 8), Std.int(healthBarBG.height - 8), this,
-      'healthLerp', 0, 2);
+    healthBar.x = healthBarBG.x + 4;
+    healthBar.y = healthBarBG.y + 4;
+    healthBar.parent = this;
+    healthBar.parentVariable = 'healthLerp';
     healthBar.scrollFactor.set();
     healthBar.createFilledBar(Constants.COLOR_HEALTH_BAR_RED, Constants.COLOR_HEALTH_BAR_GREEN);
     healthBar.zIndex = 801;
@@ -2237,8 +2284,9 @@ class PlayState extends MusicBeatSubState
     add(healthBar);
 
     // The score text below the health bar.
-    scoreText = new FlxText(healthBarBG.x + healthBarBG.width - 190, healthBarBG.y + 30, 0, '', 20);
-    scoreText.setFormat(Paths.font('vcr.ttf'), 16, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE_FAST, FlxColor.BLACK);
+    scoreText.x = healthBarBG.x + healthBarBG.width - 190;
+    scoreText.y = healthBarBG.y + 30;
+    scoreText.setFormat(Paths.font('vcr.ttf'), 16, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
     scoreText.scrollFactor.set();
     scoreText.zIndex = 802;
     add(scoreText);
@@ -2299,13 +2347,13 @@ class PlayState extends MusicBeatSubState
     else
     {
       // lolol
-      lime.app.Application.current.window.alert('Unable to load stage ${id}, is its data corrupted?.', 'Stage Error');
+      funkin.util.WindowUtil.showError('Stage Error', 'Unable to load stage $id, is its data corrupted?.');
     }
   }
 
   public function resetCameraZoom():Void
   {
-    if (PlayState.instance.isMinimalMode) return;
+    if (isMinimalMode) return;
     // Apply camera zoom level from stage data.
     currentCameraZoom = stageZoom;
     FlxG.camera.zoom = currentCameraZoom;
@@ -2327,15 +2375,21 @@ class PlayState extends MusicBeatSubState
   {
     if (currentSong == null || currentChart == null)
     {
-      trace('Song difficulty could not be loaded.');
+      throw 'Song difficulty could not be loaded.';
     }
 
-    var currentCharacterData:SongCharacterData = currentChart.characters; // Switch the variation we are playing on by manipulating targetVariation.
+    var currentCharacterData:Null<SongCharacterData> = currentChart?.characters;
+    if (currentCharacterData == null)
+    {
+      trace('Cannot retrieve character data');
+      return;
+    }
+    // Switch the variation we are playing on by manipulating targetVariation.
 
     //
     // GIRLFRIEND
     //
-    var girlfriend:BaseCharacter = CharacterDataParser.fetchCharacter(currentCharacterData.girlfriend);
+    var girlfriend:Null<BaseCharacter> = CharacterDataParser.fetchCharacter(currentCharacterData.girlfriend);
 
     if (girlfriend != null)
     {
@@ -2353,7 +2407,7 @@ class PlayState extends MusicBeatSubState
     //
     // DAD
     //
-    var dad:BaseCharacter = CharacterDataParser.fetchCharacter(currentCharacterData.opponent);
+    var dad:Null<BaseCharacter> = CharacterDataParser.fetchCharacter(currentCharacterData.opponent);
 
     if (dad != null)
     {
@@ -2368,7 +2422,7 @@ class PlayState extends MusicBeatSubState
       iconP2.cameras = [camHUD];
 
       #if FEATURE_DISCORD_RPC
-      discordRPCAlbum = 'album-${currentChart.album}';
+      discordRPCAlbum = 'album-${currentChart?.album}';
       discordRPCIcon = 'icon-${currentCharacterData.opponent}';
       #end
     }
@@ -2376,7 +2430,7 @@ class PlayState extends MusicBeatSubState
     //
     // BOYFRIEND
     //
-    var boyfriend:BaseCharacter = CharacterDataParser.fetchCharacter(currentCharacterData.player);
+    var boyfriend:Null<BaseCharacter> = CharacterDataParser.fetchCharacter(currentCharacterData.player);
 
     if (boyfriend != null)
     {
@@ -2594,7 +2648,7 @@ class PlayState extends MusicBeatSubState
       noteStyle = NoteStyleRegistry.instance.fetchEntry(noteStyleId);
       if (noteStyle == null) noteStyle = NoteStyleRegistry.instance.fetchDefault();
     }
-    var newStrummer:Strumline = new Strumline(noteStyle, playerControlled ? !isBotPlayMode : false, isModchartSong);
+    var newStrummer:Strumline = new Strumline(noteStyle, playerControlled ? !isBotPlayMode : false, currentChart?.scrollSpeed, isModchartSong);
     newStrummer.onNoteIncoming.add(onStrumlineNoteIncoming);
     newStrummer.defaultPlayerControl = playerControlled;
     add(newStrummer);
@@ -2637,10 +2691,10 @@ class PlayState extends MusicBeatSubState
     var noteStyle:NoteStyle = NoteStyleRegistry.instance.fetchEntry(noteStyleId);
     if (noteStyle == null) noteStyle = NoteStyleRegistry.instance.fetchDefault();
 
-    playerStrumline = new Strumline(noteStyle, !isBotPlayMode, isModchartSong);
+    playerStrumline = new Strumline(noteStyle, !isBotPlayMode, currentChart?.scrollSpeed, isModchartSong);
     playerStrumline.onNoteIncoming.add(onStrumlineNoteIncoming);
     playerStrumline.defaultPlayerControl = true;
-    opponentStrumline = new Strumline(noteStyle, false, isModchartSong);
+    opponentStrumline = new Strumline(noteStyle, false, currentChart?.scrollSpeed, isModchartSong);
     opponentStrumline.onNoteIncoming.add(onStrumlineNoteIncoming);
     opponentStrumline.defaultPlayerControl = false;
     add(playerStrumline);
@@ -2723,6 +2777,7 @@ class PlayState extends MusicBeatSubState
 
     playerStrumline.strumlineScale.set(playerStrumlineScale, playerStrumlineScale);
     playerStrumline.setNoteSpacing(playerNoteSpacing);
+    @:nullSafety(Off) // Who thought it'd be a good idea to make the iterator nullable?
     for (strum in playerStrumline)
     {
       strum.width *= 2;
@@ -2731,7 +2786,7 @@ class PlayState extends MusicBeatSubState
 
     playerStrumline.x = (FlxG.width - playerStrumline.width) / 2 + Constants.STRUMLINE_X_OFFSET;
     playerStrumline.y = (FlxG.height - playerStrumline.height) * 0.95 - Constants.STRUMLINE_Y_OFFSET;
-    if (currentChart.noteStyle != "pixel")
+    if (currentChart?.noteStyle != "pixel")
     {
       #if android playerStrumline.y += 10; #end
     }
@@ -2742,6 +2797,35 @@ class PlayState extends MusicBeatSubState
     opponentStrumline.y = Constants.STRUMLINE_Y_OFFSET * 0.3;
     opponentStrumline.x -= 30;
   }
+
+  function initPauseSprites()
+  {
+    pauseButton.animation.addByIndices('idle', 'back', [0], "", 24, false);
+    pauseButton.animation.addByIndices('hold', 'back', [5], "", 24, false);
+    pauseButton.animation.addByIndices('confirm', 'back', [
+      6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32
+    ], "", 24, false);
+    pauseButton.scale.set(0.8, 0.8);
+    pauseButton.updateHitbox();
+    pauseButton.animation.play("idle");
+    pauseButton.setPosition((FlxG.width - pauseButton.width) - 35, 35);
+    @:nullSafety(Off) // AAAAAAA why did camControls have to be nullable AAAAAAAAAA
+    pauseButton.cameras = [camControls];
+
+    pauseCircle.scale.set(0.84, 0.8);
+    pauseCircle.updateHitbox();
+    @:nullSafety(Off)
+    pauseCircle.cameras = [camControls];
+    pauseCircle.x = ((pauseButton.x + (pauseButton.width / 2)) - (pauseCircle.width / 2));
+    pauseCircle.y = ((pauseButton.y + (pauseButton.height / 2)) - (pauseCircle.height / 2));
+    pauseCircle.alpha = 0.1;
+
+    add(pauseCircle);
+    add(pauseButton);
+    hitbox?.forEachAlive(function(hint:FunkinHint) {
+      hint.deadZones.push(pauseButton);
+    });
+  }
   #end
 
   /**
@@ -2749,11 +2833,7 @@ class PlayState extends MusicBeatSubState
      */
   function initPopups():Void
   {
-    var noteStyleId:String = currentChart.noteStyle;
-    var noteStyle:NoteStyle = NoteStyleRegistry.instance.fetchEntry(noteStyleId);
-    if (noteStyle == null) noteStyle = NoteStyleRegistry.instance.fetchDefault();
     // Initialize the judgements and combo meter.
-    comboPopUps = new PopUpStuff(noteStyle);
     comboPopUps.zIndex = 900;
     add(comboPopUps);
     comboPopUps.cameras = [camHUD];
@@ -2819,8 +2899,12 @@ class PlayState extends MusicBeatSubState
 
   function buildDiscordRPCState():String
   {
-    var discordRPCDifficulty = PlayState.instance.currentDifficulty.replace('-', ' ').toTitleCase();
-    return '${currentChart.songName} [${discordRPCDifficulty}]';
+    if (currentChart == null)
+    {
+      trace("WARNING: Difficulty data for RPC is null.");
+    }
+    var discordRPCDifficulty = PlayState.instance?.currentDifficulty?.replace('-', ' ')?.toTitleCase() ?? '???';
+    return '${currentChart?.songName ?? '???'} [${discordRPCDifficulty}]';
   }
 
   function initPreciseInputs():Void
@@ -2837,7 +2921,7 @@ class PlayState extends MusicBeatSubState
   {
     if (currentChart == null)
     {
-      trace('Song difficulty could not be loaded.');
+      throw 'Song difficulty could not be loaded.';
     }
 
     // Conductor.instance.forceBPM(currentChart.getStartingBPM());
@@ -2845,10 +2929,10 @@ class PlayState extends MusicBeatSubState
     if (!overrideMusic)
     {
       // Stop the vocals if they already exist.
-      if (vocals != null) vocals.stop();
-      vocals = currentChart.buildVocals(currentInstrumental);
+      vocals?.stop();
+      vocals = currentChart?.buildVocals(currentInstrumental);
 
-      if (vocals.members.length == 0)
+      if (vocals?.members?.length == 0)
       {
         trace('WARNING: No vocals found for this song.');
       }
@@ -2873,16 +2957,21 @@ class PlayState extends MusicBeatSubState
     generatedMusic = true;
   }
 
-  public var excludeNoteKindFromTotalNotes:Array<String> = ["hurt", "fake"];
-
   /**
      * Read note data from the chart and generate the notes.
      */
   function regenNoteData(startTime:Float = 0):Void
   {
+    if (currentChart == null)
+    {
+      trace('Cannot regenerate note data for null chart');
+      return;
+    }
+
     Highscore.tallies.combo = 0;
     Highscore.tallies = new Tallies();
 
+    @:nullSafety(Off)
     var event:SongLoadScriptEvent = new SongLoadScriptEvent(currentChart.song.id, currentChart.difficulty, currentChart.notes.copy(), currentChart.getEvents());
 
     dispatchEvent(event);
@@ -2902,6 +2991,13 @@ class PlayState extends MusicBeatSubState
       var strumTime:Float = songNote.time;
       if (strumTime < startTime) continue; // Skip notes that are before the start time.
 
+      var scoreable = true;
+      if (songNote.kind != null)
+      {
+        var noteKind:Null<NoteKind> = NoteKindManager.getNoteKind(songNote.kind ?? '');
+        if (noteKind != null) scoreable = noteKind.scoreable;
+      }
+
       var noteData:Int = songNote.getDirection();
       var playerNote:Bool = true;
 
@@ -2912,11 +3008,7 @@ class PlayState extends MusicBeatSubState
         case 0:
           playerNoteData.push(songNote);
           // increment totalNotes for total possible notes able to be hit by the player
-          if (!(excludeNoteKindFromTotalNotes.contains(songNote?.kind ?? "normal")))
-          {
-            Highscore.tallies.totalNotes++;
-          }
-
+          if (scoreable) Highscore.tallies.totalNotes++;
         case 1:
           opponentNoteData.push(songNote);
       }
@@ -3015,7 +3107,7 @@ class PlayState extends MusicBeatSubState
 
     if (!overrideMusic && !isGamePaused && currentChart != null)
     {
-      currentChart.playInst(1.0, currentInstrumental, false);
+      currentChart?.playInst(1.0, currentInstrumental, false);
     }
 
     if (FlxG.sound.music == null)
@@ -3036,19 +3128,23 @@ class PlayState extends MusicBeatSubState
     FlxG.sound.music.volume = 1.0;
     if (FlxG.sound.music.fadeTween != null) FlxG.sound.music.fadeTween.cancel();
 
-    trace('Playing vocals...');
-    add(vocals);
+    if (vocals != null)
+    {
+      trace('Playing vocals...');
+      add(vocals);
 
-    vocals.time = startTimestamp - Conductor.instance.instrumentalOffset;
-    vocals.pitch = playbackRate;
-    vocals.volume = 1.0;
+      vocals.time = startTimestamp - Conductor.instance.instrumentalOffset;
+      vocals.pitch = playbackRate;
+      vocals.volume = 1.0;
 
-    // trace('STARTING SONG AT:');
-    // trace('${FlxG.sound.music.time}');
-    // trace('${vocals.time}');
+      // trace('STARTING SONG AT:');
+      // trace('${FlxG.sound.music.time}');
+      // trace('${vocals.time}');
+
+      vocals.play();
+    }
 
     FlxG.sound.music.play();
-    vocals.play();
 
     #if FEATURE_DISCORD_RPC
     // Updating Discord Rich Presence (with Time Left)
@@ -3249,7 +3345,7 @@ class PlayState extends MusicBeatSubState
      */
   function processNotes(elapsed:Float):Void
   {
-    if (playerStrumline?.notes?.members == null || opponentStrumline?.notes?.members == null) return;
+    if (playerStrumline.notes?.members == null || opponentStrumline.notes?.members == null) return;
 
     if (isModchartSong)
     {
@@ -3283,7 +3379,7 @@ class PlayState extends MusicBeatSubState
     // Process hold notes on the opponent's side.
     for (holdNote in opponentStrumline.holdNotes.members)
     {
-      if (holdNote == null || !holdNote.alive) continue;
+      if (holdNote == null || !holdNote.alive || holdNote.noteData == null) continue;
 
       // While the hold note is being hit, and there is length on the hold note...
       if (holdNote.hitNote && !holdNote.missedNote && holdNote.sustainLength > 0)
@@ -3302,7 +3398,7 @@ class PlayState extends MusicBeatSubState
 
         // We dropped a hold note.
         // Play miss animation, but don't penalize.
-        currentStage.getOpponent().playSingAnimation(holdNote.noteData.getDirection(), true);
+        if (currentStage != null) currentStage.getOpponent().playSingAnimation(holdNote.noteData.getDirection(), true);
       }
     }
 
@@ -3411,12 +3507,18 @@ class PlayState extends MusicBeatSubState
             var event:HoldNoteScriptEvent = new HoldNoteScriptEvent(NOTE_HOLD_DROP, holdNote, healthChange, scoreChange, true, Highscore.tallies.combo);
             dispatchEvent(event);
 
+            // Calling event.cancelEvent() skips all the other logic! Neat!
+            if (event.eventCanceled) continue;
+
             trace('Penalizing score by ${event.score} and health by ${event.healthChange} for dropping hold note (is combo break: ${event.isComboBreak})!');
             applyScore(event.score, '', event.healthChange, event.isComboBreak);
 
             // Play the miss sound.
-            vocals.playerVolume = 0;
-            FunkinSound.playOnce(Paths.soundRandom('missnote', 1, 3), FlxG.random.float(0.5, 0.6));
+            if (event.playSound)
+            {
+              if (vocals != null) vocals.playerVolume = 0;
+              FunkinSound.playOnce(Paths.soundRandom('missnote', 1, 3), FlxG.random.float(0.5, 0.6));
+            }
           }
           else
           {
@@ -3602,7 +3704,8 @@ class PlayState extends MusicBeatSubState
 
     while (inputPressQueue.length > 0)
     {
-      var input:PreciseInputEvent = inputPressQueue.shift();
+      var input:Null<PreciseInputEvent> = inputPressQueue.shift();
+      if (input == null) continue;
 
       playerStrumline.pressKey(input.noteDirection);
 
@@ -3654,7 +3757,8 @@ class PlayState extends MusicBeatSubState
 
     while (inputReleaseQueue.length > 0)
     {
-      var input:PreciseInputEvent = inputReleaseQueue.shift();
+      var input:Null<PreciseInputEvent> = inputReleaseQueue.shift();
+      if (input == null) continue;
 
       // Play the strumline animation.
       playerStrumline.playStatic(input.noteDirection);
@@ -3706,23 +3810,25 @@ class PlayState extends MusicBeatSubState
     }
 
     // Send the note hit event.
-    var event:HitNoteScriptEvent = new HitNoteScriptEvent(note, healthChange, score, daRating, isComboBreak, Highscore.tallies.combo + 1, noteDiff,
-      daRating == 'sick');
+    var event:HitNoteScriptEvent = new HitNoteScriptEvent(note, healthChange, score, daRating, isComboBreak,
+      note.scoreable ? Highscore.tallies.combo + 1 : Highscore.tallies.combo, noteDiff, daRating == 'sick');
     dispatchEvent(event);
 
     // Calling event.cancelEvent() skips all the other logic! Neat!
     if (event.eventCanceled) return;
-
-    Highscore.tallies.totalNotesHit++;
     // Display the hit on the strums
     playerStrumline.hitNote(note, !event.isComboBreak);
     if (event.doesNotesplash) playerStrumline.playNoteSplash(note.noteData.getDirection(), note);
     if (note.isHoldNote && note.holdNoteSprite != null) playerStrumline.playNoteHoldCover(note.holdNoteSprite);
-    vocals.playerVolume = 1;
+    if (vocals != null) vocals.playerVolume = 1;
 
     // Display the combo meter and add the calculation to the score.
-    applyScore(event.score, event.judgement, event.healthChange, event.isComboBreak);
-    popUpScore(event.judgement);
+    if (note.scoreable)
+    {
+      Highscore.tallies.totalNotesHit++;
+      applyScore(event.score, event.judgement, event.healthChange, event.isComboBreak);
+      popUpScore(event.judgement);
+    }
   }
 
   /**
@@ -3749,13 +3855,12 @@ class PlayState extends MusicBeatSubState
         if (pressArray[i]) indices.push(i);
       }
     }
-    vocals.playerVolume = 0;
 
     applyScore(Scoring.getMissScore(), 'miss', healthChange, true);
 
     if (playSound)
     {
-      vocals.playerVolume = 0;
+      if (vocals != null) vocals.playerVolume = 0;
       FunkinSound.playOnce(Paths.soundRandom('missnote', 1, 3), FlxG.random.float(0.5, 0.6));
     }
   }
@@ -3801,7 +3906,7 @@ class PlayState extends MusicBeatSubState
 
     if (event.playSound)
     {
-      vocals.playerVolume = 0;
+      if (vocals != null) vocals.playerVolume = 0;
       FunkinSound.playOnce(Paths.soundRandom('missnote', 1, 3), FlxG.random.float(0.1, 0.2));
     }
   }
@@ -3836,7 +3941,7 @@ class PlayState extends MusicBeatSubState
       }
       else
       {
-        this.remove(currentStage);
+        if (currentStage != null) this.remove(currentStage);
         FlxG.switchState(() -> new ChartEditorState(
           {
             targetSongId: currentSong.id,
@@ -3947,7 +4052,7 @@ class PlayState extends MusicBeatSubState
     comboPopUps.displayRating(daRating);
     if (combo >= 10) comboPopUps.displayCombo(combo);
 
-    vocals.playerVolume = 1;
+    if (vocals != null) vocals.playerVolume = 1;
   }
 
   /**
@@ -4010,7 +4115,7 @@ class PlayState extends MusicBeatSubState
   public function endSong(rightGoddamnNow:Bool = false):Void
   {
     if (FlxG.sound.music != null) FlxG.sound.music.volume = 0;
-    vocals.volume = 0;
+    if (vocals != null) vocals.volume = 0;
     mayPauseGame = false;
     isSongEnd = true;
 
@@ -4091,7 +4196,7 @@ class PlayState extends MusicBeatSubState
       if (Date.now().getDay() == 5) Medals.award(FridayNight);
 
       // Determine the score rank for this song we just finished.
-      var scoreRank:ScoringRank = Scoring.calculateRank(
+      var scoreRank:Null<ScoringRank> = Scoring.calculateRank(
         {
           score: songScore,
           tallies:
@@ -4117,7 +4222,7 @@ class PlayState extends MusicBeatSubState
       if (currentVariation == 'pico' && !PlayStatePlaylist.isStoryMode) Medals.award(FreeplayPicoMix);
       if (currentVariation == 'pico' && currentSong.id == 'stress') Medals.award(FreeplayStressPico);
 
-      Events.logEarnRank(scoreRank.toString());
+      if (scoreRank != null) Events.logEarnRank(scoreRank.toString());
     }
     #end
 
@@ -4133,7 +4238,7 @@ class PlayState extends MusicBeatSubState
 
       // Pop the next song ID from the list.
       // Returns null if the list is empty.
-      var targetSongId:String = PlayStatePlaylist.playlistSongIds.shift();
+      var targetSongId:Null<String> = PlayStatePlaylist.playlistSongIds.shift();
 
       if (targetSongId == null)
       {
@@ -4157,20 +4262,23 @@ class PlayState extends MusicBeatSubState
                 },
             };
 
-          #if FEATURE_NEWGROUNDS
-          // Award a medal for beating a Story level.
-          Medals.awardStoryLevel(PlayStatePlaylist.campaignId);
-
-          // Submit the score for the Story level to Newgrounds.
-          Leaderboards.submitLevelScore(PlayStatePlaylist.campaignId, PlayStatePlaylist.campaignDifficulty, PlayStatePlaylist.campaignScore);
-
-          Events.logCompleteLevel(PlayStatePlaylist.campaignId);
-          #end
-
-          if (Save.instance.isLevelHighScore(PlayStatePlaylist.campaignId, PlayStatePlaylist.campaignDifficulty, data))
+          if (PlayStatePlaylist.campaignId != null)
           {
-            Save.instance.setLevelScore(PlayStatePlaylist.campaignId, PlayStatePlaylist.campaignDifficulty, data);
-            isNewHighscore = true;
+            #if FEATURE_NEWGROUNDS
+            // Award a medal for beating a Story level.
+            Medals.awardStoryLevel(PlayStatePlaylist.campaignId);
+
+            // Submit the score for the Story level to Newgrounds.
+            Leaderboards.submitLevelScore(PlayStatePlaylist.campaignId, PlayStatePlaylist.campaignDifficulty, PlayStatePlaylist.campaignScore);
+
+            Events.logCompleteLevel(PlayStatePlaylist.campaignId);
+            #end
+
+            if (Save.instance.isLevelHighScore(PlayStatePlaylist.campaignId, PlayStatePlaylist.campaignDifficulty, data))
+            {
+              Save.instance.setLevelScore(PlayStatePlaylist.campaignId, PlayStatePlaylist.campaignDifficulty, data);
+              isNewHighscore = true;
+            }
           }
         }
 
@@ -4199,8 +4307,8 @@ class PlayState extends MusicBeatSubState
         FlxTransitionableState.skipNextTransIn = true;
         FlxTransitionableState.skipNextTransOut = true;
 
-        if (FlxG.sound.music != null) FlxG.sound.music.stop();
-        vocals.stop();
+        FlxG.sound.music?.stop();
+        vocals?.stop();
 
         // TODO: Softcode this cutscene.
         if (currentSong.id == 'eggnog')
@@ -4214,13 +4322,13 @@ class PlayState extends MusicBeatSubState
 
           FunkinSound.playOnce(Paths.sound('Lights_Shut_off'), function() {
             // no camFollow so it centers on horror tree
-            var targetSong:Song = SongRegistry.instance.fetchEntry(targetSongId);
+            var targetSong:Song = SongRegistry.instance.fetchEntry(targetSongId) ?? throw 'Could not find a song with the ID $targetSongId';
             var targetVariation:String = currentVariation;
             if (!targetSong.hasDifficulty(PlayStatePlaylist.campaignDifficulty, currentVariation))
             {
               targetVariation = targetSong.getFirstValidVariation(PlayStatePlaylist.campaignDifficulty) ?? Constants.DEFAULT_VARIATION;
             }
-            this.remove(currentStage);
+            if (currentStage != null) this.remove(currentStage);
             LoadingState.loadPlayState(
               {
                 targetSong: targetSong,
@@ -4232,13 +4340,13 @@ class PlayState extends MusicBeatSubState
         }
         else
         {
-          var targetSong:Song = SongRegistry.instance.fetchEntry(targetSongId);
+          var targetSong:Song = SongRegistry.instance.fetchEntry(targetSongId) ?? throw 'Could not find a song with ID $targetSongId';
           var targetVariation:String = currentVariation;
           if (!targetSong.hasDifficulty(PlayStatePlaylist.campaignDifficulty, currentVariation))
           {
             targetVariation = targetSong.getFirstValidVariation(PlayStatePlaylist.campaignDifficulty) ?? Constants.DEFAULT_VARIATION;
           }
-          this.remove(currentStage);
+          if (currentStage != null) this.remove(currentStage);
           LoadingState.loadPlayState(
             {
               targetSong: targetSong,
@@ -4390,20 +4498,24 @@ class PlayState extends MusicBeatSubState
     // If the opponent is GF, zoom in on the opponent.
     // Else, if there is no GF, zoom in on BF.
     // Else, zoom in on GF.
-    var targetDad:Bool = currentStage.getDad() != null && currentStage.getDad().characterId == 'gf';
-    var targetBF:Bool = currentStage.getGirlfriend() == null && !targetDad;
+    var boyfriend:Null<BaseCharacter> = currentStage?.getBoyfriend();
+    var girlfriend:Null<BaseCharacter> = currentStage?.getGirlfriend();
+    var dad:Null<BaseCharacter> = currentStage?.getDad();
 
-    if (targetBF)
+    var targetDad:Bool = dad?.characterId == 'gf';
+    var targetBF:Bool = girlfriend == null && !targetDad;
+
+    if (targetBF && boyfriend != null)
     {
-      FlxG.camera.follow(currentStage.getBoyfriend(), null, 0.05);
+      FlxG.camera.follow(boyfriend, null, 0.05);
     }
-    else if (targetDad)
+    else if (targetDad && dad != null)
     {
-      FlxG.camera.follow(currentStage.getDad(), null, 0.05);
+      FlxG.camera.follow(dad, null, 0.05);
     }
-    else
+    else if (girlfriend != null)
     {
-      FlxG.camera.follow(currentStage.getGirlfriend(), null, 0.05);
+      FlxG.camera.follow(girlfriend, null, 0.05);
     }
 
     // TODO: Make target offset configurable.
@@ -4425,15 +4537,15 @@ class PlayState extends MusicBeatSubState
     new FlxTimer().start(0.8, function(_) {
       if (targetBF)
       {
-        currentStage.getBoyfriend().animation.play('hey');
+        boyfriend?.animation.play('hey');
       }
       else if (targetDad)
       {
-        currentStage.getDad().animation.play('cheer');
+        dad?.animation.play('cheer');
       }
       else
       {
-        currentStage.getGirlfriend().animation.play('cheer');
+        girlfriend?.animation.play('cheer');
       }
 
       // Zoom over to the Results screen.
@@ -4452,12 +4564,17 @@ class PlayState extends MusicBeatSubState
      */
   function moveToResultsScreen(isNewHighscore:Bool, ?prevScoreData:SaveScoreData):Void
   {
+    var currentChart:SongDifficulty = currentChart ??
+      {
+        trace('ERROR: Cannot move to results screen with a null chart.');
+        return;
+      }
+
     persistentUpdate = false;
-    vocals.stop();
+    vocals?.stop();
     camHUD.alpha = 1;
 
     var talliesToUse:Tallies = PlayStatePlaylist.isStoryMode ? Highscore.talliesLevel : Highscore.tallies;
-
     var res:ResultState = new ResultState(
       {
         storyMode: PlayStatePlaylist.isStoryMode,
@@ -4503,7 +4620,7 @@ class PlayState extends MusicBeatSubState
   /**
      * Resets the camera's zoom level and focus point.
      */
-  public function resetCamera(?resetZoom:Bool = true, ?cancelTweens:Bool = true, ?snap:Bool = true):Void
+  public function resetCamera(resetZoom:Bool = true, cancelTweens:Bool = true, snap:Bool = true):Void
   {
     // Cancel camera tweens if any are active.
     if (cancelTweens)
@@ -4526,7 +4643,7 @@ class PlayState extends MusicBeatSubState
   /**
      * Sets the camera follow point's position and tweens the camera there.
      */
-  public function tweenCameraToPosition(?x:Float, ?y:Float, ?duration:Float, ?ease:Null<Float->Float>):Void
+  public function tweenCameraToPosition(x:Float = 0, y:Float = 0, duration:Float = 0, ?ease:Null<Float->Float>):Void
   {
     cameraFollowPoint.setPosition(x, y);
     tweenCameraToFollowPoint(duration, ease);
@@ -4535,7 +4652,7 @@ class PlayState extends MusicBeatSubState
   /**
      * Disables camera following and tweens the camera to the follow point manually.
      */
-  public function tweenCameraToFollowPoint(?duration:Float, ?ease:Null<Float->Float>):Void
+  public function tweenCameraToFollowPoint(duration:Float = 0, ?ease:Null<Float->Float>):Void
   {
     // Cancel the current tween if it's active.
     cancelCameraFollowTween();
@@ -4548,6 +4665,7 @@ class PlayState extends MusicBeatSubState
     else
     {
       // Disable camera following for the duration of the tween.
+      @:nullSafety(Off)
       FlxG.camera.target = null;
 
       // Follow tween! Caching it so we can cancel/pause it later if needed.
@@ -4573,7 +4691,7 @@ class PlayState extends MusicBeatSubState
   /**
      * Tweens the camera zoom to the desired amount.
      */
-  public function tweenCameraZoom(?zoom:Float, ?duration:Float, ?direct:Bool, ?ease:Null<Float->Float>):Void
+  public function tweenCameraZoom(zoom:Float = 1, duration:Float = 0, direct:Bool = false, ?ease:Null<Float->Float>):Void
   {
     // Cancel the current tween if it's active.
     cancelCameraZoomTween();
@@ -4594,7 +4712,7 @@ class PlayState extends MusicBeatSubState
     }
   }
 
-  public function cancelCameraZoomTween()
+  public function cancelCameraZoomTween():Void
   {
     if (cameraZoomTween != null)
     {
@@ -4634,7 +4752,7 @@ class PlayState extends MusicBeatSubState
 
     for (i in strumlines)
     {
-      var value:Float = speed;
+      var value:Float = speed ?? 0;
       var strum:Strumline = Reflect.getProperty(this, i);
 
       if (duration == 0)

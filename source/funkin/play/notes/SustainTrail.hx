@@ -1362,7 +1362,7 @@ class SustainTrail extends ZSprite
    */
   public function updateClipping_Vanilla(songTime:Float = 0):Void
   {
-    var clipHeight:Float = FlxMath.bound(sustainHeight(sustainLength - (songTime - strumTime), parentStrumline?.scrollSpeed ?? 1.0), 0, graphicHeight);
+    var clipHeight:Float = sustainHeight(sustainLength - (songTime - strumTime), parentStrumline?.scrollSpeed ?? 1.0).clamp(0, graphicHeight);
     if (clipHeight <= 0.1)
     {
       visible = false;

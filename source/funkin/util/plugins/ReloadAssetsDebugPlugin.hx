@@ -6,7 +6,7 @@ import funkin.ui.MusicBeatState;
 import funkin.ui.MusicBeatSubState;
 import funkin.play.PlayState;
 #if android
-import funkin.mobile.external.android.CallbackUtil;
+import funkin.external.android.CallbackUtil;
 #end
 
 /**
