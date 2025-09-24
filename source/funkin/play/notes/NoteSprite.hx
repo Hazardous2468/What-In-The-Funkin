@@ -207,8 +207,6 @@ class NoteSprite extends ZSpriteProjected
 
     noteModData = new NoteData();
 
-    noteStyleName = noteStyle.id;
-
     this.alpha = 1;
 
     setupNoteGraphic(noteStyle);
@@ -224,6 +222,8 @@ class NoteSprite extends ZSpriteProjected
   public function setupNoteGraphic(noteStyle:NoteStyle):Void
   {
     noteStyle.buildNoteSprite(this);
+
+    noteStyleName = noteStyle.id;
 
     this.shader = hsvShader;
     stealthGlow = 0.0;
