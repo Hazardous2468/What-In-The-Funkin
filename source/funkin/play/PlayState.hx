@@ -166,7 +166,8 @@ typedef PlayStateParams =
  * The gameplay state, where all the rhythm gaming happens.
  * SubState so it can be loaded as a child of the chart editor.
  */
-@:nullSafety
+// I errr, ain't dealing with this... not yet lol -Hazard
+// @:nullSafety
 class PlayState extends MusicBeatSubState
 {
   /**
