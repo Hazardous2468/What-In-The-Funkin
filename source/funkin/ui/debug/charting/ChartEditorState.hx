@@ -41,7 +41,7 @@ import funkin.input.TurboKeyHandler;
 import funkin.modding.events.ScriptEvent;
 import funkin.play.notes.notekind.NoteKindManager;
 import funkin.play.character.BaseCharacter.CharacterType;
-import funkin.play.character.CharacterData.CharacterDataParser;
+import funkin.data.character.CharacterData.CharacterDataParser;
 import funkin.play.components.HealthIcon;
 import funkin.play.notes.NoteSprite;
 import funkin.play.PlayStatePlaylist;
@@ -78,6 +78,7 @@ import funkin.ui.debug.charting.components.ChartEditorSelectionSquareSprite;
 import funkin.ui.debug.charting.toolboxes.ChartEditorDifficultyToolbox;
 import funkin.ui.debug.charting.toolboxes.ChartEditorFreeplayToolbox;
 import funkin.ui.debug.charting.toolboxes.ChartEditorOffsetsToolbox;
+import funkin.ui.debug.FunkinDebugDisplay.DebugDisplayMode;
 import funkin.ui.haxeui.components.CharacterPlayer;
 import funkin.ui.mainmenu.MainMenuState;
 import funkin.ui.transition.LoadingState;
@@ -1280,6 +1281,20 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
   var songMetadata:Map<String, SongMetadata> = [];
 
   /**
+   * Updates the current song's play data variations list.
+   */
+  function refreshPlayDataVariations():Void
+  {
+    var songVariations:Array<String> = songMetadata.get(Constants.DEFAULT_VARIATION).playData.songVariations;
+    songVariations.clear();
+    for (variation in availableVariations)
+    {
+      if (variation == Constants.DEFAULT_VARIATION) continue;
+      songVariations.push(variation);
+    }
+  }
+
+  /**
    * Retrieves the list of variations for the current song.
    */
   var availableVariations(get, never):Array<String>;
@@ -2173,6 +2188,11 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
   var notePreviewPlayhead:Null<FlxSprite> = null;
 
   /**
+   * Whether the note preview playhead is currently being dragged with the mouse by the user.
+   */
+  var notePreviewPlayHeadDragging:Bool = false;
+
+  /**
    * The rectangular sprite used for rendering the selection box.
    * Uses a 9-slice to stretch the selection box to the correct size without warping.
    */
@@ -2857,7 +2877,7 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
     txtCopyNotif.zIndex = 120;
     add(txtCopyNotif);
 
-    if (!Preferences.debugDisplay) menubar.paddingLeft = null;
+    if (Preferences.debugDisplay == DebugDisplayMode.OFF) menubar.paddingLeft = null;
 
     this.setupNotifications();
 
@@ -4378,6 +4398,12 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
         else if (measureTicks != null && FlxG.mouse.overlaps(measureTicks) && !isCursorOverHaxeUI)
         {
           gridPlayheadScrollAreaPressed = true;
+          // Stop audio playback while dragging on the grid playhead.
+          if (audioInstTrack != null && audioInstTrack.isPlaying)
+          {
+            playbarHeadDraggingWasPlaying = true;
+            stopAudioPlayback();
+          }
         }
         else if (notePreview != null && FlxG.mouse.overlaps(notePreview) && !isCursorOverHaxeUI)
         {
@@ -4400,11 +4426,24 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
       if (gridPlayheadScrollAreaPressed && FlxG.mouse.released)
       {
         gridPlayheadScrollAreaPressed = false;
+        // If we were dragging the playhead while the song was playing, resume playing.
+        if (playbarHeadDraggingWasPlaying)
+        {
+          playbarHeadDraggingWasPlaying = false;
+          startAudioPlayback();
+        }
       }
 
       if (notePreviewScrollAreaStartPos != null && FlxG.mouse.released)
       {
         notePreviewScrollAreaStartPos = null;
+        notePreviewPlayHeadDragging = false;
+
+        if (playbarHeadDraggingWasPlaying)
+        {
+          playbarHeadDraggingWasPlaying = false;
+          startAudioPlayback();
+        }
       }
 
       if (gridPlayheadScrollAreaPressed)
@@ -4679,6 +4718,14 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
       }
       else if (notePreviewScrollAreaStartPos != null)
       {
+        notePreviewPlayHeadDragging = true;
+        // Stop audio playback while dragging on the note preview playhead.
+        if (audioInstTrack != null && audioInstTrack.isPlaying)
+        {
+          playbarHeadDraggingWasPlaying = true;
+          stopAudioPlayback();
+        }
+
         // Player is clicking and holding on note preview to scrub around.
         targetCursorMode = Grabbing;
 
@@ -5705,6 +5752,8 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
       return;
     }
 
+    this.hideAllToolboxes();
+
     stopWelcomeMusic();
     // TODO: PR Flixel to make onComplete nullable.
     if (audioInstTrack != null) audioInstTrack.onComplete = null;
@@ -6037,6 +6086,9 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
     stopWelcomeMusic();
     stopAudioPlayback();
 
+    // Force pauses audio preview from OffsetsToolbox, if it exists.
+    cast(this.getToolbox(CHART_EDITOR_TOOLBOX_OFFSETS_LAYOUT), ChartEditorOffsetsToolbox)?.pauseAudioPreview();
+
     var startTimestamp:Float = 0;
     if (playtestStartTime) startTimestamp = scrollPositionInMs + playheadPositionInMs;
 
@@ -6219,6 +6271,9 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
   {
     if (audioInstTrack != null)
     {
+      // Don't allow the audio to be played while we're dragging any of the playheads
+      if (playbarHeadDragging || gridPlayheadScrollAreaPressed || notePreviewPlayHeadDragging) return;
+      cast(this.getToolbox(CHART_EDITOR_TOOLBOX_OFFSETS_LAYOUT), ChartEditorOffsetsToolbox)?.pauseAudioPreview();
       audioInstTrack.play(false, audioInstTrack.time);
       audioVocalTrackGroup.play(false, audioInstTrack.time);
     }
@@ -6330,7 +6385,7 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
 
     if (songMetadata.size() > 1)
     {
-      if (variationMetadata.playData.difficulties.length == 0)
+      if (variation != Constants.DEFAULT_VARIATION && variationMetadata.playData.difficulties.length == 0)
       {
         songMetadata.remove(variation);
         songChartData.remove(variation);
@@ -6347,6 +6402,7 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
     if (selectedDifficulty == difficulty
       || !variationMetadata.playData.difficulties.contains(selectedDifficulty)) selectedDifficulty = variationMetadata.playData.difficulties[0];
 
+    refreshPlayDataVariations();
     difficultySelectDirty = true; // Force the Difficulty toolbox to update.
   }
 
@@ -6683,6 +6739,8 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
     }
     else
     {
+      // Don't allow the audio to be played while we're dragging any of the playheads
+      if (playbarHeadDragging || gridPlayheadScrollAreaPressed || notePreviewPlayHeadDragging) return;
       // Play
       startAudioPlayback();
       stopWelcomeMusic();

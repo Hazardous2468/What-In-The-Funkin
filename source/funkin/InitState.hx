@@ -24,7 +24,7 @@ import funkin.data.event.SongEventRegistry;
 import funkin.data.stage.StageRegistry;
 import funkin.data.story.level.LevelRegistry;
 import funkin.modding.module.ModuleHandler;
-import funkin.play.character.CharacterData.CharacterDataParser;
+import funkin.data.character.CharacterData.CharacterDataParser;
 import funkin.play.notes.notekind.NoteKindManager;
 import funkin.play.PlayStatePlaylist;
 import funkin.ui.debug.charting.ChartEditorState;
@@ -125,7 +125,7 @@ class InitState extends FlxState
 
       #if ios
       // Setup Audio session
-      funkin.external.ios.AudioSession.initialize();
+      funkin.external.apple.AudioSession.initialize();
       #end
 
       // This ain't a pixel art game! (most of the time)

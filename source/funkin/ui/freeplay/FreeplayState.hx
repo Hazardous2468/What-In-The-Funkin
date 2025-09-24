@@ -246,6 +246,7 @@ class FreeplayState extends MusicBeatSubState
   var prepForNewRank:Bool = false;
   var styleData:Null<FreeplayStyle> = null;
   var fromCharSelect:Bool = false;
+  var forceSkipIntro:Bool = false;
 
   public var freeplayArrow:Null<FlxText>;
 
@@ -277,7 +278,11 @@ class FreeplayState extends MusicBeatSubState
 
     super(FlxColor.TRANSPARENT);
 
-    if (stickers?.members != null) stickerSubState = stickers;
+    if (stickers?.members != null)
+    {
+      stickerSubState = stickers;
+      forceSkipIntro = true;
+    }
 
     var backingCardPrep:Null<BackingCard> = null;
 
@@ -346,6 +351,14 @@ class FreeplayState extends MusicBeatSubState
 
       openSubState(stickerSubState);
       stickerSubState.degenStickers();
+    }
+
+    if (fromResultsParams != null)
+    {
+      @:privateAccess
+      this._parentState._constructor = () -> {
+        return FreeplayState.build(null, null);
+      }
     }
 
     #if FEATURE_DISCORD_RPC
@@ -498,7 +511,7 @@ class FreeplayState extends MusicBeatSubState
     var overhangStuff:FlxSprite = new FlxSprite().makeGraphic(FlxG.width, 164, FlxColor.BLACK);
     overhangStuff.y -= overhangStuff.height;
 
-    if (fromCharSelect)
+    if (fromCharSelect || forceSkipIntro)
     {
       blackOverlayBullshitLOLXD.visible = false;
       overhangStuff.y = -100;
@@ -764,7 +777,7 @@ class FreeplayState extends MusicBeatSubState
         albumRoll.skipIntro();
         albumRoll.showStars();
       }
-      else if (fromCharSelect)
+      else if (fromCharSelect || forceSkipIntro)
       {
         albumRoll.skipIntro();
         albumRoll.showStars();
@@ -813,10 +826,11 @@ class FreeplayState extends MusicBeatSubState
       rankCamera.fade(0xFF000000, 0, false, null, true);
     }
 
-    if (fromCharSelect)
+    if (fromCharSelect || forceSkipIntro)
     {
-      enterFromCharSel();
+      if (fromCharSelect) enterFromCharSel();
       onDJIntroDone();
+      forceSkipIntro = false;
     }
     else
     {
@@ -900,10 +914,10 @@ class FreeplayState extends MusicBeatSubState
     var randomCapsule:SongMenuItem = grpCapsules.recycle(SongMenuItem);
     randomCapsule.initRandom(styleData);
     randomCapsule.onConfirm = function() {
-      capsuleOnConfirmRandom(randomCapsule);
+      capsuleOnOpenRandom(randomCapsule);
     };
 
-    if (fromCharSelect || noJumpIn) randomCapsule.forcePosition();
+    if (fromCharSelect || forceSkipIntro || noJumpIn) randomCapsule.forcePosition();
     else
     {
       randomCapsule.initJumpIn(0, force);
@@ -933,7 +947,7 @@ class FreeplayState extends MusicBeatSubState
       funnyMenu.newText.animation.curAnim.curFrame = 45 - ((i * 4) % 45);
 
       // Stop the bounce-in animation when returning to freeplay from the character selection screen, or if noJumpIn is set to true
-      if (fromCharSelect || noJumpIn) funnyMenu.forcePosition();
+      if (fromCharSelect || forceSkipIntro || noJumpIn) funnyMenu.forcePosition();
       else
         funnyMenu.initJumpIn(0, force);
 
@@ -1034,6 +1048,7 @@ class FreeplayState extends MusicBeatSubState
     if (fromResults.oldRank != null)
     {
       capsuleToRank.fakeRanking.rank = fromResults.oldRank;
+      capsuleToRank.fakeBlurredRanking.rank = fromResults.oldRank;
 
       sparks.frames = Paths.getSparrowAtlas('freeplay/sparks');
       sparks.animation.addByPrefix('sparks', 'sparks', 24, false);
@@ -1067,6 +1082,7 @@ class FreeplayState extends MusicBeatSubState
     trace(originalPos);
 
     capsuleToRank.ranking.visible = false;
+    capsuleToRank.blurredRanking.visible = false;
 
     // Rank animation vibrations.
     HapticUtil.increasingVibrate(Constants.MIN_VIBRATION_AMPLITUDE, Constants.MAX_VIBRATION_AMPLITUDE, 0.6);
@@ -1090,23 +1106,29 @@ class FreeplayState extends MusicBeatSubState
 
   function rankDisplayNew(fromResults:Null<FromResultsParams>, capsuleToRank:SongMenuItem):Void
   {
-    capsuleToRank.ranking.visible = false;
-    capsuleToRank.fakeRanking.visible = false;
+    capsuleToRank.ranking.visible = true;
+    capsuleToRank.blurredRanking.visible = true;
     capsuleToRank.ranking.scale.set(20, 20);
+    capsuleToRank.blurredRanking.scale.set(20, 20);
 
     if (fromResults != null && fromResults.newRank != null)
     {
-      capsuleToRank.ranking.playAnimationEach(fromResults.newRank.getFreeplayRankIconAsset(), true);
+      capsuleToRank.ranking.animation.play(fromResults.newRank.getFreeplayRankIconAsset(), true);
     }
 
     FlxTween.tween(capsuleToRank.ranking, {"scale.x": 0.9, "scale.y": 0.9}, 0.1);
 
-    new FlxTimer().start(0.1, _ -> {
-      capsuleToRank.ranking.visible = true;
+    if (fromResults != null && fromResults.newRank != null)
+    {
+      capsuleToRank.blurredRanking.animation.play(fromResults.newRank.getFreeplayRankIconAsset(), true);
+    }
+    FlxTween.tween(capsuleToRank.blurredRanking, {"scale.x": 0.9, "scale.y": 0.9}, 0.1);
 
+    new FlxTimer().start(0.1, _ -> {
       if (fromResults?.oldRank != null)
       {
         capsuleToRank.fakeRanking.visible = false;
+        capsuleToRank.fakeBlurredRanking.visible = false;
 
         sparks.visible = true;
         sparksADD.visible = true;
@@ -1454,7 +1476,8 @@ class FreeplayState extends MusicBeatSubState
     fadeDots(false);
 
     #if FEATURE_TOUCH_CONTROLS
-    FlxTween.tween(backButton, {alpha: 0.0001}, 0.4, {ease: FlxEase.quadOut});
+    backTransitioning = true;
+    FlxTween.tween(backButton, {alpha: 0}, 0.4, {ease: FlxEase.quadOut});
     #end
 
     funnyCam.filtersEnabled = true;
@@ -1561,6 +1584,8 @@ class FreeplayState extends MusicBeatSubState
   {
     super.update(elapsed);
 
+    Conductor.instance.update(FlxG.sound?.music?.time ?? 0.0);
+
     #if FEATURE_TOUCH_CONTROLS
     if (backButton != null && !backTransitioning)
     {
@@ -1569,7 +1594,7 @@ class FreeplayState extends MusicBeatSubState
         backButton.animation.play("idle");
         backButton.alpha = backButton.restingOpacity;
       }
-      backButton.active = controls.active;
+      backButton.enabled = controls.active;
     }
     #end
 
@@ -2066,13 +2091,6 @@ class FreeplayState extends MusicBeatSubState
   }
   #end
 
-  override function beatHit():Bool
-  {
-    backingCard.beatHit();
-
-    return super.beatHit();
-  }
-
   public override function destroy():Void
   {
     super.destroy();
@@ -2127,7 +2145,7 @@ class FreeplayState extends MusicBeatSubState
 
     #if FEATURE_TOUCH_CONTROLS
     FlxTween.tween(backButton, {x: FlxG.width + 300}, 0.45, {ease: FlxEase.expoIn});
-    FlxTween.tween(backButton, {alpha: 0.0001}, 0.3, {ease: FlxEase.quadOut, startDelay: 0.15});
+    FlxTween.tween(backButton, {alpha: 0}, 0.3, {ease: FlxEase.quadOut, startDelay: 0.15});
     #end
 
     for (caps in grpCapsules.members)
@@ -2303,7 +2321,7 @@ class FreeplayState extends MusicBeatSubState
       intendedCompletion = Math.max(0, Scoring.tallyCompletion(songScore?.tallies));
       rememberedDifficulty = currentDifficulty;
       if (!capsuleAnim) generateSongList(currentFilter, false, true, true);
-      currentCapsule.refreshDisplay(!prepForNewRank);
+      if (change != 0) currentCapsule.refreshDisplay(!prepForNewRank);
     }
     else
     {
@@ -2410,7 +2428,10 @@ class FreeplayState extends MusicBeatSubState
   }
   #end
 
-  function capsuleOnConfirmRandom(randomCapsule:SongMenuItem):Void
+  /**
+   * Called when hitting ENTER to open the instrumental choice for random capsule
+   */
+  function capsuleOnOpenRandom(randomCapsule:SongMenuItem):Void
   {
     trace('RANDOM SELECTED');
 
@@ -2434,18 +2455,81 @@ class FreeplayState extends MusicBeatSubState
       return;
     }
 
-    var targetSong:SongMenuItem = FlxG.random.getObject(availableSongCapsules);
+    controls.active = false;
+    #if NO_FEATURE_TOUCH_CONTROLS
+    letterSort.inputEnabled = false;
+    #end
+    var instrumentalChoices:Array<String> = ['default', 'random'];
 
-    // Seeing if I can do an animation...
-    curSelected = grpCapsules.members.indexOf(targetSong);
-    changeSelection(0); // Trigger an update.
+    capsuleOptionsMenu = new CapsuleOptionsMenu(this, randomCapsule.targetPos.x + 175, randomCapsule.targetPos.y + 115, instrumentalChoices);
+    capsuleOptionsMenu.cameras = [funnyCam];
+    capsuleOptionsMenu.zIndex = 10000;
+    add(capsuleOptionsMenu);
+
+    capsuleOptionsMenu.onConfirm = function(instChoice:String) {
+      capsuleOnConfirmRandom(availableSongCapsules, instChoice);
+    }
+  }
+
+  /**
+   * Called when hitting ENTER on an instrumental choice for random capsule
+   */
+  function capsuleOnConfirmRandom(availableSongCapsules:Array<SongMenuItem>, instChoice:String):Void
+  {
+    cleanupCapsuleOptionsMenu();
     controls.active = false;
     #if NO_FEATURE_TOUCH_CONTROLS
     letterSort.inputEnabled = false;
     #end
 
-    // Act like we hit Confirm on that song.
-    capsuleOnConfirmDefault(targetSong);
+    var targetSongCap:SongMenuItem = FlxG.random.getObject(availableSongCapsules);
+    // Seeing if I can do an animation...
+    curSelected = grpCapsules.members.indexOf(targetSongCap);
+    changeSelection(); // Trigger an update. This will also fix the target variation.
+
+    var targetSongId:String = targetSongCap?.freeplayData?.data.id ?? 'unknown';
+    var targetSongNullable:Null<Song> = SongRegistry.instance.fetchEntry(targetSongId);
+    if (targetSongNullable == null)
+    {
+      FlxG.log.warn('WARN: could not find song with id (${targetSongId})');
+      controls.active = true;
+      #if NO_FEATURE_TOUCH_CONTROLS
+      letterSort.inputEnabled = true;
+      #end
+      return;
+    }
+    var targetSong:Song = targetSongNullable;
+    var targetDifficultyId:String = currentDifficulty;
+    var targetVariation:Null<String> = currentVariation;
+
+    var targetDifficulty:Null<SongDifficulty> = targetSong.getDifficulty(targetDifficultyId, targetVariation);
+    if (targetDifficulty == null)
+    {
+      FlxG.log.warn('WARN: could not find difficulty with id (${targetDifficultyId})');
+      controls.active = true;
+      #if NO_FEATURE_TOUCH_CONTROLS
+      letterSort.inputEnabled = true;
+      #end
+      return;
+    }
+
+    if (instChoice == 'random')
+    {
+      var baseInstrumentalId:String = targetSong.getBaseInstrumentalId(targetDifficultyId, targetDifficulty?.variation ?? Constants.DEFAULT_VARIATION) ?? '';
+      var altInstrumentalIds:Array<String> = targetSong.listAltInstrumentalIds(targetDifficultyId,
+        targetDifficulty?.variation ?? Constants.DEFAULT_VARIATION) ?? [];
+
+      // Choose a random instrumental
+      var instrumentalIds:Array<String> = [baseInstrumentalId].concat(altInstrumentalIds);
+      var targetInstrumentalId:String = FlxG.random.getObject(instrumentalIds);
+      // Hit Confirm on that song with random instrumental
+      capsuleOnConfirmDefault(targetSongCap, targetInstrumentalId);
+    }
+    else
+    {
+      // Hit Confirm on that song with default instrumental
+      capsuleOnConfirmDefault(targetSongCap);
+    }
   }
 
   /**
@@ -2614,6 +2698,13 @@ class FreeplayState extends MusicBeatSubState
     new FlxTimer().start(styleData?.getStartDelay(), function(tmr:FlxTimer) {
       FunkinSound.emptyPartialQueue();
 
+      #if FEATURE_TOUCH_CONTROLS
+      if (backButton != null)
+      {
+        backTransitioning = true;
+        FlxTween.tween(backButton, {alpha: 0}, 0.2, {ease: FlxEase.quadOut});
+      }
+      #end
       funnyCam.fade(FlxColor.BLACK, 0.2, false, function() {
         Paths.setCurrentLevel(cap?.freeplayData?.levelId);
         LoadingState.loadPlayState(
@@ -2732,9 +2823,7 @@ class FreeplayState extends MusicBeatSubState
     if (currentCapsule.freeplayData == null) albumRoll.albumId = null;
 
     changeDiff();
-    if (currentCapsule.freeplayData == null) currentCapsule.refreshDisplay();
-    else
-      currentCapsule.refreshDisplay(!prepForNewRank);
+    currentCapsule.refreshDisplay(currentCapsule.freeplayData == null);
 
     for (index => capsule in grpCapsules.members)
     {
@@ -2823,7 +2912,6 @@ class FreeplayState extends MusicBeatSubState
       if (songDifficulty != null)
       {
         Conductor.instance.mapTimeChanges(songDifficulty.timeChanges);
-        Conductor.instance.update(FlxG.sound?.music?.time ?? 0.0);
       }
     }
   }

@@ -254,10 +254,24 @@ class Strumline extends FlxSpriteGroup
 
   var background:FunkinSprite;
 
+  /**
+   * The strumline notes (the receptors) themselves.
+   */
   public var strumlineNotes:FlxTypedSpriteGroup<StrumlineNote>;
+
+  /**
+   * Note Splashes
+   */
   public var noteSplashes:FlxTypedSpriteGroup<NoteSplash>;
+
+  /**
+   * Hold note covers.
+   */
   public var noteHoldCovers:FlxTypedSpriteGroup<NoteHoldCover>;
 
+  /**
+   * The notes that "Vwoosh" off screen when restarting.
+   */
   public var notesVwoosh:FlxTypedSpriteGroup<NoteSprite>;
   public var holdNotesVwoosh:FlxTypedSpriteGroup<SustainTrail>;
 

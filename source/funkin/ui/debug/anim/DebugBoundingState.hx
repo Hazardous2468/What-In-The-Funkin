@@ -1,10 +1,10 @@
 package funkin.ui.debug.anim;
 
+import flixel.addons.display.FlxBackdrop;
+import flixel.addons.display.FlxGridOverlay;
 import flixel.FlxCamera;
 import flixel.FlxSprite;
 import flixel.FlxState;
-import flixel.addons.display.FlxBackdrop;
-import flixel.addons.display.FlxGridOverlay;
 import flixel.graphics.frames.FlxFrame;
 import flixel.group.FlxGroup;
 import flixel.math.FlxPoint;
@@ -12,17 +12,17 @@ import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import funkin.input.Cursor;
 import funkin.play.character.BaseCharacter;
-import funkin.play.character.CharacterData.CharacterDataParser;
-import funkin.play.character.CharacterData;
+import funkin.data.character.CharacterData;
+import funkin.data.character.CharacterData.CharacterDataParser;
 import funkin.ui.mainmenu.MainMenuState;
 import funkin.util.MouseUtil;
 import funkin.util.SerializerUtil;
 import funkin.util.SortUtil;
-import haxe.ui.RuntimeComponentBuilder;
 import haxe.ui.components.DropDown;
 import haxe.ui.containers.dialogs.CollapsibleDialog;
 import haxe.ui.core.Screen;
 import haxe.ui.events.UIEvent;
+import haxe.ui.RuntimeComponentBuilder;
 import lime.utils.Assets as LimeAssets;
 import openfl.events.Event;
 import openfl.events.IOErrorEvent;
@@ -169,6 +169,21 @@ class DebugBoundingState extends FlxState
       // swagGraphic.setPosition(, );
       // trace(uvH);
     }
+  }
+
+  function updateOnionSkin():Void
+  {
+    if (swagChar == null) return;
+    if (swagChar.hasAnimation("idle")) swagChar.playAnimation("idle", true);
+
+    onionSkinChar.loadGraphicFromSprite(swagChar);
+    onionSkinChar.frame = swagChar.frame;
+    onionSkinChar.alpha = 0.6;
+    onionSkinChar.flipX = swagChar.flipX;
+    onionSkinChar.offset.x = swagChar.animOffsets[0];
+    onionSkinChar.offset.y = swagChar.animOffsets[1];
+
+    swagChar.playAnimation(currentAnimationName, true); // reset animation to the one it should be
   }
 
   function initOffsetView():Void
@@ -332,6 +347,16 @@ class DebugBoundingState extends FlxState
 
   function offsetControls():Void
   {
+    // CTRL + S = Save Character Data
+    // CTRL + SHIFT + S = Save Offsets
+    // "WINDOWS" key code is the same keycode as COMMAND on mac
+    if ((FlxG.keys.pressed.CONTROL || FlxG.keys.pressed.WINDOWS) && FlxG.keys.justPressed.S)
+    {
+      var outputString = FlxG.keys.pressed.SHIFT ? buildOutputStringOld() : buildOutputStringNew();
+      saveOffsets(outputString, FlxG.keys.pressed.SHIFT ? swagChar.characterId + "Offsets.txt" : swagChar.characterId + ".json");
+      return;
+    }
+
     if (FlxG.keys.justPressed.RBRACKET || FlxG.keys.justPressed.E)
     {
       if (offsetAnimationDropdown.selectedIndex + 1 <= offsetAnimationDropdown.dataSource.size)
@@ -395,12 +420,13 @@ class DebugBoundingState extends FlxState
     if (FlxG.keys.justPressed.F)
     {
       onionSkinChar.visible = !onionSkinChar.visible;
+      if (onionSkinChar.visible) updateOnionSkin();
     }
 
-    // FLIP
     if (FlxG.keys.justPressed.G)
     {
       swagChar.flipX = !swagChar.flipX;
+      if (onionSkinChar.visible) updateOnionSkin();
     }
 
     // Plays the idle animation
@@ -440,12 +466,6 @@ class DebugBoundingState extends FlxState
       txtOffsetShit.y = FlxG.height - 20 - txtOffsetShit.height;
 
       trace(animName);
-    }
-
-    if (FlxG.keys.justPressed.ESCAPE)
-    {
-      var outputString = FlxG.keys.pressed.CONTROL ? buildOutputStringOld() : buildOutputStringNew();
-      saveOffsets(outputString, FlxG.keys.pressed.CONTROL ? swagChar.characterId + "Offsets.txt" : swagChar.characterId + ".json");
     }
   }
 
@@ -490,8 +510,8 @@ class DebugBoundingState extends FlxState
     }
 
     swagChar = CharacterDataParser.fetchCharacter(char);
-    swagChar.x = 100;
-    swagChar.y = 100;
+    swagChar.x = onionSkinChar.x = 100;
+    swagChar.y = onionSkinChar.y = 100;
     swagChar.debug = true;
     offsetView.add(swagChar);
 
@@ -546,14 +566,7 @@ class DebugBoundingState extends FlxState
 
   function playCharacterAnimation(str:String, setOnionSkin:Bool = true)
   {
-    if (setOnionSkin && onionSkinChar != null)
-    {
-      // clears the canvas
-      onionSkinChar.pixels.fillRect(new Rectangle(0, 0, FlxG.width * 2, FlxG.height * 2), 0x00000000);
-
-      onionSkinChar.stamp(swagChar, Std.int(swagChar.x), Std.int(swagChar.y));
-      onionSkinChar.alpha = 0.6;
-    }
+    if (setOnionSkin) updateOnionSkin();
 
     // var animName = characterAnimNames[Std.parseInt(str)];
     var animName = str;
