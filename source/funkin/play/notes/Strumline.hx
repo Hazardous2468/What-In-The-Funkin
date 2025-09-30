@@ -273,6 +273,7 @@ class Strumline extends FlxSpriteGroup
    * The notes that "Vwoosh" off screen when restarting.
    */
   public var notesVwoosh:FlxTypedSpriteGroup<NoteSprite>;
+
   public var holdNotesVwoosh:FlxTypedSpriteGroup<SustainTrail>;
 
   public final noteStyle:NoteStyle;
@@ -1169,11 +1170,13 @@ class Strumline extends FlxSpriteGroup
       }
 
       final magicNumberIGuess:Float = 8;
+
       var drawDistanceBack:Float = 1;
       if (mods != null)
       {
         drawDistanceBack = 1.0 + (holdNote?.whichStrumNote?.strumExtraModData?.drawdistanceBack ?? 0.0);
       }
+
       var renderWindowEnd = holdNote.strumTime + holdNote.fullSustainLength + Constants.HIT_WINDOW_MS
         + (renderDistanceMs / magicNumberIGuess * drawDistanceBack);
 

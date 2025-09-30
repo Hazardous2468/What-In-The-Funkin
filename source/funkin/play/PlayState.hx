@@ -3334,6 +3334,23 @@ class PlayState extends MusicBeatSubState
               strummer.playNoteHoldCover(note.holdNoteSprite);
             }
           }
+          if (!r.cont) continue;
+
+          // This becomes true when the note leaves the hit window.
+          // It might still be on screen.
+          if (note.hasMissed && !note.handledMiss)
+          {
+            // Call an event to allow canceling the note miss.
+
+            // NOTE: This is what handles the character animations!
+            var event:NoteScriptEvent = new NoteScriptEvent(NOTE_MISS, note, Constants.HEALTH_MISS_PENALTY, Highscore.tallies.combo, true);
+            dispatchEvent(event);
+
+            // Calling event.cancelEvent() skips all the other logic! Neat!
+            if (event.eventCanceled) continue;
+
+            note.handledMiss = true;
+          }
         }
 
         // Process hold notes on the player's side.
