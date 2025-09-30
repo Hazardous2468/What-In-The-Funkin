@@ -3609,7 +3609,8 @@ class PlayState extends MusicBeatSubState
         }
         else
         {
-          var targetNote:Null<NoteSprite> = getNoteToHit(notesInDirection);
+          var targetNote:Null<NoteSprite> = notesInDirection.find((note) -> !note.lowPriority);
+          if (targetNote == null) targetNote = notesInDirection[0];
           if (targetNote == null) continue;
 
           notesInDirection.remove(targetNote);
@@ -3680,53 +3681,6 @@ class PlayState extends MusicBeatSubState
   }
 
   /**
-     * Returns the note that must be hit
-     * added by WITF for better inputs (mainly for jacks)
-     * @param notesInDirection A SORTED array of notes to pick from.
-     * @return The NoteSprite to return. Null if no note could be found.
-     */
-  function getNoteToHit(notesInDirection:Array<NoteSprite>):Null<NoteSprite>
-  {
-    #if FEATURE_WITF_INPUTS
-    // WITF logic:
-
-    // Separate the array into two, one for regular and one for low priority.
-    var notesInDirectionLowPriority:Array<NoteSprite> = [];
-    var notesInDirectionRegularPriority:Array<NoteSprite> = [];
-    for (note in notesInDirection)
-    {
-      if (note.lowPriority) notesInDirectionLowPriority.push(note);
-      else
-        notesInDirectionRegularPriority.push(note);
-    }
-
-    // Grab the first note in the array (sorted in WITF in the getNotes function).
-    if (notesInDirectionRegularPriority.length > 0)
-    {
-      return notesInDirectionRegularPriority[0];
-    }
-    else
-    {
-      // If there is no first note in the array, swap to the low priority array.
-      if (notesInDirectionLowPriority.length > 0)
-      {
-        return notesInDirectionLowPriority[0];
-      }
-      else
-      {
-        return null; // Return null if both arrays are empty :(
-      }
-    }
-    #else
-    // vanilla logic:
-    // Choose the first note, deprioritizing low priority notes.
-    var targetNote:Null<NoteSprite> = notesInDirection.find((note) -> !note.lowPriority);
-    if (targetNote == null) targetNote = notesInDirection[0];
-    return targetNote;
-    #end
-  }
-
-  /**
      * PreciseInputEvents are put into a queue between update() calls,
      * and then processed here.
      */
@@ -3792,7 +3746,8 @@ class PlayState extends MusicBeatSubState
     }
     else
     {
-      var targetNote:Null<NoteSprite> = getNoteToHit(notesInDirection);
+      var targetNote:Null<NoteSprite> = notesInDirection.find((note) -> !note.lowPriority);
+      if (targetNote == null) targetNote = notesInDirection[0];
       if (targetNote == null) continue;
 
       // Judge and hit the note.
