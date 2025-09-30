@@ -113,7 +113,6 @@ class Conductor
     if (bpmOverride != null) return bpmOverride;
 
     if (currentTimeChange == null) return Constants.DEFAULT_BPM;
-
     @:privateAccess
     if (PlayState.instance != null && PlayState.instance.startingSong)
     {

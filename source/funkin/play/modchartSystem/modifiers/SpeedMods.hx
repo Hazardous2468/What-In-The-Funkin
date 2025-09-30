@@ -96,7 +96,7 @@ class ReverseMod extends Modifier
   }
 }
 
-// Notes slow down as they approach the receptors
+// Notes slow down as they approach the receptors. Kind of outdated.
 class SlowDownMod extends Modifier
 {
   public function new(name:String)
@@ -256,5 +256,39 @@ class OldWaveMod extends Modifier
     var curPos_Part2:Float = curPos_Part1; // Slow the curPos right the fuck down to stop the notes from zooming so hard
     returnVal += currentValue * 0.22 * sin(curPos_Part2 / 38.0 * multSubmod.value * 0.2);
     return returnVal;
+  }
+}
+
+// Scroll speed slows down and speeds back up and slows down then speeds back up again.
+class Expand extends Modifier
+{
+  var speedSubmod:ModifierSubValue;
+
+  public function new(name:String)
+  {
+    super(name, 0);
+    unknown = false;
+    speedMod = true;
+    speedSubmod = createSubMod("speed", 1.0, ["period", "size", "mult"]);
+  }
+
+  override function speedMath(lane:Int, curPos:Float, strumLine:Strumline, isHoldNote:Bool = false):Float
+  {
+    var b:Float = Conductor.instance.currentBeatTime / 2 * speedSubmod.value;
+    var sine:Float = FlxMath.fastSin(b * Math.PI);
+
+    if (this.currentValue > 0)
+    {
+      return 1 + (sine * this.currentValue / 4); // 400% means that the scroll speed becomes 0!
+    }
+    else // special negative curValue behaviour
+    {
+      var r:Float = FlxMath.lerp(1, 0, this.currentValue * -1);
+      r = FlxMath.bound(r, 0, 1);
+
+      r += sine * (1 - r) * (this.currentValue * -0.5); // 200 % is normal speed for both ways? idk
+
+      return r;
+    }
   }
 }

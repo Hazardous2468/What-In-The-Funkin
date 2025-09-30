@@ -1137,6 +1137,8 @@ class ModConstants
         newMod = new WaveMod(tag);
       case "oldwave":
         newMod = new OldWaveMod(tag);
+      case "expand":
+        newMod = new Expand(tag);
       case "reverse":
         newMod = new ReverseMod(tag);
 

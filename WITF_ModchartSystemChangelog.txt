@@ -2,7 +2,7 @@ v1.0.0a EARLY:
 
 THIS UPDATE WILL REQUIRE MODCHARTS TO BE UPDATED DUE TO MODIFIER MATH CHANGES! (see below)
 
-Updated to version v0.7.3 of FNF
+Updated to version v0.7.5 of FNF
 
 Re-added 'isPlayer' variable to Strumline.hx to fix scripts which may rely on said variable.
 
@@ -52,7 +52,7 @@ Submod aliases finally added. Can now use "period" instead of "mult" for example
 
 Added "offset" submods to: circ, bumpy, bounce, zigzag, attenuate, digital, saw, spiral, tornado
 
-Added: spiralScaleX, spiralScaleY, attenuateScaleX, attenuateScaleY, attenuateAngleX, attenuateAngleY, digitalScaleX, digitalScaleY, antiNegativeScale, mini, zoom, zoomX, zoomY, perspectiveOffsetX, perspectiveOffsetY
+Added: spiralScaleX, spiralScaleY, attenuateScaleX, attenuateScaleY, attenuateAngleX, attenuateAngleY, digitalScaleX, digitalScaleY, antiNegativeScale, mini, zoom, zoomX, zoomY, perspectiveOffsetX, perspectiveOffsetY, expand
 Fixed attenuateY affecting z instead of y (oops)
 Tiny modifier math is now divided by 2 (so now 100% is half the size instead of 0 scale)! Update your tiny values!
 Values from drive will now work for drive2. Update your drive2 values!

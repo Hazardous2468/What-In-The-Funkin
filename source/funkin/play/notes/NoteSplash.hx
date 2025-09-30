@@ -89,8 +89,17 @@ class NoteSplash extends ZSprite
 
     if (animation.curAnim == null) return;
 
-    // Vary the speed of the animation a bit.
-    animation.curAnim.frameRate = splashFramerate + FlxG.random.int(-splashFramerateVariance, splashFramerateVariance);
+    // Dumb fix for animation playing at 2x speed when zSort is enabled. To future me, please find a better fix for this.
+    var splashFramerateEdit:Int = splashFramerate;
+    if (PlayState.instance != null)
+    {
+      if (PlayState.instance.allStrumSprites != null && PlayState.instance.noteRenderMode)
+      {
+        splashFramerateEdit = Math.round(splashFramerate * 0.5);
+      }
+    }
+
+    animation.curAnim.frameRate = splashFramerateEdit + FlxG.random.int(-splashFramerateVariance, splashFramerateVariance);
 
     // Center the animation on the note splash.
     offset.set(width * 0.3, height * 0.3);

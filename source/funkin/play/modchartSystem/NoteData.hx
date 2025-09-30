@@ -113,11 +113,14 @@ class NoteData
   // Used for orient mod, but could be useful to use?
   public var lastKnownPosition:Vector3D;
 
-  // Sometimes orient mod just has a heart attack and dies.
-  // This should make the notes spazz out less in the event that happens. just a bandaid fix for the NaN problem from orient.
-  // orient, orientx, orienty, orient2, orientx2, orienty2
+  /*
+   * Sometimes orient mod just has a heart attack and dies.
+   * This should make the notes spazz out less in the event that happens. just a bandaid fix for the NaN problem from orient.
+   * orient, orientx, orienty, orient2, orientx2, orienty2
+   */
   public var lastKnownOrientAngle:Array<Float> = [0, 0, 0, 0, 0, 0];
 
+  // Cur orient2 modifier value. Used to determine if additional math must be performed (will overwrite last known position!!)
   public var orient2:Array<Float> = [0, 0, 0];
 
   // An array of mods which should be done to this note!
@@ -224,6 +227,8 @@ class NoteData
     speedMod = 1;
     strumPosition = 0;
 
+    orient2 = [0, 0, 0];
+
     noteType = "note";
 
     x = 0;
@@ -264,8 +269,10 @@ class NoteData
     stealthGlowGreen = 1;
     stealthGlowBlue = 1;
 
-    strumPosWasHere = new Vector3D(0, 0, 0);
-    strumPosOffsetThingy = new Vector3D(0, 0, 0);
+    strumPosWasHere.setTo(0, 0, 0);
+    strumPosOffsetThingy.setTo(0, 0, 0);
+    // strumPosWasHere = new Vector3D(0, 0, 0);
+    // strumPosOffsetThingy = new Vector3D(0, 0, 0);
   }
 
   public function setStrumPosWasHere():Void

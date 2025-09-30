@@ -25,7 +25,7 @@ class CustomModifier extends Modifier
 
   public var noteMathFunc:NoteData->Void;
   public var strumMathFunc:NoteData->Void;
-  public var specialMathFunc:Void->Void;
+  public var specialMathFunc:Int->Void;
 
   private var noteMathBroke:Bool = false;
   private var strumMathBroke:Bool = false;
@@ -136,7 +136,7 @@ class CustomModifier extends Modifier
     {
       try
       {
-        specialMathFunc();
+        specialMathFunc(lane);
       }
       catch (e:Dynamic)
       {

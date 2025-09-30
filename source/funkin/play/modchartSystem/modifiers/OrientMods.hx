@@ -9,29 +9,56 @@ import flixel.math.FlxMath;
 import flixel.math.FlxAngle;
 
 // Notes angle themselves towards direction of travel
-// A little bit more on the experimental side. Probably breaks when having active overlapping orient mods.
+// Do note that these mods require additional calcs to be performed (that are usually skipped for performance).
 // Also, orienty is very... weird? I don't get it.
 
 class OrientModBase extends Modifier
 {
-  // the position in the array table for the orient stuff...
+  // If true, will automatically flip the angle values for when the reverse mod is active.
+  var reverseFix:Bool = true;
+
+  /*
+   * If true, forces holds to be affected by this modifier.
+   * If false, holds won't be affected by this modifier.
+   * If null, then only gets enabled for OrientY.
+   */
+  var affectHolds:Null<Bool> = false;
+
+  /*
+   * the position in the array table for the orient stuff...
+   * 0 = z
+   * 1 = x
+   * 2 = y
+   * +3 for orient 2.
+   */
   var index:Int = 0;
+
+  /*
+   * if enabled (above 0.5), will use the old orient math logic (will only work between -180 to 180 degrees instead of full 360 degree support)
+   * if below 0.0, orientY will act the same as orientZ (easier to use / understand imo, though "intended" behaviour can be reverted via this submod)
+   */
+  var useAltMathSubmod:ModifierSubValue;
 
   public function new(name:String, i:Int)
   {
     super(name, 0);
     index = i;
+
+    if (affectHolds == null)
+    {
+      affectHolds = i % 3 == 2; // To skip this modifier math for holds except for orientY
+    }
+
     modPriority = -999999; // ALWAYS APPLY LAST!!
     unknown = false;
     notesMod = true;
     strumsMod = true;
     specialMod = true;
+    holdsMod = affectHolds;
+    pathMod = false;
 
-    // default to old math if angleZ to avoid breaking older modfiles (and because the old method meant it would work for up and down scroll)
-    useAltMathSubmod = createSubMod("alt", (i % 3 == 0 ? 1.0 : 0.0), ["type", "old", "other", "variant", "varient"]);
+    useAltMathSubmod = createSubMod("alt", (i % 3 == 2 ? -1.0 : 0.0), ["type", "old", "other", "variant", "varient"]);
   }
-
-  var useAltMathSubmod:ModifierSubValue;
 
   var strumResult:Array<Float> = [0, 0, 0, 0];
 
@@ -49,7 +76,7 @@ class OrientModBase extends Modifier
         data.angleZ += (getOrientAngle(data) * currentValue);
         data.angleZ -= strumResult[data.direction];
       case 1:
-        data.angleX += ((getOrientAngle(data) + 180) * currentValue);
+        data.angleX += (getOrientAngle(data) * currentValue);
       case 2:
         data.angleY += (getOrientAngle(data) * currentValue);
     }
@@ -92,8 +119,16 @@ class OrientModBase extends Modifier
         a = (data.y - data.lastKnownPosition.y) * -1;
         b = (data.z - data.lastKnownPosition.z);
       case 2: // y axis
-        b = (data.z - data.lastKnownPosition.z) * -1;
-        a = (data.x - data.lastKnownPosition.x);
+        if (useAltMathSubmod.value >= 0.0)
+        {
+          b = (data.z - data.lastKnownPosition.z) * -1;
+          a = (data.x - data.lastKnownPosition.x);
+        }
+        else
+        {
+          a = (data.y - data.lastKnownPosition.y) * -1;
+          b = (data.x - data.lastKnownPosition.x);
+        }
     }
 
     if (useAltMathSubmod.value >= 0.5) // Old math. Only allows 180 degrees
@@ -119,15 +154,15 @@ class OrientModBase extends Modifier
         b *= -1;
       }
 
-      // Fix for Z
-      if (data.noteType != "receptor" && index == 3)
+      // Fixes for differences between notes and receptors.
+      if (data.noteType != "receptor" && index >= 3)
       {
         a *= -1;
         b *= -1;
       }
 
-      // hardcoded fix for reverse for z variant. Won't bother with fixing other mods though
-      if (index % 3 == 0)
+      // Make it look nicer when reversed.
+      if (reverseFix)
       {
         var reverseModAmount:Float = data.getReverse(); // 0 to 1
         if (reverseModAmount > 0.5)
