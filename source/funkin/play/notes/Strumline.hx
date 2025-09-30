@@ -849,29 +849,11 @@ class Strumline extends FlxSpriteGroup
     });
 
     #if FEATURE_WITF_INPUTS
-    return Arrays.order(notesInRange, (a, b) -> return byValues(-1, a.strumTime, b.strumTime));
+    return Arrays.order(notesInRange, (a, b) -> return FlxSort.byValues(-1, a.strumTime, b.strumTime));
     #else
     return notesInRange;
     #end
   }
-
-  #if FEATURE_WITF_INPUTS
-  function byValues(Order:Int, Value1:Float, Value2:Float):Int
-  {
-    var result:Int = 0;
-
-    if (Value1 < Value2)
-    {
-      result = Order;
-    }
-    else if (Value1 > Value2)
-    {
-      result = -Order;
-    }
-
-    return result;
-  }
-  #end
 
   /**
    * Return hold notes that are within `Constants.HIT_WINDOW` ms of the strumline.
@@ -2317,7 +2299,19 @@ class Strumline extends FlxSpriteGroup
   {
     if (mods != null && zSortMode)
     {
-      return FlxSort.byValues(order, a?.z, b?.z);
+      // Default to sorting by z. If the z values are equal, sort by strumTime instead.
+      if (a?.z == b?.z)
+      {
+        // Should the strumTimes be the same, then add 1 to the strumTime if the note is low priority.
+        if (a?.strumTime == b?.strumTime)
+        {
+          return FlxSort.byValues(order, a.strumTime + (a.lowPriority ? 0 : 1), b.strumTime + (b.lowPriority ? 0 : 1));
+        }
+        else
+          return FlxSort.byValues(order, a?.strumTime, b?.strumTime);
+      }
+      else
+        return FlxSort.byValues(order, a?.z, b?.z);
     }
     else
     {
@@ -2336,7 +2330,13 @@ class Strumline extends FlxSpriteGroup
   {
     if (mods != null && zSortMode)
     {
-      return FlxSort.byValues(order, a?.z, b?.z);
+      // Default to sorting by z. If the z values are equal, sort by strumTime instead.
+      if (a?.z == b?.z)
+      {
+        return FlxSort.byValues(order, a?.strumTime, b?.strumTime);
+      }
+      else
+        return FlxSort.byValues(order, a?.z, b?.z);
     }
     else
     {
