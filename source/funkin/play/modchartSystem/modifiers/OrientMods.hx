@@ -179,11 +179,12 @@ class OrientModBase extends Modifier
   }
 }
 
+// Swapped the orient mods around for improved accuracy to NotITG
 class OrientMod extends OrientModBase
 {
   public function new(name:String)
   {
-    super(name, 0);
+    super(name, 0 + 3);
   }
 }
 
@@ -191,7 +192,7 @@ class OrientXMod extends OrientModBase
 {
   public function new(name:String)
   {
-    super(name, 1);
+    super(name, 1 + 3);
   }
 }
 
@@ -199,7 +200,7 @@ class OrientYMod extends OrientModBase
 {
   public function new(name:String)
   {
-    super(name, 2);
+    super(name, 2 + 3);
   }
 }
 
@@ -208,7 +209,7 @@ class Orient2Mod extends OrientModBase
 {
   public function new(name:String)
   {
-    super(name, 3);
+    super(name, 3 - 3);
   }
 }
 
@@ -216,7 +217,7 @@ class OrientX2Mod extends OrientModBase
 {
   public function new(name:String)
   {
-    super(name, 4);
+    super(name, 4 - 3);
   }
 }
 
@@ -224,6 +225,6 @@ class OrientY2Mod extends OrientModBase
 {
   public function new(name:String)
   {
-    super(name, 5);
+    super(name, 5 - 3);
   }
 }

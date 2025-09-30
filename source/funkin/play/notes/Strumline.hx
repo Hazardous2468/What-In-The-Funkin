@@ -839,14 +839,39 @@ class Strumline extends FlxSpriteGroup
 
   /**
    * Return notes that are within `Constants.HIT_WINDOW` ms of the strumline.
+   * If FEATURE_WITF_INPUTS is enabled, this array is sorted by strumTime.
    * @return An array of `NoteSprite` objects.
    */
   public function getNotesMayHit():Array<NoteSprite>
   {
-    return notes.members.filter(function(note:NoteSprite) {
+    var notesInRange:Array<NoteSprite> = notes.members.filter(function(note:NoteSprite) {
       return note != null && note.alive && !note.hasBeenHit && note.mayHit;
     });
+
+    #if FEATURE_WITF_INPUTS
+    return Arrays.order(notesInRange, (a, b) -> return byValues(-1, a.strumTime, b.strumTime));
+    #else
+    return notesInRange;
+    #end
   }
+
+  #if FEATURE_WITF_INPUTS
+  function byValues(Order:Int, Value1:Float, Value2:Float):Int
+  {
+    var result:Int = 0;
+
+    if (Value1 < Value2)
+    {
+      result = Order;
+    }
+    else if (Value1 > Value2)
+    {
+      result = -Order;
+    }
+
+    return result;
+  }
+  #end
 
   /**
    * Return hold notes that are within `Constants.HIT_WINDOW` ms of the strumline.

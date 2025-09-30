@@ -27,7 +27,7 @@ class NoteSprite extends ZSpriteProjected
   // The Hue, Saturation, Value Shader attached to this note sprites. Mainly used for quant coloured note styles
   public var hsvShader:HSVNotesShader;
 
-  // Multiplies the hitWindow size by this amount
+  // Multiplies the hitWindow size by this amount. Unused if FEATURE_WITF_INPUTS is enabled.
   public var hitWindowMultiplier:Float = 1;
 
   /**
@@ -307,6 +307,9 @@ class NoteSprite extends ZSpriteProjected
     this.hasMissed = false;
     this.handledMiss = false;
     this.holdNoteSprite = null;
+
+    this.lowPriority = false;
+    this.hitWindowMultiplier = 1.0;
 
     // The hsvShader should only be applied when it's necessary.
     // Otherwise, it should be turned off to keep note batching.

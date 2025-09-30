@@ -29,6 +29,7 @@ Fixed hurt note splashes and offsets.
 Refactored some stuff -> This includes changing offset submods for the rotate modifiers to be more understandable.
 
 New song: Stroll
+New song: It-Go
 Updated Too Many Trumpets
 
 Improved inconsistencies with setDefault behaviour.
@@ -63,7 +64,8 @@ Beat modifier now has "accel" and "total" submods that control the timing math.
 
 Arrowpaths no longer scale based on hold notestyle scale
 
-Added "hitWindowMultiplier" variable to noteSprites. Used by the hurt note script to decrease the hitWindow size. (Should fix inputs being lost when hurts are around)
+Added "hitWindowMultiplier" variable to noteSprites. Used by the hurt note script to decrease the hitWindow size. (Should fix inputs being lost when hurts are around).
+Also updated / tweaked how inputs are handled (can be disabled with FEATURE_WITF_INPUTS)
 
 getNoteBeats logic moved to ModConstants for easy access in hxScript. (Works the same though).
 
@@ -93,6 +95,7 @@ Blacksphere, Drive, Jump now take reverse modifier into account
 Rotate submods have been renamed
 Note/AFT cameras are now layered ontop of the HUD like vanilla
 OrientX and Y changed
+Orient and Orient2 swapped
 
 
 
