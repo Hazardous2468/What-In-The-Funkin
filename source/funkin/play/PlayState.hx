@@ -831,6 +831,10 @@ class PlayState extends MusicBeatSubState
             allStrumSprites.add(note);
           });
 
+          strumLine.arrowPaths.forEach(function(note:ZSprite) {
+            allStrumSprites.add(note);
+          });
+
           strumLine.noteSplashes.forEach(function(note:ZSprite) {
             allStrumSprites.add(note);
           });

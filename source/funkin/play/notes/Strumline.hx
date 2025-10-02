@@ -159,7 +159,6 @@ class Strumline extends FlxSpriteGroup
   public var arrowPaths:FlxTypedSpriteGroup<SustainTrail>;
 
   var notitgPaths:Array<HazardArrowpath> = [];
-  // var arrowPaths_SPRITES:FlxTypedSpriteGroup<ZSprite>;
   var notitgPathSprite:ZSprite;
 
   public var sustainGraphicWidth:Null<Float> = null;
