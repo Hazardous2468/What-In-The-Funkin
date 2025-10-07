@@ -848,7 +848,7 @@ class ModConstants
   }
 
   // Used by the metaMods script to invert which character gets targetted by mods.
-  static var invertStrumlineTarget:Bool = false;
+  public static var invertStrumlineTarget:Bool = false;
 
   public static function grabStrumModTarget(playerTarget:String = "bf"):ModHandler
   {

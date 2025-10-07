@@ -43,7 +43,6 @@ class HazardAFT
   {
     bitmap.lock();
 
-    // bitmap.disposeImage();
     if (!recursive)
     {
       clearAFT();

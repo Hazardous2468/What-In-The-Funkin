@@ -116,6 +116,8 @@ class HazardModLuaTest
     set('upScroll', !Preferences.downscroll);
     set('scrollSpeed', PlayState.instance.currentChart.scrollSpeed);
 
+    set('invertStrumlineTarget', ModConstants.invertStrumlineTarget);
+
     Lua_helper.add_callback(lua, "targetExclude", function(who:String):Void {
       var strummy:Null<Strumline> = ModConstants.grabStrumModTarget(who).strum;
       if (strummy != null) allTargetExlusions.push(strummy);

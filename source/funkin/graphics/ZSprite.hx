@@ -20,6 +20,12 @@ class ZSprite extends FunkinSkewedSprite
   public var y2:Float = 0.0;
   public var x2:Float = 0.0;
 
+  /*
+   * Due to angle being overridden every frame (if the modchart system is using this sprite), angular velocity won't work properly.
+   * As such, angular velocity will instead add to this value, which is then used in the draw function to rotate this sprite
+   */
+  var angleAngularVelocityOffset:Float = 0.0;
+
   // Used for orient mod, but could be useful to use?
   public var lastKnownPosition:Vector3D;
 
@@ -73,8 +79,29 @@ class ZSprite extends FunkinSkewedSprite
   // If set to true, will automatically calculate this sprites perspective to emulate 3D in every draw() call
   public var autoCalculatePerspective:Bool = true;
 
+  // untested!
+  override function updateMotion(elapsed:Float):Void
+  {
+    var angleBefore = this.angle;
+    super.updateMotion(elapsed);
+    var angleAfter = this.angle;
+    angleAngularVelocityOffset += angleAfter - angleBefore;
+
+    // var velocityDelta = 0.5 * (FlxVelocity.computeVelocity(angularVelocity, angularAcceleration, angularDrag, maxAngular, elapsed) - angularVelocity);
+    // angularVelocity += velocityDelta;
+    // angle += angularVelocity * elapsed;
+    // angularVelocity += velocityDelta;
+  }
+
+  override public function update(elapsed:Float):Void
+  {
+    super.update(elapsed);
+  }
+
   override public function draw():Void
   {
+    var angleOffset:Float = angleAngularVelocityOffset;
+    this.angle += angleOffset;
     if (!autoCalculatePerspective || getZ() == 0) // Draw like a regular sprite if the z value is 0, or we have autoCalculate disabled
     {
       super.draw();
@@ -103,6 +130,7 @@ class ZSprite extends FunkinSkewedSprite
       this.scale.x = wasScaleX;
       this.scale.y = wasScaleY;
     }
+    this.angle -= angleOffset;
   }
 
   // Feed a noteData into this function to apply all of it's parameters to this sprite!

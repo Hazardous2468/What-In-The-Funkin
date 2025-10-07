@@ -1,4 +1,4 @@
-v1.0.0a EARLY:
+v1.0.0a:
 
 THIS UPDATE WILL REQUIRE MODCHARTS TO BE UPDATED DUE TO MODIFIER MATH CHANGES! (see below)
 
@@ -24,7 +24,7 @@ Notestyles now have "zCalcMult" variable in data for holdCovers and splashes. Ap
 Fixed hold covers zMath.
 
 Fixed HyperNova for upscroll
-Fixed hurt note splashes and offsets.
+Overhauled hurt notes (now are a scripted note kind instead of a module)
 
 Refactored some stuff -> This includes changing offset submods for the rotate modifiers to be more understandable.
 

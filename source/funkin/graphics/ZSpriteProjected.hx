@@ -61,6 +61,13 @@ class ZSpriteProjected extends ZSprite
     return this.angle;
   }
 
+  var angleZWithOffset(get, never):Float;
+
+  function get_angleZWithOffset():Float
+  {
+    return this.angleZ + angleAngularVelocityOffset;
+  }
+
   // for group shit
   public var angleX2:Float = 0;
   public var angleY2:Float = 0;
@@ -507,7 +514,7 @@ class ZSpriteProjected extends ZSprite
     skewPosY += (h) / 2;
 
     var rotateModPivotPoint:Vector2 = new Vector2(0.5, 0.5); // to skew from center
-    var thing:Vector2 = ModConstants.rotateAround(rotateModPivotPoint, new Vector2(xPercent, yPercent), angleZ); // to fix incorrect skew when rotated
+    var thing:Vector2 = ModConstants.rotateAround(rotateModPivotPoint, new Vector2(xPercent, yPercent), angleZWithOffset); // to fix incorrect skew when rotated
 
     // For some reason, we need a 0.5 offset for this for it to be centered???????????????????
     var xPercent_SkewOffset:Float = thing.x - skewY_offset - skewOffsetFix;
@@ -609,7 +616,7 @@ class ZSpriteProjected extends ZSprite
         case "y":
           pos_modified = applyRotY(pos_modified, xPercent, yPercent, w, h, angleY);
         case "z":
-          pos_modified = applyRotZ(pos_modified, xPercent, yPercent, w, h, angleZ);
+          pos_modified = applyRotZ(pos_modified, xPercent, yPercent, w, h, angleZWithOffset);
 
         case "x2":
           pos_modified = applyRotX(pos_modified, xPercent, yPercent, w, h, angleX2);
