@@ -683,7 +683,7 @@ class Strumline extends FlxSpriteGroup
       note.strumTime = ModConstants.getSongPosition();
       note.strumTime -= whichStrumNote?.strumExtraModData?.arrowpathBackwardsLength ?? 0;
       note.strumTime += length * note.piece;
-      note.updateClipping();
+      // note.updateClipping();
 
       // note.x += 112 / 2 * note.piece;
 
@@ -715,10 +715,10 @@ class Strumline extends FlxSpriteGroup
 
     sortNoteSprites();
 
-    for (note in holdNotes)
-    {
-      note.updateClipping();
-    }
+    // for (note in holdNotes)
+    // {
+    //  note.updateClipping();
+    // }
   }
 
   /**

@@ -369,7 +369,8 @@ class SustainTrail extends ZSprite
 
     if (usingHazModHolds)
     {
-      updateClipping_mods(songTime);
+      return;
+      // updateClipping_mods(songTime); //done in the draw call now for draw funcs to work properly.
     }
     else
     {
@@ -1469,6 +1470,9 @@ class SustainTrail extends ZSprite
   override public function draw():Void
   {
     if (alpha == 0 || graphic == null || vertices == null || !this.alive) return;
+
+    // Update tris if modchart system
+    if (usingHazModHolds) updateClipping_mods();
 
     var alphaMemory:Float = this.alpha;
     for (camera in cameras)
