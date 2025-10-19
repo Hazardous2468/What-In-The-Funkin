@@ -10,12 +10,13 @@ import funkin.util.SortUtil;
 import flixel.system.FlxAssets.FlxGraphicAsset;
 import lime.math.Vector2;
 import funkin.play.modchartSystem.ModConstants;
+import openfl.geom.Vector3D;
 
 /**
- * A group for ZProjectSprites which contains helper functions for creating 3D shapes. Automatically sorts the sprites based on their z posiiton plus z index!
+ * A group for ZSpriteProjected which contains helper functions for creating 3D shapes. Automatically sorts the sprites based on their z posiiton plus z index!
  * Currently experimental / WIP
  */
-class ZProjectSpriteGroup extends FlxTypedSpriteGroup<ZProjectSprite>
+class ZProjectSpriteGroup extends FlxTypedSpriteGroup<ZSpriteProjected>
 {
   public function new()
   {
@@ -41,9 +42,8 @@ class ZProjectSpriteGroup extends FlxTypedSpriteGroup<ZProjectSprite>
     return z = Value;
   }
 
-  // inline function zTransform(Sprite:ZProjectSprite, Z:Float)
-  //  Sprite.z += Z; // addition
   var pivot:Vector2 = new Vector2(0, 0);
+  var pivotOffset:Vector3D = new Vector3D(0, 0, 0);
 
   var tempVec2:Vector2 = new Vector2(0, 0);
 
@@ -54,72 +54,57 @@ class ZProjectSpriteGroup extends FlxTypedSpriteGroup<ZProjectSprite>
   // Rotates all the sprites on the x axis
   public function rotateX(rotation:Float):Void
   {
-    // var rotationRaw:Float = rotation;
-    rotation += curRotX;
-    curRotX = rotation;
-    pivot.setTo(this.z, this.y);
+    curRotX += rotation;
+    pivot.setTo(this.z + pivotOffset.z, this.y + pivotOffset.y);
     for (spr in this)
     {
+      if (spr == null) continue;
       tempVec2.setTo(spr.z + ((spr.depth ?? 0) / 2), spr.y + (spr.height / 2));
-      tempVec2 = ModConstants.rotateAround(pivot, tempVec2, rotation);
+      tempVec2 = ModConstants.rotateAround(pivot, tempVec2, curRotX);
       tempVec2.y -= (spr.height / 2);
       tempVec2.x -= ((spr.depth ?? 0) / 2);
 
-      spr.moveY = tempVec2.y - spr.y; // use move variable, otherwise drift occurs?
-      spr.moveZ = tempVec2.x - spr.z;
-
-      // spr.z = tempVec2.x;
-      // spr.y = tempVec2.y;
-      spr.angleX2 = rotation;
-      spr.updateTris();
+      spr.z2 = tempVec2.x - spr.z;
+      spr.y2 = tempVec2.y - spr.y;
+      spr.angleX2 = curRotX;
     }
   }
 
   // Rotates all the sprites on the y axis
   public function rotateY(rotation:Float):Void
   {
-    // var rotationRaw:Float = rotation;
-    rotation += curRotY;
-    curRotY = rotation;
-    pivot.setTo(this.x, this.z);
-
+    curRotY += rotation;
+    pivot.setTo(this.x + pivotOffset.x, this.z + pivotOffset.z);
     for (spr in this)
     {
+      if (spr == null) continue;
       tempVec2.setTo(spr.x + (spr.width / 2), spr.z + ((spr.depth ?? 0) / 2));
-      tempVec2 = ModConstants.rotateAround(pivot, tempVec2, rotation);
+      tempVec2 = ModConstants.rotateAround(pivot, tempVec2, curRotY);
       tempVec2.x -= (spr.width / 2);
       tempVec2.y -= ((spr.depth ?? 0) / 2);
 
-      spr.moveX = tempVec2.x - spr.x; // use move variable, otherwise drift occurs?
-      spr.moveZ = tempVec2.y - spr.z;
-      // spr.x = tempVec2.x;
-      // spr.z = tempVec2.y;
-      spr.angleY2 = rotation;
-      spr.updateTris();
+      spr.x2 = tempVec2.x - spr.x;
+      spr.z2 = tempVec2.y - spr.z;
+      spr.angleY2 = curRotY;
     }
   }
 
   // Rotates all the sprites on the z axis
   public function rotateZ(rotation:Float):Void
   {
-    // var rotationRaw:Float = rotation;
-    rotation += curRotZ;
-    curRotZ = rotation;
-    pivot.setTo(this.x, this.y);
+    curRotZ += rotation;
+    pivot.setTo(this.x + pivotOffset.x, this.y + pivotOffset.y);
     for (spr in this)
     {
+      if (spr == null) continue;
       tempVec2.setTo(spr.x + (spr.width / 2), spr.y + (spr.height / 2));
-
-      tempVec2 = ModConstants.rotateAround(pivot, tempVec2, rotation);
+      tempVec2 = ModConstants.rotateAround(pivot, tempVec2, curRotZ);
       tempVec2.x -= (spr.width / 2);
       tempVec2.y -= (spr.height / 2);
 
-      spr.moveX = tempVec2.x - spr.x; // use move variable, otherwise drift occurs?
-      spr.moveY = tempVec2.y - spr.y;
-      // spr.x = tempVec2.x;
-      // spr.y = tempVec2.y;
-      spr.angleZ2 = rotation;
-      spr.updateTris();
+      spr.x2 = tempVec2.x - spr.x;
+      spr.y2 = tempVec2.y - spr.y;
+      spr.angleZ2 = curRotZ;
     }
   }
 
@@ -133,20 +118,23 @@ class ZProjectSpriteGroup extends FlxTypedSpriteGroup<ZProjectSprite>
     // insertionSort(sortByZ.bind(FlxSort.ASCENDING));
   }
 
+  // If set to true, will constantly call the "refresh()" function which will resort all the sprites in this group.
+  public var autoRefresh:Bool = true;
+
   var sortExperimentAngleY:Bool = false;
   var sortExperimentAngleX:Bool = false;
 
   // Also takes into account the zIndex!
-  function sortLogic(order:Int, a:ZProjectSprite, b:ZProjectSprite):Int
+  function sortLogic(order:Int, a:ZSpriteProjected, b:ZSpriteProjected):Int
   {
-    var aX:Float = (a?.x ?? 0) + (a?.moveX ?? 0);
-    var bX:Float = (b?.x ?? 0) + (b?.moveX ?? 0);
+    var aX:Float = (a?.x ?? 0) + (a?.x2 ?? 0);
+    var bX:Float = (b?.x ?? 0) + (b?.x2 ?? 0);
 
-    var aY:Float = (a?.y ?? 0) + (a?.moveY ?? 0);
-    var bY:Float = (b?.y ?? 0) + (b?.moveY ?? 0);
+    var aY:Float = (a?.y ?? 0) + (a?.y2 ?? 0);
+    var bY:Float = (b?.y ?? 0) + (b?.y2 ?? 0);
 
-    var aZ:Float = (a?.z ?? 0) + (a?.moveZ ?? 0);
-    var bZ:Float = (b?.z ?? 0) + (b?.moveZ ?? 0);
+    var aZ:Float = (a?.z ?? 0) + (a?.z2 ?? 0);
+    var bZ:Float = (b?.z ?? 0) + (b?.z2 ?? 0);
 
     var val1:Float = aZ;
     var val2:Float = bZ;
@@ -158,8 +146,8 @@ class ZProjectSpriteGroup extends FlxTypedSpriteGroup<ZProjectSprite>
       val2 = bX;
     }
 
-    val1 += a.zIndex;
-    val2 += b.zIndex;
+    val1 += a?.zIndex ?? 0;
+    val2 += b?.zIndex ?? 0;
 
     return FlxSort.byValues(order, val1, val2);
   }
@@ -168,9 +156,24 @@ class ZProjectSpriteGroup extends FlxTypedSpriteGroup<ZProjectSprite>
   {
     super.update(elapsed);
 
-    if (this.length > 1 && this.visible)
+    if (this.length > 1 && this.visible && autoRefresh)
     {
       refresh();
+    }
+  }
+
+  public var rotationOrder:Array<String> = ["z2", "y2", "x2"];
+
+  override function preAdd(sprite:ZSpriteProjected):Void
+  {
+    super.preAdd(sprite);
+    // check if the sprite has the ang2 rot vars
+    for (rot2 in rotationOrder)
+    {
+      if (!sprite.rotationOrder.contains(rot2))
+      {
+        sprite.rotationOrder.push(rot2);
+      }
     }
   }
 
@@ -178,13 +181,19 @@ class ZProjectSpriteGroup extends FlxTypedSpriteGroup<ZProjectSprite>
   public function createCube(imageTexture:FlxGraphicAsset, width:Float = 1, height:Float = 1, depth:Float = 1):CubeSpriteGroup
   {
     var cube = new CubeSpriteGroup(imageTexture, width, height, depth);
+    for (spr in cube.getFaceSprites())
+    {
+      this.add(spr);
+    }
+    // this.add(cube);
     return cube;
   }
 
-  // Easy helper function for creating a zProjectSprite. Automatically adds it to this group. Returns the zProjectSprite
-  public function createPlane():ZProjectSprite
+  // Easy helper function for creating a ZSpriteProjected. Automatically adds it to this group. Returns the ZSpriteProjected
+  public function createPlane():ZSpriteProjected
   {
-    var p = new ZProjectSprite();
+    var p = new ZSpriteProjected();
+    this.add(p);
     return p;
   }
 
@@ -211,14 +220,19 @@ class ZProjectSpriteGroup extends FlxTypedSpriteGroup<ZProjectSprite>
   }
 }
 
-class CubeSpriteGroup extends FlxTypedSpriteGroup<ZProjectSprite>
+class CubeSpriteGroup extends FlxTypedSpriteGroup<ZSpriteProjected>
 {
-  var frontFace:ZProjectSprite;
-  var backFace:ZProjectSprite;
-  var topFace:ZProjectSprite;
-  var bottomFace:ZProjectSprite;
-  var leftFace:ZProjectSprite;
-  var sideFace:ZProjectSprite;
+  var frontFace:ZSpriteProjected;
+  var backFace:ZSpriteProjected;
+  var topFace:ZSpriteProjected;
+  var bottomFace:ZSpriteProjected;
+  var leftFace:ZSpriteProjected;
+  var rightFace:ZSpriteProjected;
+
+  public function getFaceSprites():Array<ZSpriteProjected>
+  {
+    return [frontFace, backFace, topFace, bottomFace, leftFace, rightFace];
+  }
 
   public function new(imageTexture:FlxGraphicAsset, width:Float = 1, height:Float = 1, depth:Float = 1)
   {

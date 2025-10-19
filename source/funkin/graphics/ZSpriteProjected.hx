@@ -36,6 +36,9 @@ class ZSpriteProjected extends ZSprite
   // If true, will correct the texture distortion created when transforming in 3D
   public var doPerspectiveCorrection:Bool = true;
 
+  // If set to true, will set this sprite to be culled if all the subdivision points are considered "too close" to the camera.
+  public var cullIfTooClose:Bool = true;
+
   // If true, will repeat the texture in the draw call. Otherwise texture will be clamped
   public var textureRepeat:Bool = false;
 
@@ -153,7 +156,7 @@ class ZSpriteProjected extends ZSprite
 
   public var fov:Float = 90;
 
-  // custom setter to prevent values below 0, cuz otherwise we'll devide by 0!
+  // custom setter to prevent values below 0, cuz otherwise we'll divide by 0!
   public var subdivisions(default, set):Int = 2;
 
   function set_subdivisions(value:Int):Int
@@ -165,6 +168,9 @@ class ZSpriteProjected extends ZSprite
     setUp();
     return subdivisions;
   }
+
+  // The depth of this object (width, length, depth). Defaults to 0 cuz... well... we can only really do flat planes lol
+  public var depth:Float = 0;
 
   /**
    * A `Vector` of floats where each pair of numbers is treated as a coordinate location (an x, y pair).
@@ -227,6 +233,8 @@ class ZSpriteProjected extends ZSprite
   public var uvOffset:Vector2 = new Vector2(0.0, 0.0);
 
   var destroying:Bool = false;
+
+  var cullCounter:Int = 0;
 
   /**
    * The function which will update all the vertex and UV data.
@@ -294,6 +302,8 @@ class ZSpriteProjected extends ZSprite
     var offsetScaledY:Float = (frameHeight - h) * (scaleY - 1) / 2;
 
     culled = false;
+    cullCounter = 0; // If every point triggers the "too close to camera" check, then we cull this sprite.
+    var cullCounterCap:Int = (subdivisions + 2) * (subdivisions + 2);
 
     var i:Int = 0;
     for (x in 0...subdivisions + 2) // x
@@ -358,9 +368,12 @@ class ZSpriteProjected extends ZSprite
         point3D.x -= offset.x;
         point3D.y -= offset.y;
         point3D = applyPerspective(point3D, xPercent, yPercent);
+        if (cullCounter >= cullCounterCap) culled = true;
 
         vertices[i * 2] = point3D.x;
         vertices[i * 2 + 1] = point3D.y;
+
+        if (culled) return; // Just stop if we are culled.
 
         if (needsFlipX)
         {
@@ -642,6 +655,17 @@ class ZSpriteProjected extends ZSprite
       pos_modified.x += fovOffsetX;
       pos_modified.y += fovOffsetY;
       pos_modified.z *= 0.001;
+
+      if (cullIfTooClose)
+      {
+        var newz:Float = pos_modified.z;
+        newz *= FlxMath.lerp(0, 1, ModConstants.FOV / 90);
+        // Too close to camera!
+        if (newz > ModConstants.zNear + ModConstants.tooCloseToCameraFix)
+        {
+          cullCounter += 1;
+        }
+      }
 
       pos_modified = ModConstants.perspectiveMath(pos_modified, 0, 0, perspectiveCenterOffset);
 
