@@ -74,6 +74,9 @@ class TitleState extends MusicBeatState
   var logoBl:FlxSprite;
   var outlineShaderShit:TitleOutline;
 
+  var witfIcon:FlxSprite;
+  var witfIconTween:FlxTween;
+
   var gfDance:FlxSpriteOverlay;
   var danceLeft:Bool = false;
   var titleText:FlxSprite;
@@ -90,6 +93,13 @@ class TitleState extends MusicBeatState
     var bg:FunkinSprite = new FunkinSprite(-1).makeSolidColor(FlxG.width + 2, FlxG.height, FlxColor.BLACK);
     bg.screenCenter();
     add(bg);
+
+    witfIcon = new FlxSprite(-10, 10);
+    witfIcon.loadGraphic(Paths.image('witfIcon'));
+    witfIcon.shader = swagShader.shader;
+    witfIcon.x += FlxG.width - witfIcon.width;
+    witfIcon.angle = 20;
+    add(witfIcon);
 
     logoBl = new FlxSprite(-150 + (FullScreenScaleMode.gameCutoutSize.x / 2.5), -100);
     logoBl.frames = Paths.getSparrowAtlas('logoBumpin');
@@ -511,6 +521,10 @@ class TitleState extends MusicBeatState
       remove(ngSpr);
 
       FlxG.camera.flash(FlxColor.WHITE, initialized ? 1 : 4);
+
+      var ogIconPos:Float = witfIcon.y;
+      witfIcon.y -= witfIcon.height * 2.5;
+      FlxTween.tween(witfIcon, {y: ogIconPos}, 1.1, {ease: FlxEase.backOut});
 
       if (credGroup != null) remove(credGroup);
       skippedIntro = true;
