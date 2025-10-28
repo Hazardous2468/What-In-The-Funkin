@@ -203,17 +203,17 @@ class Modifier
 
   function sin(r:Float):Float
   {
-    return strumOwner.mods.sin(r);
+    return strumOwner?.mods?.sin(r) ?? FlxMath.fastSin(r);
   }
 
   function cos(r:Float):Float
   {
-    return strumOwner.mods.cos(r);
+    return strumOwner?.mods?.cos(r) ?? FlxMath.fastCos(r);
   }
 
   function tan(r:Float):Float
   {
-    return strumOwner.mods.tan(r);
+    return strumOwner?.mods?.tan(r) ?? ModConstants.fastTan(r);
   }
 
   // Variables for defining which array this mod should be added to for performance reasons!

@@ -369,8 +369,9 @@ class SustainTrail extends ZSprite
 
     if (usingHazModHolds)
     {
-      return;
-      // updateClipping_mods(songTime); //done in the draw call now for draw funcs to work properly.
+      if (!parentStrumline.doUpdateClipsInDraw) updateClipping_mods(songTime);
+      else
+        return;
     }
     else
     {
@@ -438,6 +439,10 @@ class SustainTrail extends ZSprite
     updateStealthGlowV2();
   }
 
+  /**
+   * Forwards data to the hsvShader to render stealth transitions smoothly.
+   * Hopefully will be updated in the future to use an array instead cuz at the moment, only supports 1 of each type (sudden, hidden, vanish)
+   */
   function updateStealthGlowV2():Void
   {
     if (isArrowPath)
@@ -1303,6 +1308,7 @@ class SustainTrail extends ZSprite
       {
         vertices[k] += holdNoteJankX;
 
+        // If for whatever reason we need to rotate based on angle (like cuz of a draw func for playfields?)
         if (this.angle != 0 && vertices.length % 2 == 0)
         {
           // assume +1 means we access the y vert
@@ -1469,10 +1475,12 @@ class SustainTrail extends ZSprite
   @:access(flixel.FlxCamera)
   override public function draw():Void
   {
-    if (alpha == 0 || graphic == null || vertices == null || !this.alive) return;
+    if (graphic == null || !this.alive) return;
 
     // Update tris if modchart system
-    if (usingHazModHolds) updateClipping_mods();
+    if (usingHazModHolds && parentStrumline.doUpdateClipsInDraw) updateClipping_mods();
+
+    if (alpha == 0 || vertices == null) return;
 
     var alphaMemory:Float = this.alpha;
     for (camera in cameras)

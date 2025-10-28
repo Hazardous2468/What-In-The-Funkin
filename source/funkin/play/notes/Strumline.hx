@@ -683,7 +683,7 @@ class Strumline extends FlxSpriteGroup
       note.strumTime = ModConstants.getSongPosition();
       note.strumTime -= whichStrumNote?.strumExtraModData?.arrowpathBackwardsLength ?? 0;
       note.strumTime += length * note.piece;
-      // note.updateClipping();
+      if (!doUpdateClipsInDraw) note.updateClipping();
 
       // note.x += 112 / 2 * note.piece;
 
@@ -715,11 +715,17 @@ class Strumline extends FlxSpriteGroup
 
     sortNoteSprites();
 
-    // for (note in holdNotes)
-    // {
-    //  note.updateClipping();
-    // }
+    if (!doUpdateClipsInDraw)
+    {
+      for (note in holdNotes)
+      {
+        note.updateClipping();
+      }
+    }
   }
+
+  // Temp fix?
+  public var doUpdateClipsInDraw:Bool = true;
 
   /**
    * The FlxText which displays the current active mods
@@ -2006,7 +2012,7 @@ class Strumline extends FlxSpriteGroup
 
       holdNoteSprite.whichStrumNote = getByIndex(holdNoteSprite.noteDirection);
 
-      holdNoteSprite.cullMode = getByIndex(holdNoteSprite.noteDirection).strumExtraModData?.cullModeSustain ?? "none";
+      holdNoteSprite.cullMode = holdNoteSprite.whichStrumNote?.strumExtraModData?.cullModeSustain ?? "none";
     }
 
     return holdNoteSprite;
