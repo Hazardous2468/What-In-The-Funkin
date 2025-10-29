@@ -18,7 +18,7 @@ Added 'targetExclude' which allows you to remove a strumLine from being targeted
 Changed notesCamera and AFTcamera to be ABOVE the HUD instead of behind for parity with baseGame. This can be reverted by adding "notesBehindHUD(true)" in the onCreate function (has to be onCreate as it needs to be done before cameras are created!) 
 
 Metamods script overhaul:
-More modifiers, overhauled menu visuals, now works in StoryMenuState.
+More modifiers, overhauled menu visuals. Also added chart/turn modifiers.
 
 Notestyles now have "zCalcMult" variable in data for holdCovers and splashes. Applied to pixel notestyle to fix hold covers and notesplashes on the z axis. 
 Fixed hold covers zMath.
@@ -30,6 +30,7 @@ Refactored some stuff -> This includes changing offset submods for the rotate mo
 
 New song: Stroll
 New song: It-Go
+New song: IT-NEVER-ENDS
 Updated Too Many Trumpets
 
 Improved inconsistencies with setDefault behaviour.
@@ -38,9 +39,14 @@ Improved inconsistencies with setDefault behaviour.
 Using the "Cosecant" modifier will enable Cosecant on all Tan modifiers. (old cosecant modifier will remain for legacy support)
 Also added offsets to sin, cos, tan, and cosecant for silly I guess?
 
-Overhauled wave and boost mod math
+Overhauled wave and boost mod math.
+OldBoost and OldWave modifiers are available if needed.
 
 NoteSplashes and HoldCovers now copy the strum scale. This behaviour can be disabled with "holdCoversScaleCopy" or "noteSplashScaleCopy" modifier
+
+HoldCovers now have an alternative positioning method that can be used in their noteStyle properties: Will position based on the hold note end instead of ontop of the strum receptor.
+Hold Covers can now also be set to be behind the strums similar to holds.
+
 
 Separated the modified HSV shader from the original so any mods that may use the base game HSV shader won't be incorrect.
 
@@ -78,11 +84,13 @@ Stage (untested)
 
 
 Cat now has the doodle note skin (ported from Inhuman)
-Emergency Reset now has the Inhuman pause music
+Emergency Reset (and any other Inhuman songs) now have the Inhuman pause menu
 
 ZProjectSprite deprecated. Use ZSpriteProjected instead!
 ZSprites and ZSpriteProjected now auto apply their perspective. No more manually calling applyPerspective to each ZSprite.
 
+Spin and Scale2 added to ZSprites. Spin allows for sprites to be rotated before any other transformations take place.
+Scale2 scales the sprite after all other transformations.
 
 Modchart breaking changes to be aware of:
 Linear math change (now automatically flips for downscroll)

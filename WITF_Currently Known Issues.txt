@@ -1,21 +1,38 @@
-Fork specific issues (V0.9.1a):
+Fork specific issues (V1.0.0a):
 
-- Pixel Notesplashes are incorrectly positioned when moving on the z axis
-- Pixel arrowpath appears very large. Could also impact other notestyles with a different hold width and scale
+- Hitting a hold early will sometimes make them bug out visually
+
+- Chart editor crashes when leaving and re-entering it sometimes
+- Also sprite null crash when hot reloading with F5 sometimes
+
+- Misses may randomly occur when skipping forward / backward in a song
+
+- Playing in story mode and transitioning to another song will break the debug visual scripts.
+- Some other scripts will also break when transitioning such as metamodifiers.
+
+- Hold covers sometimes fail to disappear
+
+- Incorrect animation speeds with zSort enabled
+
+- Metamods menu softlocks the story menu state
+- Metamods will not apply turn/chart modifiers unless you enter and exit the menu
+- Chaos mode is still a WIP so there are some issues with it that will be eventually fixed
+
+- Incorrect playfield skewing with 3D mode enabled
+
+- Freeplay DJ for Modchart Hell sometimes disappears
 
 - Passing nothing into a built-in lua function (like "centerPlayer()") will trigger an instant game crash.
 
 - Offsets (input / visual) aren't properly tested
 
-- flxStrip ignores camera alpha (this affects sustains and 3D notes)
+- flxStrip ignores camera alpha (this affects sustains and 3D notes [might be fixed in v1.0])
 
 - If zsort is enabled earlier then beat -5, then the strums appear invisible.
 
 - Hurts can visually be seen being hit on some custom players while not for others. Thankfully this is just a visual bug and not anything to be worried about as the hurt logic now only works for player 1.
 
 - New hold sudden / hidden logic doesn't work if there are multiple hidden / sudden mods (can only have one of each type active at a time). 
-
-- The custom freeplay card for modchart hell is pretty buggy (should be fine when custom backing cards are added though)
 
 - Some mods may have slight differences between upscroll and downscroll. Be sure to check both scroll directions for your modcharts!
 
@@ -27,15 +44,11 @@ Fork specific issues (V0.9.1a):
 
 - Sometimes holds / notes will be incorrectly layered when using Zsort mod
   (v0.8.0a introduces a scuffed work around by adjusting zSortMod_SustainOffset and zSortMod_StrumNoteOffset in the PlayState instance.)
+Update: v1.0 may have brought back this issue, how fun!
 
 - Custom path mod jank (just try to stick to values between '0 - 1')
 
-- Holds will have a visual flicker / stutter when being hitting on the first frame.
-  -The same can sometimes be seen on the first frame of a notesplash being created
-
-- 3D mesh renderer will still sometimes have lag spikes when loading new graphics mid song. Please try to preload any 3D sprites in before they get used!
-
-
+- Note Splashes will have a visual flicker / stutter when being hitting on the first frame sometimes.
 
 
 
@@ -52,7 +65,5 @@ V-Slice v0.6.4 issues:
 - Resizing the game when a shader is active breaks the shader (v0.7.6a ports the Inhuman fix to this problem since this fork already overrides the flxCamera for drawTriangles culling)
 
 - Mouse bugs lol
-
-- By default, the Conductor on Freeplay never gets updated. This fork adds a script which fixes that.
 
 - Input / visual offsets bugs
