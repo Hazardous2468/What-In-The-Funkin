@@ -211,6 +211,8 @@ class NoteSprite extends ZSpriteProjected
 
     setupNoteGraphic(noteStyle);
     vwooshing = false;
+
+    this.applyAngularVelocityOffset = true;
   }
 
   public var targetScale:Float = 0.7;

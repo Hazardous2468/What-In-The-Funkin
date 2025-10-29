@@ -222,9 +222,9 @@ class MiniModifier extends Modifier
   {
     if (currentValue == 0 || data.noteType == "receptor") return;
     var tinyVal:Float = currentValue * 0.5;
+
     data.scaleX = FlxMath.lerp(data.scaleX, 0.0, tinyVal);
     data.scaleY = FlxMath.lerp(data.scaleY, 0.0, tinyVal);
-    data.scaleZ = FlxMath.lerp(data.scaleZ, 0.0, tinyVal);
   }
 
   override function speedMath(lane:Int, curPos:Float, strumLine:Strumline, isHoldNote = false):Float
@@ -242,7 +242,6 @@ class MiniModifier extends Modifier
 
     data.scaleX = FlxMath.lerp(data.scaleX, 0.0, tinyVal);
     data.scaleY = FlxMath.lerp(data.scaleY, 0.0, tinyVal);
-    data.scaleZ = FlxMath.lerp(data.scaleZ, 0.0, tinyVal);
   }
 }
 
@@ -473,6 +472,9 @@ class ZoomModifier extends RotateModBase
   var doX:Bool = true;
   var doY:Bool = true;
 
+  // If set to 0.5 or higher, will use scale2 instead. Otherwise use normal scale.
+  var typeSubmod:ModifierSubValue;
+
   public function new(name:String)
   {
     super(name);
@@ -482,6 +484,7 @@ class ZoomModifier extends RotateModBase
     this.baseValue = 1;
     this.currentValue = 1;
     notPercentage = false;
+    typeSubmod = createSubMod("type", 1.0, ["variant", "mode", "scale2"]);
   }
 
   var strumResultX:Array<Float> = [0, 0, 0, 0];
@@ -534,15 +537,17 @@ class ZoomModifier extends RotateModBase
     {
       data.x += strumResultX[data.direction];
       data.x = FlxMath.lerp(data.x, getScalePivot_X(data, strumLine), curVal);
-      // data.scaleX = FlxMath.lerp(data.scaleX, 0.0, curVal);
-      data.scaleX *= currentValue;
+      if (typeSubmod.value >= 0.5) data.scaleX2 *= currentValue;
+      else
+        data.scaleX *= currentValue;
     }
     if (doY)
     {
       data.y += strumResultY[data.direction];
       data.y = FlxMath.lerp(data.y, getScalePivot_Y(data, strumLine), curVal);
-      // data.scaleY = FlxMath.lerp(data.scaleY, 0.0, curVal);
-      data.scaleY *= currentValue;
+      if (typeSubmod.value >= 0.5) data.scaleY2 *= currentValue;
+      else
+        data.scaleY *= currentValue;
     }
   }
 
@@ -556,8 +561,9 @@ class ZoomModifier extends RotateModBase
       data.x = FlxMath.lerp(data.x, getScalePivot_X(data, strumLine), curVal);
       strumResultX[data.direction] = memoryX - data.x;
 
-      data.scaleX *= currentValue;
-      // data.scaleX = FlxMath.lerp(data.scaleX, 0.0, curVal);
+      if (typeSubmod.value >= 0.5) data.scaleX2 *= currentValue;
+      else
+        data.scaleX *= currentValue;
     }
     if (doY)
     {
@@ -565,8 +571,9 @@ class ZoomModifier extends RotateModBase
       data.y = FlxMath.lerp(data.y, getScalePivot_Y(data, strumLine), curVal);
       strumResultY[data.direction] = memoryY - data.y;
 
-      data.scaleY *= currentValue;
-      // data.scaleY = FlxMath.lerp(data.scaleY, 0.0, curVal);
+      if (typeSubmod.value >= 0.5) data.scaleY2 *= currentValue;
+      else
+        data.scaleY *= currentValue;
     }
   }
 }

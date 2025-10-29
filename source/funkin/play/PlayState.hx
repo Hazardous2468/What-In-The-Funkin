@@ -989,12 +989,12 @@ class PlayState extends MusicBeatSubState
   }
 
   /**
-   * The camera which contains, and controls visibility of, the strumlines!
+   * The camera which contains and controls the visibility of the strumlines!
    */
   public var camNotes:FlxCamera;
 
   /**
-   * The camera which contains, and controls visibility of, errr... unused for now lol
+   * An extra camera layer stacked in front of the notes camera that can be used for effects.
    */
   public var camAFT:FlxCamera;
 

@@ -63,6 +63,7 @@ class NoteHoldCover extends FlxTypedSpriteGroup<ZSprite>
     glow.isHoldCover = true;
     glow.coverBehindStrums = noteStyle.holdCoversBehindStrums();
     add(glow);
+    glow.applyAngularVelocityOffset = true;
 
     // TODO: null check here like how NoteSplash does
     noteStyle.buildHoldCoverSprite(this);

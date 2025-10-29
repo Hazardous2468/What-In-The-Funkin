@@ -67,6 +67,12 @@ class NoteData
   // The scale on the z axis (unused unless 3D models /noteskins are added somehow)
   public var scaleZ:Float = 1;
 
+  // The scale on the x axis, unaffected by rotations
+  public var scaleX2:Float = 1;
+
+  // The scale on the y axis, unaffected by rotations
+  public var scaleY2:Float = 1;
+
   // The amount to skew on the x axis
   public var skewX:Float = 0;
 
@@ -242,6 +248,8 @@ class NoteData
     scaleX = 1;
     scaleY = 1;
     scaleZ = 1;
+    scaleX2 = 1;
+    scaleY2 = 1;
 
     stealth = 0;
     alpha = 1;
@@ -313,6 +321,9 @@ class NoteData
     if (scaleX != 1) return true;
     if (scaleY != 1) return true;
     if (scaleZ != 1) return true;
+
+    if (scaleX2 != 1) return true;
+    if (scaleY2 != 1) return true;
 
     if (skewX != 0) return true;
     if (skewY != 0) return true;

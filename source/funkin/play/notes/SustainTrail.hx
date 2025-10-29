@@ -615,11 +615,15 @@ class SustainTrail extends ZSprite
     is3D = (whichStrumNote.strumExtraModData?.threeD ?? false);
     old3Dholds = (whichStrumNote.strumExtraModData?.old3Dholds ?? false);
 
-    noteModData.x -= noteStyleOffsets[0]; // apply notestyle offset here for z math reasons lol
+    noteModData.x -= noteStyleOffsets[0]; // apply notestyle offset here for z math reasons
     noteModData.y -= noteStyleOffsets[1];
 
     fakeNote.applyNoteData(noteModData, !is3D);
-    if (flipY) fakeNote.y += 27; // fix gap for downscroll lol Moved from verts so it is applied before perspective fucks it up!
+
+    fakeNote.scale.x *= noteModData.scaleX2; // Account for scale2! Don't need to worry about angle... for now?
+    fakeNote.scale.y *= noteModData.scaleY2;
+
+    if (flipY) fakeNote.y += 27; // fix gap for downscroll. Moved from verts so it is applied before perspective fucks it up!
 
     tempVec2.x = fakeNote.x;
     tempVec2.y = fakeNote.y;

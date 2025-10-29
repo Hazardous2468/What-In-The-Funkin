@@ -1953,6 +1953,8 @@ class Strumline extends FlxSpriteGroup
       noteSprite.noteModData.clearNoteMods();
       @:privateAccess noteSprite.angleAngularVelocityOffset = 0;
       noteSprite.angularVelocity = 0;
+      noteSprite.spinVelocity = 0;
+      noteSprite.spinAngle = 0;
 
       noteSprite.x = this.x;
       noteSprite.x += getXPos(DIRECTIONS[note.getDirection() % KEY_COUNT]);

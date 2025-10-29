@@ -242,7 +242,7 @@ class ModConstants
   public static function rotateAround(origin:Vector2, point:Vector2, degrees:Float):Vector2
   {
     if (degrees == 0) return point; // Do nothing if there is no rotation
-    var angle:Float = degrees * (Math.PI / 180);
+    var angle:Float = degrees * FlxAngle.TO_RAD;
     var ox = origin.x;
     var oy = origin.y;
     var px = point.x;

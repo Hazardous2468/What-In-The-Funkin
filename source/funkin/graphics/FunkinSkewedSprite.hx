@@ -9,6 +9,7 @@ import flixel.math.FlxAngle;
 import flixel.math.FlxPoint;
 import flixel.util.FlxDestroyUtil;
 import flixel.addons.effects.FlxSkewedSprite;
+import flixel.math.FlxVelocity;
 
 /**
  * A FunkinSprite which implements FlxSkewedSprite, allowing this sprite to skew!
@@ -47,6 +48,7 @@ class FunkinSkewedSprite extends FunkinSprite
   {
     _frame.prepareMatrix(_matrix, FlxFrameAngle.ANGLE_0, checkFlipX(), checkFlipY());
     _matrix.translate(-origin.x, -origin.y);
+    _matrix.rotate(spinAngle * Math.PI / 180);
     _matrix.scale(scale.x, scale.y);
 
     if (matrixExposed)
@@ -65,6 +67,8 @@ class FunkinSkewedSprite extends FunkinSprite
       updateSkewMatrix();
       _matrix.concat(_skewMatrix);
     }
+
+    _matrix.scale(scaleX2, scaleY2);
 
     getScreenPosition(_point, camera).subtractPoint(offset);
     _point.add(origin.x, origin.y);
@@ -98,5 +102,27 @@ class FunkinSkewedSprite extends FunkinSprite
     {
       return false;
     }
+  }
+
+  // Eh fuck it, throw this in here as well to avoid copying the draw code for zSprites (all this just for hurt notes to rotate properly lol)
+  // ------------------------------------------------
+  // A copy of scale which is applied AFTER rotation.
+  // Used by certain modifiers like zoomX to mimick the effect of stretching the playfield on the x-axis WITHOUT being affected by the sprite angle
+  public var scaleX2:Float = 1;
+  public var scaleY2:Float = 1;
+
+  // The velocity of the spin!
+  public var spinVelocity:Float = 0;
+
+  // Current angle of the spin!
+  public var spinAngle:Float = 0.0;
+
+  override function updateMotion(elapsed:Float):Void
+  {
+    var velocityDelta = 0.5 * (FlxVelocity.computeVelocity(spinVelocity, angularAcceleration, angularDrag, maxAngular, elapsed) - spinVelocity);
+    spinVelocity += velocityDelta;
+    spinAngle += spinVelocity * elapsed;
+    spinVelocity += velocityDelta;
+    super.updateMotion(elapsed);
   }
 }

@@ -94,6 +94,8 @@ class StrumlineNote extends ZSpriteProjected
     this.hsvShader = new HSVNotesShader();
     this.shader = hsvShader;
     updateStealthGlow();
+
+    this.applyAngularVelocityOffset = true;
   }
 
   @:access(flixel.FlxCamera)
