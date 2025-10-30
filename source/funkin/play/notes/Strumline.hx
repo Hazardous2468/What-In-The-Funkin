@@ -683,28 +683,31 @@ class Strumline extends FlxSpriteGroup
       note.strumTime = ModConstants.getSongPosition();
       note.strumTime -= whichStrumNote?.strumExtraModData?.arrowpathBackwardsLength ?? 0;
       note.strumTime += length * note.piece;
-      if (!doUpdateClipsInDraw) note.updateClipping();
-
-      // note.x += 112 / 2 * note.piece;
-
-      // UH OH, SCUFFED CODE ALERT
-      // We sow the end of the arrowpath to the start of the new piece. This is so that we don't have any gaps. Mainly occurs with spiral holds lol
-      // MY NAME IS EDWIN
-      if (note.previousPiece != null && stitchEnds)
+      if (doUpdateClipsInDraw)
       {
-        // I made the mimic
-        var v_prev:Array<Float> = note.previousPiece.vertices_array;
-        var v:Array<Float> = note.vertices_array;
+        note.updateClipping();
 
-        // it was difficult, to put the pieces together
-        v[3] = v_prev[v_prev.length - 1];
-        v[2] = v_prev[v_prev.length - 2];
-        v[1] = v_prev[v_prev.length - 3];
-        v[0] = v_prev[v_prev.length - 4];
+        // note.x += 112 / 2 * note.piece;
 
-        // but unfortunately, something went so wrong.
-        @:privateAccess
-        note.setVerts(v);
+        // UH OH, SCUFFED CODE ALERT
+        // We sow the end of the arrowpath to the start of the new piece. This is so that we don't have any gaps. Mainly occurs with spiral holds lol
+        // MY NAME IS EDWIN
+        if (note.previousPiece != null && stitchEnds)
+        {
+          // I made the mimic
+          var v_prev:Array<Float> = note.previousPiece.vertices_array;
+          var v:Array<Float> = note.vertices_array;
+
+          // it was difficult, to put the pieces together
+          v[3] = v_prev[v_prev.length - 1];
+          v[2] = v_prev[v_prev.length - 2];
+          v[1] = v_prev[v_prev.length - 3];
+          v[0] = v_prev[v_prev.length - 4];
+
+          // but unfortunately, something went so wrong.
+          @:privateAccess
+          note.setVerts(v);
+        }
       }
     });
   }

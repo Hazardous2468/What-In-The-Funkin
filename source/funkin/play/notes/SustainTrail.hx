@@ -1482,7 +1482,24 @@ class SustainTrail extends ZSprite
     if (graphic == null || !this.alive) return;
 
     // Update tris if modchart system
-    if (usingHazModHolds && parentStrumline.doUpdateClipsInDraw) updateClipping_mods();
+    if (usingHazModHolds && parentStrumline.doUpdateClipsInDraw)
+    {
+      updateClipping_mods();
+      if (this.previousPiece != null)
+      {
+        // I made the mimic
+        var v_prev:Array<Float> = this.previousPiece.vertices_array;
+        var v:Array<Float> = this.vertices_array;
+
+        // it was difficult, to put the pieces together
+        v[3] = v_prev[v_prev.length - 1];
+        v[2] = v_prev[v_prev.length - 2];
+        v[1] = v_prev[v_prev.length - 3];
+        v[0] = v_prev[v_prev.length - 4];
+
+        this.setVerts(v);
+      }
+    }
 
     if (alpha == 0 || vertices == null) return;
 
