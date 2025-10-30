@@ -1485,13 +1485,13 @@ class SustainTrail extends ZSprite
     if (usingHazModHolds && parentStrumline.doUpdateClipsInDraw)
     {
       updateClipping_mods();
+
+      // Stiching the verts of this sustain to the previous piece verts.
       if (this.previousPiece != null)
       {
-        // I made the mimic
         var v_prev:Array<Float> = this.previousPiece.vertices_array;
         var v:Array<Float> = this.vertices_array;
 
-        // it was difficult, to put the pieces together
         v[3] = v_prev[v_prev.length - 1];
         v[2] = v_prev[v_prev.length - 2];
         v[1] = v_prev[v_prev.length - 3];
@@ -1501,7 +1501,7 @@ class SustainTrail extends ZSprite
       }
     }
 
-    if (alpha == 0 || vertices == null) return;
+    if (alpha == 0 || vertices == null || visible == false) return;
 
     var alphaMemory:Float = this.alpha;
     for (camera in cameras)
