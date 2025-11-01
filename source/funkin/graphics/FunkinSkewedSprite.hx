@@ -13,10 +13,20 @@ import flixel.math.FlxVelocity;
 
 /**
  * A FunkinSprite which implements FlxSkewedSprite, allowing this sprite to skew!
+ * Also introduces Spin and Scale 2 variables and a tag you can use to easily assign a name to the sprite -Hazard
  * Original author of FlxSkewedSprite: Zaphod
  */
 class FunkinSkewedSprite extends FunkinSprite
 {
+  /**
+   * A handy string that can be used to 'tag' a sprite.
+   */
+  public var tag:Null<String> = null;
+
+  /**
+   * This sprites current skew!
+   * Set with skew.x or skew.y
+   */
   public var skew(default, null):FlxPoint = FlxPoint.get();
 
   /**
@@ -41,6 +51,7 @@ class FunkinSkewedSprite extends FunkinSprite
     skew = FlxDestroyUtil.put(skew);
     _skewMatrix = null;
     transformMatrix = null;
+    tag = null;
     super.destroy();
   }
 
@@ -111,10 +122,12 @@ class FunkinSkewedSprite extends FunkinSprite
   public var scaleX2:Float = 1;
   public var scaleY2:Float = 1;
 
-  // The velocity of the spin!
+  // The velocity of the spin angle variable!
   public var spinVelocity:Float = 0;
 
-  // Current angle of the spin!
+  /**
+   * The angle this sprite will be rotated by BEFORE any other transformations.
+   */
   public var spinAngle:Float = 0.0;
 
   override function updateMotion(elapsed:Float):Void
