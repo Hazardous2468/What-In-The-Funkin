@@ -1,4 +1,11 @@
-v1.0.0a:
+v1.0.1:
+
+Fixed hurt notes affecting the final score rank incorrectly.
+Fixed potential shader crashes for some GPU's on Halved, HyperNova, and Argos
+
+
+
+v1.0.0:
 
 THIS UPDATE WILL REQUIRE MODCHARTS TO BE UPDATED DUE TO MODIFIER MATH CHANGES! (see below)
 

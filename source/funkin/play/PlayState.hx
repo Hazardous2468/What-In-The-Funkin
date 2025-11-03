@@ -4408,6 +4408,8 @@ class PlayState extends MusicBeatSubState
     if (debugNotifs != null)
     {
       destroyDebugNotifications();
+      debugNotifs.destroy();
+      debugNotifs = null;
     }
 
     // clear graphicCache for 3D render mode
