@@ -1510,6 +1510,7 @@ class SustainTrail extends ZSprite
       // if (!isOnScreen(camera)) continue; // TODO: Update this code to make it work properly.
 
       alpha = alphaMemory * camera.alpha; // Fix for drawTriangles not fading with camera
+      alpha *= this.parentStrumline?.alpha ?? 1.0; // Fix for notes not respecting their parents alpha.
 
       getScreenPosition(_point, camera).subtractPoint(offset);
 

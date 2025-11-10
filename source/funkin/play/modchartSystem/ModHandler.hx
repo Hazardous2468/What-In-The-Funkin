@@ -776,6 +776,9 @@ class ModHandler
     note.noteModData.funnyOffMyself();
 
     note.applyNoteData(note.noteModData);
+
+    note.alpha *= note.weBelongTo?.alpha ?? 1.0; // Fix for notes not respecting their parents alpha.
+
     note.updateLastKnownPos();
     note.noteModData.lastKnownPosition = note.lastKnownPosition;
 
@@ -949,6 +952,7 @@ class ModHandler
     var rememberMeX:Float = note.scale.x;
     var rememberMeY:Float = note.scale.y;
     note.applyNoteData(note.noteModData);
+    note.alpha *= note.weBelongTo?.alpha ?? 1.0; // Fix for notes not respecting their parents alpha.
     note.updateLastKnownPos();
     note.noteModData.lastKnownPosition = note.lastKnownPosition;
     note.updateStealthGlow();
