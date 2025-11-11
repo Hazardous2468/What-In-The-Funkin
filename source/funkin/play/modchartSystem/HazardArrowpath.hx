@@ -122,10 +122,10 @@ class HazardArrowpath
 
       var pathLength:Float = whichStrumNote?.strumExtraModData?.arrowpathLength ?? 1500;
       var pathBackLength:Float = whichStrumNote?.strumExtraModData?.arrowpathBackwardsLength ?? 200;
-      var holdGrain:Float = whichStrumNote?.strumExtraModData?.pathGrain ?? 50;
+      var holdGrain:Float = ModConstants.defaultPathGrain;
 
       var fullLength:Float = pathLength + pathBackLength;
-      var holdResolution:Int = Math.floor(fullLength / holdGrain); // use full sustain so the uv doesn't mess up? huh?
+      var holdResolution:Int = 2; // Will get set after the first sample to get the path-specific modifiers (mainly grain)
 
       // https://github.com/4mbr0s3-2/Schmovin/blob/main/SchmovinRenderers.hx
       var commands = new Vector<Int>();
@@ -136,16 +136,23 @@ class HazardArrowpath
       tim -= pathBackLength;
       for (i in 0...holdResolution)
       {
-        var timmy:Float = ((fullLength / holdResolution) * i);
-        setNotePos(fakeNote, tim + timmy, l, whichStrumNote);
+        if (i == 0)
+        {
+          setNotePos(fakeNote, tim, l, whichStrumNote);
+          holdGrain = fakeNoteData.holdGrain;
+          holdResolution = Math.floor(fullLength / holdGrain);
+        }
+        else
+        {
+          var timmy:Float = ((fullLength / holdResolution) * i);
+          setNotePos(fakeNote, tim + timmy, l, whichStrumNote);
+        }
 
         var scaleX = FlxMath.remapToRange(fakeNote.scale.x, 0, ModConstants.noteScale, 0, 1);
         var lineSize:Float = defaultLineSize * scaleX;
 
         var path2:Vector2 = new Vector2(fakeNote.x, fakeNote.y);
 
-        // if (FlxMath.inBounds(path2.x, 0, width) && FlxMath.inBounds(path2.y, 0, height))
-        // {
         if (i == 0)
         {
           commands.push(GraphicsPathCommand.MOVE_TO);
@@ -157,7 +164,6 @@ class HazardArrowpath
         }
         data.push(path2.x);
         data.push(path2.y);
-        // }
       }
       flashGfx.drawPath(commands, data);
     }
@@ -167,37 +173,6 @@ class HazardArrowpath
     bitmap.unlock();
   }
 
-  /*
-    public function updateAFT():Void
-    {
-      bitmap.lock();
-      clearAFT();
-
-      flashGfx.clear();
-      flashGfx.lineStyle(3, FlxColor.WHITE.to24Bit(), alpha, false);
-
-      flashGfx.beginFill(FlxColor.WHITE.to24Bit(), 0.35);
-
-      var point1X:Float = -250;
-      var point2X:Float = 250;
-
-      var point1Y:Float = 0;
-      var point2Y:Float = 1280;
-
-      flashGfx.moveTo(point1X, point1Y);
-      flashGfx.lineTo(point2X, point2Y);
-
-      flashGfx.endFill();
-      // bitmap.draw(flashGfxSprite, drawStyle.matrix, drawStyle.colorTransform, drawStyle.blendMode, drawStyle.clipRect, drawStyle.smoothing);
-      // bitmap.draw(targetCAM.canvas, null, colTransf, blendMode);
-      bitmap.draw(flashGfxSprite, null, colTransf, blendMode);
-
-      bitmap.disposeImage(); // To prevent memory leak lol
-      bitmap.unlock();
-
-      // trace("updated bitmap?");
-    }
-   */
   // clear out the old bitmap data
   public function clearAFT():Void
   {

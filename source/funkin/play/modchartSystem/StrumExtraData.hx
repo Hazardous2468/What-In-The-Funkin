@@ -83,49 +83,11 @@ class StrumExtraData
   // Who we belong too, in case we need to reference it
   public var whichStrumNote:StrumlineNote;
 
-  // Lower number = more detailed holds
-  public var holdGrain:Float = 82;
-
-  // Lower number = more detailed holds
-  public var pathGrain:Float = 95;
-
   // multiplier on the drawdistance! Note that it acts like NotITG where 0 is default, 1 is double, -1 is mutliplied by 0 (no draw distance)
   public var drawdistanceForward:Float = 0;
 
   // multiplier on the drawdistance! Note that it acts like NotITG where 0 is default, 1 is double, -1 is mutliplied by 0 (no draw distance)
   public var drawdistanceBack:Float = 0;
-
-  /**
-   * Determines the hold render method:
-   * Above 0.5 is spiral holds (rotates the sustain to always face direction of travel).
-   * Below 0 will prevent holds from going backwards, kind of like NotITG.
-   * Otherwise, will default to the usual method.
-   */
-  public var holdType:Float = 0;
-
-  // Duplicate of holdType but for paths instead.
-  public var pathType:Float = 0;
-
-  // Returns true if spiralPaths should be used.
-  public function usingSpiralHolds(isArrowPath:Bool = false):Bool
-  {
-    return (isArrowPath ? pathType >= 0.5 : holdType >= 0.5);
-  }
-
-  // Returns true if holdType is below 0
-  public function usingForwardHolds(isArrowPath:Bool = false):Bool
-  {
-    return (isArrowPath ? pathType < 0.0 : holdType < 0.0);
-  }
-
-  // Makes holds straight lol. negative makes them less straight FOR ARROW PATH
-  public var arrowpathStraightHold:Float = 0;
-
-  // Makes holds straight lol. negative makes them less straight
-  public var straightHolds:Float = 0;
-
-  // makes holds look longer then what they actually are
-  public var longHolds:Float = 0;
 
   // If distance is equal or greater then the value set, then skip doing mod math! 0 or below means don't use this mod!
   public var mathCutOff:Float = 0;
@@ -156,9 +118,6 @@ class StrumExtraData
 
   // The alpha of the hold covers
   public var alphaHoldCoverMod:Float = 0;
-
-  // Enable this to re-enable the old 3D math for sustains! This basically just makes them scale on the x axis instead of applying true 3D math for each vert.
-  public var old3Dholds:Bool = false;
 
   // Dumb stupid shit for skew shit
   public var skewMovedX:Float = 0;
@@ -236,18 +195,11 @@ class StrumExtraData
     drawdistanceForward = 0;
     drawdistanceBack = 0;
 
-    holdGrain = 82;
-    holdType = 0;
-    straightHolds = 0;
-    longHolds = 0;
     noHoldMathShortcut = 0;
 
-    pathType = 0;
-    pathGrain = 95;
     arrowPathAlpha = 0;
     arrowpathLength = 1500;
     arrowpathBackwardsLength = 400;
-    arrowpathStraightHold = 0;
 
     orientStrumAngle = [0, 0, 0, 0, 0, 0];
     orientExtraMath = [0, 0, 0, 0, 0, 0];

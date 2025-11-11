@@ -133,9 +133,41 @@ class NoteData
   // public var noteMods:Array<String> = [];
   public var noteMods:Array<Modifier> = [];
 
-  // What kind of note is this? Unused for now.
+  // What kind of note is this?
   // Examples: "note", "hurt", "hold", "path", "receptor", "path hold", "my custom note", "roll"
   public var noteType:String = "note";
+
+  // Lower number = more detailed holds
+  public var holdGrain:Float = 82;
+
+  /**
+   * Determines the hold render method:
+   * Above 0.5 is spiral holds (rotates the sustain to always face direction of travel).
+   * Below 0 will prevent holds from going backwards, kind of like NotITG.
+   * Otherwise, will default to the usual method.
+   */
+  public var holdType:Float = 0;
+
+  // Returns true if spiralPaths should be used.
+  public function usingSpiralHolds():Bool
+  {
+    return (this.holdType >= 0.5);
+  }
+
+  // Returns true if holdType is below 0
+  public function usingForwardHolds(isArrowPath:Bool = false):Bool
+  {
+    return (this.holdType < 0.0);
+  }
+
+  // Makes holds straight. negative makes them less straight.
+  public var straightHolds:Float = 0;
+
+  // Makes holds look longer then what they actually are
+  public var longHolds:Float = 0;
+
+  // Enable this to re-enable the old 3D math for sustains! This basically just makes them scale on the x axis instead of applying true 3D math for each vert.
+  public var old3Dholds:Bool = false;
 
   // I think these two were for Centered2 mod?
   public var strumPosOffsetThingy:Vector3D;
@@ -276,6 +308,9 @@ class NoteData
     stealthGlowRed = 1;
     stealthGlowGreen = 1;
     stealthGlowBlue = 1;
+
+    straightHolds = 0;
+    longHolds = 0;
 
     strumPosWasHere.setTo(0, 0, 0);
     strumPosOffsetThingy.setTo(0, 0, 0);

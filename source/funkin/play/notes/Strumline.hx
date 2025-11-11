@@ -1695,7 +1695,9 @@ class Strumline extends FlxSpriteGroup
 
     var noteStyleScale:Float = noteStyle.getHoldCoverScale();
     var whichStrumNote:StrumlineNote = getByIndex(cover.holdNoteDir % KEY_COUNT);
-    var spiralHolds:Bool = whichStrumNote.strumExtraModData?.usingSpiralHolds(false) ?? false;
+
+    @:privateAccess var spiralHolds:Bool = cover.holdNote?.noteModData?.usingSpiralHolds() ?? false;
+    // var spiralHolds:Bool = whichStrumNote.strumExtraModData?.usingSpiralHolds(false) ?? false;
 
     if (cover.holdPositioned)
     {

@@ -683,30 +683,7 @@ class HazardModLuaTest
 
     // legacy function, just use the grain mod
     Lua_helper.add_callback(lua, "setGrain", function(newGrainValue:Float = 80, playerTarget:String = "all") {
-      luaTrace("'setGrain' is deprecated! Use the 'grain' modifier instead!", FlxColor.RED);
-      if (playerTarget == "everyone" || playerTarget == "both" || playerTarget == "all")
-      {
-        for (strumLine in PlayState.instance.allStrumLines)
-        {
-          // strumLine.mods.holdGrain = newGrainValue;
-          for (lane in 0...Strumline.KEY_COUNT)
-          {
-            var whichStrum:StrumlineNote = strumLine.getByIndex(lane);
-            whichStrum.strumExtraModData.holdGrain = newGrainValue;
-          }
-        }
-      }
-      else
-      {
-        var modsTarget = ModConstants.grabStrumModTarget(playerTarget);
-
-        for (lane in 0...Strumline.KEY_COUNT)
-        {
-          var whichStrum:StrumlineNote = modsTarget.strum.getByIndex(lane);
-          whichStrum.strumExtraModData.holdGrain = newGrainValue;
-        }
-      }
-      trace("set grain to: " + newGrainValue);
+      luaTrace("'setGrain' is obsolete! Use the 'grain' modifier instead!", FlxColor.RED);
     });
 
     // legacy function, use createNewPlayer

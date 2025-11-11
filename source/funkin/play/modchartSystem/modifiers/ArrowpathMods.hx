@@ -37,13 +37,12 @@ class SpiralPathsMod extends Modifier
   {
     super(name, 0);
     unknown = false;
-    specialMod = true;
+    pathMod = true;
   }
 
-  override function specialMath(lane:Int, strumLine:Strumline):Void
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    var whichStrum:StrumlineNote = strumLine.getByIndex(lane);
-    whichStrum.strumExtraModData.pathType = currentValue;
+    data.holdType = currentValue;
   }
 }
 
@@ -176,13 +175,12 @@ class ArrowpathStraightHoldMod extends Modifier
   {
     super(name, 0);
     unknown = false;
-    specialMod = true;
+    pathMod = true;
   }
 
-  override function specialMath(lane:Int, strumLine:Strumline):Void
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    var whichStrum:StrumlineNote = strumLine.getByIndex(lane);
-    whichStrum.strumExtraModData.arrowpathStraightHold = currentValue;
+    data.straightHolds += currentValue;
   }
 }
 
@@ -193,12 +191,11 @@ class ArrowpathGrainMod extends Modifier
     super(name, 95);
     unknown = false;
     notPercentage = true;
-    specialMod = true;
+    pathMod = true;
   }
 
-  override function specialMath(lane:Int, strumLine:Strumline):Void
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    var whichStrum:StrumlineNote = strumLine.getByIndex(lane);
-    whichStrum.strumExtraModData.pathGrain = currentValue;
+    data.holdGrain = currentValue;
   }
 }

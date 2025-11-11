@@ -541,6 +541,7 @@ class SustainTrail extends ZSprite
 
   // 953.27ms with tracy. Ouch.
   // OPTIMISE ME!
+  // Call this function to sample where a note would be at this strum position.
   function susSample(strumTimmy:Float, isRoot:Bool = false, dumbHeight:Float = 0):Void
   {
     strumTimmy = strumTimmy - whichStrumNote?.strumExtraModData?.strumPos ?? 0;
@@ -553,7 +554,6 @@ class SustainTrail extends ZSprite
         && !missedNote
         && ((notePos < 0.5 && !flipY) || (notePos > -0.5 && flipY))))
     {
-      // if (noteDirection == 0) trace("skipped!");
       return;
     }
 
@@ -567,7 +567,7 @@ class SustainTrail extends ZSprite
     noteModData.curPos_unscaled = notePos;
     noteModData.whichStrumNote = whichStrumNote;
     noteModData.noteType = isArrowPath ? "path" : "hold";
-    var straightHoldsModAmount:Float = isArrowPath ? whichStrumNote.strumExtraModData.arrowpathStraightHold : whichStrumNote.strumExtraModData.straightHolds;
+
     var scrollMult:Float = 1.0;
     for (mod in parentStrumline.mods.mods_speed)
     {
@@ -613,7 +613,8 @@ class SustainTrail extends ZSprite
     noteModData.funnyOffMyself();
 
     is3D = (whichStrumNote.strumExtraModData?.threeD ?? false);
-    old3Dholds = (whichStrumNote.strumExtraModData?.old3Dholds ?? false);
+    // old3Dholds = (whichStrumNote.strumExtraModData?.old3Dholds ?? false);
+    old3Dholds = noteModData?.old3Dholds ?? false;
 
     noteModData.x -= noteStyleOffsets[0]; // apply notestyle offset here for z math reasons
     noteModData.y -= noteStyleOffsets[1];
@@ -638,7 +639,8 @@ class SustainTrail extends ZSprite
     var scaleX = FlxMath.remapToRange(fakeNote.scale.x, 0, isArrowPath ? ModConstants.arrowPathScale : ModConstants.noteScale, 0, 1);
     var scaleY = FlxMath.remapToRange(fakeNote.scale.y, 0, isArrowPath ? ModConstants.arrowPathScale : ModConstants.noteScale, 0, 1);
 
-    var forwardHolds:Bool = whichStrumNote.strumExtraModData?.usingForwardHolds(isArrowPath);
+    var forwardHolds:Bool = noteModData.usingForwardHolds();
+    var straightHoldsModAmount:Float = noteModData.straightHolds;
 
     if (isRoot)
     {
@@ -807,23 +809,34 @@ class SustainTrail extends ZSprite
    */
   public function updateClipping_mods(songTime:Float = 0, uvSetup:Bool = true):Void
   {
+    // Skip all the logic if this note is considered a 'miss' and we already was hit.
+    if (hitNote && missedNote && hideOnMiss)
+    {
+      visible = false;
+      return;
+    }
+
     // Make sure we're at the proper position!
     // This is cuz hold notes are always set to this exact position, then the tris are set to make it appear where it needs to be on the screen.
     // Done cuz I'm lazy and it made the calcs easier lol
     this.x = ModConstants.holdNoteJankX;
     this.y = ModConstants.holdNoteJankY;
-
+    if (fakeNote == null) fakeNote = new ZSprite();
+    var songTimmy:Float = (ModConstants.getSongPosition());
     whichStrumNote = parentStrumline.getByIndex(noteDirection);
 
-    if (fakeNote == null) fakeNote = new ZSprite();
+    // Moved the first susSample point to be much earlier so that we can also get the current mod values for how we should render he rest of this hold
+    // (such as are we using spiral holds for example?)
+    var clippingTimeOffset:Float = clipTimeThing(songTimmy, strumTime);
+    extraHoldRootInfo(this.strumTime);
+    susSample(this.strumTime + clippingTimeOffset, true, 0);
 
-    grain = isArrowPath ? (whichStrumNote?.strumExtraModData?.pathGrain ?? ModConstants.defaultPathGrain) : (whichStrumNote?.strumExtraModData?.holdGrain ?? ModConstants.defaultHoldGrain);
-    var songTimmy:Float = (ModConstants.getSongPosition());
+    grain = noteModData?.holdGrain ?? ModConstants.defaultPathGrain;
 
-    var longHolds:Float = 0;
+    // Long hold logic:
+    var longHolds:Float = noteModData?.longHolds ?? 0;
     if (!isArrowPath)
     {
-      longHolds = whichStrumNote.strumExtraModData?.longHolds ?? 0;
       // longHolds = parentStrumline?.mods?.longHolds[noteDirection % 4] ?? 0;
       if (longHolds != 0)
       {
@@ -840,16 +853,16 @@ class SustainTrail extends ZSprite
 
     holdResolution = Math.floor(fullSustainLength * longHolds / grain);
 
-    if (holdResolution < 1) // To ensure UV's to break (lol???)
+    if (holdResolution < 1) // To ensure UV's dont break (lol???)
     {
       holdResolution = 1;
     }
 
+    // Renders the holds to face the direction of travel.
+    var spiralHolds:Bool = noteModData.usingSpiralHolds();
+
     var holdNoteJankX:Float = ModConstants.holdNoteJankX * -1;
     var holdNoteJankY:Float = ModConstants.holdNoteJankY * -1;
-
-    // Renders the holds to face the direction of travel.
-    var spiralHolds:Bool = whichStrumNote.strumExtraModData?.usingSpiralHolds(isArrowPath);
 
     var testCol:Array<Int> = [];
     var vertices:Array<Float> = [];
@@ -858,13 +871,8 @@ class SustainTrail extends ZSprite
 
     // to keep the face normal facing towards the camera for culling.
     var dumbAlt:Bool = true;
-
     for (i in 0...Std.int(holdResolution * 2))
     {
-      // for (k in 0...3)
-      // {
-      //  noteIndices.push(i + k);
-      // }
       if (dumbAlt)
       {
         noteIndices.push(i + 0);
@@ -889,11 +897,6 @@ class SustainTrail extends ZSprite
     noteIndices.push(highestNumSoFar_ + 1 + 2);
     noteIndices.push(highestNumSoFar_ + 2 + 2);
 
-    // for (k in 0...3)
-    // {
-    //  noteIndices.push(highestNumSoFar_ + k + 2);
-    // }
-
     var clipHeight:Float = FlxMath.bound(sustainHeight(sustainLength - (songTime - strumTime), parentStrumline?.scrollSpeed ?? 1.0), 0, graphicHeight);
     if (clipHeight <= 0.1 && !isArrowPath)
     {
@@ -905,38 +908,19 @@ class SustainTrail extends ZSprite
       visible = true;
     }
 
-    // lmao, make it invisible if we dropped a hold. Done using alpha in base game but since alpha is being used, we need to use visible instead
-    if (hitNote && missedNote && hideOnMiss)
-    {
-      visible = false;
-      return; // Update v0.7.3 -> No need to do any more math / code if it's going to not be seen lol
-    }
-
     var sussyLength:Float = fullSustainLength;
     var holdWidth = graphicWidth;
-    // var scaleTest = fakeNote.scale.x;
-    // var holdLeftSide = (holdWidth * (scaleTest - 1)) * -1;
-    // var holdRightSide = holdWidth * scaleTest;
-
-    var clippingTimeOffset:Float = clipTimeThing(songTimmy, strumTime);
 
     var bottomHeight:Float = graphic.height * zoom * endOffset;
     var partHeight:Float = clipHeight - bottomHeight;
 
-    extraHoldRootInfo(this.strumTime);
-    susSample(this.strumTime + clippingTimeOffset, true, 0);
     var scaleTest = fakeNote.scale.x;
     var widthScaled = holdWidth * scaleTest;
     var scaleChange = widthScaled - holdWidth;
     var holdLeftSide = 0 - (scaleChange / 2);
     var holdRightSide = widthScaled - (scaleChange / 2);
 
-    // scaleTest = fakeNote.scale.x;
-    // holdLeftSide = (holdWidth * (scaleTest - 1)) * -1;
-    // holdRightSide = holdWidth * scaleTest;
-
     // ===HOLD VERTICES==
-    // var uvHeight = (-partHeight) / graphic.height / zoom;
     // V0.7.4a -> Updated UV textures to not be stupid anymore. (0 -> 1 -> 2 -> 3) since we can just use the repeating texture power of drawTriangles.
 
     // just copy it from source idgaf
@@ -959,7 +943,6 @@ class SustainTrail extends ZSprite
 
     // Top left
     vertices[0 * 2] = vert.x; // Inline with left side
-    // vertices[0 * 2 + 1] = flipY ? clipHeight : graphicHeight - clipHeight;
     vertices[0 * 2 + 1] = vert.y;
 
     testCol[0 * 2] = fakeNote.color;
@@ -1001,15 +984,10 @@ class SustainTrail extends ZSprite
       var tm:Float = holdPieceStrumTime;
       if (spiralHolds && !spiralHoldOldMath)
       {
-        tm += (k +
-          1) * (grain * tinyOffsetForSpiral); // ever so slightly offset the time so that it never hits 0, 0 on the strum time so spiral hold can do its magic
+        // ever so slightly offset the time so that it never hits 0, 0 on the strum time so spiral hold can do its magic
+        tm += (k + 1) * (grain * tinyOffsetForSpiral);
       }
       susSample(tm + clipTimeThing(songTimmy, holdPieceStrumTime), false, sussyLength / holdResolution);
-
-      // susSample(this.strumTime + clippingTimeOffset + ((sussyLength / holdResolution) * (k + 1)), true);
-      // scaleTest = fakeNote.scale.x;
-      // holdLeftSide = (holdWidth * (scaleTest - 1)) * -1;
-      // holdRightSide = holdWidth * scaleTest;
 
       scaleTest = fakeNote.scale.x;
       widthScaled = holdWidth * scaleTest;
@@ -1071,7 +1049,6 @@ class SustainTrail extends ZSprite
         var calculateAngleDif:Float = angle * (180 / Math.PI);
 
         // rotate right point
-        // var rvert:Vector2 = applyPerspective(new Vector3D(fakeNote.x + holdRightSide, fakeNote.y, fakeNote.z), rotateOrigin);
         var rotatePoint:Vector2 = new Vector2(fakeNote.x + holdRightSide, fakeNote.y);
         var thing:Vector2 = ModConstants.rotateAround(rotateOrigin, rotatePoint, calculateAngleDif);
         thing = applyPerspective(new Vector3D(thing.x, thing.y, fakeNote.z), rotateOrigin);
@@ -1179,18 +1156,11 @@ class SustainTrail extends ZSprite
       holdLeftSide = 0 - (scaleChange / 2);
       holdRightSide = widthScaled - (scaleChange / 2);
 
-      // scaleTest = fakeNote.scale.x;
-      // holdLeftSide = (holdWidth * (scaleTest - 1)) * -1;
-      // holdRightSide = holdWidth * scaleTest;
-
       // Top left
       vertices[highestNumSoFar * 2] = vertices[endvertsoftrail * 2]; // Inline with bottom left vertex of hold
       vertices[highestNumSoFar * 2 + 1] = vertices[endvertsoftrail * 2 + 1]; // Inline with bottom left vertex of hold
       testCol[highestNumSoFar * 2] = testCol[endvertsoftrail * 2];
       testCol[highestNumSoFar * 2 + 1] = testCol[endvertsoftrail * 2 + 1];
-
-      // vertices[highestNumSoFar * 2] = holdNoteJankX * -1;
-      // vertices[highestNumSoFar * 2 + 1] = holdNoteJankY * -1;
 
       // Top right
       highestNumSoFar += 1;
@@ -1198,9 +1168,6 @@ class SustainTrail extends ZSprite
       vertices[highestNumSoFar * 2 + 1] = vertices[(endvertsoftrail + 1) * 2 + 1]; // Inline with bottom right vertex of hold
       testCol[highestNumSoFar * 2] = testCol[(endvertsoftrail + 1) * 2]; // Inline with bottom right vertex of hold
       testCol[highestNumSoFar * 2 + 1] = testCol[(endvertsoftrail + 1) * 2 + 1]; // Inline with bottom right vertex of hold
-
-      // vertices[highestNumSoFar * 2] = holdNoteJankX * -1;
-      // vertices[highestNumSoFar * 2 + 1] = holdNoteJankY * -1;
 
       // Bottom left
       highestNumSoFar += 1;
@@ -1215,9 +1182,6 @@ class SustainTrail extends ZSprite
       vertices[highestNumSoFar * 2 + 1] = vert.y;
       testCol[highestNumSoFar * 2] = fakeNote.color;
       testCol[highestNumSoFar * 2 + 1] = fakeNote.color;
-
-      // vertices[highestNumSoFar * 2] = holdNoteJankX * -1;
-      // vertices[highestNumSoFar * 2 + 1] = holdNoteJankY * -1;
 
       // Bottom right
       highestNumSoFar += 1;
@@ -1241,7 +1205,6 @@ class SustainTrail extends ZSprite
         rotateOrigin.x += (vertices[highestNumSoFar * 2] - rotateOrigin.x) / 2;
 
         // rotate right point
-        // var rotatePoint:Vector2 = new Vector2(fakeNote.x + holdRightSide,vertices[i * 2+1]);
         var rotatePoint:Vector2 = new Vector2(vertices[highestNumSoFar * 2], vertices[highestNumSoFar * 2 + 1]);
 
         var thing = ModConstants.rotateAround(rotateOrigin, rotatePoint, calculateAngleDif);

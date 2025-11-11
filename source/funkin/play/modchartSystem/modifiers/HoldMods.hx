@@ -12,13 +12,12 @@ class Old3DHoldsMod extends Modifier
   {
     super(name, 0);
     unknown = false;
-    specialMod = true;
+    holdsMod = true;
   }
 
-  override function specialMath(lane:Int, strumLine:Strumline):Void
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    var whichStrum:StrumlineNote = strumLine.getByIndex(lane);
-    whichStrum.strumExtraModData.old3Dholds = (currentValue > 0.5 ? true : false);
+    data.old3Dholds = (currentValue > 0.5 ? true : false);
   }
 }
 
@@ -28,13 +27,12 @@ class HoldTypeMod extends Modifier
   {
     super(name, 0);
     unknown = false;
-    specialMod = true;
+    holdsMod = true;
   }
 
-  override function specialMath(lane:Int, strumLine:Strumline):Void
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    var whichStrum:StrumlineNote = strumLine.getByIndex(lane);
-    whichStrum.strumExtraModData.holdType = currentValue;
+    data.holdType = currentValue;
   }
 }
 
@@ -42,16 +40,15 @@ class HoldGrainMod extends Modifier
 {
   public function new(name:String)
   {
-    super(name, 82);
+    super(name, ModConstants.defaultHoldGrain);
     unknown = false;
-    specialMod = true;
+    holdsMod = true;
     notPercentage = true;
   }
 
-  override function specialMath(lane:Int, strumLine:Strumline):Void
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    var whichStrum:StrumlineNote = strumLine.getByIndex(lane);
-    whichStrum.strumExtraModData.holdGrain = currentValue;
+    data.holdGrain = currentValue;
   }
 }
 
@@ -61,13 +58,12 @@ class LongHoldsMod extends Modifier
   {
     super(name, 0);
     unknown = false;
-    specialMod = true;
+    holdsMod = true;
   }
 
-  override function specialMath(lane:Int, strumLine:Strumline):Void
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    var whichStrum:StrumlineNote = strumLine.getByIndex(lane);
-    whichStrum.strumExtraModData.longHolds = currentValue;
+    data.longHolds += currentValue;
   }
 }
 
@@ -77,12 +73,11 @@ class StraightHoldsMod extends Modifier
   {
     super(name, 0);
     unknown = false;
-    specialMod = true;
+    holdsMod = true;
   }
 
-  override function specialMath(lane:Int, strumLine:Strumline):Void
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    var whichStrum:StrumlineNote = strumLine.getByIndex(lane);
-    whichStrum.strumExtraModData.straightHolds = currentValue;
+    data.straightHolds += currentValue;
   }
 }
