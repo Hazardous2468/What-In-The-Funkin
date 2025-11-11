@@ -16,6 +16,7 @@ Fork specific issues (V1.0.0a):
 
 - Metamods menu softlocks the story menu state
 - Metamods will not apply turn/chart modifiers unless you enter and exit the menu
+- The 'random' chart shuffle may take ages to load. Will be overhauled in a later fix
 - Chaos mode is still a WIP so there are some issues with it that will be eventually fixed
 
 - Incorrect playfield skewing with 3D mode enabled

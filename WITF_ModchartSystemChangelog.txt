@@ -2,6 +2,13 @@ v1.0.1:
 
 Fixed hurt notes affecting the final score rank incorrectly.
 Fixed potential shader crashes for some GPU's on Halved, HyperNova, and Argos
+Updated Final-Hope to better support chart shuffles and re-enabling the HUD.
+
+Notes now respect Strumline.alpha (so fading the entire strumline will also fade the notes)
+
+Sustains now get their hold modifiers from note data instead of the strum data. This means you can set hold modifiers to each hold individually (such as giving one hold spiral holds and another hold straight holds without interference)
+
+
 
 
 
