@@ -2,6 +2,7 @@ package funkin;
 
 import flixel.graphics.frames.FlxAtlasFrames;
 import openfl.utils.AssetType;
+import flixel.graphics.frames.FlxBitmapFont;
 
 /**
  * A core class which handles determining asset paths.
@@ -166,6 +167,13 @@ class Paths
   public static function getPackerAtlas(key:String, ?library:String):FlxAtlasFrames
   {
     return FlxAtlasFrames.fromSpriteSheetPacker(image(key, library), file('images/$key.txt', library));
+  }
+
+  // Added by WITF v1.0.2
+  // Use this application to generate the bitmap font: https://www.angelcode.com/products/bmfont/
+  public static function getFlxBitmapFontFromAngelCode(key:String, ?library:String):FlxBitmapFont
+  {
+    return FlxBitmapFont.fromAngelCode(image(key + "_0", library), file('images/$key.fnt', library));
   }
 }
 

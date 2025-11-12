@@ -8,6 +8,7 @@ import flixel.group.FlxSpriteGroup;
 import flixel.math.FlxAngle;
 import flixel.math.FlxMath;
 import flixel.text.FlxText;
+import flixel.text.FlxBitmapText;
 import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
 import flixel.util.FlxColor;
@@ -517,14 +518,14 @@ class Strumline extends FlxSpriteGroup
       this.mods.strum = this;
     }
 
-    if (txtActiveMods == null)
+    if (this.txtActiveMods == null)
     {
-      this.txtActiveMods = new FlxText(this.x, this.y, 0, 'wtf', 20);
-      this.txtActiveMods.x += (1.5 * Strumline.NOTE_SPACING);
-      // this.txtActiveMods.y += (Preferences.downscroll ? -200 : 200);
-      // errrr, wtf lol?
-      this.txtActiveMods.setFormat(Paths.font('vcr.ttf'), 24, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+      this.txtActiveMods = new FlxBitmapText(this.x, this.y, 'wtf', Paths.getFlxBitmapFontFromAngelCode("fonts/vcr", "preload"));
+      this.txtActiveMods.borderStyle = FlxTextBorderStyle.OUTLINE;
+      this.txtActiveMods.borderColor = FlxColor.BLACK;
+      this.txtActiveMods.alignment = FlxTextAlign.CENTER;
       this.txtActiveMods.borderSize = 2;
+      this.txtActiveMods.x += (1.5 * Strumline.NOTE_SPACING);
       this.txtActiveMods.zIndex = 66;
       this.add(this.txtActiveMods);
     }
@@ -744,7 +745,7 @@ class Strumline extends FlxSpriteGroup
   /**
    * The FlxText which displays the current active mods
    */
-  public var txtActiveMods:FlxText;
+  public var txtActiveMods:FlxBitmapText;
 
   public var hideZeroValueMods:Bool = true;
   public var hideSubMods:Bool = true;

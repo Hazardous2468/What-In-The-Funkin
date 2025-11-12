@@ -1,3 +1,10 @@
+v1.0.2:
+
+Swapped FlxText in favour of FlxBitmapText for debug text. Game will no longer crash and burn having to constantly regen the text sprites every frame.
+
+
+
+
 v1.0.1:
 
 Fixed hurt notes affecting the final score rank incorrectly.
