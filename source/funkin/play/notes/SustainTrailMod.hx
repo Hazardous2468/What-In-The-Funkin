@@ -66,9 +66,6 @@ class SustainTrailMod extends SustainTrail // Extend from SustainTrail for all t
   // If enabled, each vertex will be projected in 3D space to create the illusion of 3D. Otherwise, will just project the entire sprite as one big piece for z axis movement.
   public var is3D:Bool = true;
 
-  // The Hue, Saturation, Value Shader. Mainly used for quant coloured note styles
-  public var hsvShader:HSVNotesShader;
-
   public var cullMode = TriangleCulling.NONE;
 
   var useOldStealthGlowStyle:Bool = false;
@@ -84,7 +81,6 @@ class SustainTrailMod extends SustainTrail // Extend from SustainTrail for all t
    */
   public function new(noteDirection:NoteDirection, sustainLength:Float, noteStyle:NoteStyle, isArrowPath:Bool)
   {
-    hsvShader = new HSVNotesShader();
     super(noteDirection, sustainLength, noteStyle);
     this.active = true;
     this.shader = hsvShader;
@@ -183,6 +179,8 @@ class SustainTrailMod extends SustainTrail // Extend from SustainTrail for all t
     validatePieces();
   }
 
+  var validateAttempts:Int = 0;
+
   function validatePieces()
   {
     var startingTime:Float = this.strumTime;
@@ -195,6 +193,17 @@ class SustainTrailMod extends SustainTrail // Extend from SustainTrail for all t
     for (i in 0...susPieces.length)
     {
       var daPiece = susPieces[i];
+      if (daPiece == null || !daPiece.alive)
+      {
+        trace("WARNING: PIECE VALIDATION ERROR!");
+        validateAttempts++;
+        if (validateAttempts > 2)
+        {
+          throw "Hold Pieces Validation error!";
+        }
+        recalculatePiecesArray();
+        return;
+      }
 
       var pieceTime:Float = startingTime;
       if (i == susPieces.length - 1) // end cap
@@ -206,6 +215,10 @@ class SustainTrailMod extends SustainTrail // Extend from SustainTrail for all t
       {
         pieceTime += (i * pieceLength);
       }
+
+      daPiece.noteDirection = this.noteDirection;
+      daPiece.parentStrumline = this.parentStrumline;
+      daPiece.noteData = this.noteData;
 
       daPiece.strumTime = pieceTime;
       daPiece.fullSustainLength = pieceLength;
@@ -231,6 +244,7 @@ class SustainTrailMod extends SustainTrail // Extend from SustainTrail for all t
         daPiece.previousPiece = null;
       }
     }
+    validateAttempts = 0;
   }
 
   // This now controls how the pieces are laid out and their lengths
@@ -241,14 +255,40 @@ class SustainTrailMod extends SustainTrail // Extend from SustainTrail for all t
     return;
   }
 
-  public function desaturate():Void
+  override public function desaturate():Void
   {
-    this.hsvShader.saturation = 0.2;
+    super.desaturate();
+    for (piece in susPieces)
+    {
+      piece.hsvShader.saturation = 0.2;
+    }
   }
 
-  public function setHue(hue:Float):Void
+  override public function setSaturation(sat:Float):Void
   {
-    this.hsvShader.hue = hue;
+    super.setSaturation(sat);
+    for (piece in susPieces)
+    {
+      piece.hsvShader.saturation = sat;
+    }
+  }
+
+  override public function setValue(val:Float):Void
+  {
+    super.setValue(val);
+    for (piece in susPieces)
+    {
+      piece.hsvShader.value = val;
+    }
+  }
+
+  override public function setHue(hue:Float):Void
+  {
+    super.setHue(hue);
+    for (piece in susPieces)
+    {
+      piece.hsvShader.hue = hue;
+    }
   }
 
   /**
@@ -262,6 +302,20 @@ class SustainTrailMod extends SustainTrail // Extend from SustainTrail for all t
 
     // Sort the array so that the sustain piecs closest to the camera are rendered first.
     susPieces.sort(function(a, b) {
+      // Sort by piece order
+      if (a.pieceID < b.pieceID) return -1;
+      else if (a.pieceID > b.pieceID) return 1;
+      else
+        return 0;
+    });
+
+    // Go through each piece and prepare all the verts to ensure they all stich together correctly.
+    for (piece in susPieces)
+    {
+      piece.updateClipAndStitch();
+    }
+
+    susPieces.sort(function(a, b) {
       if (a.z < b.z) return -1;
       else if (a.z > b.z) return 1;
       else
@@ -274,12 +328,10 @@ class SustainTrailMod extends SustainTrail // Extend from SustainTrail for all t
       }
     });
 
+    // Once all prepared, draw each piece, starting from closest to furthest away from camera.
     for (piece in susPieces)
     {
-      var pieceAlphaMemory:Float = piece.alpha;
-      piece.alpha *= this.alpha;
       piece.draw();
-      piece.alpha = pieceAlphaMemory;
     }
 
     #if FLX_DEBUG
@@ -330,6 +382,7 @@ class SustainTrailMod extends SustainTrail // Extend from SustainTrail for all t
 
     // Setting up the noteData
     pieceModData.defaultValues();
+    pieceModData.holdGrain = ModConstants.defaultHoldGrain;
     pieceModData.strumTime = strumTime;
     pieceModData.direction = noteDirection % Strumline.KEY_COUNT;
     pieceModData.curPos_unscaled = notePos;
@@ -351,7 +404,15 @@ class SustainTrailMod extends SustainTrail // Extend from SustainTrail for all t
     pieceModData.speedMod = scrollMult;
 
     // Setting the x and y and z position of this piece.
-    pieceModData.x = whichStrumNote.x + parentStrumline.mods.getHoldOffsetX(isArrowPath, graphicWidth);
+    // pieceModData.x = whichStrumNote.x + parentStrumline.mods.getHoldOffsetX(isArrowPath, graphicWidth);
+    pieceModData.x = whichStrumNote.x + (ModConstants.strumSize / 2);
+    // pieceModData.x += (graphicWidth - Strumline.STRUMLINE_SIZE) / 2; // Center it
+    pieceModData.x += graphicWidth / 4; // temp for now!
+
+    var defaultPosition:Array<Float> = parentStrumline.mods.getDefaultStrumPos(pieceModData.direction);
+    var xDif:Float = whichStrumNote.x - defaultPosition[0];
+    pieceModData.x += xDif;
+
     var sillyPos:Float = parentStrumline.calculateNoteYPos(pieceModData.strumTime) * scrollMult;
     if (flipY)
     {
@@ -361,6 +422,7 @@ class SustainTrailMod extends SustainTrail // Extend from SustainTrail for all t
     {
       pieceModData.y = (whichStrumNote.y - Strumline.INITIAL_OFFSET + sillyPos + Strumline.STRUMLINE_SIZE / 2);
     }
+    pieceModData.y += graphicWidth / 4; // temp for now!
 
     pieceModData.x -= whichStrumNote.strumExtraModData.noteStyleOffsetX; // undo strum offset
     pieceModData.y -= whichStrumNote.strumExtraModData.noteStyleOffsetY;
@@ -397,6 +459,12 @@ class SustainTrailMod extends SustainTrail // Extend from SustainTrail for all t
       straightHolds = pieceModData.straightHolds;
       longHolds = pieceModData.longHolds;
       grain = pieceModData.holdGrain;
+
+      rootData.rootX = pieceModData.x;
+      rootData.rootY = pieceModData.y;
+      rootData.rootZ = pieceModData.z;
+      rootData.rootScaleX = pieceModData.scaleX;
+      rootData.rootScaleY = pieceModData.scaleY;
     }
     else
     {
@@ -459,6 +527,8 @@ class SustainTrailModPiece extends SustainTrail // Extend from SustainTrail for 
     setIndices(TRIANGLE_VERTEX_INDICES);
     this.active = true;
     noteModData = new NoteData();
+    this.hsvShader.setBool('_isHold', true);
+    this.shader = hsvShader;
   }
 
   public function applyPerspective(curVec:Vector3D):Vector3D
@@ -479,8 +549,11 @@ class SustainTrailModPiece extends SustainTrail // Extend from SustainTrail for 
   {
     var holdWidth = graphicWidth / 2;
     vec3.setTo(noteModData.x, noteModData.y, noteModData.z);
+
+    var rotateOrigin:Vector2 = new Vector2(vec3.x, vec3.y);
+
+    // Push left or right half the graphic width.
     vec3.x += holdWidth / 2 * (leftSide ? -1 : 1) * noteModData.scaleX;
-    var rotateOrigin:Vector2 = new Vector2(noteModData.x, noteModData.y);
 
     if (parent.spiralHolds)
     {
@@ -497,14 +570,23 @@ class SustainTrailModPiece extends SustainTrail // Extend from SustainTrail for 
   {
     // apply skew
     // -: update code here :-
-    // var xPercent_SkewOffset:Float = tempVec3.x - fakeNote.x - (graphicWidth / 2);
-    // if (noteModData.skewY != 0) tempVec3.y += xPercent_SkewOffset * Math.tan(noteModData.skewY * FlxAngle.TO_RAD);
+    var xPercent_SkewOffset:Float = curVec.x - rotateOrigin.x;
+    if (noteModData.skewY != 0) curVec.y += xPercent_SkewOffset * Math.tan(noteModData.skewY * FlxAngle.TO_RAD);
 
-    // Rotate
-    var angleY:Float = noteModData.angleY;
+    // Rotate Z
+    if (this.angle != 0)
+    {
+      vec2.setTo(curVec.x, curVec.y);
+      var rotateModPivotPoint:Vector2 = new Vector2(anglePivot.x, anglePivot.y);
+      vec2 = ModConstants.rotateAround(rotateModPivotPoint, vec2, this.angle);
+      curVec.x = vec2.x;
+      curVec.y = vec2.y;
+    }
+
+    // Rotate Y
     vec2.setTo(curVec.x, curVec.z);
     var rotateModPivotPoint:Vector2 = new Vector2(rotateOrigin.x, curVec.z);
-    vec2 = ModConstants.rotateAround(rotateModPivotPoint, vec2, angleY);
+    vec2 = ModConstants.rotateAround(rotateModPivotPoint, vec2, noteModData.angleY);
     curVec.x = vec2.x;
     curVec.z = vec2.y;
 
@@ -536,6 +618,43 @@ class SustainTrailModPiece extends SustainTrail // Extend from SustainTrail for 
   public function sampleNotePosition(strumTime:Float = 0, isBottom:Bool = false):Void
   {
     noteModData = parent.sampleNotePosition(noteModData, strumTime, (isBottom && isRoot));
+    updateShaderStuff(isBottom);
+    if (isBottom)
+    {
+      var angleMemory = this.angle;
+      this.applyNoteData(noteModData);
+      this.x = ModConstants.holdNoteJankX;
+      this.y = ModConstants.holdNoteJankY;
+      this.angle = angleMemory;
+      this.alpha = parentStrumline.alpha;
+    }
+  }
+
+  function updateShaderStuff(isBottom:Bool):Void
+  {
+    if (isEnd) isBottom = !isBottom; // Silly fix
+    if (isBottom)
+    {
+      this.hsvShader.setFloat('_bottomStealth', noteModData.stealth);
+      this.hsvShader.setFloat('_bottomAlpha', noteModData.alpha);
+      this.hsvShader.setFloat('_bottomRed', noteModData.red);
+      this.hsvShader.setFloat('_bottomGreen', noteModData.green);
+      this.hsvShader.setFloat('_bottomBlue', noteModData.blue);
+      this.hsvShader.setFloat('_bottomStealthRed', noteModData.stealthGlowRed);
+      this.hsvShader.setFloat('_bottomStealthGreen', noteModData.stealthGlowGreen);
+      this.hsvShader.setFloat('_bottomStealthBlue', noteModData.stealthGlowBlue);
+    }
+    else
+    {
+      this.hsvShader.setFloat('_topStealth', noteModData.stealth);
+      this.hsvShader.setFloat('_topAlpha', noteModData.alpha);
+      this.hsvShader.setFloat('_topRed', noteModData.red);
+      this.hsvShader.setFloat('_topGreen', noteModData.green);
+      this.hsvShader.setFloat('_topBlue', noteModData.blue);
+      this.hsvShader.setFloat('_topStealthRed', noteModData.stealthGlowRed);
+      this.hsvShader.setFloat('_topStealthGreen', noteModData.stealthGlowGreen);
+      this.hsvShader.setFloat('_topStealthBlue', noteModData.stealthGlowBlue);
+    }
   }
 
   /**
@@ -558,8 +677,6 @@ class SustainTrailModPiece extends SustainTrail // Extend from SustainTrail for 
     v = getVertPos(true); // Bottom right
     verts[1 * 2] = v.x;
     verts[1 * 2 + 1] = v.y;
-
-    this.z = noteModData.z;
 
     // Grab the position of where the top two verts should be.
     sampleNotePosition(this.strumTime + this.sustainLength, false);
@@ -638,16 +755,19 @@ class SustainTrailModPiece extends SustainTrail // Extend from SustainTrail for 
     }
   }
 
+  public function updateClipAndStitch():Void
+  {
+    if (!this.alive) return;
+    this.updateClipping();
+    this.stichToPrevious();
+  }
+
   @:access(flixel.FlxCamera)
   override public function draw():Void
   {
-    var alphaMemory:Float = this.alpha;
-    // if (alphaMemory == 0 || !visible || !this.alive) return;
     if (!this.alive) return;
 
-    this.updateClipping();
-    this.stichToPrevious();
-
+    var alphaMemory:Float = this.alpha;
     for (camera in parent.cameras)
     {
       var newAlpha:Float = alphaMemory * camera.alpha * parent?.parentStrumline?.alpha ?? 1.0;
@@ -656,8 +776,8 @@ class SustainTrailModPiece extends SustainTrail // Extend from SustainTrail for 
 
       getScreenPosition(_point, camera).subtractPoint(offset);
 
-      camera.drawTriangles(parent.graphic, vertices, indices, uvtData, null, _point, blend, true, parent.antialiasing, this.colorTransform, parent.shader,
-        parent.cullMode);
+      camera.drawTriangles(parent.graphic, this.vertices, this.indices, this.uvtData, null, _point, parent.blend, true, parent.antialiasing,
+        parent.colorTransform, this.shader, parent.cullMode);
     }
 
     // Reset alpha back to what it was to prevent issues.

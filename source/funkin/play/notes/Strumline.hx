@@ -1743,6 +1743,10 @@ class Strumline extends FlxSpriteGroup
         if (mods != null)
         {
           var sussyMod:SustainTrailMod = cast(daHold, SustainTrailMod);
+
+          holdX = sussyMod.rootData.rootX;
+          holdY = sussyMod.rootData.rootY;
+
           holdZ = sussyMod.rootData.rootZ;
           holdScaleX = sussyMod.rootData.rootScaleX;
           holdScaleY = sussyMod.rootData.rootScaleY;

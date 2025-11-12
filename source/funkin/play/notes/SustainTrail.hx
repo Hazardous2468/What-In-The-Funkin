@@ -8,6 +8,7 @@ import flixel.graphics.FlxGraphic;
 import flixel.graphics.tile.FlxDrawTrianglesItem.DrawData;
 import flixel.math.FlxMath;
 import funkin.graphics.ZSprite;
+import funkin.graphics.shaders.HSVNotesShader;
 
 /**
  * This is based heavily on the `FlxStrip` class. It uses `drawTriangles()` to clip a sustain note
@@ -454,4 +455,31 @@ class SustainTrail extends ZSprite
 
     super.destroy();
   }
+
+  public function setHue(hue:Float):Void
+  {
+    if (this.hsvShader == null) return;
+    this.hsvShader.hue = hue;
+  }
+
+  public function desaturate():Void
+  {
+    if (this.hsvShader == null) return;
+    this.hsvShader.saturation = 0.2;
+  }
+
+  public function setSaturation(sat:Float):Void
+  {
+    if (this.hsvShader == null) return;
+    this.hsvShader.saturation = sat;
+  }
+
+  public function setValue(val:Float):Void
+  {
+    if (this.hsvShader == null) return;
+    this.hsvShader.value = val;
+  }
+
+  // The Hue, Saturation, Value Shader. Also handles blending between the top and bottom points (for alpha / stealth)
+  public var hsvShader:HSVNotesShader = new HSVNotesShader();
 }
