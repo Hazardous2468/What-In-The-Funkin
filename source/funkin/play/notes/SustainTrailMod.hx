@@ -33,7 +33,7 @@ import openfl.geom.Vector3D;
  * Keep in mind this is developed as downscroll so any comments like "the bottom of the hold" would be the top for upscroll
  * @author Hazard24
  */
-class SustainTrailMod extends SustainTrail
+class SustainTrailMod extends SustainTrail // Extend from SustainTrail for all the sustainTrail logic.
 {
   // A variable containing information relating to the root / base of this sustain.
   // May be changed in future to instead use this sprites variables instead.
@@ -49,13 +49,13 @@ class SustainTrailMod extends SustainTrail
   public var whichStrumNote:StrumlineNote;
 
   // The grain (detail) of this sustain piece. Higher grain means less detail and vice versa.
-  public var grain:Float = ModConstants.defaultHoldGrain;
+  public var grain(default, set):Float = ModConstants.defaultHoldGrain;
 
   // A modifier that allows this hold to be rendered straight instead of wavey. Supports negative values (makes it MORE wavey)
   public var straightHolds:Float = 0;
 
   // A modifier that stretches this hold to make it visually look longer then what it actually is.
-  public var longHolds:Float = 0;
+  public var longHolds(default, set):Float = 0;
 
   // A modifier that, when enabled, will rotate the pieces to face the direction of travel.
   public var spiralHolds:Bool = false;
@@ -89,6 +89,32 @@ class SustainTrailMod extends SustainTrail
     this.active = true;
     this.shader = hsvShader;
     this.isArrowPath = isArrowPath;
+  }
+
+  function set_longHolds(s:Float):Float
+  {
+    if (this.longHolds == s) return s;
+    this.longHolds = s;
+    recalculatePiecesArray();
+    return this.longHolds;
+  }
+
+  function set_grain(s:Float):Float
+  {
+    if (s < 1.0) s = 1.0;
+    if (this.grain == s) return s;
+    this.grain = s;
+    recalculatePiecesArray();
+    return this.grain;
+  }
+
+  override function set_fullSustainLength(s:Float):Float
+  {
+    if (s < 0.0) s = 0.0;
+    if (this.fullSustainLength == s) return s;
+    this.fullSustainLength = s;
+    recalculatePiecesArray();
+    return this.fullSustainLength;
   }
 
   override public function setupHoldNoteGraphic(noteStyle:NoteStyle):Void
@@ -133,6 +159,7 @@ class SustainTrailMod extends SustainTrail
     howManyPieces += 1; // Add one for the end cap.
 
     var howManyDif:Int = howManyPieces - susPieces.length;
+    trace("TARGET DIF: " + howManyDif);
 
     // if we do not have the required pieces (the susPieces array length isnt equal )
     // generate the required pieces from the parent strumline using recycling behaviour.
@@ -146,6 +173,7 @@ class SustainTrailMod extends SustainTrail
     // if we are OVER the required pieces, kill and remove the susPieces that we don't need ready to be recycled elsewhere.
     else if (howManyDif < 0)
     {
+      howManyDif *= -1;
       for (i in 0...howManyDif)
       {
         removePiece();
@@ -203,15 +231,6 @@ class SustainTrailMod extends SustainTrail
         daPiece.previousPiece = null;
       }
     }
-  }
-
-  override function set_fullSustainLength(s:Float):Float
-  {
-    if (s < 0.0) s = 0.0;
-    if (this.fullSustainLength == s) return s;
-    this.fullSustainLength = s;
-    recalculatePiecesArray();
-    return this.fullSustainLength;
   }
 
   // This now controls how the pieces are laid out and their lengths
@@ -404,7 +423,7 @@ class SustainTrailRootPieceData
 }
 
 // A series of data used to determine how a piece should be rendered.
-class SustainTrailModPiece extends SustainTrail
+class SustainTrailModPiece extends SustainTrail // Extend from SustainTrail for all the sustainTrail render logic. (tbf, could probably just make this it's own class later on)
 {
   // The modData, shared between all the pieces.
   var noteModData:NoteData;
@@ -460,7 +479,7 @@ class SustainTrailModPiece extends SustainTrail
   {
     var holdWidth = graphicWidth / 2;
     vec3.setTo(noteModData.x, noteModData.y, noteModData.z);
-    vec3.x += holdWidth / 2 * (leftSide ? -1 : 1);
+    vec3.x += holdWidth / 2 * (leftSide ? -1 : 1) * noteModData.scaleX;
     var rotateOrigin:Vector2 = new Vector2(noteModData.x, noteModData.y);
 
     if (parent.spiralHolds)
@@ -629,7 +648,7 @@ class SustainTrailModPiece extends SustainTrail
     this.updateClipping();
     this.stichToPrevious();
 
-    for (camera in cameras)
+    for (camera in parent.cameras)
     {
       var newAlpha:Float = alphaMemory * camera.alpha * parent?.parentStrumline?.alpha ?? 1.0;
       this.alpha = newAlpha;
