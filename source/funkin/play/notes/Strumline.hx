@@ -117,9 +117,9 @@ class Strumline extends FlxSpriteGroup
 
   public function requestMeshCullUpdateForPaths():Void
   {
-    arrowPaths.forEach(function(note:SustainTrail) {
-      note.cullMode = note.whichStrumNote?.strumExtraModData?.cullModeArrowpath ?? "none";
-    });
+    // arrowPaths.forEach(function(note:SustainTrail) {
+    //  note.cullMode = note.whichStrumNote?.strumExtraModData?.cullModeArrowpath ?? "none";
+    // });
   }
 
   public function requestMeshCullUpdateForNotes(forNotes:Bool = false):Void
@@ -147,11 +147,19 @@ class Strumline extends FlxSpriteGroup
     {
       for (note in holdNotes.members)
       {
-        if (note != null && note.alive) note.cullMode = note.whichStrumNote?.strumExtraModData?.cullModeSustain ?? "none";
+        if (note != null && note.alive)
+        {
+          var sussyMod:SustainTrailMod = cast(note, SustainTrailMod);
+          sussyMod.cullMode = sussyMod.whichStrumNote?.strumExtraModData?.cullModeSustain ?? "none";
+        }
       }
       for (note in holdNotesVwoosh.members)
       {
-        if (note != null && note.alive) note.cullMode = note.whichStrumNote?.strumExtraModData?.cullModeSustain ?? "none";
+        if (note != null && note.alive)
+        {
+          var sussyMod:SustainTrailMod = cast(note, SustainTrailMod);
+          sussyMod.cullMode = sussyMod.whichStrumNote?.strumExtraModData?.cullModeSustain ?? "none";
+        }
       }
     }
   }
@@ -558,47 +566,48 @@ class Strumline extends FlxSpriteGroup
           arrowPaths.remove(note);
           note.destroy();
         });
-
-        for (i in 0...KEY_COUNT)
-        {
-          var prev:SustainTrail = null;
-          for (p in 0...pathPieces)
-          {
-            var holdNoteSprite:SustainTrail = new SustainTrail(0, 0, noteStyle, true, this);
-            // holdNoteSprite.makeGraphic(10, 20, FlxColor.WHITE);
-            this.arrowPaths.add(holdNoteSprite);
-            holdNoteSprite.weBelongTo = this;
-
-            if (PlayState.instance.allStrumSprites != null && PlayState.instance.noteRenderMode)
+        /*
+            for (i in 0...KEY_COUNT)
             {
-              PlayState.instance.allStrumSprites.add(holdNoteSprite);
-            }
+              var prev:SustainTrail = null;
+              for (p in 0...pathPieces)
+              {
+                var holdNoteSprite:SustainTrail = new SustainTrail(0, 0, noteStyle, true, this);
+                // holdNoteSprite.makeGraphic(10, 20, FlxColor.WHITE);
+                this.arrowPaths.add(holdNoteSprite);
+                holdNoteSprite.weBelongTo = this;
 
-            if (prev != null)
-            {
-              holdNoteSprite.previousPiece = prev;
-            }
-            holdNoteSprite.piece = p;
-            holdNoteSprite.renderEnd = (p == (pathPieces - 1));
-            holdNoteSprite.parentStrumline = this;
-            holdNoteSprite.noteData = null;
-            holdNoteSprite.strumTime = 0;
-            holdNoteSprite.noteDirection = i;
+                if (PlayState.instance.allStrumSprites != null && PlayState.instance.noteRenderMode)
+                {
+                  PlayState.instance.allStrumSprites.add(holdNoteSprite);
+                }
 
-            @:privateAccess
-            holdNoteSprite.tinyOffsetForSpiral = 0; // shouldn't need this cuz there shouldn't be any clipping
+                if (prev != null)
+                {
+                  holdNoteSprite.previousPiece = prev;
+                }
+                holdNoteSprite.piece = p;
+                holdNoteSprite.renderEnd = (p == (pathPieces - 1));
+                holdNoteSprite.parentStrumline = this;
+                holdNoteSprite.noteData = null;
+                holdNoteSprite.strumTime = 0;
+                holdNoteSprite.noteDirection = i;
 
-            var whichStrumNote:StrumlineNote = getByIndex(i);
-            holdNoteSprite.alpha = whichStrumNote?.strumExtraModData?.arrowPathAlpha ?? 0;
-            holdNoteSprite.fullSustainLength = holdNoteSprite.sustainLength = whichStrumNote.strumExtraModData.arrowpathLength
-              + whichStrumNote.strumExtraModData.arrowpathBackwardsLength;
+                @:privateAccess
+                holdNoteSprite.tinyOffsetForSpiral = 0; // shouldn't need this cuz there shouldn't be any clipping
 
-            holdNoteSprite.missedNote = false;
-            holdNoteSprite.hitNote = false;
-            holdNoteSprite.visible = true;
-            prev = holdNoteSprite;
+                var whichStrumNote:StrumlineNote = getByIndex(i);
+                holdNoteSprite.alpha = whichStrumNote?.strumExtraModData?.arrowPathAlpha ?? 0;
+                holdNoteSprite.fullSustainLength = holdNoteSprite.sustainLength = whichStrumNote.strumExtraModData.arrowpathLength
+                  + whichStrumNote.strumExtraModData.arrowpathBackwardsLength;
+
+                holdNoteSprite.missedNote = false;
+                holdNoteSprite.hitNote = false;
+                holdNoteSprite.visible = true;
+                prev = holdNoteSprite;
+              }
           }
-        }
+         */
         generatedArrowPaths = true;
       }
 
@@ -649,67 +658,69 @@ class Strumline extends FlxSpriteGroup
     if (!generatedArrowPaths) return;
     if (!drawArrowPaths) return;
 
-    notitgPathSprite.visible = notitgStyledPath;
-    if (notitgStyledPath)
-    {
-      notitgPath.updateAFT();
+    /*
+      notitgPathSprite.visible = notitgStyledPath;
+      if (notitgStyledPath)
+      {
+        notitgPath.updateAFT();
 
-      var isPixel:Bool = noteStyle.id.toLowerCase() == "pixel"; // dumb fucking fix lmfao
-      isPixel = false;
-      notitgPathSprite.x = isPixel ? -12 : 0; // temp fix lmao
+        var isPixel:Bool = noteStyle.id.toLowerCase() == "pixel"; // dumb fucking fix lmfao
+        isPixel = false;
+        notitgPathSprite.x = isPixel ? -12 : 0; // temp fix lmao
 
-      notitgPathSprite.y = 0;
+        notitgPathSprite.y = 0;
+
+        arrowPaths.forEach(function(note:SustainTrail) {
+          note.visible = false;
+        });
+        return;
+      }
+
+      var stitchEnds:Bool = true;
 
       arrowPaths.forEach(function(note:SustainTrail) {
-        note.visible = false;
-      });
-      return;
-    }
+        note.x = ModConstants.holdNoteJankX;
+        note.y = ModConstants.holdNoteJankY;
 
-    var stitchEnds:Bool = true;
+        note.visible = drawArrowPaths;
+        // note.alpha = arrowPathAlpha[note.noteDirection];
+        var whichStrumNote:StrumlineNote = getByIndex(note.noteDirection);
+        note.alpha = whichStrumNote?.strumExtraModData?.arrowPathAlpha ?? 0;
+        // ay -= whichStrumNote.strumExtraModData.alphaHoldCoverMod;
+        var length:Float = (whichStrumNote.strumExtraModData.arrowpathLength + whichStrumNote.strumExtraModData.arrowpathBackwardsLength) / (pathPieces);
+        note.fullSustainLength = note.sustainLength = length;
 
-    arrowPaths.forEach(function(note:SustainTrail) {
-      note.x = ModConstants.holdNoteJankX;
-      note.y = ModConstants.holdNoteJankY;
-
-      note.visible = drawArrowPaths;
-      // note.alpha = arrowPathAlpha[note.noteDirection];
-      var whichStrumNote:StrumlineNote = getByIndex(note.noteDirection);
-      note.alpha = whichStrumNote?.strumExtraModData?.arrowPathAlpha ?? 0;
-      // ay -= whichStrumNote.strumExtraModData.alphaHoldCoverMod;
-      var length:Float = (whichStrumNote.strumExtraModData.arrowpathLength + whichStrumNote.strumExtraModData.arrowpathBackwardsLength) / (pathPieces);
-      note.fullSustainLength = note.sustainLength = length;
-
-      note.strumTime = ModConstants.getSongPosition();
-      note.strumTime -= whichStrumNote?.strumExtraModData?.arrowpathBackwardsLength ?? 0;
-      note.strumTime += length * note.piece;
-      if (doUpdateClipsInDraw)
-      {
-        note.updateClipping();
-
-        // note.x += 112 / 2 * note.piece;
-
-        // UH OH, SCUFFED CODE ALERT
-        // We sow the end of the arrowpath to the start of the new piece. This is so that we don't have any gaps. Mainly occurs with spiral holds lol
-        // MY NAME IS EDWIN
-        if (note.previousPiece != null && stitchEnds)
+        note.strumTime = ModConstants.getSongPosition();
+        note.strumTime -= whichStrumNote?.strumExtraModData?.arrowpathBackwardsLength ?? 0;
+        note.strumTime += length * note.piece;
+        if (doUpdateClipsInDraw)
         {
-          // I made the mimic
-          var v_prev:Array<Float> = note.previousPiece.vertices_array;
-          var v:Array<Float> = note.vertices_array;
+          note.updateClipping();
 
-          // it was difficult, to put the pieces together
-          v[3] = v_prev[v_prev.length - 1];
-          v[2] = v_prev[v_prev.length - 2];
-          v[1] = v_prev[v_prev.length - 3];
-          v[0] = v_prev[v_prev.length - 4];
+          // note.x += 112 / 2 * note.piece;
 
-          // but unfortunately, something went so wrong.
-          @:privateAccess
-          note.setVerts(v);
+          // UH OH, SCUFFED CODE ALERT
+          // We sow the end of the arrowpath to the start of the new piece. This is so that we don't have any gaps. Mainly occurs with spiral holds lol
+          // MY NAME IS EDWIN
+          if (note.previousPiece != null && stitchEnds)
+          {
+            // I made the mimic
+            var v_prev:Array<Float> = note.previousPiece.vertices_array;
+            var v:Array<Float> = note.vertices_array;
+
+            // it was difficult, to put the pieces together
+            v[3] = v_prev[v_prev.length - 1];
+            v[2] = v_prev[v_prev.length - 2];
+            v[1] = v_prev[v_prev.length - 3];
+            v[0] = v_prev[v_prev.length - 4];
+
+            // but unfortunately, something went so wrong.
+            @:privateAccess
+            note.setVerts(v);
+          }
         }
-      }
-    });
+      });
+     */
   }
 
   function updatePerspective():Void
@@ -1189,7 +1200,8 @@ class Strumline extends FlxSpriteGroup
       var drawDistanceBack:Float = 1;
       if (mods != null)
       {
-        drawDistanceBack = 1.0 + (holdNote?.whichStrumNote?.strumExtraModData?.drawdistanceBack ?? 0.0);
+        var sussyMod:SustainTrailMod = cast(holdNote, SustainTrailMod);
+        drawDistanceBack = 1.0 + (sussyMod?.whichStrumNote?.strumExtraModData?.drawdistanceBack ?? 0.0);
       }
 
       var renderWindowEnd = holdNote.strumTime + holdNote.fullSustainLength + Constants.HIT_WINDOW_MS
@@ -1696,8 +1708,16 @@ class Strumline extends FlxSpriteGroup
     var noteStyleScale:Float = noteStyle.getHoldCoverScale();
     var whichStrumNote:StrumlineNote = getByIndex(cover.holdNoteDir % KEY_COUNT);
 
-    @:privateAccess var spiralHolds:Bool = cover.holdNote?.noteModData?.usingSpiralHolds() ?? false;
+    // @:privateAccess var spiralHolds:Bool = cover.holdNote?.noteModData?.usingSpiralHolds() ?? false;
     // var spiralHolds:Bool = whichStrumNote.strumExtraModData?.usingSpiralHolds(false) ?? false;
+
+    var spiralHolds:Bool = false;
+    if (mods != null && cover.holdNote != null)
+    {
+      var sussyMod:SustainTrailMod = cast(cover.holdNote, SustainTrailMod);
+
+      spiralHolds = sussyMod.spiralHolds;
+    }
 
     if (cover.holdPositioned)
     {
@@ -1705,7 +1725,7 @@ class Strumline extends FlxSpriteGroup
       {
         var daHold:SustainTrail = cover.holdNote;
 
-        var v:Array<Float> = daHold.vertices_array;
+        var v = daHold.vertices;
 
         // v[0] = first x pos
         // v[2] = second x pos
@@ -1714,9 +1734,19 @@ class Strumline extends FlxSpriteGroup
         var holdX:Float = v[0] + ((v[2] - v[0]) / 2);
         var holdY:Float = v[0 + 1] + ((v[2 + 1] - v[0 + 1]) / 2);
 
-        @:privateAccess var holdZ:Float = daHold.holdRootZ;
-        @:privateAccess var holdScaleX:Float = daHold.holdRootScaleX;
-        @:privateAccess var holdScaleY:Float = daHold.holdRootScaleY;
+        var holdZ:Float = 0;
+        var holdScaleX:Float = 1;
+        var holdScaleY:Float = 1;
+        var holdAngle:Float = 0;
+
+        if (mods != null)
+        {
+          var sussyMod:SustainTrailMod = cast(daHold, SustainTrailMod);
+          holdZ = sussyMod.rootData.rootZ;
+          holdScaleX = sussyMod.rootData.rootScaleX;
+          holdScaleY = sussyMod.rootData.rootScaleY;
+          holdAngle = sussyMod.rootData.rootAngle;
+        }
 
         cover.x = holdX;
         cover.y = holdY;
@@ -1731,7 +1761,7 @@ class Strumline extends FlxSpriteGroup
         var daAngle:Float = 0;
         if (spiralHolds && holdCoverRotate)
         {
-          if (cover.holdNote != null) daAngle = cover.holdNote.baseAngle;
+          daAngle = holdAngle;
         }
 
         cover.x += offsetX;
@@ -1817,7 +1847,7 @@ class Strumline extends FlxSpriteGroup
 
     if (spiralHolds && holdCoverRotate)
     {
-      if (cover.holdNote != null) cover.glow.angle = cover.holdNote.baseAngle;
+      // if (cover.holdNote != null) cover.glow.angle = cover.holdNote.baseAngle;
     }
     else // Fix for if spiral holds get disabled, the covers stay rotated.
     {
@@ -1895,15 +1925,15 @@ class Strumline extends FlxSpriteGroup
 
       cover.playStart();
 
-      if (holdNote != null && noteStyle.shouldHoldNoteCoverCopyHSV())
-      {
-        cover.setHSV(holdNote.hsvShader.hue, holdNote.hsvShader.saturation, holdNote.hsvShader.value);
-      }
-
       cover.holdPositioned = !noteStyle.holdCoverVanillaPositionLogic();
 
       if (mods != null)
       {
+        if (holdNote != null && noteStyle.shouldHoldNoteCoverCopyHSV())
+        {
+          var sussyMod:SustainTrailMod = cast(holdNote, SustainTrailMod);
+          cover.setHSV(sussyMod.hsvShader.hue, sussyMod.hsvShader.saturation, sussyMod.hsvShader.value);
+        }
         noteCoverSetPos(cover);
       }
       else
@@ -2001,12 +2031,15 @@ class Strumline extends FlxSpriteGroup
       holdNoteSprite.visible = true;
       holdNoteSprite.alpha = 1.0;
 
-      @:privateAccess holdNoteSprite.noteModData.clearNoteMods();
-
       if (mods != null)
       {
         holdNoteSprite.x = ModConstants.holdNoteJankX;
         holdNoteSprite.y = ModConstants.holdNoteJankY;
+
+        var sussyMod:SustainTrailMod = cast(holdNoteSprite, SustainTrailMod);
+        sussyMod.whichStrumNote = getByIndex(sussyMod.noteDirection);
+        sussyMod.cullMode = sussyMod.whichStrumNote?.strumExtraModData?.cullModeSustain ?? "none";
+        sussyMod.clearNoteMods();
       }
       else
       {
@@ -2016,10 +2049,6 @@ class Strumline extends FlxSpriteGroup
         holdNoteSprite.x -= holdNoteSprite.width / 2;
         holdNoteSprite.y = -9999;
       }
-
-      holdNoteSprite.whichStrumNote = getByIndex(holdNoteSprite.noteDirection);
-
-      holdNoteSprite.cullMode = holdNoteSprite.whichStrumNote?.strumExtraModData?.cullModeSustain ?? "none";
     }
 
     return holdNoteSprite;
@@ -2148,11 +2177,11 @@ class Strumline extends FlxSpriteGroup
   // Edited version of getFirstAvailable that also checks if the noteStyle is matching.
   function getFirstAvailableHold():SustainTrail
   {
-    for (basic in this.holdNotes)
+    for (holdNote in this.holdNotes)
     {
-      if (basic != null && !basic.exists && basic.noteStyleName == this.noteStyle.id)
+      if (holdNote != null && !holdNote.exists && holdNote.noteStyleWITF.id == this.noteStyle.id)
       {
-        return basic;
+        return holdNote;
       }
     }
     return null;
@@ -2167,8 +2196,8 @@ class Strumline extends FlxSpriteGroup
 
     // Find a note which is inactive so we can revive it.
 
-    result = getFirstAvailableHold();
-    // result = this.holdNotes.getFirstAvailable();
+    // result = getFirstAvailableHold();
+    result = this.holdNotes.getFirstAvailable();
 
     if (result != null)
     {
@@ -2179,7 +2208,17 @@ class Strumline extends FlxSpriteGroup
     {
       // The note sprite pool is full and all note splashes are active.
       // We have to create a new note.
-      result = new SustainTrail(0, 0, noteStyle, false, this);
+
+      if (mods != null)
+      {
+        result = new SustainTrailMod(0, 0, noteStyle, false);
+      }
+      else
+      {
+        result = new SustainTrail(0, 0, noteStyle);
+      }
+      result.parentStrumline = this;
+
       this.holdNotes.add(result);
       result.weBelongTo = this;
       if (PlayState.instance != null)

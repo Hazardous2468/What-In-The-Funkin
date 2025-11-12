@@ -62,6 +62,7 @@ import funkin.play.notes.NoteSprite;
 import funkin.play.notes.Strumline;
 import funkin.play.notes.StrumlineNote;
 import funkin.play.notes.SustainTrail;
+import funkin.play.notes.SustainTrailMod;
 import funkin.play.notes.NoteHoldCover;
 import funkin.play.notes.NoteSplash;
 import funkin.play.notes.notekind.NoteKindManager;
@@ -757,9 +758,9 @@ class PlayState extends MusicBeatSubState
     {
       return a.coverBehindStrums ? zSortMod_CoverBehindOffset : zSortMod_CoverOffset;
     }
-    else if (Std.isOfType(a, SustainTrail))
+    else if (Std.isOfType(a, SustainTrailMod))
     {
-      var pcheck:SustainTrail = cast(a, SustainTrail);
+      var pcheck:SustainTrailMod = cast(a, SustainTrailMod);
       return pcheck.isArrowPath ? zSortMod_PathOffset : zSortMod_SustainOffset;
     }
     else if (Std.isOfType(a, StrumlineNote))
@@ -769,6 +770,11 @@ class PlayState extends MusicBeatSubState
     else if (Std.isOfType(a, NoteSplash))
     {
       return zSortMod_SplashOffset;
+    }
+    else if (Std.isOfType(a, SustainTrail))
+    {
+      var pcheck:SustainTrail = cast(a, SustainTrail);
+      return zSortMod_SustainOffset;
     }
     else
     {

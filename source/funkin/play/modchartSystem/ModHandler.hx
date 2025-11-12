@@ -8,6 +8,7 @@ import funkin.play.song.Song;
 import funkin.Preferences;
 import funkin.util.Constants;
 import funkin.play.notes.Strumline;
+import funkin.play.notes.SustainTrailMod;
 import funkin.Paths;
 import funkin.play.notes.NoteSprite;
 import funkin.play.notes.StrumlineNote;
@@ -32,6 +33,7 @@ import funkin.play.modchartSystem.modifiers.BaseModifier;
 import funkin.graphics.ZSprite;
 import flixel.util.FlxColor;
 import funkin.util.GRhythmUtil;
+import flixel.group.FlxSpriteGroup.FlxTypedSpriteGroup;
 
 class ModHandler
 {
@@ -1008,5 +1010,28 @@ class ModHandler
       }
       applyStrumModifierMath(note);
     });
+  }
+
+  // A group containing hold pieces that can be recycled for use in the sustainTrailMod renderer.
+  public var holdPieces:FlxTypedSpriteGroup<SustainTrailModPiece> = new FlxTypedSpriteGroup<SustainTrailModPiece>();
+
+  /**
+   * Custom recycling behavior for hold pieces.
+   */
+  public function constructHoldPiece():SustainTrailModPiece
+  {
+    var result:SustainTrailModPiece = null;
+    result = this.holdPieces.getFirstAvailable();
+    if (result != null)
+    {
+      result.revive();
+    }
+    else
+    {
+      result = new SustainTrailModPiece(0, 0, strum.noteStyle);
+      this.holdPieces.add(result);
+      result.weBelongTo = strum;
+    }
+    return result;
   }
 }

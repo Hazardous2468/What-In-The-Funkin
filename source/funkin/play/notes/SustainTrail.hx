@@ -6,22 +6,8 @@ import funkin.mobile.ui.FunkinHitbox.FunkinHitboxControlSchemes;
 import flixel.FlxSprite;
 import flixel.graphics.FlxGraphic;
 import flixel.graphics.tile.FlxDrawTrianglesItem.DrawData;
-import flixel.math.FlxAngle;
 import flixel.math.FlxMath;
-import flixel.util.FlxColor;
-import funkin.data.song.SongData.SongNoteData;
-import funkin.graphics.FunkinSprite;
 import funkin.graphics.ZSprite;
-import funkin.graphics.shaders.HSVNotesShader;
-import funkin.play.modchartSystem.ModConstants;
-import funkin.play.modchartSystem.ModHandler;
-import funkin.play.modchartSystem.NoteData;
-import funkin.play.notes.StrumlineNote;
-import funkin.play.notes.notestyle.NoteStyle;
-import funkin.ui.options.PreferencesMenu;
-import lime.math.Vector2;
-import openfl.display.TriangleCulling;
-import openfl.geom.Vector3D;
 
 /**
  * This is based heavily on the `FlxStrip` class. It uses `drawTriangles()` to clip a sustain note
@@ -43,7 +29,7 @@ class SustainTrail extends ZSprite
   public var strumTime:Float = 0; // millis
   public var noteDirection:NoteDirection = 0;
   public var sustainLength(default, set):Float = 0; // millis
-  public var fullSustainLength:Float = 0;
+  public var fullSustainLength(default, set):Float = 0; // millis
   public var noteData:Null<SongNoteData>;
   public var parentStrumline:Strumline;
 
@@ -78,8 +64,6 @@ class SustainTrail extends ZSprite
    */
   public var vertices:DrawData<Float> = new DrawData<Float>();
 
-  public var vertices_array:Array<Float> = [];
-
   /**
    * A `Vector` of integers or indexes, where every three indexes define a triangle.
    */
@@ -89,11 +73,6 @@ class SustainTrail extends ZSprite
    * A `Vector` of normalized coordinates used to apply texture mapping.
    */
   public var uvtData:DrawData<Float> = new DrawData<Float>();
-
-  /**
-   * A `Vector` representing each vertex colour. Doesn't work though :(
-   */
-  public var colors:DrawData<Int> = null;
 
   private var zoom:Float = 1;
 
@@ -120,14 +99,7 @@ class SustainTrail extends ZSprite
   var graphicWidth:Float = 0;
   var graphicHeight:Float = 0;
 
-  // if true, then this will have the arrowpath logic applied to this sustain!
-  public var isArrowPath:Bool = false;
-
-  // for identifying what noteStyle this notesprite is using in hxScript or even lua
-  public var noteStyleName:String = "funkin";
-
-  // Makes the mesh all wobbly! Taken from ZProjectSprite_Note.hx
-  public var vibrateEffect:Float = 0.0;
+  public var noteStyleWITF:NoteStyle;
 
   /**
    * Normally you would take strumTime:Float, noteData:Int, sustainLength:Float, parentNote:Note (?)
@@ -135,21 +107,19 @@ class SustainTrail extends ZSprite
    * @param SustainLength Length in milliseconds.
    * @param fileName
    */
-  public function new(noteDirection:NoteDirection, sustainLength:Float, noteStyle:NoteStyle, isArrowPath:Bool = false, ?parentStrum:Strumline)
+  public function new(noteDirection:NoteDirection, sustainLength:Float, noteStyle:NoteStyle)
   {
     super(0, 0);
-    this.isArrowPath = isArrowPath;
-    this.parentStrumline = parentStrum;
 
+    // BASIC SETUP
     this.sustainLength = sustainLength;
     this.fullSustainLength = sustainLength;
     this.noteDirection = noteDirection;
 
-    noteModData = new NoteData();
+    setupHoldNoteGraphic(noteStyle);
+    noteStyleOffsets = noteStyle.getHoldNoteOffsets();
 
     setIndices(TRIANGLE_VERTEX_INDICES);
-    noteStyleOffsets = noteStyle.getHoldNoteOffsets();
-    setupHoldNoteGraphic(noteStyle);
 
     this.active = true; // This NEEDS to be true for the note to be drawn!
   }
@@ -217,23 +187,9 @@ class SustainTrail extends ZSprite
    */
   public function setupHoldNoteGraphic(noteStyle:NoteStyle):Void
   {
-    if (isArrowPath)
-    {
-      if (parentStrumline != null)
-      {
-        loadGraphic(Paths.image(parentStrumline.arrowPathFileName));
-      }
-      else
-      {
-        loadGraphic(Paths.image('NOTE_ArrowPath'));
-      }
-    }
-    else
-    {
-      loadGraphic(noteStyle.getHoldNoteAssetPath());
-    }
+    this.noteStyleWITF = noteStyle;
+    loadGraphic(noteStyle.getHoldNoteAssetPath());
 
-    noteStyleName = noteStyle.id;
     antialiasing = true;
 
     this.isPixel = noteStyle.isHoldNotePixel();
@@ -249,22 +205,12 @@ class SustainTrail extends ZSprite
     }
 
     zoom = 1.0;
-    if (isArrowPath) zoom *= 0.7; // based of funkin notestyle
-    else
-      zoom *= noteStyle.fetchHoldNoteScale(); // arrowpath scale should not be controlled by notestyle hold scale
+    zoom *= noteStyle.fetchHoldNoteScale();
 
     // CALCULATE SIZE
     graphicWidth = graphic.width / 8 * zoom; // amount of notes * 2
     graphicHeight = sustainHeight(sustainLength, parentStrumline?.scrollSpeed ?? 1.0);
     // instead of scrollSpeed, PlayState.SONG.speed
-
-    if (parentStrumline != null)
-    {
-      if (parentStrumline.sustainGraphicWidth == null && !isArrowPath)
-      {
-        parentStrumline.sustainGraphicWidth = graphicWidth;
-      }
-    }
 
     flipY = Preferences.downscroll #if mobile
     || (Preferences.controlsScheme == FunkinHitboxControlSchemes.Arrows
@@ -274,23 +220,17 @@ class SustainTrail extends ZSprite
     alpha = 1.0;
     updateColorTransform();
 
-    if (useHSVShader)
-    {
-      if (hsvShader == null) hsvShader = new HSVNotesShader();
-      this.shader = hsvShader;
-    }
-
     updateClipping();
   }
 
-  function getBaseScrollSpeed():Float
+  function getBaseScrollSpeed()
   {
     return (PlayState.instance?.currentChart?.scrollSpeed ?? 1.0);
   }
 
   var previousScrollSpeed:Float = 1;
 
-  override function update(elapsed):Void
+  override function update(elapsed)
   {
     super.update(elapsed);
     if (previousScrollSpeed != (parentStrumline?.scrollSpeed ?? 1.0))
@@ -320,11 +260,18 @@ class SustainTrail extends ZSprite
     return this.sustainLength;
   }
 
-  function triggerRedraw():Void
+  function set_fullSustainLength(s:Float):Float
+  {
+    if (s < 0.0) s = 0.0;
+    if (this.fullSustainLength == s) return s;
+    this.fullSustainLength = s;
+    return this.fullSustainLength;
+  }
+
+  function triggerRedraw()
   {
     graphicHeight = sustainHeight(sustainLength, parentStrumline?.scrollSpeed ?? 1.0);
-    if (!usingHazModHolds) // Don't update cuz we updateClipping every frame anyway in Strumline.hx
-      updateClipping(); // Commenting this out = holds don't render for 1 frame when being hit. Keeping this means the hold renders incorrectly... what?
+    updateClipping();
     updateHitbox();
   }
 
@@ -332,20 +279,9 @@ class SustainTrail extends ZSprite
   {
     width = graphicWidth;
     height = graphicHeight;
-
-    offset.set(0, 0);
-    if (noteStyleOffsets != null)
-    {
-      if (!usingHazModHolds || parentStrumline == null || parentStrumline.mods == null)
-      {
-        offset.set(noteStyleOffsets[0], noteStyleOffsets[1]);
-      }
-    }
-
+    offset.set(noteStyleOffsets[0], noteStyleOffsets[1]);
     origin.set(width * 0.5, height * 0.5);
   }
-
-  var usingHazModHolds:Bool = true;
 
   /**
    * Sets up new vertex and UV data to clip the trail.
@@ -359,983 +295,6 @@ class SustainTrail extends ZSprite
       return;
     }
 
-    if (parentStrumline == null || parentStrumline.mods == null)
-    {
-      // trace("AW FUCK, THERE IS NO WAY TO SAMPLE MOD DATA!");
-      updateClipping_Vanilla(songTime);
-      usingHazModHolds = false;
-      return;
-    }
-
-    if (usingHazModHolds)
-    {
-      if (!parentStrumline.doUpdateClipsInDraw) updateClipping_mods(songTime);
-      else
-        return;
-    }
-    else
-    {
-      updateClipping_Vanilla(songTime);
-    }
-  }
-
-  var fakeNote:ZSprite;
-  var perspectiveShift:Vector3D = new Vector3D(0, 0, 0); // z is scale dif
-
-  function resetFakeNote():Void
-  {
-    if (isArrowPath)
-    {
-      fakeNote.alpha = 0;
-      fakeNote.scale.set(ModConstants.arrowPathScale, ModConstants.arrowPathScale);
-    }
-    else
-    {
-      fakeNote.alpha = 1;
-      fakeNote.scale.set(ModConstants.noteScale, ModConstants.noteScale);
-    }
-    return; // don't care for the rest of this, gets set to zero in noteModData default values anyway
-    /*
-      fakeNote.x = 0;
-      fakeNote.y = 0;
-      fakeNote.z = 0;
-      fakeNote.angle = 0;
-      fakeNote.color = FlxColor.WHITE;
-
-      fakeNote.stealthGlow = 0.0;
-      fakeNote.stealthGlowBlue = 1.0;
-      fakeNote.stealthGlowGreen = 1.0;
-      fakeNote.stealthGlowRed = 1.0;
-
-      fakeNote.skew.x = 0;
-      fakeNote.skew.y = 0;
-     */
-  }
-
-  var noteModData:NoteData;
-
-  public var renderEnd:Bool = true; // test
-  public var piece:Int = 0; // test
-  public var previousPiece:SustainTrail = null;
-
-  public var cullMode = TriangleCulling.NONE;
-
-  public var whichStrumNote:StrumlineNote;
-
-  private var old3Dholds:Bool = false;
-
-  private var holdResolution:Int = 4;
-
-  private var useOldStealthGlowStyle:Bool = false;
-
-  // Extra math for if you need information about the hold's TRUE curPos (not affected by being held down or not).
-  function extraHoldRootInfo(t:Float):Void
-  {
-    if (this.hsvShader == null) return;
-    var strumTimmy:Float = t - whichStrumNote?.strumExtraModData?.strumPos ?? 0.0;
-
-    var notePos:Float = parentStrumline.calculateNoteYPos(strumTimmy);
-    distanceFromReceptor_unscaledpos = notePos;
-    updateStealthGlowV2();
-  }
-
-  /**
-   * Forwards data to the hsvShader to render stealth transitions smoothly.
-   * Hopefully will be updated in the future to use an array instead cuz at the moment, only supports 1 of each type (sudden, hidden, vanish)
-   */
-  function updateStealthGlowV2():Void
-  {
-    if (isArrowPath)
-    {
-      this.hsvShader.setFloat('_holdHeight', holdResolution);
-      return;
-    }
-
-    this.hsvShader.setFloat('_stealthSustainSuddenAmount', 0.0);
-    this.hsvShader.setFloat('_stealthSustainHiddenAmount', 0.0);
-    this.hsvShader.setFloat('_stealthSustainVanishAmount', 0.0);
-
-    useOldStealthGlowStyle = whichStrumNote?.strumExtraModData?.useOldStealthGlowStyle ?? false;
-    if (useOldStealthGlowStyle)
-    {
-      return;
-    }
-
-    this.hsvShader.setFloat('_stealthSustainSuddenNoGlow', whichStrumNote?.strumExtraModData?.sudden_noGlow ?? 0.0);
-    this.hsvShader.setFloat('_stealthSustainHiddenNoGlow', whichStrumNote?.strumExtraModData?.hidden_noGlow ?? 0.0);
-    this.hsvShader.setFloat('_stealthSustainVanishNoGlow', whichStrumNote?.strumExtraModData?.vanish_noGlow ?? 0.0);
-
-    // get the info we need
-    var sStart:Float = whichStrumNote?.strumExtraModData?.suddenStart ?? 500.0;
-    var sEnd:Float = whichStrumNote?.strumExtraModData?.suddenEnd ?? 300.0;
-
-    var hStart:Float = whichStrumNote?.strumExtraModData?.hiddenStart ?? 500.0;
-    var hEnd:Float = whichStrumNote?.strumExtraModData?.hiddenEnd ?? 300.0;
-
-    this.hsvShader.setFloat('_stealthSustainSuddenAmount', whichStrumNote?.strumExtraModData?.suddenModAmount ?? 0.0);
-    this.hsvShader.setFloat('_stealthSustainHiddenAmount', whichStrumNote?.strumExtraModData?.hiddenModAmount ?? 0.0);
-    this.hsvShader.setFloat('_stealthSustainVanishAmount', whichStrumNote?.strumExtraModData?.vanishModAmount ?? 0.0);
-
-    this.hsvShader.setBool('_isHold', true);
-    this.hsvShader.setFloat('_holdHeight', holdResolution);
-
-    var holdPosFromReceptor:Float = (distanceFromReceptor_unscaledpos - (whichStrumNote?.noteModData?.curPos_unscaled ?? 0)) * (flipY ? -1 : 1);
-
-    // 1.125 works really well for 2.5 scroll speed so let's go from there
-    // 2.5 = 1.125
-    // 1 = 0.45 (WAIT I RECONGISE THAT NUMBER!!!)
-    var magicNumber:Float = Constants.PIXELS_PER_MS * parentStrumline?.scrollSpeed ?? 1.0;
-
-    var spacingBetweenEachUVpiece:Float = this.fullSustainLength * magicNumber; // magic number?
-
-    // Sudden math
-    var holdPosFromSuddenStart:Float = holdPosFromReceptor - sStart;
-    var holdPosFromSuddenEnd:Float = holdPosFromReceptor - sEnd;
-
-    var test1:Float = holdPosFromSuddenStart / spacingBetweenEachUVpiece * -1;
-    var test2:Float = holdPosFromSuddenEnd / spacingBetweenEachUVpiece * -1;
-
-    this.hsvShader.setFloat('_stealthSustainSuddenStart', test2);
-    this.hsvShader.setFloat('_stealthSustainSuddenEnd', test1);
-
-    // Hidden math
-    var holdPosFromHiddenStart:Float = holdPosFromReceptor - hStart;
-    var holdPosFromHiddenEnd:Float = holdPosFromReceptor - hEnd;
-
-    var test1:Float = holdPosFromHiddenStart / spacingBetweenEachUVpiece * -1;
-    var test2:Float = holdPosFromHiddenEnd / spacingBetweenEachUVpiece * -1;
-
-    this.hsvShader.setFloat('_stealthSustainHiddenStart', test1);
-    this.hsvShader.setFloat('_stealthSustainHiddenEnd', test2);
-
-    // FUCK ME
-
-    sStart = whichStrumNote?.strumExtraModData?.vanish_SuddenStart ?? 202.5;
-    sEnd = whichStrumNote?.strumExtraModData?.vanish_SuddenEnd ?? 125.0;
-
-    hStart = whichStrumNote?.strumExtraModData?.vanish_HiddenStart ?? 475.0;
-    hEnd = whichStrumNote?.strumExtraModData?.vanish_HiddenEnd ?? 397.5;
-
-    var holdPosFromSuddenStart:Float = holdPosFromReceptor - sStart;
-    var holdPosFromSuddenEnd:Float = holdPosFromReceptor - sEnd;
-
-    var test1:Float = holdPosFromSuddenStart / spacingBetweenEachUVpiece * -1;
-    var test2:Float = holdPosFromSuddenEnd / spacingBetweenEachUVpiece * -1;
-
-    this.hsvShader.setFloat('_stealthSustainVanish_SuddenStart', test2);
-    this.hsvShader.setFloat('_stealthSustainVanish_SuddenEnd', test1);
-
-    var holdPosFromHiddenStart:Float = holdPosFromReceptor - hStart;
-    var holdPosFromHiddenEnd:Float = holdPosFromReceptor - hEnd;
-
-    var test1:Float = holdPosFromHiddenStart / spacingBetweenEachUVpiece * -1;
-    var test2:Float = holdPosFromHiddenEnd / spacingBetweenEachUVpiece * -1;
-
-    this.hsvShader.setFloat('_stealthSustainVanish_HiddenStart', test1);
-    this.hsvShader.setFloat('_stealthSustainVanish_HiddenEnd', test2);
-  }
-
-  // reuse this vector2 and vector3 variable instead of creating a bunch of new ones all the time
-  var tempVec2:Vector2 = new Vector2(0, 0);
-  var tempVec3:Vector3D = new Vector3D(0, 0, 0);
-
-  // 953.27ms with tracy. Ouch.
-  // OPTIMISE ME!
-  // Call this function to sample where a note would be at this strum position.
-  function susSample(strumTimmy:Float, isRoot:Bool = false, dumbHeight:Float = 0):Void
-  {
-    strumTimmy = strumTimmy - whichStrumNote?.strumExtraModData?.strumPos ?? 0;
-    var notePos:Float = parentStrumline.calculateNoteYPos(strumTimmy);
-
-    if (parentStrumline.mods.mathCutOffCheck(notePos, noteDirection % 4)
-      || (!isRoot
-        && whichStrumNote.strumExtraModData.noHoldMathShortcut < 0.5
-        && hitNote
-        && !missedNote
-        && ((notePos < 0.5 && !flipY) || (notePos > -0.5 && flipY))))
-    {
-      return;
-    }
-
-    resetFakeNote();
-    noteModData.defaultValues();
-    noteModData.alpha = fakeNote.alpha;
-    noteModData.scaleX = fakeNote.scale.x;
-    noteModData.scaleY = fakeNote.scale.y;
-    noteModData.strumTime = strumTimmy;
-    noteModData.direction = noteDirection % Strumline.KEY_COUNT;
-    noteModData.curPos_unscaled = notePos;
-    noteModData.whichStrumNote = whichStrumNote;
-    noteModData.noteType = isArrowPath ? "path" : "hold";
-
-    var scrollMult:Float = 1.0;
-    for (mod in parentStrumline.mods.mods_speed)
-    {
-      if (mod.targetLane != -1 && noteModData.direction != mod.targetLane) continue;
-      scrollMult *= mod.speedMath(noteModData.direction, noteModData.curPos_unscaled, parentStrumline, true);
-    }
-    for (mod in noteModData.noteMods)
-    {
-      if (mod.targetLane != -1 && noteModData.direction != mod.targetLane) continue;
-      scrollMult *= mod.speedMath(noteModData.direction, noteModData.curPos_unscaled, parentStrumline, true);
-    }
-    noteModData.speedMod = scrollMult;
-
-    noteModData.x = whichStrumNote.x + parentStrumline.mods.getHoldOffsetX(isArrowPath, graphicWidth);
-    var sillyPos:Float = parentStrumline.calculateNoteYPos(noteModData.strumTime) * scrollMult;
-    if (flipY)
-    {
-      noteModData.y = (whichStrumNote.y + sillyPos + Strumline.STRUMLINE_SIZE / 2);
-    }
-    else
-    {
-      noteModData.y = (whichStrumNote.y - Strumline.INITIAL_OFFSET + sillyPos + Strumline.STRUMLINE_SIZE / 2);
-    }
-
-    noteModData.x -= whichStrumNote.strumExtraModData.noteStyleOffsetX; // undo strum offset
-    noteModData.y -= whichStrumNote.strumExtraModData.noteStyleOffsetY;
-
-    noteModData.z = whichStrumNote.z;
-    noteModData.curPos = sillyPos;
-
-    for (mod in (isArrowPath ? parentStrumline.mods.mods_arrowpath : parentStrumline.mods.mods_notes))
-    {
-      if (mod.targetLane != -1 && noteModData.direction != mod.targetLane) continue;
-      mod.noteMath(noteModData, parentStrumline, true, isArrowPath);
-    }
-
-    for (mod in noteModData.noteMods)
-    {
-      if (mod.targetLane != -1 && noteModData.direction != mod.targetLane) continue;
-      mod.noteMath(noteModData, parentStrumline, true, isArrowPath);
-    }
-
-    noteModData.funnyOffMyself();
-
-    is3D = (whichStrumNote.strumExtraModData?.threeD ?? false);
-    // old3Dholds = (whichStrumNote.strumExtraModData?.old3Dholds ?? false);
-    old3Dholds = noteModData?.old3Dholds ?? false;
-
-    noteModData.x -= noteStyleOffsets[0]; // apply notestyle offset here for z math reasons
-    noteModData.y -= noteStyleOffsets[1];
-
-    fakeNote.applyNoteData(noteModData, !is3D);
-
-    fakeNote.scale.x *= noteModData.scaleX2; // Account for scale2! Don't need to worry about angle... for now?
-    fakeNote.scale.y *= noteModData.scaleY2;
-
-    if (flipY) fakeNote.y += 27; // fix gap for downscroll. Moved from verts so it is applied before perspective fucks it up!
-
-    tempVec2.x = fakeNote.x;
-    tempVec2.y = fakeNote.y;
-
-    if (old3Dholds || !is3D) perspectiveShift.z = ModConstants.applyPerspective_returnScale(fakeNote, graphicWidth, 8 /*dumbHeight*/,
-      noteModData.perspectiveOffset);
-
-    // caluclate diff
-    perspectiveShift.x = fakeNote.x - tempVec2.x;
-    perspectiveShift.y = fakeNote.y - tempVec2.y;
-
-    var scaleX = FlxMath.remapToRange(fakeNote.scale.x, 0, isArrowPath ? ModConstants.arrowPathScale : ModConstants.noteScale, 0, 1);
-    var scaleY = FlxMath.remapToRange(fakeNote.scale.y, 0, isArrowPath ? ModConstants.arrowPathScale : ModConstants.noteScale, 0, 1);
-
-    var forwardHolds:Bool = noteModData.usingForwardHolds();
-    var straightHoldsModAmount:Float = noteModData.straightHolds;
-
-    if (isRoot)
-    {
-      if (previousPiece != null)
-      {
-        holdRootX = previousPiece.holdRootX;
-        holdRootY = previousPiece.holdRootY;
-        holdRootZ = previousPiece.holdRootZ;
-        // holdRootAngle = previousPiece.holdRootAngle;
-        holdRootScaleX = previousPiece.holdRootScaleX;
-        holdRootScaleY = previousPiece.holdRootScaleY;
-      }
-      else
-      {
-        holdRootX = fakeNote.x;
-        holdRootY = fakeNote.y;
-        holdRootZ = fakeNote.z;
-        holdRootScaleX = scaleX;
-        holdRootScaleY = scaleY;
-      }
-    }
-    else
-    {
-      if (forwardHolds) // Prevents holds from going backwards
-      {
-        var flipThingy:Bool = flipY;
-        if (noteModData.getReverse() > 0.5)
-        {
-          flipThingy = !flipThingy;
-        }
-
-        if ((flipThingy && fakeNote.y > holdRootY) || (!flipThingy && fakeNote.y < holdRootY))
-        {
-          fakeNote.y = FlxMath.lerp(fakeNote.y, holdRootY, 1.0);
-        }
-      }
-
-      if (straightHoldsModAmount != 0)
-      {
-        fakeNote.x = FlxMath.lerp(fakeNote.x, holdRootX, straightHoldsModAmount);
-        fakeNote.z = FlxMath.lerp(fakeNote.z, holdRootZ, straightHoldsModAmount);
-        scaleX = FlxMath.lerp(scaleX, holdRootScaleX, straightHoldsModAmount);
-        scaleY = FlxMath.lerp(scaleY, holdRootScaleY, straightHoldsModAmount);
-      }
-    }
-    fakeNote.scale.set(scaleX, scaleY);
-
-    if (!is3D || old3Dholds)
-    {
-      ModConstants.playfieldSkew(fakeNote, noteModData.skewX_playfield, noteModData.skewY_playfield, whichStrumNote.strumExtraModData.playfieldX,
-        whichStrumNote.strumExtraModData.playfieldY, (graphicWidth / 2), 0);
-      // undo the strum skew
-      fakeNote.x -= whichStrumNote.strumExtraModData.skewMovedX;
-      fakeNote.y -= whichStrumNote.strumExtraModData.skewMovedY;
-      fakeNote.skew.x += noteModData.skewX_playfield;
-      fakeNote.skew.y += noteModData.skewY_playfield;
-    }
-
-    // temp fix for sus notes covering the entire fucking screen
-    if (fakeNote.z > zCutOff)
-    {
-      fakeNote.alpha = 0;
-      fakeNote.scale.set(0.0, 0.0);
-    }
-  }
-
-  var zCutOff:Float = 835;
-
-  var is3D:Bool = false;
-
-  function applyPerspective(pos:Vector3D, rotatePivot:Vector2):Vector2
-  {
-    if (vibrateEffect != 0)
-    {
-      pos.x += FlxG.random.float(-1, 1) * vibrateEffect;
-      pos.y += FlxG.random.float(-1, 1) * vibrateEffect;
-      pos.z += FlxG.random.float(-1, 1) * vibrateEffect;
-    }
-
-    if (!is3D || old3Dholds)
-    {
-      tempVec2.setTo(pos.x, pos.y);
-
-      // apply skew
-      // Currently doesn't work when the sustain moves on the z axis!
-      var xPercent_SkewOffset:Float = tempVec2.x - fakeNote.x - (graphicWidth / 2 * (perspectiveShift.z)); // this is dumb but at least for the time being, it makes the disconnect less bad.
-      if (fakeNote.skew.y != 0) tempVec2.y += xPercent_SkewOffset * Math.tan(fakeNote.skew.y * FlxAngle.TO_RAD);
-      return tempVec2;
-    }
-    else
-    {
-      tempVec3.setTo(pos.x, pos.y, pos.z);
-
-      // apply skew
-      var xPercent_SkewOffset:Float = tempVec3.x - fakeNote.x - (graphicWidth / 2);
-      if (fakeNote.skew.y != 0) tempVec3.y += xPercent_SkewOffset * Math.tan(fakeNote.skew.y * FlxAngle.TO_RAD);
-
-      // Rotate
-      var angleY:Float = noteModData.angleY;
-
-      tempVec2.setTo(tempVec3.x, tempVec3.z);
-      var rotateModPivotPoint:Vector2 = new Vector2(rotatePivot.x, tempVec3.z);
-      tempVec2 = ModConstants.rotateAround(rotateModPivotPoint, tempVec2, angleY);
-      tempVec3.x = tempVec2.x;
-      tempVec3.z = tempVec2.y;
-
-      // v0.8.0a -> playfield skewing
-      var playfieldSkewOffset_Y:Float = pos.x - (whichStrumNote?.strumExtraModData?.playfieldX ?? FlxG.width / 2);
-      var playfieldSkewOffset_X:Float = pos.y - (whichStrumNote?.strumExtraModData?.playfieldY ?? FlxG.height / 2);
-
-      if (noteModData.skewX_playfield != 0) tempVec3.x += playfieldSkewOffset_X * Math.tan(noteModData.skewX_playfield * FlxAngle.TO_RAD);
-      if (noteModData.skewY_playfield != 0) tempVec3.y += playfieldSkewOffset_Y * Math.tan(noteModData.skewY_playfield * FlxAngle.TO_RAD);
-
-      var playfieldSkewOffset_Z:Float = pos.y - (whichStrumNote?.strumExtraModData?.playfieldY ?? FlxG.height / 2);
-      if (noteModData.skewZ_playfield != 0) tempVec3.z += playfieldSkewOffset_Z * Math.tan(noteModData.skewZ_playfield * FlxAngle.TO_RAD);
-
-      tempVec3.z *= 0.001;
-      var thisNotePos:Vector3D = ModConstants.perspectiveMath(tempVec3, 0, 0, noteModData.perspectiveOffset);
-      return new Vector2(thisNotePos.x, thisNotePos.y);
-    }
-  }
-
-  var spiralHoldOldMath:Bool = false;
-  var tinyOffsetForSpiral:Float = 0.01;
-  var lastOrientAngle:Float = 0; // same bandaid fix for orient.
-
-  private var holdRootX:Float = 0.0;
-  private var holdRootY:Float = 0.0;
-  private var holdRootZ:Float = 0.0;
-  // private var holdRootAngle:Float = 0.0;
-  // private var holdRootAlpha:Float = 0.0;
-  private var holdRootScaleX:Float = 0.0;
-  private var holdRootScaleY:Float = 0.0;
-
-  private function clipTimeThing(songTimmy:Float, strumtimm:Float, piece:Int = 0):Float
-  {
-    var returnVal:Float = 0.0;
-    // if (hitNote && !missedNote) returnVal = songTimmy - strumTime;
-    if (!(hitNote && !missedNote)) return 0.0;
-    if (songTimmy >= strumtimm)
-    {
-      returnVal = songTimmy - strumtimm;
-      returnVal -= (grain * tinyOffsetForSpiral) * piece;
-    }
-    if (returnVal < 0) returnVal = 0;
-    return returnVal;
-  }
-
-  // If set to false, will disable the hold being hidden when being dropped
-  public var hideOnMiss:Bool = true;
-
-  // The angle the hold note is coming from with spiral holds! used for hold covers!
-  public var baseAngle:Float = 0;
-
-  // TEST
-  // public var distanceFromReceptor_pos:Float = 0;
-  public var distanceFromReceptor_unscaledpos:Float = 0;
-
-  // The lower the number, the more hold segments are rendered and calculated!
-  public var grain:Float = ModConstants.defaultHoldGrain;
-
-  /**
-   * Sets up new vertex and UV data to clip the trail.
-   * @param songTime	The time to clip the note at, in milliseconds.
-   * @param uvSetup	Should UV's be updated?.
-   */
-  public function updateClipping_mods(songTime:Float = 0, uvSetup:Bool = true):Void
-  {
-    // Skip all the logic if this note is considered a 'miss' and we already was hit.
-    if (hitNote && missedNote && hideOnMiss)
-    {
-      visible = false;
-      return;
-    }
-
-    // Make sure we're at the proper position!
-    // This is cuz hold notes are always set to this exact position, then the tris are set to make it appear where it needs to be on the screen.
-    // Done cuz I'm lazy and it made the calcs easier lol
-    this.x = ModConstants.holdNoteJankX;
-    this.y = ModConstants.holdNoteJankY;
-    if (fakeNote == null) fakeNote = new ZSprite();
-    var songTimmy:Float = (ModConstants.getSongPosition());
-    whichStrumNote = parentStrumline.getByIndex(noteDirection);
-
-    // Moved the first susSample point to be much earlier so that we can also get the current mod values for how we should render he rest of this hold
-    // (such as are we using spiral holds for example?)
-    var clippingTimeOffset:Float = clipTimeThing(songTimmy, strumTime);
-    extraHoldRootInfo(this.strumTime);
-    susSample(this.strumTime + clippingTimeOffset, true, 0);
-
-    grain = noteModData?.holdGrain ?? ModConstants.defaultPathGrain;
-
-    // Long hold logic:
-    var longHolds:Float = noteModData?.longHolds ?? 0;
-    if (!isArrowPath)
-    {
-      // longHolds = parentStrumline?.mods?.longHolds[noteDirection % 4] ?? 0;
-      if (longHolds != 0)
-      {
-        var percentageTillCompletion_part:Float = 0;
-        if (songTimmy >= strumTime) percentageTillCompletion_part = songTimmy - strumTime;
-        if (percentageTillCompletion_part < 0) percentageTillCompletion_part = 0;
-        var percentageTillCompletion:Float = percentageTillCompletion_part / fullSustainLength;
-        percentageTillCompletion = FlxMath.bound(percentageTillCompletion, 0, 1); // clamp
-        percentageTillCompletion = 1 - percentageTillCompletion;
-        longHolds *= percentageTillCompletion;
-      }
-    }
-    longHolds += 1;
-
-    holdResolution = Math.floor(fullSustainLength * longHolds / grain);
-
-    if (holdResolution < 1) // To ensure UV's dont break (lol???)
-    {
-      holdResolution = 1;
-    }
-
-    // Renders the holds to face the direction of travel.
-    var spiralHolds:Bool = noteModData.usingSpiralHolds();
-
-    var holdNoteJankX:Float = ModConstants.holdNoteJankX * -1;
-    var holdNoteJankY:Float = ModConstants.holdNoteJankY * -1;
-
-    var testCol:Array<Int> = [];
-    var vertices:Array<Float> = [];
-    var uvtData:Array<Float> = [];
-    var noteIndices:Array<Int> = [];
-
-    // to keep the face normal facing towards the camera for culling.
-    var dumbAlt:Bool = true;
-    for (i in 0...Std.int(holdResolution * 2))
-    {
-      if (dumbAlt)
-      {
-        noteIndices.push(i + 0);
-        noteIndices.push(i + 2);
-        noteIndices.push(i + 1);
-      }
-      else
-      {
-        noteIndices.push(i + 0);
-        noteIndices.push(i + 1);
-        noteIndices.push(i + 2);
-      }
-      dumbAlt = !dumbAlt;
-    }
-    // add cap
-    var highestNumSoFar_:Int = Std.int((holdResolution * 2) - 1 + 2);
-    noteIndices.push(highestNumSoFar_ + 0 + 1);
-    noteIndices.push(highestNumSoFar_ + 2 + 1);
-    noteIndices.push(highestNumSoFar_ + 1 + 1);
-
-    noteIndices.push(highestNumSoFar_ + 0 + 2);
-    noteIndices.push(highestNumSoFar_ + 1 + 2);
-    noteIndices.push(highestNumSoFar_ + 2 + 2);
-
-    var clipHeight:Float = FlxMath.bound(sustainHeight(sustainLength - (songTime - strumTime), parentStrumline?.scrollSpeed ?? 1.0), 0, graphicHeight);
-    if (clipHeight <= 0.1 && !isArrowPath)
-    {
-      visible = false;
-      return;
-    }
-    else
-    {
-      visible = true;
-    }
-
-    var sussyLength:Float = fullSustainLength;
-    var holdWidth = graphicWidth;
-
-    var bottomHeight:Float = graphic.height * zoom * endOffset;
-    var partHeight:Float = clipHeight - bottomHeight;
-
-    var scaleTest = fakeNote.scale.x;
-    var widthScaled = holdWidth * scaleTest;
-    var scaleChange = widthScaled - holdWidth;
-    var holdLeftSide = 0 - (scaleChange / 2);
-    var holdRightSide = widthScaled - (scaleChange / 2);
-
-    // ===HOLD VERTICES==
-    // V0.7.4a -> Updated UV textures to not be stupid anymore. (0 -> 1 -> 2 -> 3) since we can just use the repeating texture power of drawTriangles.
-
-    // just copy it from source idgaf
-    if (uvSetup)
-    {
-      uvtData[0 * 2] = (1 / 4) * (noteDirection % 4); // 0%/25%/50%/75% of the way through the image
-      uvtData[0 * 2 + 1] = 0; // top bound
-      // Top left
-
-      // Top right
-      uvtData[1 * 2] = uvtData[0 * 2] + (1 / 8); // 12.5%/37.5%/62.5%/87.5% of the way through the image (1/8th past the top left)
-      uvtData[1 * 2 + 1] = uvtData[0 * 2 + 1]; // top bound
-    }
-
-    // grab left vert
-    var rotateOrigin:Vector2 = new Vector2(fakeNote.x + holdLeftSide, fakeNote.y);
-    // move rotateOrigin to be inbetween the left and right vert so it's centered
-    rotateOrigin.x += ((fakeNote.x + holdRightSide) - (fakeNote.x + holdLeftSide)) / 2;
-    var vert:Vector2 = applyPerspective(new Vector3D(fakeNote.x + holdLeftSide, fakeNote.y, fakeNote.z), rotateOrigin);
-
-    // Top left
-    vertices[0 * 2] = vert.x; // Inline with left side
-    vertices[0 * 2 + 1] = vert.y;
-
-    testCol[0 * 2] = fakeNote.color;
-    testCol[0 * 2 + 1] = fakeNote.color;
-    testCol[1 * 2] = fakeNote.color;
-    testCol[1 * 2 + 1] = fakeNote.color;
-
-    this.color = fakeNote.color;
-    this.alpha = fakeNote.alpha;
-    this.z = fakeNote.z; // for z ordering
-
-    if (useHSVShader && this.hsvShader != null)
-    {
-      this.hsvShader.stealthGlow = fakeNote.stealthGlow;
-      this.hsvShader.stealthGlowBlue = fakeNote.stealthGlowBlue;
-      this.hsvShader.stealthGlowGreen = fakeNote.stealthGlowGreen;
-      this.hsvShader.stealthGlowRed = fakeNote.stealthGlowRed;
-    }
-
-    // Top right
-    vert = applyPerspective(new Vector3D(fakeNote.x + holdRightSide, fakeNote.y, fakeNote.z), rotateOrigin);
-    vertices[1 * 2] = vert.x;
-    vertices[1 * 2 + 1] = vert.y; // Inline with top left vertex
-
-    var holdPieceStrumTime:Float = 0.0;
-
-    var previousSampleX:Float = fakeNote.x;
-    var previousSampleY:Float = fakeNote.y;
-
-    var rightSideOffX:Float = 0;
-    var rightSideOffY:Float = 0;
-
-    // THE REST, HOWEVER...
-    for (k in 0...holdResolution)
-    {
-      var i:Int = (k + 1) * 2;
-
-      holdPieceStrumTime = this.strumTime + ((sussyLength / holdResolution) * (k + 1) * longHolds);
-      var tm:Float = holdPieceStrumTime;
-      if (spiralHolds && !spiralHoldOldMath)
-      {
-        // ever so slightly offset the time so that it never hits 0, 0 on the strum time so spiral hold can do its magic
-        tm += (k + 1) * (grain * tinyOffsetForSpiral);
-      }
-      susSample(tm + clipTimeThing(songTimmy, holdPieceStrumTime), false, sussyLength / holdResolution);
-
-      scaleTest = fakeNote.scale.x;
-      widthScaled = holdWidth * scaleTest;
-      scaleChange = widthScaled - holdWidth;
-      holdLeftSide = 0 - (scaleChange / 2);
-      holdRightSide = widthScaled - (scaleChange / 2);
-
-      // grab left vert
-      var rotateOrigin:Vector2 = new Vector2(fakeNote.x + holdLeftSide, fakeNote.y);
-      // move rotateOrigin to be inbetween the left and right vert so it's centered
-      rotateOrigin.x += ((fakeNote.x + holdRightSide) - (fakeNote.x + holdLeftSide)) / 2;
-
-      var vert:Vector2 = applyPerspective(new Vector3D(fakeNote.x + holdLeftSide, fakeNote.y, fakeNote.z), rotateOrigin);
-
-      // Bottom left
-      vertices[i * 2] = vert.x; // Inline with left side
-      vertices[i * 2 + 1] = vert.y;
-
-      if (spiralHolds && spiralHoldOldMath)
-      {
-        var calculateAngleDif:Float = 0;
-        var a:Float = (fakeNote.y - previousSampleY) * -1; // height
-        var b:Float = (fakeNote.x - previousSampleX); // length
-        var angle:Float = Math.atan(b / a);
-        angle *= (180 / Math.PI);
-        calculateAngleDif = angle;
-        tempVec2.setTo(vertices[i * 2], vertices[i * 2 + 1]);
-        var thing:Vector2 = ModConstants.rotateAround(tempVec2, new Vector2(fakeNote.x + holdRightSide, vertices[i * 2 + 1]), calculateAngleDif);
-        rightSideOffX = thing.x;
-        rightSideOffY = thing.y;
-        previousSampleX = fakeNote.x;
-        previousSampleY = fakeNote.y;
-        if (k == 0) // to orient the root of the hold properly!
-        {
-          var scuffedDifferenceX:Float = fakeNote.x + holdRightSide - rightSideOffX;
-          var scuffedDifferenceY:Float = vertices[i * 2 + 1] - rightSideOffY;
-          vertices[(i + 1 - 2) * 2] -= scuffedDifferenceX;
-          vertices[(i + 1 - 2) * 2 + 1] -= scuffedDifferenceY;
-        }
-        // Bottom right
-        vertices[(i + 1) * 2] = rightSideOffX;
-        vertices[(i + 1) * 2 + 1] = rightSideOffY;
-      }
-      else if (spiralHolds)
-      {
-        var affectRoot:Bool = (k == 0);
-        var angle:Float = 0;
-        var a:Float = (fakeNote.y - previousSampleY) * -1; // height
-        var b:Float = (fakeNote.x - previousSampleX); // length
-        if (!(a == 0 && b == 0)) // if we're in the same spot...
-        {
-          angle = Math.atan2(b, a);
-          lastOrientAngle = angle;
-        }
-        else
-        {
-          angle = lastOrientAngle; // alternatively, instead of previous sample we could try sampling forward instead of where we *would* be without any clipping being applied
-        }
-        var calculateAngleDif:Float = angle * (180 / Math.PI);
-
-        // rotate right point
-        var rotatePoint:Vector2 = new Vector2(fakeNote.x + holdRightSide, fakeNote.y);
-        var thing:Vector2 = ModConstants.rotateAround(rotateOrigin, rotatePoint, calculateAngleDif);
-        thing = applyPerspective(new Vector3D(thing.x, thing.y, fakeNote.z), rotateOrigin);
-        rightSideOffX = thing.x;
-        rightSideOffY = thing.y;
-
-        // Bottom right
-        vertices[(i + 1) * 2] = rightSideOffX;
-        vertices[(i + 1) * 2 + 1] = rightSideOffY;
-
-        // left
-        rotatePoint.setTo(fakeNote.x + holdLeftSide, fakeNote.y);
-        thing = ModConstants.rotateAround(rotateOrigin, rotatePoint, calculateAngleDif);
-        thing = applyPerspective(new Vector3D(thing.x, thing.y, fakeNote.z), rotateOrigin);
-        rightSideOffX = thing.x;
-        rightSideOffY = thing.y;
-
-        vertices[(i) * 2] = rightSideOffX;
-        vertices[(i) * 2 + 1] = rightSideOffY;
-
-        if (affectRoot)
-        {
-          baseAngle = calculateAngleDif;
-
-          var rotateOrigin_rooter:Vector2 = new Vector2(vertices[(i - 2) * 2], vertices[(i - 2) * 2 + 1]);
-          // move rotateOrigin to be inbetween the left and right vert so it's centered
-          rotateOrigin_rooter.x += (vertices[(i - 2 + 1) * 2] - vertices[(i - 2) * 2]) / 2;
-
-          rotatePoint = new Vector2(vertices[(i - 2) * 2], vertices[(i - 2) * 2 + 1]);
-          thing = ModConstants.rotateAround(rotateOrigin_rooter, rotatePoint, calculateAngleDif);
-
-          vertices[(i - 2) * 2] = thing.x;
-          vertices[(i - 2) * 2 + 1] = thing.y;
-
-          rotatePoint = new Vector2(vertices[(i - 2 + 1) * 2], vertices[(i - 2 + 1) * 2 + 1]);
-          thing = ModConstants.rotateAround(rotateOrigin_rooter, rotatePoint, calculateAngleDif);
-
-          vertices[(i - 2 + 1) * 2] = thing.x;
-          vertices[(i - 2 + 1) * 2 + 1] = thing.y;
-        }
-        previousSampleX = fakeNote.x;
-        previousSampleY = fakeNote.y;
-      }
-      else
-      {
-        // Bottom right
-        var vert:Vector2 = applyPerspective(new Vector3D(fakeNote.x + holdRightSide, fakeNote.y, fakeNote.z), rotateOrigin);
-        vertices[(i + 1) * 2] = vert.x;
-        vertices[(i + 1) * 2 + 1] = vert.y;
-      }
-
-      testCol[i * 2] = fakeNote.color;
-      testCol[i * 2 + 1] = fakeNote.color;
-      testCol[(i + 1) * 2] = fakeNote.color;
-      testCol[(i + 1) * 2 + 1] = fakeNote.color;
-    }
-
-    if (uvSetup)
-    {
-      for (k in 0...holdResolution)
-      {
-        var i = (k + 1) * 2;
-
-        // Bottom left
-        uvtData[i * 2] = uvtData[0 * 2]; // 0%/25%/50%/75% of the way through the image
-        uvtData[i * 2 + 1] = 1 * (k + 1);
-
-        // Bottom right
-        uvtData[(i + 1) * 2] = uvtData[1 * 2]; // 12.5%/37.5%/62.5%/87.5% of the way through the image (1/8th past the top left)
-        uvtData[(i + 1) * 2 + 1] = uvtData[i * 2 + 1]; // bottom bound
-      }
-    }
-
-    // === END CAP VERTICES ===
-    if (renderEnd)
-    {
-      var endvertsoftrail:Int = (holdResolution * 2);
-      var highestNumSoFar:Int = endvertsoftrail + 2;
-
-      // TODO - FIX HOLD ENDS MOD SAMPLE TIME!
-      var sillyEndOffset = (graphic.height * (endOffset) * zoom);
-
-      // just some random magic number for now. Don't know how to convert the pixels / height into strumTime
-      sillyEndOffset = sillyEndOffset / (0.45 * parentStrumline?.scrollSpeed ?? 1.0);
-
-      sillyEndOffset *= 1.9; // MAGIC NUMBER IDFK
-
-      // sillyEndOffset = sustainHeight(sustainLength, getScrollSpeed());
-
-      // pixels = (susLength * 0.45 * getScrollSpeed());
-      // sillyEndOffset = (? * 0.45)
-      // ? = sillyEndOffset / (0.45 * getScrollSpeed());
-
-      holdPieceStrumTime = this.strumTime + (sussyLength * longHolds) + sillyEndOffset;
-      var tm_end:Float = holdPieceStrumTime;
-      if (spiralHolds && !spiralHoldOldMath)
-      {
-        tm_end += holdResolution * (grain * tinyOffsetForSpiral); // ever so slightly offset the time so that it never hits 0, 0 on the strum time so spiral hold can do its magic
-      }
-      susSample(tm_end + clipTimeThing(songTimmy, holdPieceStrumTime), false, sillyEndOffset);
-
-      scaleTest = fakeNote.scale.x;
-      widthScaled = holdWidth * scaleTest;
-      scaleChange = widthScaled - holdWidth;
-      holdLeftSide = 0 - (scaleChange / 2);
-      holdRightSide = widthScaled - (scaleChange / 2);
-
-      // Top left
-      vertices[highestNumSoFar * 2] = vertices[endvertsoftrail * 2]; // Inline with bottom left vertex of hold
-      vertices[highestNumSoFar * 2 + 1] = vertices[endvertsoftrail * 2 + 1]; // Inline with bottom left vertex of hold
-      testCol[highestNumSoFar * 2] = testCol[endvertsoftrail * 2];
-      testCol[highestNumSoFar * 2 + 1] = testCol[endvertsoftrail * 2 + 1];
-
-      // Top right
-      highestNumSoFar += 1;
-      vertices[highestNumSoFar * 2] = vertices[(endvertsoftrail + 1) * 2]; // Inline with bottom right vertex of hold
-      vertices[highestNumSoFar * 2 + 1] = vertices[(endvertsoftrail + 1) * 2 + 1]; // Inline with bottom right vertex of hold
-      testCol[highestNumSoFar * 2] = testCol[(endvertsoftrail + 1) * 2]; // Inline with bottom right vertex of hold
-      testCol[highestNumSoFar * 2 + 1] = testCol[(endvertsoftrail + 1) * 2 + 1]; // Inline with bottom right vertex of hold
-
-      // Bottom left
-      highestNumSoFar += 1;
-
-      // grab left vert
-      var rotateOrigin:Vector2 = new Vector2(fakeNote.x + holdLeftSide, fakeNote.y);
-      // move rotateOrigin to be inbetween the left and right vert so it's centered
-      rotateOrigin.x += ((fakeNote.x + holdRightSide) - (fakeNote.x + holdLeftSide)) / 2;
-
-      vert = applyPerspective(new Vector3D(fakeNote.x + holdLeftSide, fakeNote.y, fakeNote.z), rotateOrigin);
-      vertices[highestNumSoFar * 2] = vert.x;
-      vertices[highestNumSoFar * 2 + 1] = vert.y;
-      testCol[highestNumSoFar * 2] = fakeNote.color;
-      testCol[highestNumSoFar * 2 + 1] = fakeNote.color;
-
-      // Bottom right
-      highestNumSoFar += 1;
-      vert = applyPerspective(new Vector3D(fakeNote.x + holdRightSide, fakeNote.y, fakeNote.z), rotateOrigin);
-      vertices[highestNumSoFar * 2] = vert.x;
-      vertices[highestNumSoFar * 2 + 1] = vert.y;
-      testCol[highestNumSoFar * 2] = fakeNote.color;
-      testCol[highestNumSoFar * 2 + 1] = fakeNote.color;
-      if (spiralHolds && !spiralHoldOldMath)
-      {
-        var a:Float = (fakeNote.y - previousSampleY) * -1; // height
-        var b:Float = (fakeNote.x - previousSampleX); // length
-        var angle:Float = Math.atan2(b, a);
-        var calculateAngleDif:Float = angle * (180 / Math.PI);
-
-        var ybeforerotate:Float = vertices[(highestNumSoFar - 1) * 2 + 1];
-
-        // grab left vert
-        rotateOrigin.setTo(vertices[(highestNumSoFar - 1) * 2], vertices[(highestNumSoFar - 1) * 2 + 1]);
-        // move rotateOrigin to be inbetween the left and right vert so it's centered
-        rotateOrigin.x += (vertices[highestNumSoFar * 2] - rotateOrigin.x) / 2;
-
-        // rotate right point
-        var rotatePoint:Vector2 = new Vector2(vertices[highestNumSoFar * 2], vertices[highestNumSoFar * 2 + 1]);
-
-        var thing = ModConstants.rotateAround(rotateOrigin, rotatePoint, calculateAngleDif);
-
-        vertices[highestNumSoFar * 2 + 1] = thing.y;
-        vertices[highestNumSoFar * 2] = thing.x;
-
-        rotatePoint = new Vector2(vertices[(highestNumSoFar - 1) * 2], ybeforerotate);
-        var thing = ModConstants.rotateAround(rotateOrigin, rotatePoint, calculateAngleDif);
-        vertices[(highestNumSoFar - 1) * 2 + 1] = thing.y;
-        vertices[(highestNumSoFar - 1) * 2] = thing.x;
-      }
-      else if (spiralHolds && spiralHoldOldMath)
-      {
-        var calculateAngleDif:Float = 0;
-        var a:Float = (fakeNote.y - previousSampleY) * -1; // height
-        var b:Float = (fakeNote.x - previousSampleX); // length
-        var angle:Float = Math.atan(b / a);
-        angle *= (180 / Math.PI);
-        calculateAngleDif = angle;
-
-        tempVec2.setTo(vertices[(highestNumSoFar - 1) * 2], vertices[(highestNumSoFar - 1) * 2 + 1]);
-        var thing = ModConstants.rotateAround(tempVec2, new Vector2(vertices[highestNumSoFar * 2], vertices[highestNumSoFar * 2 + 1]), calculateAngleDif);
-        vertices[highestNumSoFar * 2 + 1] = thing.y;
-        vertices[highestNumSoFar * 2] = thing.x;
-      }
-
-      if (uvSetup)
-      {
-        highestNumSoFar = (holdResolution * 2) + 2;
-
-        // === END CAP UVs ===
-        // Top left
-        uvtData[highestNumSoFar * 2] = uvtData[2 * 2] + (1 / 8); // 12.5%/37.5%/62.5%/87.5% of the way through the image (1/8th past the top left of hold)
-        uvtData[highestNumSoFar * 2 + 1] = if (partHeight > 0)
-        {
-          0;
-        }
-        else
-        {
-          (bottomHeight - clipHeight) / zoom / graphic.height;
-        };
-
-        // Top right
-        uvtData[(highestNumSoFar + 1) * 2] = uvtData[highestNumSoFar * 2] +
-          (1 / 8); // 25%/50%/75%/100% of the way through the image (1/8th past the top left of cap)
-        uvtData[(highestNumSoFar + 1) * 2 + 1] = uvtData[highestNumSoFar * 2 + 1]; // top bound
-
-        // Bottom left
-        uvtData[(highestNumSoFar +
-          2) * 2] = uvtData[highestNumSoFar * 2]; // 12.5%/37.5%/62.5%/87.5% of the way through the image (1/8th past the top left of hold)
-        uvtData[(highestNumSoFar + 2) * 2 + 1] = bottomClip; // bottom bound
-
-        // Bottom right
-        uvtData[(highestNumSoFar + 3) * 2] = uvtData[(highestNumSoFar +
-          1) * 2]; // 25%/50%/75%/100% of the way through the image (1/8th past the top left of cap)
-        uvtData[(highestNumSoFar + 3) * 2 + 1] = uvtData[(highestNumSoFar + 2) * 2 + 1]; // bottom bound
-      }
-    }
-
-    for (k in 0...vertices.length)
-    {
-      if (k % 2 == 1)
-      { // all y verts
-        vertices[k] += holdNoteJankY;
-      }
-      else
-      {
-        vertices[k] += holdNoteJankX;
-
-        // If for whatever reason we need to rotate based on angle (like cuz of a draw func for playfields?)
-        if (this.angle != 0 && vertices.length % 2 == 0)
-        {
-          // assume +1 means we access the y vert
-          tempVec2.setTo(vertices[k], vertices[k + 1]);
-          var rotateModPivotPoint:Vector2 = new Vector2(holdRootX, holdRootY); // TEMP FOR NOW
-          tempVec2 = ModConstants.rotateAround(rotateModPivotPoint, tempVec2, this.angle);
-          vertices[k] = tempVec2.x;
-          vertices[k + 1] = tempVec2.y;
-        }
-      }
-    }
-    setVerts(vertices);
-    this.indices = new DrawData<Int>(noteIndices.length - 0, true, noteIndices);
-    this.colors = new DrawData<Int>(testCol.length - 0, true, testCol);
-
-    if (uvSetup)
-    {
-      // V0.8.0a -> Can now modify hold UV's!
-      for (k in 0...uvtData.length)
-      {
-        if (k % 2 == 1)
-        { // all y verts
-          uvtData[k] -= 0.5;
-          uvtData[k] *= uvScale.y;
-          uvtData[k] += 0.5;
-          uvtData[k] += uvOffset.y;
-        }
-        else
-        {
-          uvtData[k] -= 0.5; // try to scale from center
-          uvtData[k] *= uvScale.x;
-          uvtData[k] += 0.5;
-          uvtData[k] += uvOffset.x / 4;
-        }
-      }
-
-      this.uvtData = new DrawData<Float>(uvtData.length, true, uvtData);
-      uvtData = null;
-    }
-    testCol = null;
-    noteIndices = null;
-    vertices = null;
-  }
-
-  function setVerts(vertices):Void
-  {
-    this.vertices_array = vertices;
-    this.vertices = new DrawData<Float>(vertices.length - 0, true, vertices);
-  }
-
-  public var uvScale:Vector2 = new Vector2(1.0, 1.0);
-  public var uvOffset:Vector2 = new Vector2(0.0, 0.0);
-
-  /**
-   * Sets up new vertex and UV data to clip the trail.
-   * If flipY is true, top and bottom bounds swap places.
-   * @param songTime	The time to clip the note at, in milliseconds.
-   */
-  public function updateClipping_Vanilla(songTime:Float = 0):Void
-  {
     var clipHeight:Float = sustainHeight(sustainLength - (songTime - strumTime), parentStrumline?.scrollSpeed ?? 1.0).clamp(0, graphicHeight);
     if (clipHeight <= 0.1)
     {
@@ -1442,46 +401,18 @@ class SustainTrail extends ZSprite
   @:access(flixel.FlxCamera)
   override public function draw():Void
   {
-    if (graphic == null || !this.alive) return;
+    if (alpha == 0 || graphic == null || vertices == null) return;
 
-    // Update tris if modchart system
-    if (usingHazModHolds && parentStrumline.doUpdateClipsInDraw)
-    {
-      updateClipping_mods();
-
-      // Stiching the verts of this sustain to the previous piece verts.
-      if (this.previousPiece != null)
-      {
-        var v_prev:Array<Float> = this.previousPiece.vertices_array;
-        var v:Array<Float> = this.vertices_array;
-
-        v[3] = v_prev[v_prev.length - 1];
-        v[2] = v_prev[v_prev.length - 2];
-        v[1] = v_prev[v_prev.length - 3];
-        v[0] = v_prev[v_prev.length - 4];
-
-        this.setVerts(v);
-      }
-    }
-
-    if (alpha == 0 || vertices == null || visible == false) return;
-
-    var alphaMemory:Float = this.alpha;
     for (camera in cameras)
     {
       if (!camera.visible || !camera.exists) continue;
       // if (!isOnScreen(camera)) continue; // TODO: Update this code to make it work properly.
 
-      alpha = alphaMemory * camera.alpha; // Fix for drawTriangles not fading with camera
-      alpha *= this.parentStrumline?.alpha ?? 1.0; // Fix for notes not respecting their parents alpha.
-
       getScreenPosition(_point, camera).subtractPoint(offset);
-
-      camera.drawTriangles(graphic, vertices, indices, uvtData, colors, _point, blend, true, antialiasing, colorTransform, shader, cullMode);
+      camera.drawTriangles(graphic, vertices, indices, uvtData, null, _point, blend, true, antialiasing, colorTransform, shader);
     }
-    this.alpha = alphaMemory;
 
-    #if debug
+    #if FLX_DEBUG
     if (FlxG.debugger.drawDebug) drawDebug();
     #end
   }
@@ -1498,12 +429,6 @@ class SustainTrail extends ZSprite
 
     hitNote = false;
     missedNote = false;
-
-    if (cover != null)
-    {
-      cover.holdNote = null;
-      this.cover = null;
-    }
   }
 
   public override function revive():Void
@@ -1521,25 +446,12 @@ class SustainTrail extends ZSprite
     handledMiss = false;
   }
 
-  public override function destroy():Void
+  override public function destroy():Void
   {
     vertices = null;
     indices = null;
     uvtData = null;
+
     super.destroy();
   }
-
-  public function desaturate():Void
-  {
-    this.hsvShader.saturation = 0.2;
-  }
-
-  public function setHue(hue:Float):Void
-  {
-    this.hsvShader.hue = hue;
-  }
-
-  var useHSVShader:Bool = true;
-
-  public var hsvShader:HSVNotesShader = null;
 }

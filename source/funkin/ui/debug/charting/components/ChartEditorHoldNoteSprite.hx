@@ -4,7 +4,7 @@ import funkin.play.notes.Strumline;
 import funkin.data.notestyle.NoteStyleRegistry;
 import funkin.play.notes.notestyle.NoteStyle;
 import flixel.FlxObject;
-import funkin.play.notes.SustainTrailVanilla;
+import funkin.play.notes.SustainTrail;
 import funkin.data.song.SongData.SongNoteData;
 import flixel.math.FlxMath;
 
@@ -14,7 +14,7 @@ import flixel.math.FlxMath;
  */
 @:access(funkin.ui.debug.charting.ChartEditorState)
 @:nullSafety
-class ChartEditorHoldNoteSprite extends SustainTrailVanilla
+class ChartEditorHoldNoteSprite extends SustainTrail
 {
   /**
    * The ChartEditorState this note belongs to.
