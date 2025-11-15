@@ -275,7 +275,7 @@ class CenteredNotesMod extends Modifier
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
-    var screenCenter:Float = (FlxG.height / 2) - (ModConstants.strumSize / 2) + strumLine.getNoteYOffset();
+    var screenCenter:Float = (FlxG.height / 2) - (ModConstants.strumSize / 2) - Strumline.INITIAL_OFFSET;
     var differenceBetween:Float = data.y - screenCenter;
     data.y -= currentValue * differenceBetween;
   }

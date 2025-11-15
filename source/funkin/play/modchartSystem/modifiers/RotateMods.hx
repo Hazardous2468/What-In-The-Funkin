@@ -60,19 +60,13 @@ class RotateModBase extends Modifier
     }
     else if (data.noteType == "hold" || data.noteType == "path")
     {
-      if (Preferences.downscroll)
-      {
-        r += (Strumline.STRUMLINE_SIZE / 2);
-      }
-      else
-      {
-        r += (Strumline.STRUMLINE_SIZE / 2) - Strumline.INITIAL_OFFSET;
-      }
+      r += (Strumline.STRUMLINE_SIZE / 2);
+      r -= Strumline.INITIAL_OFFSET;
       r -= data.whichStrumNote.strumExtraModData.noteStyleOffsetY;
     }
     else
     {
-      r += data.whichStrumNote.weBelongTo.getNoteYOffset();
+      r -= Strumline.INITIAL_OFFSET;
       r -= data.whichStrumNote.strumExtraModData.noteStyleOffsetY;
     }
     return r;

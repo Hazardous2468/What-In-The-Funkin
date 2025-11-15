@@ -71,9 +71,7 @@ class HazardArrowpath
     var notePos:Float = strum.calculateNoteYPos(strumTime) * scrollMult;
     note.angle = whichStrumNote.angle;
     note.x = whichStrumNote.x + strum.getNoteXOffset();
-    // note.set_y(whichStrumNote.y - INITIAL_OFFSET + notePos);
-
-    note.y = whichStrumNote.y + strum.getNoteYOffset() + notePos;
+    note.y = whichStrumNote.y - Strumline.INITIAL_OFFSET + notePos;
 
     note.x += whichStrumNote.width / 2 * ModConstants.noteScale;
     note.y += whichStrumNote.height / 2 * ModConstants.noteScale;

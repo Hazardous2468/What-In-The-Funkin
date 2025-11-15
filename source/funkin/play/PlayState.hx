@@ -823,10 +823,15 @@ class PlayState extends MusicBeatSubState
         strumLine.arrowPaths.visible = !v;
         strumLine.noteSplashes.visible = !v;
         strumLine.noteHoldCovers.visible = !v;
+        strumLine.holdPieces.visible = !v;
 
         // Grab everything and throw it into the spritegroup!
         if (noteRenderMode)
         {
+          strumLine.holdPieces.forEach(function(note:ZSprite) {
+            allStrumSprites.add(note);
+          });
+
           strumLine.strumlineNotes.forEach(function(note:ZSprite) {
             allStrumSprites.add(note);
           });

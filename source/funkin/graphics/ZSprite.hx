@@ -96,10 +96,10 @@ class ZSprite extends FunkinSkewedSprite
     }
   }
 
-  override public function update(elapsed:Float):Void
-  {
-    super.update(elapsed);
-  }
+  // override public function update(elapsed:Float):Void
+  // {
+  //  super.update(elapsed);
+  // }
 
   override public function draw():Void
   {

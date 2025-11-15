@@ -8,7 +8,6 @@ import funkin.play.song.Song;
 import funkin.Preferences;
 import funkin.util.Constants;
 import funkin.play.notes.Strumline;
-import funkin.play.notes.SustainTrailMod;
 import funkin.Paths;
 import funkin.play.notes.NoteSprite;
 import funkin.play.notes.StrumlineNote;
@@ -63,12 +62,10 @@ class ModHandler
   // The strumline this modHandler is tied to
   public var strum:Strumline;
 
-  public function new(daddy:Bool = false)
+  public function new(parent:Strumline)
   {
-    if (daddy)
-    {
-      isDad = daddy;
-    }
+    this.strum = parent;
+    isDad = !parent.defaultPlayerControl;
     // Speedmod is always added by default
     // addMod('speedmod', 1);
   }
@@ -109,8 +106,9 @@ class ModHandler
 
   function cosecant(angle:Float):Float
   {
-    // Edwhak claims math.sin is better her instead of fastSin.
-    return 1 / Math.sin(angle + cosecantOffset);
+    // Edwhak claims math.sin is better here instead of fastSin.
+    // return 1 / Math.sin(angle + cosecantOffset);
+    return 1 / FlxMath.fastSin(angle + cosecantOffset);
   }
 
   public function resortMods():Void
@@ -161,25 +159,12 @@ class ModHandler
     {
       modifiers.remove(key);
     }
-
-    // https://stackoverflow.com/questions/45324169/what-is-the-correct-way-to-clear-an-array-in-haxe
-    while (mods_all.length > 0)
-      mods_all.pop();
-
-    while (mods_strums.length > 0)
-      mods_strums.pop();
-
-    while (mods_notes.length > 0)
-      mods_notes.pop();
-
-    while (mods_speed.length > 0)
-      mods_speed.pop();
-
-    while (mods_arrowpath.length > 0)
-      mods_arrowpath.pop();
-
-    while (mods_special.length > 0)
-      mods_special.pop();
+    mods_all = [];
+    mods_strums = [];
+    mods_notes = [];
+    mods_speed = [];
+    mods_arrowpath = [];
+    mods_special = [];
   }
 
   // Set a mod value instantly.
@@ -668,6 +653,7 @@ class ModHandler
     return sillyPos;
   }
 
+  // Return true if we are past the cutoff point for mod math.
   public function mathCutOffCheck(notePos:Float, lane:Int = 0):Bool
   {
     var whichStrumNote:StrumlineNote = strum.getByIndex(lane % Strumline.KEY_COUNT);
@@ -747,20 +733,24 @@ class ModHandler
     note.noteModData.scaleX = note.scale.x;
     note.noteModData.scaleY = note.scale.y;
 
+    // Setting y, z, and angle to match the strum.
     note.noteModData.angleZ = note.noteModData.whichStrumNote.angle;
-    note.noteModData.y = note.noteModData.whichStrumNote.y + note.noteModData.getNoteYOffset() + note.noteModData.curPos;
+    note.noteModData.y = note.noteModData.whichStrumNote.y - Strumline.INITIAL_OFFSET + note.noteModData.curPos;
     note.noteModData.z = note.noteModData.whichStrumNote.z; // Copy strum Z
 
+    // Vanilla position logic for X axis
     note.noteModData.x = strum.x;
     note.noteModData.x += strum.getXPos(note.noteModData.direction);
     note.noteModData.x -= (note.width - Strumline.STRUMLINE_SIZE) / 2; // Center it
     note.noteModData.x -= Strumline.NUDGE;
 
+    // Move to match strum
     var defaultPosition:Array<Float> = getDefaultStrumPos(note.noteModData.direction);
     var xDif:Float = note.noteModData.whichStrumNote.x - defaultPosition[0];
     note.noteModData.x += xDif;
     note.noteModData.y -= note.noteModData.whichStrumNote.strumExtraModData.noteStyleOffsetY;
 
+    // Cutoff check for performance
     if (!this.mathCutOffCheck(note.noteModData.curPos, note.noteModData.direction))
     {
       for (mod in this.mods_notes)
@@ -1010,28 +1000,5 @@ class ModHandler
       }
       applyStrumModifierMath(note);
     });
-  }
-
-  // A group containing hold pieces that can be recycled for use in the sustainTrailMod renderer.
-  public var holdPieces:FlxTypedSpriteGroup<SustainTrailModPiece> = new FlxTypedSpriteGroup<SustainTrailModPiece>();
-
-  /**
-   * Custom recycling behavior for hold pieces.
-   */
-  public function constructHoldPiece():SustainTrailModPiece
-  {
-    var result:SustainTrailModPiece = null;
-    result = this.holdPieces.getFirstAvailable();
-    if (result != null)
-    {
-      result.revive();
-    }
-    else
-    {
-      result = new SustainTrailModPiece(0, 0, strum.noteStyle);
-      this.holdPieces.add(result);
-      result.weBelongTo = strum;
-    }
-    return result;
   }
 }

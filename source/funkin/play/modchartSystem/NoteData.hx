@@ -137,6 +137,8 @@ class NoteData
   // Examples: "note", "hurt", "hold", "path", "receptor", "path hold", "my custom note", "roll"
   public var noteType:String = "note";
 
+  public var clipped:Float = 0;
+
   // Lower number = more detailed holds
   public var holdGrain:Float = 82;
 
@@ -205,8 +207,7 @@ class NoteData
 
   public function getNoteYOffset():Float
   {
-    return whichStrumNote.weBelongTo.getNoteYOffset();
-    // return Strumline.INITIAL_OFFSET * -1;
+    return -Strumline.INITIAL_OFFSET;
   }
 
   // call this to set the values from an already existing sprite!
@@ -268,6 +269,8 @@ class NoteData
     orient2 = [0, 0, 0];
 
     noteType = "note";
+
+    clipped = 0;
 
     x = 0;
     y = 0;

@@ -21,14 +21,8 @@ class UseOldStealthHoldsModifier extends Modifier
     unknown = false;
     notesMod = false;
     holdsMod = false;
-    strumsMod = true;
+    strumsMod = false;
     pathMod = false;
-  }
-
-  override function strumMath(data:NoteData, strumLine:Strumline):Void
-  {
-    var whichStrum:StrumlineNote = strumLine.getByIndex(data.direction);
-    whichStrum.strumExtraModData.useOldStealthGlowStyle = currentValue >= 0.5;
   }
 }
 
@@ -226,8 +220,7 @@ class SuddenMod extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    var useOldStealthGlowStyle:Bool = data.whichStrumNote.strumExtraModData.useOldStealthGlowStyle;
-    if (isArrowPath || data.noteType == "receptor" || (isHoldNote && !useOldStealthGlowStyle)) return;
+    if (isArrowPath || data.noteType == "receptor") return;
 
     var curPos2:Float = data.curPos_unscaled - (data.whichStrumNote?.noteModData?.curPos_unscaled ?? 0);
     curPos2 *= Preferences.downscroll ? -1 : 1;
@@ -304,8 +297,7 @@ class HiddenMod extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    var useOldStealthGlowStyle:Bool = data.whichStrumNote.strumExtraModData.useOldStealthGlowStyle;
-    if (isArrowPath || data.noteType == "receptor" || (isHoldNote && !useOldStealthGlowStyle)) return;
+    if (isArrowPath || data.noteType == "receptor") return;
 
     var curPos2:Float = data.curPos_unscaled - (data.whichStrumNote?.noteModData?.curPos_unscaled ?? 0);
     curPos2 *= Preferences.downscroll ? -1 : 1;
@@ -394,8 +386,7 @@ class VanishMod extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    var useOldStealthGlowStyle:Bool = data.whichStrumNote.strumExtraModData.useOldStealthGlowStyle;
-    if (isArrowPath || data.noteType == "receptor" || (isHoldNote && !useOldStealthGlowStyle)) return;
+    if (isArrowPath || data.noteType == "receptor") return;
 
     var curPos2:Float = data.curPos_unscaled - (data.whichStrumNote?.noteModData?.curPos_unscaled ?? 0);
     curPos2 *= Preferences.downscroll ? -1 : 1;

@@ -153,8 +153,6 @@ class StrumExtraData
   public var vanish_SuddenStart:Float = 202.5;
   public var vanish_SuddenEnd:Float = 125;
 
-  public var useOldStealthGlowStyle:Bool = false;
-
   public function new(who:StrumlineNote)
   {
     whichStrumNote = who;
@@ -173,7 +171,6 @@ class StrumExtraData
     strumScaleDifX = 0;
     strumScaleDifY = 0;
 
-    useOldStealthGlowStyle = false;
     suddenModAmount = 0;
     suddenStart = 500;
     suddenEnd = 300;

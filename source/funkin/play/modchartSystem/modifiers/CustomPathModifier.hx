@@ -280,7 +280,7 @@ class CustomPathMod extends Modifier
       }
       else
       {
-        strumY += strumLine.getNoteYOffset();
+        strumY -= Strumline.INITIAL_OFFSET;
       }
     }
 

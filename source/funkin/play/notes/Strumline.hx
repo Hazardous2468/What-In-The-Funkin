@@ -29,6 +29,7 @@ import funkin.play.notes.NoteHoldCover;
 import funkin.play.notes.NoteSplash;
 import funkin.play.notes.NoteSprite;
 import funkin.play.notes.SustainTrail;
+import funkin.play.notes.SustainTrailMod;
 import funkin.play.notes.NoteVibrationsHandler;
 import funkin.util.GRhythmUtil;
 import funkin.play.notes.notekind.NoteKind;
@@ -349,11 +350,18 @@ class Strumline extends FlxSpriteGroup
     this.add(notitgPathSprite);
   }
 
-  function setupNoteGroup(groupStr:String, index:Int)
+  function setupNoteGroup(groupStr:String, index:Int):Dynamic
   {
     var group:Dynamic;
     switch (groupStr)
     {
+      case "holdPiecesVwoosh":
+        group = new FlxTypedSpriteGroup<SustainTrail>();
+        this.holdPiecesVwoosh = group;
+      case "holdPieces":
+        group = new FlxTypedSpriteGroup<SustainTrail>();
+        this.holdPieces = group;
+        holdPieceInitCache();
       case "holdNotesVwoosh":
         group = new FlxTypedSpriteGroup<SustainTrail>();
         this.holdNotesVwoosh = group;
@@ -380,6 +388,7 @@ class Strumline extends FlxSpriteGroup
     }
     group.zIndex = index;
     this.add(group);
+
     return group;
   }
 
@@ -409,6 +418,8 @@ class Strumline extends FlxSpriteGroup
     {
       setupNoteGroup("holdNotes", 8);
       setupNoteGroup("holdNotesVwoosh", 9);
+      setupNoteGroup("holdPieces", 8);
+      setupNoteGroup("holdPiecesVwoosh", 9);
     }
 
     if (holdCoversBehindStrums)
@@ -421,6 +432,8 @@ class Strumline extends FlxSpriteGroup
     {
       setupNoteGroup("holdNotes", 20);
       setupNoteGroup("holdNotesVwoosh", 21);
+      setupNoteGroup("holdPieces", 20);
+      setupNoteGroup("holdPiecesVwoosh", 21);
     }
 
     setupNoteGroup("notes", 30);
@@ -514,8 +527,8 @@ class Strumline extends FlxSpriteGroup
   {
     if (mods == null)
     {
-      this.mods = new ModHandler(!defaultPlayerControl);
-      this.mods.strum = this;
+      this.mods = new ModHandler(this);
+      // trace("Setup mod stuff!");
     }
 
     if (this.txtActiveMods == null)
@@ -529,6 +542,7 @@ class Strumline extends FlxSpriteGroup
       this.txtActiveMods.zIndex = 66;
       this.add(this.txtActiveMods);
     }
+    refresh();
   }
 
   /**
@@ -977,6 +991,27 @@ class Strumline extends FlxSpriteGroup
           }
         });
     }
+
+    for (holdPiece in holdPieces.members)
+    {
+      if (holdPiece == null) continue;
+      if (!holdPiece.alive) continue;
+
+      holdPieces.remove(holdPiece);
+      holdPiecesVwoosh.add(holdPiece);
+
+      var targetY:Float = FlxG.height + holdPiece.y;
+      if (isDownscroll) targetY = 0 - holdPiece.height;
+      FlxTween.tween(holdPiece, {y: targetY}, vwooshTime,
+        {
+          ease: FlxEase.expoIn,
+          onComplete: function(twn) {
+            holdPiece.kill();
+            holdNotesVwoosh.remove(holdPiece, true);
+            holdPiece.destroy();
+          }
+        });
+    }
   }
 
   /**
@@ -1079,15 +1114,6 @@ class Strumline extends FlxSpriteGroup
   public function getNoteXOffset():Float
   {
     return dumbMagicNumberForX;
-    // so errr, noteScale (0.697blahblah...) = 28?
-    // var idk:Float = dumbMagicNumberForX / ModConstants.noteScale;
-    // idk *= dumbTempScaleTargetThing ?? 1.0;
-    // return idk;
-  }
-
-  public function getNoteYOffset():Float
-  {
-    return -INITIAL_OFFSET;
   }
 
   public function updateNotes():Void
@@ -1421,6 +1447,8 @@ class Strumline extends FlxSpriteGroup
 
     if (holdNotes.members.length > 1) holdNotes.members.insertionSort(compareHoldNoteSprites.bind(FlxSort.ASCENDING));
 
+    if (holdPieces.members.length > 1) holdPieces.members.insertionSort(compareHoldPieceSprites.bind(FlxSort.ASCENDING));
+
     if (strumlineNotes.members.length > 1 && mods != null) strumlineNotes.members.insertionSort(compareStrums.bind(FlxSort.ASCENDING));
 
     // if (strumlineNotes_Visual.members.length > 1) strumlineNotes_Visual.members.insertionSort(compareNoteSprites.bind(FlxSort.ASCENDING));
@@ -1465,6 +1493,12 @@ class Strumline extends FlxSpriteGroup
     {
       if (note == null) continue;
       killNote(note);
+    }
+
+    for (holdPiece in holdPieces.members)
+    {
+      if (holdPiece == null) continue;
+      holdPiece.kill();
     }
 
     for (holdNote in holdNotes.members)
@@ -2377,14 +2411,7 @@ class Strumline extends FlxSpriteGroup
     }
   }
 
-  /**
-   * Compare two hold note sprites by their strumtime.
-   * @param order The order to sort the notes in.
-   * @param a The first hold note sprite.
-   * @param b The second hold note sprite.
-   * @return The comparison result, based on the time of the notes.
-   */
-  function compareHoldNoteSprites(order:Int, a:SustainTrail, b:SustainTrail):Int
+  function compareHoldPieceSprites(order:Int, a:SustainTrail, b:SustainTrail):Int
   {
     if (mods != null && zSortMode)
     {
@@ -2400,6 +2427,32 @@ class Strumline extends FlxSpriteGroup
     {
       return FlxSort.byValues(order, a?.strumTime, b?.strumTime);
     }
+  }
+
+  /**
+   * Compare two hold note sprites by their strumtime.
+   * @param order The order to sort the notes in.
+   * @param a The first hold note sprite.
+   * @param b The second hold note sprite.
+   * @return The comparison result, based on the time of the notes.
+   */
+  function compareHoldNoteSprites(order:Int, a:SustainTrail, b:SustainTrail):Int
+  {
+    /*
+      if (mods != null && zSortMode)
+      {
+        // Default to sorting by z. If the z values are equal, sort by strumTime instead.
+        if (a?.z == b?.z)
+        {
+          return FlxSort.byValues(order, a?.strumTime, b?.strumTime);
+        }
+        else
+          return FlxSort.byValues(order, a?.z, b?.z);
+      }
+      else
+      { */
+    return FlxSort.byValues(order, a?.strumTime, b?.strumTime);
+    // }
   }
 
   /**
@@ -2477,5 +2530,51 @@ class Strumline extends FlxSpriteGroup
     {
       super.draw();
     }
+  }
+
+  // A group containing hold pieces that can be recycled for use in the sustainTrailMod renderer.
+  public var holdPieces:FlxTypedSpriteGroup<SustainTrailModPiece>;
+
+  public var holdPiecesVwoosh:FlxTypedSpriteGroup<SustainTrailModPiece>;
+
+  var initPieceCount:Int = 25; // Start with THIS many pieces. More pieces will be created as needed.
+
+  function holdPieceInitCache():Void
+  {
+    for (i in 0...initPieceCount)
+    {
+      var result:SustainTrailModPiece = new SustainTrailModPiece(0, 0, noteStyle);
+      this.holdPieces.add(result);
+      result.weBelongTo = this;
+    }
+  }
+
+  /**
+   * Custom recycling behavior for hold pieces.
+   * @return the revived piece to return.
+   */
+  public function constructHoldPiece():SustainTrailModPiece
+  {
+    var result:SustainTrailModPiece = null;
+    result = this.holdPieces.getFirstAvailable();
+    if (result != null)
+    {
+      result.revive();
+    }
+    else
+    {
+      result = new SustainTrailModPiece(0, 0, noteStyle);
+      this.holdPieces.add(result);
+      result.weBelongTo = this;
+
+      if (PlayState.instance != null)
+      {
+        if (PlayState.instance.allStrumSprites != null && PlayState.instance.noteRenderMode)
+        {
+          PlayState.instance.allStrumSprites.add(result);
+        }
+      }
+    }
+    return result;
   }
 }
