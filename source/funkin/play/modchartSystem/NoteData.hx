@@ -139,6 +139,8 @@ class NoteData
 
   public var clipped:Float = 0;
 
+  public var pieceID:Int = 0;
+
   public var previousData:NoteData;
 
   // Lower number = more detailed holds
