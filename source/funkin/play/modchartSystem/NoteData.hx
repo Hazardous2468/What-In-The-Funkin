@@ -139,6 +139,8 @@ class NoteData
 
   public var clipped:Float = 0;
 
+  public var previousData:NoteData;
+
   // Lower number = more detailed holds
   public var holdGrain:Float = 82;
 
