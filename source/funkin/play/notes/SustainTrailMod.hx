@@ -116,13 +116,49 @@ class SustainTrailMod extends SustainTrail // Extend from SustainTrail for all t
     return this.fullSustainLength;
   }
 
+  /**
+   * Set this to true if you are using a sparrow atlas (for animated holds)
+   */
+  public var usingSparrow:Bool = false;
+
+  /**
+   * If holds are animated with sparrowAtlas, this will determine if each pieces' frame is tied to this animations frame.
+   * For this to work, make sure each piece all share the same number of frames (including the end caps)!
+   * If false, each piece will animate on their own terms.
+   */
+  public var sharedAnimFrames:Bool = false;
+
   override public function setupHoldNoteGraphic(noteStyle:NoteStyle):Void
   {
+    usingSparrow = false;
+    // Hard coded for now as Animated holds aren't supported by FNF.
+    if (StringTools.contains(noteStyle.getHoldNoteAssetPath(), "animated_hold_test"))
+    {
+      trace("HOLD ANIM TEST ASSET DETECTED!");
+      usingSparrow = true;
+      sharedAnimFrames = true;
+    }
     super.setupHoldNoteGraphic(noteStyle);
+    if (usingSparrow && sharedAnimFrames)
+    {
+      // Here would be the setup for your animation frames IF you're using sharedAnimFrames!
+      // this.frames = Paths.getSparrowAtlas(noteStyle.getHoldNoteAssetPath());
+      this.frames = Paths.getSparrowAtlas("hold_debug_noteskin/animated_hold_test");
+      this.animation.addByPrefix('idle', 'piece', 24, true);
+      this.animation.play("idle");
+      this.updateAnimation(0);
+    }
     for (piece in susPieces)
     {
-      if (piece.noteStyleWITF != this.noteStyleWITF) piece.setupHoldNoteGraphic(noteStyle);
+      checkAndUpdatePieceGraphic(piece);
     }
+  }
+
+  // Check this piece to see if it's graphic needs to be updated.
+  function checkAndUpdatePieceGraphic(piece:SustainTrailModPiece):Void
+  {
+    if (piece.noteStyleWITF != this.noteStyleWITF) piece.setupHoldNoteGraphic(noteStyleWITF);
+    if (piece.usingSparrow) piece.animation.play(piece.isEnd ? "cap" : "piece");
   }
 
   // Adds a piece to the array
@@ -253,8 +289,8 @@ class SustainTrailMod extends SustainTrail // Extend from SustainTrail for all t
 
     var pieceLength:Float = fullSustainLength / (susPieces.length - 1);
 
-    var bottomHeight:Float = graphic.height * zoom * endOffset;
-    var endCapLength:Float = bottomHeight;
+    // var bottomHeight:Float = graphic.height * zoom * endOffset;
+    // var endCapLength:Float = bottomHeight;
 
     susPieces_sorted1 = [];
 
@@ -282,7 +318,7 @@ class SustainTrailMod extends SustainTrail // Extend from SustainTrail for all t
         trace(" uh oh not alive");
         daPiece.revive();
       }
-
+      daPiece.validated = false;
       var curPieceTime:Float = startingTime;
       var curPieceLength:Float = pieceLength;
       curPieceTime += (i * curPieceLength);
@@ -321,9 +357,12 @@ class SustainTrailMod extends SustainTrail // Extend from SustainTrail for all t
         daPiece.isRoot = true;
         daPiece.previousPiece = null;
       }
+      checkAndUpdatePieceGraphic(daPiece);
+      daPiece.validated = true;
       susPieces_sorted1.push(daPiece);
     }
     validateAttempts = 0;
+    this.update(0); // Run the update func to update everything, including updating the verts ready to be drawn.
   }
 
   public var anglePivot:Vector2 = new Vector2();
@@ -401,7 +440,7 @@ class SustainTrailMod extends SustainTrail // Extend from SustainTrail for all t
     }
   }
 
-  override function update(elapsed)
+  override function update(elapsed):Void
   {
     super.update(elapsed);
     updatePieces();
@@ -662,7 +701,9 @@ class SustainTrailModPiece extends SustainTrail // Extend from SustainTrail for 
     if (parent == null) return vec3;
     var curData:NoteData = bottomSide ? bottomNoteModData : topNoteModData;
     leftSide = !leftSide; // flip fix lol
-    var holdWidth = graphicWidth;
+
+    var holdWidth = this.usingSparrow ? this.frameWidth : graphicWidth;
+
     vec3.setTo(curData.x, curData.y, curData.z);
 
     var rotateOrigin:Vector2 = new Vector2(vec3.x, vec3.y);
@@ -777,12 +818,24 @@ class SustainTrailModPiece extends SustainTrail // Extend from SustainTrail for 
 
   var lastOrientAngle:Float = 0;
 
-  // Override this and make it not do anything lol.
-  override function update(elapsed)
+  override function update(elapsed):Void
   {
-    // super.update(elapsed);
-    this.updateAnimation(elapsed);
+    if (!validated) return;
+    if (parent != null)
+    {
+      if (!parent.sharedAnimFrames && this.usingSparrow)
+      {
+        super.update(elapsed);
+      }
+    }
   }
+
+  /**
+   * Once set to true, will then allow this piece to be drawn in the draw function.
+   * Used to prevent this piece drawing for 1 frame while it's still being set up.
+   * Also used to ensure everything is probably initialised before using this piece to avoid any errors.
+   */
+  public var validated:Bool = false;
 
   // Some vectors that are reused to avoid creating new ones constantly every frame.
   var vec2:Vector2 = new Vector2();
@@ -880,56 +933,137 @@ class SustainTrailModPiece extends SustainTrail // Extend from SustainTrail for 
     return; // do nothing!
   }
 
+  function uvFallback():Void
+  {
+    uv[0 * 2] = 0;
+    uv[0 * 2 + 1] = 0;
+
+    uv[1 * 2] = 1;
+    uv[1 * 2 + 1] = 0;
+
+    uv[2 * 2] = 0;
+    uv[2 * 2 + 1] = 1;
+
+    uv[3 * 2] = 1;
+    uv[3 * 2 + 1] = 1;
+    setUVTData(uv);
+  }
+
   /**
    * Updates this pieces' uv mapping.
-   * Could maybe be updated to support animations similar to zSpriteProjected in the future.
    */
   public function updateUV():Void
   {
     var uv:Array<Float> = [];
+
     // Do UV's
     // Eventually will make it so that these can be manipulated, as well as making them work properly with clipping.
 
     var endCapNudge:Float = (isEnd ? (1 / 8) : 0);
 
-    var bottom:Float = 0;
-
-    /* Will come back to this later
-
-      // offset the uv if we are being clipped
-      // trace(bottomNoteModData.clipped);
-      if (bottomNoteModData.clipped > 0 && topNoteModData.clipped > 0) return;
-      if (bottomNoteModData.clipped > 0)
+    if (this.usingSparrow)
+    {
+      if (parent?.sharedAnimFrames ?? false)
       {
-        var testSample:NoteData = new NoteData();
-        testSample.strumTime = this.strumTime - bottomNoteModData.clipped;
-        testSample = parent.sampleNotePosition(testSample, testSample.strumTime, false, false);
-
-        // how many pixels away?
-
-        var pxDist:Float = bottomNoteModData.y - testSample.y;
-        // convert to %
-        bottom = pxDist / graphicHeight;
-
-        trace(bottom);
+        // Set the current frame index to the one in parent.
+        this.animation.curAnim.curFrame = parent.animation.curAnim.curFrame;
       }
-     */
+      this.updateAnimation(0);
 
-    // Bottom Left
-    uv[0 * 2] = endCapNudge + 1 / 4 * (noteDirection % 4); // 0%/25%/50%/75% of the way through the image
-    uv[0 * 2 + 1] = bottom;
+      var curFrame = this.frame;
+      if (curFrame == null)
+      {
+        uvFallback();
+        return;
+      }
 
-    // Bottom Right
-    uv[1 * 2] = uvtData[0 * 2] + 1 / 8; // 12.5%/37.5%/62.5%/87.5% of the way through the image (1/8th past the top left)
-    uv[1 * 2 + 1] = uv[0 * 2 + 1];
+      // Bottom Left
+      uv[0 * 2] = curFrame.uv.x;
+      uv[0 * 2 + 1] = curFrame.uv.y;
 
-    // Top left
-    uv[2 * 2] = uvtData[0 * 2];
-    uv[2 * 2 + 1] = isEnd ? this.bottomClip : 1;
-    // Top Right
-    uv[3 * 2] = uvtData[1 * 2];
-    uv[3 * 2 + 1] = uv[2 * 2 + 1];
+      // Bottom Right
+      uv[1 * 2] = curFrame.uv.width;
+      uv[1 * 2 + 1] = uv[0 * 2 + 1];
+
+      // Top left
+      uv[2 * 2] = uvtData[0 * 2];
+      uv[2 * 2 + 1] = curFrame.uv.height;
+
+      // Top Right
+      uv[3 * 2] = uvtData[1 * 2];
+      uv[3 * 2 + 1] = uv[2 * 2 + 1];
+    }
+    else
+    {
+      // Bottom Left
+      uv[0 * 2] = endCapNudge + 1 / 4 * (noteDirection % 4); // 0%/25%/50%/75% of the way through the image
+      uv[0 * 2 + 1] = 0;
+
+      // Bottom Right
+      uv[1 * 2] = uvtData[0 * 2] + 1 / 8; // 12.5%/37.5%/62.5%/87.5% of the way through the image (1/8th past the top left)
+      uv[1 * 2 + 1] = uv[0 * 2 + 1];
+
+      // Top left
+      uv[2 * 2] = uvtData[0 * 2];
+      uv[2 * 2 + 1] = isEnd ? this.bottomClip : 1;
+      // Top Right
+      uv[3 * 2] = uvtData[1 * 2];
+      uv[3 * 2 + 1] = uv[2 * 2 + 1];
+    }
     setUVTData(uv);
+  }
+
+  public var usingSparrow:Bool = false;
+
+  override public function setupHoldNoteGraphic(noteStyle:NoteStyle):Void
+  {
+    this.usingSparrow = false;
+    // Hard coded for now as Animated holds aren't supported by FNF.
+    if (StringTools.contains(noteStyle.getHoldNoteAssetPath(), "animated_hold_test"))
+    {
+      trace("HOLD ANIM TEST ASSET DETECTED!");
+      usingSparrow = true;
+    }
+
+    if (usingSparrow)
+    {
+      // this.frames = Paths.getSparrowAtlas(noteStyle.getHoldNoteAssetPath());
+      this.frames = Paths.getSparrowAtlas("hold_debug_noteskin/animated_hold_test");
+      lol(noteStyle);
+      this.animation.addByPrefix('piece', 'piece', 24, true);
+      this.animation.addByPrefix('cap', 'cap', 24, true);
+      this.animation.play("piece");
+      updateColorTransform();
+    }
+    else
+    {
+      super.setupHoldNoteGraphic(noteStyle);
+    }
+  }
+
+  function lol(noteStyle:NoteStyle):Void
+  {
+    this.noteStyleWITF = noteStyle;
+    antialiasing = true;
+    this.isPixel = noteStyle.isHoldNotePixel();
+    if (isPixel)
+    {
+      endOffset = bottomClip = 1;
+      antialiasing = false;
+    }
+    else
+    {
+      endOffset = 0.5;
+      bottomClip = 0.9;
+    }
+    zoom = 1.0;
+    zoom *= noteStyle.fetchHoldNoteScale();
+
+    flipY = Preferences.downscroll #if mobile
+    || (Preferences.controlsScheme == FunkinHitboxControlSchemes.Arrows
+      && !funkin.mobile.input.ControlsHandler.usingExternalInputDevice) #end;
+
+    alpha = 1.0;
   }
 
   public var vertices_array:Array<Float> = [];
@@ -978,7 +1112,8 @@ class SustainTrailModPiece extends SustainTrail // Extend from SustainTrail for 
   @:access(flixel.FlxCamera)
   override public function draw():Void
   {
-    if (!readyToDraw || this.parent == null || this.vertices == null || this.indices == null || this.uvtData == null || alpha == 0 || !this.visible) return;
+    if (!validated || !readyToDraw || this.parent == null || this.vertices == null || this.indices == null || this.uvtData == null || alpha == 0
+      || !this.visible) return;
 
     if (topNoteModData.clipped > 0 && bottomNoteModData.clipped > 0)
     {
@@ -1008,6 +1143,7 @@ class SustainTrailModPiece extends SustainTrail // Extend from SustainTrail for 
 
   public override function kill():Void
   {
+    validated = false;
     readyToDraw = false;
     pieceID = 0;
     isEnd = false;
@@ -1029,11 +1165,13 @@ class SustainTrailModPiece extends SustainTrail // Extend from SustainTrail for 
     topNoteModData.clipped = 0;
     bottomNoteModData.clipped = 0;
     readyToDraw = false;
+    validated = false;
     super.revive();
   }
 
   override public function destroy():Void
   {
+    validated = false;
     readyToDraw = false;
     topNoteModData = null;
     bottomNoteModData = null;
