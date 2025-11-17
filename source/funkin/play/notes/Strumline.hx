@@ -1495,16 +1495,17 @@ class Strumline extends FlxSpriteGroup
       killNote(note);
     }
 
-    for (holdPiece in holdPieces.members)
-    {
-      if (holdPiece == null) continue;
-      holdPiece.kill();
-    }
-
     for (holdNote in holdNotes.members)
     {
       if (holdNote == null) continue;
       holdNote.kill();
+    }
+
+    // Kill any left overs
+    for (holdPiece in holdPieces.members)
+    {
+      if (holdPiece == null) continue;
+      holdPiece.kill();
     }
 
     for (splash in noteSplashes)

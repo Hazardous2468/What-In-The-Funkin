@@ -30,7 +30,7 @@ class SustainTrail extends ZSprite
   public var strumTime:Float = 0; // millis
   public var noteDirection:NoteDirection = 0;
   public var sustainLength(default, set):Float = 0; // millis
-  public var fullSustainLength(default, set):Float = 0; // millis
+  public var fullSustainLength:Float = 0; // millis
   public var noteData:Null<SongNoteData>;
   public var parentStrumline:Strumline;
 
@@ -259,14 +259,6 @@ class SustainTrail extends ZSprite
     this.sustainLength = s;
     triggerRedraw();
     return this.sustainLength;
-  }
-
-  function set_fullSustainLength(s:Float):Float
-  {
-    if (s < 0.0) s = 0.0;
-    if (this.fullSustainLength == s) return s;
-    this.fullSustainLength = s;
-    return this.fullSustainLength;
   }
 
   function triggerRedraw()
