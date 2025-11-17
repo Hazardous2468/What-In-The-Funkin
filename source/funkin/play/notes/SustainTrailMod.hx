@@ -48,12 +48,12 @@ import openfl.geom.Vector3D;
  *
  *
  * TODO:
+ * FIX UV / GRAPHICS FLICKERING?!
  * Vibrate Effect (make sure there are no visible gaps!),
  * Long Holds,
  * forwardHolds (improve consistency and maybe math?),
  * spiral holds visual issues at the strum when being clipped (probs use same fix for old sustain logic (tiny time offset))
  * holdCover support (hold covers positioning doesn't work with these new holds as of now),
- * Anything that requires calling recalculatePiecesArray will temporarily fuck the holds visually (such as grain or long holds),
  * playfield skew mods (inaccurate positions),
  * performance checks (compare performance to old holds to see if it's even worth replacing with this new system),
  *
@@ -328,6 +328,10 @@ class SustainTrailMod extends SustainTrail // Extend from SustainTrail for all t
   {
     if (!this.alive || parentStrumline == null) return;
 
+    spiralHolds = false;
+    forwardHolds = false;
+    is3D = true;
+
     var needsRecalc:Bool = false;
     var sussy:Float = clipFromBottom ? fullSustainLength : sustainLength;
     if (sussy < 0)
@@ -347,12 +351,6 @@ class SustainTrailMod extends SustainTrail // Extend from SustainTrail for all t
       clearPiecesArray();
       trace("Recalculate pieces! - meta");
     }
-
-    // trace("-----");
-    // trace("c: " + noteModData.clipped);
-    // trace("t1: " + noteModData.strumTime);
-    // trace("t2: " + this.strumTime);
-    // trace("x: " + noteModData.x);
 
     // Apply the root meta data
     this.is3D = (whichStrumNote?.strumExtraModData?.threeD ?? false);
@@ -439,6 +437,7 @@ class SustainTrailMod extends SustainTrail // Extend from SustainTrail for all t
         daPiece.previousPiece = null;
       }
 
+      // temporarily disabled while I figure out what causes the UV data to be fucked
       if (false)
       {
         daPiece.strumTime = curPieceTime;
@@ -492,12 +491,6 @@ class SustainTrailMod extends SustainTrail // Extend from SustainTrail for all t
       var ss:Float = daPiece.strumTime + daPiece.sustainLength;
       daPiece.topNoteModData = sampleNotePosition(daPiece.topNoteModData, ss, false, true);
       susPiecesData.push(daPiece.topNoteModData);
-
-      // trace('-------');
-      // trace('piece: $i');
-      // trace('Bot sample at: ' + daPiece.strumTime);
-      // trace('Top sample at: ' + ss);
-
       // if (!daPiece.isEnd) daPiece.nextPiece = susPieces_sorted1[i + 1];
     }
 
@@ -508,8 +501,6 @@ class SustainTrailMod extends SustainTrail // Extend from SustainTrail for all t
      */
     for (piece in susPieces_sorted1)
     {
-      // trace('piece ' + piece.pieceID + ' top x: ' + piece.topNoteModData.x);
-
       piece.updateClipAndStitch();
       piece.readyToDraw = true;
     }
@@ -1013,8 +1004,12 @@ class SustainTrailModPiece extends SustainTrail // Extend from SustainTrail for 
     verts[3 * 2] = v.x;
     verts[3 * 2 + 1] = v.y;
 
+    setIndices(TRIANGLE_VERTEX_INDICES);
+
     // Set the data!
     setVertices(verts);
+    // this.vertices = new DrawData<Float>(verts.length, true, verts);
+    // this.vertices_array = verts;
 
     // Set the z to be the average between the bottom and top
     this.z = bottomNoteModData.z + topNoteModData.z / 2;
@@ -1113,6 +1108,27 @@ class SustainTrailModPiece extends SustainTrail // Extend from SustainTrail for 
       uv[3 * 2] = uvtData[1 * 2];
       uv[3 * 2 + 1] = uv[2 * 2 + 1];
     }
+
+    /*
+      for (k in 0...uv.length)
+      {
+        if (k % 2 == 1)
+        { // all y verts
+          uv[k] -= 0.5;
+          uv[k] *= uvScale.y;
+          uv[k] += 0.5;
+          uv[k] += uvOffset.y;
+        }
+        else
+        {
+          uv[k] -= 0.5; // try to scale from center
+          uv[k] *= uvScale.x;
+          uv[k] += 0.5;
+          uv[k] += uvOffset.x / 4;
+        }
+    }*/
+
+    // this.uvtData = new DrawData<Float>(uv.length, true, uv);
     setUVTData(uv);
   }
 
@@ -1225,14 +1241,14 @@ class SustainTrailModPiece extends SustainTrail // Extend from SustainTrail for 
     var alphaMemory:Float = this.alpha;
     for (camera in parent.cameras)
     {
-      var newAlpha:Float = alphaMemory * camera.alpha * parent.parentStrumline?.alpha ?? 1.0;
+      var newAlpha:Float = alphaMemory * camera.alpha * parent.alpha * parent.parentStrumline?.alpha ?? 1.0;
       this.alpha = newAlpha;
       if (!camera.visible || !camera.exists || newAlpha == 0) continue;
 
       getScreenPosition(_point, camera).subtractPoint(offset);
 
       camera.drawTriangles(parent.graphic, this.vertices, this.indices, this.uvtData, null, _point, parent.blend, true, parent.antialiasing,
-        parent.colorTransform, this.shader, parent.cullMode);
+        this.colorTransform, this.shader, parent.cullMode);
     }
 
     // Reset alpha back to what it was to prevent issues.
