@@ -48,7 +48,9 @@ import openfl.geom.Vector3D;
  *
  *
  * TODO:
- * FIX UV / GRAPHICS FLICKERING?!
+ * Fix end cap lengths (should maybe be made consistent regardless of grain?)
+ * Fix for drive modifiers
+ * Fix UV flickering when clipping.
  * Vibrate Effect (make sure there are no visible gaps!),
  * Long Holds,
  * forwardHolds (improve consistency and maybe math?),
@@ -421,24 +423,25 @@ class SustainTrailMod extends SustainTrail // Extend from SustainTrail for all t
       daPiece.isEnd = false;
       daPiece.isRoot = false;
       daPiece.anglePivot = this.anglePivot;
-      if (i > 0)
+
+      if (i == 0)
+      {
+        daPiece.isRoot = true;
+        daPiece.previousPiece = null;
+      }
+      else
       {
         daPiece.isRoot = false;
         daPiece.previousPiece = susPieces[i - 1];
-        if (i == susPieces.length - 1)
+
+        if (i == howManyPieces - 1)
         {
           daPiece.isEnd = true;
           pieceLength *= daPiece.bottomClip; // adjust length for end cap
         }
       }
-      else
-      {
-        daPiece.isRoot = true;
-        daPiece.previousPiece = null;
-      }
 
-      // temporarily disabled while I figure out what causes the UV data to be fucked
-      if (false)
+      if (true)
       {
         daPiece.strumTime = curPieceTime;
         // Clip the time here when being hit so sustainLength is used properly alongside fullSustainLength.
@@ -941,17 +944,6 @@ class SustainTrailModPiece extends SustainTrail // Extend from SustainTrail for 
 
   var lastOrientAngle:Float = 0;
 
-  override function update(elapsed):Void
-  {
-    if (parent != null)
-    {
-      if (!parent.sharedAnimFrames && this.usingSparrow)
-      {
-        super.update(elapsed);
-      }
-    }
-  }
-
   // Some vectors that are reused to avoid creating new ones constantly every frame.
   var vec2:Vector2 = new Vector2();
   var vec3:Vector3D = new Vector3D();
@@ -977,6 +969,9 @@ class SustainTrailModPiece extends SustainTrail // Extend from SustainTrail for 
     this.hsvShader.setFloat('_topStealthBlue', topNoteModData.stealthGlowBlue);
   }
 
+  // If set to true, will automatically stitch this pieces' bottom to the previous piece instead of manually setting the verts based of the noteModData.
+  var autoStitch:Bool = true;
+
   /**
    * Updates this pieces' verticies and UV's
    */
@@ -987,13 +982,25 @@ class SustainTrailModPiece extends SustainTrail // Extend from SustainTrail for 
     var verts:Array<Float> = [];
 
     // Apply
-    var v = getVertPos(false, true); // Bottom Left
-    verts[0 * 2] = v.x;
-    verts[0 * 2 + 1] = v.y;
+    var v:Vector3D;
+    if (autoStitch && this.previousPiece != null && this.previousPiece.alive)
+    {
+      var v_prev:Array<Float> = this.previousPiece.vertices_array;
+      verts[3] = v_prev[v_prev.length - 1];
+      verts[2] = v_prev[v_prev.length - 2];
+      verts[1] = v_prev[v_prev.length - 3];
+      verts[0] = v_prev[v_prev.length - 4];
+    }
+    else
+    {
+      v = getVertPos(false, true); // Bottom Left
+      verts[0 * 2] = v.x;
+      verts[0 * 2 + 1] = v.y;
 
-    v = getVertPos(true, true); // Bottom right
-    verts[1 * 2] = v.x;
-    verts[1 * 2 + 1] = v.y;
+      v = getVertPos(true, true); // Bottom right
+      verts[1 * 2] = v.x;
+      verts[1 * 2 + 1] = v.y;
+    }
 
     // Apply
     v = getVertPos(false, false); // Top Left
@@ -1004,12 +1011,8 @@ class SustainTrailModPiece extends SustainTrail // Extend from SustainTrail for 
     verts[3 * 2] = v.x;
     verts[3 * 2 + 1] = v.y;
 
-    setIndices(TRIANGLE_VERTEX_INDICES);
-
     // Set the data!
     setVertices(verts);
-    // this.vertices = new DrawData<Float>(verts.length, true, verts);
-    // this.vertices_array = verts;
 
     // Set the z to be the average between the bottom and top
     this.z = bottomNoteModData.z + topNoteModData.z / 2;
@@ -1023,6 +1026,11 @@ class SustainTrailModPiece extends SustainTrail // Extend from SustainTrail for 
 
     updateUV();
     updateShaderStuff();
+  }
+
+  override function triggerRedraw():Void
+  {
+    return; // do nothing!
   }
 
   override public function updateClipping(songTime:Float = 0):Void
@@ -1084,28 +1092,33 @@ class SustainTrailModPiece extends SustainTrail // Extend from SustainTrail for 
       uv[1 * 2 + 1] = uv[0 * 2 + 1];
 
       // Top left
-      uv[2 * 2] = uvtData[0 * 2];
+      uv[2 * 2] = uv[0 * 2];
       uv[2 * 2 + 1] = curFrame.uv.height;
 
       // Top Right
-      uv[3 * 2] = uvtData[1 * 2];
+      uv[3 * 2] = uv[1 * 2];
       uv[3 * 2 + 1] = uv[2 * 2 + 1];
     }
     else
     {
+      // clipping magic
+      var p:Float = bottomNoteModData.clipped / this.fullSustainLength;
+      // p = 1 - p;
+
       // Bottom Left
       uv[0 * 2] = endCapNudge + 1 / 4 * (noteDirection % 4); // 0%/25%/50%/75% of the way through the image
-      uv[0 * 2 + 1] = 0;
+      uv[0 * 2 + 1] = p;
 
       // Bottom Right
-      uv[1 * 2] = uvtData[0 * 2] + 1 / 8; // 12.5%/37.5%/62.5%/87.5% of the way through the image (1/8th past the top left)
+      uv[1 * 2] = uv[0 * 2] + 1 / 8; // 12.5%/37.5%/62.5%/87.5% of the way through the image (1/8th past the top left)
       uv[1 * 2 + 1] = uv[0 * 2 + 1];
 
       // Top left
-      uv[2 * 2] = uvtData[0 * 2];
+      uv[2 * 2] = uv[0 * 2];
       uv[2 * 2 + 1] = isEnd ? this.bottomClip : 1;
+
       // Top Right
-      uv[3 * 2] = uvtData[1 * 2];
+      uv[3 * 2] = uv[1 * 2];
       uv[3 * 2 + 1] = uv[2 * 2 + 1];
     }
 
@@ -1128,7 +1141,6 @@ class SustainTrailModPiece extends SustainTrail // Extend from SustainTrail for 
         }
     }*/
 
-    // this.uvtData = new DrawData<Float>(uv.length, true, uv);
     setUVTData(uv);
   }
 
@@ -1220,7 +1232,7 @@ class SustainTrailModPiece extends SustainTrail // Extend from SustainTrail for 
     if (!this.alive) return;
     this.updateClipping_mod();
     // this.stichToPrevious();
-    readyToDraw = true;
+    // readyToDraw = true;
   }
 
   /* Variable that gets set to true once all the verts are ready to be drawn. Set to false when killed.
