@@ -2622,7 +2622,7 @@ class PlayState extends MusicBeatSubState
       {
         if (!strumLine.defaultPlayerControl)
         {
-          strumLine.mods.invertValues = modchartEventHandler.invertForOpponent;
+          if (strumLine.mods != null) strumLine.mods.invertValues = modchartEventHandler.invertForOpponent;
         }
       }
 

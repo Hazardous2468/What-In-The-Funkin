@@ -149,7 +149,7 @@ class Strumline extends FlxSpriteGroup
     {
       for (note in holdNotes.members)
       {
-        if (note != null && note.alive)
+        if (note != null && note.alive && useModSustains)
         {
           var sussyMod:SustainTrailMod = cast(note, SustainTrailMod);
           sussyMod.cullMode = sussyMod.whichStrumNote?.strumExtraModData?.cullModeSustain ?? "none";
@@ -157,7 +157,7 @@ class Strumline extends FlxSpriteGroup
       }
       for (note in holdNotesVwoosh.members)
       {
-        if (note != null && note.alive)
+        if (note != null && note.alive && useModSustains)
         {
           var sussyMod:SustainTrailMod = cast(note, SustainTrailMod);
           sussyMod.cullMode = sussyMod.whichStrumNote?.strumExtraModData?.cullModeSustain ?? "none";
@@ -1225,7 +1225,7 @@ class Strumline extends FlxSpriteGroup
       final magicNumberIGuess:Float = 8;
 
       var drawDistanceBack:Float = 1;
-      if (mods != null)
+      if (mods != null && useModSustains)
       {
         var sussyMod:SustainTrailMod = cast(holdNote, SustainTrailMod);
         drawDistanceBack = 1.0 + (sussyMod?.whichStrumNote?.strumExtraModData?.drawdistanceBack ?? 0.0);
@@ -1279,7 +1279,7 @@ class Strumline extends FlxSpriteGroup
 
         var yOffset:Float = (holdNote.fullSustainLength - holdNote.sustainLength) * Constants.PIXELS_PER_MS;
 
-        if (mods != null)
+        if (mods != null && useModSustains)
         {
           holdNote.x = ModConstants.holdNoteJankX;
           holdNote.y = ModConstants.holdNoteJankY;
@@ -1329,7 +1329,7 @@ class Strumline extends FlxSpriteGroup
           holdNote.visible = false;
         }
 
-        if (mods != null)
+        if (mods != null && useModSustains)
         {
           holdNote.x = ModConstants.holdNoteJankX;
           holdNote.y = ModConstants.holdNoteJankY;
@@ -1353,7 +1353,7 @@ class Strumline extends FlxSpriteGroup
       {
         // Hold note is new, render it normally.
         holdNote.visible = true;
-        if (mods != null)
+        if (mods != null && useModSustains)
         {
           holdNote.x = ModConstants.holdNoteJankX;
           holdNote.y = ModConstants.holdNoteJankY;
@@ -1748,7 +1748,7 @@ class Strumline extends FlxSpriteGroup
     // var spiralHolds:Bool = whichStrumNote.strumExtraModData?.usingSpiralHolds(false) ?? false;
 
     var spiralHolds:Bool = false;
-    if (mods != null && cover.holdNote != null)
+    if (mods != null && cover.holdNote != null && useModSustains)
     {
       var sussyMod:SustainTrailMod = cast(cover.holdNote, SustainTrailMod);
 
@@ -1775,7 +1775,7 @@ class Strumline extends FlxSpriteGroup
         var holdScaleY:Float = 1;
         var holdAngle:Float = 0;
 
-        if (mods != null)
+        if (mods != null && useModSustains)
         {
           var sussyMod:SustainTrailMod = cast(daHold, SustainTrailMod);
 
@@ -1967,7 +1967,7 @@ class Strumline extends FlxSpriteGroup
 
       cover.holdPositioned = !noteStyle.holdCoverVanillaPositionLogic();
 
-      if (mods != null)
+      if (mods != null && useModSustains)
       {
         if (holdNote != null && noteStyle.shouldHoldNoteCoverCopyHSV())
         {
@@ -2071,7 +2071,7 @@ class Strumline extends FlxSpriteGroup
       holdNoteSprite.visible = true;
       holdNoteSprite.alpha = 1.0;
 
-      if (mods != null)
+      if (mods != null && useModSustains)
       {
         holdNoteSprite.x = ModConstants.holdNoteJankX;
         holdNoteSprite.y = ModConstants.holdNoteJankY;
@@ -2227,6 +2227,8 @@ class Strumline extends FlxSpriteGroup
     return null;
   }
 
+  public var useModSustains:Bool = true;
+
   /**
    * Custom recycling behavior for hold note sprites.
    */
@@ -2249,7 +2251,7 @@ class Strumline extends FlxSpriteGroup
       // The note sprite pool is full and all note splashes are active.
       // We have to create a new note.
 
-      if (mods != null)
+      if (mods != null && useModSustains)
       {
         result = new SustainTrailMod(0, 0, noteStyle, false);
       }

@@ -48,11 +48,10 @@ import openfl.geom.Vector3D;
  *
  *
  * TODO:
- * Fix end cap lengths (should maybe be made consistent regardless of grain?)
+ * Upscroll support!
  * Fix for drive modifiers
  * Fix UV flickering when clipping.
  * Vibrate Effect (make sure there are no visible gaps!),
- * Long Holds,
  * forwardHolds (improve consistency and maybe math?),
  * spiral holds visual issues at the strum when being clipped (probs use same fix for old sustain logic (tiny time offset))
  * holdCover support (hold covers positioning doesn't work with these new holds as of now),
@@ -212,12 +211,18 @@ class SustainTrailMod extends SustainTrail // Extend from SustainTrail for all t
     if (!isArrowPath && longHolds != 0)
     {
       var curPos:Float = this.strumTime - getSongPos();
+      curPos *= longHolds;
 
       // at curpos = -fullSustainLength, return 0
       // at curpos = 0, normal length, return 1
       // at curpos = fullSustainLength, return 2
 
-      a = FlxMath.remapToRange(curPos, -fullSustainLength, fullSustainLength, 0, 2);
+      a = FlxMath.remapToRange(curPos, -fullSustainLength, fullSustainLength, 1, 2);
+      if (longHolds > 0)
+      {
+        // If positive, prevent negative numbers. Only for if we are positive though cuz the jank caused by negative long holds is funny
+        if (a < 0) a = 0;
+      }
     }
     return a;
   }
@@ -330,12 +335,18 @@ class SustainTrailMod extends SustainTrail // Extend from SustainTrail for all t
   {
     if (!this.alive || parentStrumline == null) return;
 
+    var scrollSpeed:Float = parentStrumline?.scrollSpeed ?? 1.0;
+
     spiralHolds = false;
     forwardHolds = false;
     is3D = true;
 
+    var endPieceGraphicSize:Float = graphic.height * zoom * endOffset;
+    var endPieceLengthInMS:Float = endPieceGraphicSize / (Constants.PIXELS_PER_MS * scrollSpeed);
+
     var needsRecalc:Bool = false;
     var sussy:Float = clipFromBottom ? fullSustainLength : sustainLength;
+    sussy -= endPieceLengthInMS;
     if (sussy < 0)
     {
       if (susPieces.length > 0) clearPiecesArray();
@@ -373,9 +384,10 @@ class SustainTrailMod extends SustainTrail // Extend from SustainTrail for all t
     susPiecesData = [this.noteModData];
 
     // long hold math:
-    var longBoi:Float = 1;
+    var longBoi:Float = longHoldMath();
+    // trace(longBoi);
 
-    var howMany:Int = Math.floor(sussy / grain); // calculate how many pieces we need using sussy
+    var howMany:Int = Math.floor(sussy * Math.abs(longBoi) / grain * scrollSpeed); // calculate how many pieces we need using sussy
     if (howMany < 1) howMany = 1; // Must ALWAYS have one piece.
     howMany += 1; // Add one for the end cap.
 
@@ -390,7 +402,7 @@ class SustainTrailMod extends SustainTrail // Extend from SustainTrail for all t
     // Step 3: Calculate the note data for each step of the sustain!
     for (i in 0...howManyPieces)
     {
-      var pieceLength:Float = sussy * longBoi / howManyPieces;
+      var pieceLength:Float = sussy * longBoi / (howManyPieces - 1);
       var curPieceTime:Float = baseTime + (pieceLength * i);
 
       var daPiece:SustainTrailModPiece;
@@ -437,7 +449,8 @@ class SustainTrailMod extends SustainTrail // Extend from SustainTrail for all t
         if (i == howManyPieces - 1)
         {
           daPiece.isEnd = true;
-          pieceLength *= daPiece.bottomClip; // adjust length for end cap
+          pieceLength = endPieceLengthInMS * 2;
+          pieceLength *= daPiece.bottomClip;
         }
       }
 

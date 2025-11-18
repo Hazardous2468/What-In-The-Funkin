@@ -184,7 +184,7 @@ class ModEventHandler
 
     for (strumLine in PlayState.instance.allStrumLines)
     {
-      strumLine.mods.sortMods();
+      if (strumLine.mods != null) strumLine.mods.sortMods();
 
       trace("\nSTRUM-" + strumLine.mods.customTweenerName + " mods list: \n" + strumLine.mods.modifiers);
     }
