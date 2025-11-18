@@ -40,8 +40,8 @@ class HourGlassModBase extends Modifier
     var a:Float = FlxMath.remapToRange(pos, start.value + offset.value, end.value + offset.value, 1, 0);
     a = FlxMath.bound(a, 0, 1); // clamp
 
-    var b:Float = 1 - a;
-    var c:Float = (FlxMath.fastCos(b * Math.PI) / 2) + 0.5;
+    final b:Float = 1 - a;
+    final c:Float = (FlxMath.fastCos(b * Math.PI) / 2) + 0.5;
 
     return c;
   }
@@ -56,7 +56,7 @@ class HourGlassX extends HourGlassModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    var c:Float = hourGlassMath(data);
+    final c:Float = hourGlassMath(data);
     data.x += ModConstants.strumSize * c * (data.direction - 1.5) * -2 * currentValue;
   }
 }
@@ -70,7 +70,7 @@ class HourGlassY extends HourGlassModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    var c:Float = hourGlassMath(data);
+    final c:Float = hourGlassMath(data);
     data.y += ModConstants.strumSize * c * (data.direction - 1.5) * -2 * currentValue;
   }
 }
@@ -84,7 +84,7 @@ class HourGlassZ extends HourGlassModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    var c:Float = hourGlassMath(data);
+    final c:Float = hourGlassMath(data);
     data.z += ModConstants.strumSize * c * (data.direction - 1.5) * -2 * currentValue;
   }
 }
@@ -98,7 +98,7 @@ class HourGlassAngleX extends HourGlassModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    var c:Float = hourGlassMath(data);
+    final c:Float = hourGlassMath(data);
     data.angleX += c * (currentValue * -1);
   }
 }
@@ -112,7 +112,7 @@ class HourGlassAngleZ extends HourGlassModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    var c:Float = hourGlassMath(data);
+    final c:Float = hourGlassMath(data);
     data.angleZ += c * (currentValue * -1);
   }
 }
@@ -126,7 +126,7 @@ class HourGlassAngleY extends HourGlassModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    var c:Float = hourGlassMath(data);
+    final c:Float = hourGlassMath(data);
     data.angleY += c * (currentValue * -1);
   }
 }
@@ -140,7 +140,7 @@ class HourGlassSkewX extends HourGlassModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    var c:Float = hourGlassMath(data);
+    final c:Float = hourGlassMath(data);
     data.skewX += c * (currentValue * -2);
   }
 }
@@ -154,7 +154,7 @@ class HourGlassSkewY extends HourGlassModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    var c:Float = hourGlassMath(data);
+    final c:Float = hourGlassMath(data);
     data.skewY += c * (currentValue * -2);
   }
 }
@@ -168,7 +168,7 @@ class HourGlassScaleX extends HourGlassModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    var c:Float = hourGlassMath(data);
+    final c:Float = hourGlassMath(data);
     data.scaleX += c * currentValue;
   }
 }
@@ -182,7 +182,7 @@ class HourGlassScaleY extends HourGlassModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    var c:Float = hourGlassMath(data);
+    final c:Float = hourGlassMath(data);
     data.scaleY += c * currentValue;
   }
 }
@@ -196,7 +196,7 @@ class HourGlassScale extends HourGlassModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    var c:Float = hourGlassMath(data);
+    final c:Float = hourGlassMath(data);
     data.scaleX += c * currentValue;
     data.scaleY += c * currentValue;
   }

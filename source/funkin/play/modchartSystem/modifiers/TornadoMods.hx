@@ -26,26 +26,26 @@ class TornadoModBase extends Modifier
 
   function tornadoMath(lane:Int, curPos:Float):Float
   {
-    var swagWidth:Float = ModConstants.strumSize;
+    final swagWidth:Float = ModConstants.strumSize;
     curPos += offset.value * (Preferences.downscroll ? -1 : 1);
-    var playerColumn:Float = lane % Strumline.KEY_COUNT;
-    var columnPhaseShift = playerColumn * Math.PI / 3;
-    var phaseShift = (curPos / 135) * speed.value * 0.2;
-    var returnReceptorToZeroOffsetX = (-cos(-columnPhaseShift) + 1) / 2 * swagWidth * 3;
-    var offsetX = (-cos((phaseShift - columnPhaseShift)) + 1) / 2 * swagWidth * 3 - returnReceptorToZeroOffsetX;
+    final playerColumn:Float = lane % Strumline.KEY_COUNT;
+    final columnPhaseShift = playerColumn * Math.PI / 3;
+    final phaseShift = (curPos / 135) * speed.value * 0.2;
+    final returnReceptorToZeroOffsetX = (-cos(-columnPhaseShift) + 1) / 2 * swagWidth * 3;
+    final offsetX = (-cos((phaseShift - columnPhaseShift)) + 1) / 2 * swagWidth * 3 - returnReceptorToZeroOffsetX;
 
     return offsetX;
   }
 
   function tanTornadoMath(lane:Int, curPos:Float):Float
   {
-    var swagWidth:Float = ModConstants.strumSize;
+    final swagWidth:Float = ModConstants.strumSize;
     curPos += offset.value * (Preferences.downscroll ? -1 : 1);
-    var playerColumn:Float = lane % Strumline.KEY_COUNT;
-    var columnPhaseShift = playerColumn * Math.PI / 3;
-    var phaseShift = (curPos / 135) * speed.value * 0.2;
-    var returnReceptorToZeroOffsetX = (-tan(-columnPhaseShift) + 1) / 2 * swagWidth * 3;
-    var offsetX = (-tan((phaseShift - columnPhaseShift)) + 1) / 2 * swagWidth * 3 - returnReceptorToZeroOffsetX;
+    final playerColumn:Float = lane % Strumline.KEY_COUNT;
+    final columnPhaseShift = playerColumn * Math.PI / 3;
+    final phaseShift = (curPos / 135) * speed.value * 0.2;
+    final returnReceptorToZeroOffsetX = (-tan(-columnPhaseShift) + 1) / 2 * swagWidth * 3;
+    final offsetX = (-tan((phaseShift - columnPhaseShift)) + 1) / 2 * swagWidth * 3 - returnReceptorToZeroOffsetX;
 
     return offsetX;
   }
@@ -213,7 +213,7 @@ class TornadoScaleMod extends TornadoModBase
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
-    var r:Float = tornadoMath(data.direction, data.curPos) * currentValue * 0.01;
+    final r:Float = tornadoMath(data.direction, data.curPos) * currentValue * 0.01;
     data.scaleX += r;
     data.scaleY += r;
     data.scaleZ += r;
@@ -253,7 +253,7 @@ class TornadoScaleXMod extends TornadoModBase
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
-    var r:Float = tornadoMath(data.direction, data.curPos) * currentValue;
+    final r:Float = tornadoMath(data.direction, data.curPos) * currentValue;
     data.scaleX += r * 0.01;
   }
 
@@ -289,7 +289,7 @@ class TornadoScaleYMod extends TornadoModBase
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
-    var r:Float = tornadoMath(data.direction, data.curPos) * currentValue;
+    final r:Float = tornadoMath(data.direction, data.curPos) * currentValue;
     data.scaleY += r * 0.01;
   }
 
@@ -325,7 +325,7 @@ class TornadoSkewXMod extends TornadoModBase
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
-    var r:Float = tornadoMath(data.direction, data.curPos) * currentValue;
+    final r:Float = tornadoMath(data.direction, data.curPos) * currentValue;
     data.skewX += r;
   }
 
@@ -361,7 +361,7 @@ class TornadoSkewYMod extends TornadoModBase
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
-    var r:Float = tornadoMath(data.direction, data.curPos) * currentValue;
+    final r:Float = tornadoMath(data.direction, data.curPos) * currentValue;
     data.skewY += r;
   }
 
@@ -541,7 +541,7 @@ class TanTornadoScaleMod extends TornadoModBase
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
-    var r:Float = tanTornadoMath(data.direction, data.curPos) * currentValue;
+    final r:Float = tanTornadoMath(data.direction, data.curPos) * currentValue;
     data.scaleX += r;
     data.scaleY += r;
     data.scaleZ += r;
@@ -550,7 +550,7 @@ class TanTornadoScaleMod extends TornadoModBase
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
-    var r:Float = tanTornadoMath(data.direction, data.curPos) * currentValue;
+    final r:Float = tanTornadoMath(data.direction, data.curPos) * currentValue;
     strumResult[data.direction] = r;
     data.scaleX += r * 0.01;
     data.scaleY += r * 0.01;

@@ -48,9 +48,10 @@ import openfl.geom.Vector3D;
  *
  *
  * TODO:
+ * Update all grain values for modcharts!
  * Upscroll support!
  * Fix for drive modifiers
- * Fix UV flickering when clipping.
+ * Fix UV flickering when clipping during recalcs
  * Vibrate Effect (make sure there are no visible gaps!),
  * forwardHolds (improve consistency and maybe math?),
  * spiral holds visual issues at the strum when being clipped (probs use same fix for old sustain logic (tiny time offset))
@@ -171,6 +172,12 @@ class SustainTrailMod extends SustainTrail // Extend from SustainTrail for all t
     return daPiece;
   }
 
+  public override function revive():Void
+  {
+    super.revive();
+    triggerRedrawRequest = true;
+  }
+
   /**
    * Removes a piece from the array and kills it, ready to be recycled elsewhere.
    * Doesn't seem to be very consistent atm
@@ -236,6 +243,7 @@ class SustainTrailMod extends SustainTrail // Extend from SustainTrail for all t
     }
     susPieces = [];
     susPieces_sorted1 = [];
+    this.howManyPieces = 0;
   }
 
   // let go of all the pieces to be reuse elsewhere!
@@ -255,27 +263,32 @@ class SustainTrailMod extends SustainTrail // Extend from SustainTrail for all t
     if (!clipFromBottom) return;
     for (daPiece in susPieces)
     {
-      if (daPiece == null || !daPiece.alive)
+      if (daPiece == null || !daPiece.alive || !daPiece.visible)
       {
         continue;
       }
 
       // if the top part starts getting clipped, then we assume that the entire thing has been fully clipped and is no longer visible.
-      if (daPiece?.topNoteModData?.clipped ?? 0 > 0)
+      if (daPiece.topNoteModData?.clipped ?? 0 > 0)
       {
-        if (daPiece.isRoot)
-        {
-          // If we are the root, then we need to define a new root piece before we get killed. Do this by getting the next piece in the sorted array
-          if (daPiece.pieceID < susPieces_sorted1.length - 1)
+        daPiece.visible = false;
+        trace('piece ' + daPiece.pieceID + ' fully clipped');
+        /*
+          if (daPiece.isRoot)
           {
-            susPieces_sorted1[daPiece.pieceID + 1].isRoot = true;
-            daPiece.isRoot = false;
+            // If we are the root, then we need to define a new root piece before we get killed. Do this by getting the next piece in the sorted array
+            if (daPiece.pieceID < susPieces_sorted1.length - 1)
+            {
+              susPieces_sorted1[daPiece.pieceID + 1].isRoot = true;
+              daPiece.isRoot = false;
+            }
           }
-        }
 
-        daPiece.kill();
-        susPieces_sorted1.remove(daPiece);
-        susPieces.remove(daPiece);
+          // this.howManyPieces -= 1;
+          // susPieces_sorted1.remove(daPiece);
+          susPieces.remove(daPiece);
+          daPiece.kill();
+         */
       }
     }
   }
@@ -322,9 +335,36 @@ class SustainTrailMod extends SustainTrail // Extend from SustainTrail for all t
 
   var susPiecesData:Array<NoteData> = [];
 
-  // If set to false, will instead hold the sustain at the song position when being hit as the sustain length counts down.
-  // If set to true, will instead clip the sustain at the bottom and changing sustain length will not do anything.
+  /**
+   * If set to false, will instead hold the sustain at the song position when being hit as the sustain length counts down.
+   * If set to true, will instead clip the sustain at the bottom and changing sustain length will not do anything.
+   */
   var clipFromBottom:Bool = true;
+
+  /**
+   * Does the triggerRedraw for regular sustain,
+   * but also sets a flag so that next time the pieces are updated, it recalculates the piece array.
+   * Can manually call 'updatePieces()' right after this if you don't want to wait till next frame.
+   */
+  override function triggerRedraw():Void
+  {
+    super.triggerRedraw();
+    triggerRedrawRequest = true;
+  }
+
+  // Same as the sustainLength setter but without triggering the 'triggerRedrawRequest' flag to avoid constant recalcs during clipping.
+  override function set_sustainLength(s:Float):Float
+  {
+    if (s < 0.0) s = 0.0;
+    if (sustainLength == s) return s;
+    this.sustainLength = s;
+    final was = triggerRedrawRequest;
+    triggerRedraw();
+    triggerRedrawRequest = was;
+    return this.sustainLength;
+  }
+
+  var triggerRedrawRequest:Bool = false;
 
   /**
    * This function is responsible for going through each piece of this sustain,
@@ -335,14 +375,14 @@ class SustainTrailMod extends SustainTrail // Extend from SustainTrail for all t
   {
     if (!this.alive || parentStrumline == null) return;
 
-    var scrollSpeed:Float = parentStrumline?.scrollSpeed ?? 1.0;
+    final scrollSpeed:Float = parentStrumline?.scrollSpeed ?? 1.0;
 
     spiralHolds = false;
     forwardHolds = false;
     is3D = true;
 
-    var endPieceGraphicSize:Float = graphic.height * zoom * endOffset;
-    var endPieceLengthInMS:Float = endPieceGraphicSize / (Constants.PIXELS_PER_MS * scrollSpeed);
+    final endPieceGraphicSize:Float = graphic.height * zoom * endOffset;
+    final endPieceLengthInMS:Float = endPieceGraphicSize / (Constants.PIXELS_PER_MS * scrollSpeed);
 
     var needsRecalc:Bool = false;
     var sussy:Float = clipFromBottom ? fullSustainLength : sustainLength;
@@ -355,14 +395,14 @@ class SustainTrailMod extends SustainTrail // Extend from SustainTrail for all t
 
     // Step 1: Calculate the root of the hold to get all the hold meta data like grain or long holds!
     this.noteModData = sampleNotePosition(this.noteModData, this.strumTime, true, true);
-    var baseTime:Float = clipFromBottom ? this.strumTime : this.noteModData.strumTime;
+    final baseTime:Float = clipFromBottom ? this.strumTime : this.noteModData.strumTime;
 
     // Step 2: Check if we need to recalculate the pieces array!
-    if (grain != noteModData.holdGrain || longHolds != noteModData.longHolds)
+    if (grain != noteModData.holdGrain || longHolds != noteModData.longHolds || triggerRedrawRequest)
     {
       needsRecalc = true;
       clearPiecesArray();
-      trace("Recalculate pieces! - meta");
+      trace("Recalculate pieces!");
     }
 
     // Apply the root meta data
@@ -384,20 +424,18 @@ class SustainTrailMod extends SustainTrail // Extend from SustainTrail for all t
     susPiecesData = [this.noteModData];
 
     // long hold math:
-    var longBoi:Float = longHoldMath();
+    final longBoi:Float = longHoldMath();
     // trace(longBoi);
 
-    var howMany:Int = Math.floor(sussy * Math.abs(longBoi) / grain * scrollSpeed); // calculate how many pieces we need using sussy
-    if (howMany < 1) howMany = 1; // Must ALWAYS have one piece.
-    howMany += 1; // Add one for the end cap.
-
-    if ((howMany != this.howManyPieces || susPieces_sorted1.length != howMany) && !needsRecalc)
+    if (needsRecalc)
     {
-      needsRecalc = true;
-      clearPiecesArray();
-      trace('Recalculate pieces! - Different pieces amount ($howMany)');
+      var howMany:Int = Math.floor(sussy * Math.abs(longBoi) / grain * scrollSpeed); // calculate how many pieces we need using sussy
+      if (howMany < 1) howMany = 1; // Must ALWAYS have one piece.
+      howMany += 1; // Add one for the end cap.
+      this.howManyPieces = howMany;
+
+      trace("New piece amount: " + howMany);
     }
-    this.howManyPieces = howMany;
 
     // Step 3: Calculate the note data for each step of the sustain!
     for (i in 0...howManyPieces)
@@ -414,9 +452,7 @@ class SustainTrailMod extends SustainTrail // Extend from SustainTrail for all t
       else
       {
         daPiece = susPieces_sorted1[i];
-        if (!daPiece.alive) continue;
       }
-
       if (daPiece == null)
       {
         // Something is wrong! Abort everything and try again!
@@ -425,6 +461,7 @@ class SustainTrailMod extends SustainTrail // Extend from SustainTrail for all t
         updatePieces();
         return;
       }
+      if (!daPiece.alive || !daPiece.visible) continue;
 
       // Set all the daPiece data here!
       daPiece.noteDirection = this.noteDirection;
@@ -449,7 +486,7 @@ class SustainTrailMod extends SustainTrail // Extend from SustainTrail for all t
         if (i == howManyPieces - 1)
         {
           daPiece.isEnd = true;
-          pieceLength = endPieceLengthInMS * 2;
+          pieceLength = endPieceLengthInMS / endOffset; // either divide by endOffset or multiply by 2, idk lol
           pieceLength *= daPiece.bottomClip;
         }
       }
@@ -461,7 +498,7 @@ class SustainTrailMod extends SustainTrail // Extend from SustainTrail for all t
         var clip:Float = 0;
         if ((hitNote && !missedNote))
         {
-          var songTime:Float = getSongPos();
+          final songTime:Float = getSongPos();
           if (songTime >= daPiece.strumTime)
           {
             clip = songTime - daPiece.strumTime;
@@ -491,7 +528,7 @@ class SustainTrailMod extends SustainTrail // Extend from SustainTrail for all t
       else
       {
         daPiece.previousPiece = susPieces_sorted1[i - 1];
-        if (daPiece.previousPiece != null && daPiece.previousPiece.alive)
+        if (daPiece.previousPiece != null && daPiece.previousPiece.alive && daPiece.previousPiece.visible)
         {
           // Re use this note data if available.
           daPiece.bottomNoteModData = daPiece.previousPiece.topNoteModData;
@@ -504,11 +541,12 @@ class SustainTrailMod extends SustainTrail // Extend from SustainTrail for all t
       }
 
       // Set the note data for the piece top
-      var ss:Float = daPiece.strumTime + daPiece.sustainLength;
-      daPiece.topNoteModData = sampleNotePosition(daPiece.topNoteModData, ss, false, true);
+      daPiece.topNoteModData = sampleNotePosition(daPiece.topNoteModData, daPiece.strumTime + daPiece.sustainLength, false, true);
       susPiecesData.push(daPiece.topNoteModData);
       // if (!daPiece.isEnd) daPiece.nextPiece = susPieces_sorted1[i + 1];
     }
+
+    triggerRedrawRequest = false;
 
     /**
      * Once all data is in place, we then tell all the pieces to update their verts and stitch it all together to avoid gaps.
@@ -533,7 +571,7 @@ class SustainTrailMod extends SustainTrail // Extend from SustainTrail for all t
     return; // Do nothing. as the drawing logic is handled elsewhere. We only exist to manage all the data between each piece.
   }
 
-  var tinyOffsetForSpiral:Float = 0.01; // in ms
+  final tinyOffsetForSpiral:Float = 0.01; // in ms
 
   /**
    * A function that will clamp the provided strumTime based on the current status of this hold
@@ -546,7 +584,7 @@ class SustainTrailMod extends SustainTrail // Extend from SustainTrail for all t
     // Note is currently being hit!
     if ((hitNote && !missedNote))
     {
-      var songTime:Float = getSongPos();
+      final songTime:Float = getSongPos();
       if (songTime >= pieceModData.strumTime)
       {
         pieceModData.clipped = songTime - pieceModData.strumTime;
@@ -636,8 +674,8 @@ class SustainTrailMod extends SustainTrail // Extend from SustainTrail for all t
     pieceModData.x += Strumline.STRUMLINE_SIZE / 2;
 
     // Make it follow strum position.
-    var defaultPosition:Array<Float> = parentStrumline.mods.getDefaultStrumPos(pieceModData.direction);
-    var xDif:Float = whichStrumNote.x - defaultPosition[0];
+    final defaultPosition:Array<Float> = parentStrumline.mods.getDefaultStrumPos(pieceModData.direction);
+    final xDif:Float = whichStrumNote.x - defaultPosition[0];
     pieceModData.x += xDif;
 
     // Y positioning
@@ -838,10 +876,10 @@ class SustainTrailModPiece extends SustainTrail // Extend from SustainTrail for 
   public function getVertPos(leftSide:Bool, bottomSide:Bool):Vector3D
   {
     if (parent == null) return vec3;
-    var curData:NoteData = bottomSide ? bottomNoteModData : topNoteModData;
+    final curData = bottomSide ? bottomNoteModData : topNoteModData;
     leftSide = !leftSide; // flip fix lol
 
-    var holdWidth = this.usingSparrow ? this.frameWidth : graphicWidth;
+    final holdWidth = this.usingSparrow ? this.frameWidth : graphicWidth;
 
     vec3.setTo(curData.x, curData.y, curData.z);
 
@@ -864,7 +902,7 @@ class SustainTrailModPiece extends SustainTrail // Extend from SustainTrail for 
   public function applySkewAndRotation(curVec:Vector3D, rotateOrigin:Vector2, curData:NoteData):Vector3D
   {
     // apply skew
-    var xPercent_SkewOffset:Float = curVec.x - rotateOrigin.x;
+    final xPercent_SkewOffset:Float = curVec.x - rotateOrigin.x;
     if (curData.skewY != 0) curVec.y += xPercent_SkewOffset * Math.tan(curData.skewY * FlxAngle.TO_RAD);
 
     // Rotate Z
@@ -885,8 +923,8 @@ class SustainTrailModPiece extends SustainTrail // Extend from SustainTrail for 
     curVec.z = vec2.y;
 
     // Playfield Skewing
-    var playfieldSkewOffsetY:Float = curVec.x - (curData.whichStrumNote?.strumExtraModData?.playfieldX ?? FlxG.width / 2);
-    var playfieldSkewOffsetX:Float = curVec.y - (curData.whichStrumNote?.strumExtraModData?.playfieldY ?? FlxG.height / 2);
+    final playfieldSkewOffsetY:Float = curVec.x - (curData.whichStrumNote?.strumExtraModData?.playfieldX ?? FlxG.width / 2);
+    final playfieldSkewOffsetX:Float = curVec.y - (curData.whichStrumNote?.strumExtraModData?.playfieldY ?? FlxG.height / 2);
 
     if (curData.skewX_playfield != 0) curVec.x += playfieldSkewOffsetX * Math.tan(curData.skewX_playfield * FlxAngle.TO_RAD);
     if (curData.skewY_playfield != 0) curVec.y += playfieldSkewOffsetY * Math.tan(curData.skewY_playfield * FlxAngle.TO_RAD);
@@ -928,8 +966,8 @@ class SustainTrailModPiece extends SustainTrail // Extend from SustainTrail for 
 
       // calc angle
       var travelAngle:Float = 0;
-      var a:Float = (curData.y - prevSample.y) * -1; // height
-      var b:Float = (curData.x - prevSample.x); // length
+      final a:Float = (curData.y - prevSample.y) * -1; // height
+      final b:Float = (curData.x - prevSample.x); // length
 
       if (!(a == 0 && b == 0))
       { // if we're NOT in the same spot...
@@ -996,7 +1034,7 @@ class SustainTrailModPiece extends SustainTrail // Extend from SustainTrail for 
 
     // Apply
     var v:Vector3D;
-    if (autoStitch && this.previousPiece != null && this.previousPiece.alive)
+    if (autoStitch && this.previousPiece != null && this.previousPiece.alive && this.previousPiece.visible)
     {
       var v_prev:Array<Float> = this.previousPiece.vertices_array;
       verts[3] = v_prev[v_prev.length - 1];
@@ -1030,7 +1068,7 @@ class SustainTrailModPiece extends SustainTrail // Extend from SustainTrail for 
     // Set the z to be the average between the bottom and top
     this.z = bottomNoteModData.z + topNoteModData.z / 2;
 
-    var angleMemory = this.angle;
+    final angleMemory = this.angle;
     this.applyNoteData(bottomNoteModData);
     this.x = ModConstants.holdNoteJankX;
     this.y = ModConstants.holdNoteJankY;
@@ -1078,7 +1116,7 @@ class SustainTrailModPiece extends SustainTrail // Extend from SustainTrail for 
     // Do UV's
     // Eventually will make it so that these can be manipulated, as well as making them work properly with clipping.
 
-    var endCapNudge:Float = (isEnd ? (1 / 8) : 0);
+    final endCapNudge:Float = (isEnd ? (1 / 8) : 0);
 
     if (this.usingSparrow && false)
     {
@@ -1228,7 +1266,7 @@ class SustainTrailModPiece extends SustainTrail // Extend from SustainTrail for 
     {
       if (this.previousPiece.vertices_array == null || this.vertices_array == null) return; // Can't stich!
 
-      var v_prev:Array<Float> = this.previousPiece.vertices_array;
+      final v_prev:Array<Float> = this.previousPiece.vertices_array;
       var v:Array<Float> = this.vertices_array;
 
       v[3] = v_prev[v_prev.length - 1];
@@ -1242,7 +1280,7 @@ class SustainTrailModPiece extends SustainTrail // Extend from SustainTrail for 
 
   public function updateClipAndStitch():Void
   {
-    if (!this.alive) return;
+    if (!this.alive || !this.visible) return;
     this.updateClipping_mod();
     // this.stichToPrevious();
     // readyToDraw = true;
@@ -1263,7 +1301,7 @@ class SustainTrailModPiece extends SustainTrail // Extend from SustainTrail for 
       return;
     }
 
-    var alphaMemory:Float = this.alpha;
+    final alphaMemory:Float = this.alpha;
     for (camera in parent.cameras)
     {
       var newAlpha:Float = alphaMemory * camera.alpha * parent.alpha * parent.parentStrumline?.alpha ?? 1.0;
@@ -1306,6 +1344,7 @@ class SustainTrailModPiece extends SustainTrail // Extend from SustainTrail for 
       bottomNoteModData.pieceID = 0;
       bottomNoteModData.previousData = null;
     }
+    this.visible = false;
 
     super.kill();
   }
@@ -1321,6 +1360,7 @@ class SustainTrailModPiece extends SustainTrail // Extend from SustainTrail for 
     topNoteModData.previousData = bottomNoteModData;
     bottomNoteModData.previousData = null;
     readyToDraw = false;
+    this.visible = true;
     super.revive();
   }
 

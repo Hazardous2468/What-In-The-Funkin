@@ -123,7 +123,7 @@ class TipsyScaleMod extends TipsyModBase
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
-    var s:Float = tipsyMath(data.direction, data.curPos);
+    final s:Float = tipsyMath(data.direction, data.curPos);
     data.scaleX += s * 0.01;
     data.scaleZ += s * 0.01;
     data.scaleY += s * 0.01;
@@ -150,7 +150,7 @@ class TipsySkewXMod extends TipsyModBase
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
-    var s:Float = tipsyMath(data.direction, data.curPos);
+    final s:Float = tipsyMath(data.direction, data.curPos);
     data.skewX += s;
   }
 }
@@ -175,7 +175,7 @@ class TipsySkewYMod extends TipsyModBase
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
-    var s:Float = tipsyMath(data.direction, data.curPos);
+    final s:Float = tipsyMath(data.direction, data.curPos);
     data.skewY += s;
   }
 }
@@ -256,7 +256,7 @@ class TanTipsyScaleMod extends TipsyModBase
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
-    var s:Float = tanTipsyMath(data.direction, data.curPos);
+    final s:Float = tanTipsyMath(data.direction, data.curPos);
     data.scaleX += s * 0.01;
     data.scaleZ += s * 0.01;
     data.scaleY += s * 0.01;

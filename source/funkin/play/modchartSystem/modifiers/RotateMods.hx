@@ -88,7 +88,7 @@ class RotateModBase extends Modifier
         pivotPoint.y = noteRotateFunc_GetPivotY(data, strumLine);
         point.x = data.x;
         point.y = data.y;
-        var output:Vector2 = ModConstants.rotateAround(pivotPoint, point, angle);
+        final output:Vector2 = ModConstants.rotateAround(pivotPoint, point, angle);
         data.x = output.x;
         data.y = output.y;
       case "y":
@@ -96,7 +96,7 @@ class RotateModBase extends Modifier
         pivotPoint.y = noteRotateFunc_GetPivotZ(data, strumLine);
         point.x = data.x;
         point.y = data.z;
-        var output:Vector2 = ModConstants.rotateAround(pivotPoint, point, angle);
+        final output:Vector2 = ModConstants.rotateAround(pivotPoint, point, angle);
         data.x = output.x;
         data.z = output.y;
       case "x":
@@ -104,7 +104,7 @@ class RotateModBase extends Modifier
         pivotPoint.y = noteRotateFunc_GetPivotY(data, strumLine);
         point.x = data.z;
         point.y = data.y;
-        var output:Vector2 = ModConstants.rotateAround(pivotPoint, point, angle);
+        final output:Vector2 = ModConstants.rotateAround(pivotPoint, point, angle);
         data.z = output.x;
         data.y = output.y;
     }
@@ -143,21 +143,21 @@ class RotateModBase extends Modifier
         pivotPoint.x = strumRotateFunc_GetPivotX(data, strumLine);
         pivotPoint.y = strumRotateFunc_GetPivotY(data, strumLine);
         point.setTo(data.x, data.y);
-        var output:Vector2 = ModConstants.rotateAround(pivotPoint, point, angle);
+        final output:Vector2 = ModConstants.rotateAround(pivotPoint, point, angle);
         data.x = output.x;
         data.y = output.y;
       case "y":
         pivotPoint.x = strumRotateFunc_GetPivotX(data, strumLine);
         pivotPoint.y = strumRotateFunc_GetPivotZ(data, strumLine);
         point.setTo(data.x, data.z);
-        var output:Vector2 = ModConstants.rotateAround(pivotPoint, point, angle);
+        final output:Vector2 = ModConstants.rotateAround(pivotPoint, point, angle);
         data.x = output.x;
         data.z = output.y;
       case "x":
         pivotPoint.x = strumRotateFunc_GetPivotZ(data, strumLine);
         pivotPoint.y = strumRotateFunc_GetPivotY(data, strumLine);
         point.setTo(data.z, data.y);
-        var output:Vector2 = ModConstants.rotateAround(pivotPoint, point, angle);
+        final output:Vector2 = ModConstants.rotateAround(pivotPoint, point, angle);
         data.z = output.x;
         data.y = output.y;
     }
@@ -360,14 +360,14 @@ class RotatingXModifier extends RotateModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    var curVal:Float = currentValue * data.curPos / 180;
+    final curVal:Float = currentValue * data.curPos / 180;
     noteRotateFunc(data, strumLine, "x", curVal);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
     if (this.currentValue % 360 == 0 || affectsStrums.value == 0) return;
-    var curVal:Float = currentValue * data.curPos / 180;
+    final curVal:Float = currentValue * data.curPos / 180;
     strumRotateFunc(data, strumLine, "x", curVal);
   }
 }
@@ -397,14 +397,14 @@ class RotatingYModifier extends RotateModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    var curVal:Float = currentValue * data.curPos / 180;
+    final curVal:Float = currentValue * data.curPos / 180;
     noteRotateFunc(data, strumLine, "y", curVal);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
     if (this.currentValue % 360 == 0 || affectsStrums.value == 0) return;
-    var curVal:Float = currentValue * data.curPos / 180;
+    final curVal:Float = currentValue * data.curPos / 180;
     strumRotateFunc(data, strumLine, "y", curVal);
   }
 }
@@ -434,14 +434,14 @@ class RotatingZModifier extends RotateModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    var curVal:Float = currentValue * data.curPos / 180;
+    final curVal:Float = currentValue * data.curPos / 180;
     noteRotateFunc(data, strumLine, "z", curVal);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
     if (this.currentValue % 360 == 0 || affectsStrums.value == 0) return;
-    var curVal:Float = currentValue * data.curPos / 180;
+    final curVal:Float = currentValue * data.curPos / 180;
     strumRotateFunc(data, strumLine, "z", curVal);
   }
 }

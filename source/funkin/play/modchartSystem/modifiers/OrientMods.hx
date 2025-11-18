@@ -84,7 +84,7 @@ class OrientModBase extends Modifier
 
   override function specialMath(lane:Int, strumLine:Strumline):Void
   {
-    var whichStrum:StrumlineNote = strumLine.getByIndex(lane);
+    final whichStrum:StrumlineNote = strumLine.getByIndex(lane);
     whichStrum.strumExtraModData.orientExtraMath[index] = currentValue;
   }
 
@@ -164,7 +164,7 @@ class OrientModBase extends Modifier
       // Make it look nicer when reversed.
       if (reverseFix)
       {
-        var reverseModAmount:Float = data.getReverse(); // 0 to 1
+        final reverseModAmount:Float = data.getReverse(); // 0 to 1
         if (reverseModAmount > 0.5)
         {
           a *= -1;
@@ -172,7 +172,7 @@ class OrientModBase extends Modifier
         }
       }
 
-      var calculateAngleDif:Float = FlxAngle.degreesFromOrigin(a, b);
+      final calculateAngleDif:Float = FlxAngle.degreesFromOrigin(a, b);
       data.lastKnownOrientAngle[index] = calculateAngleDif;
       return calculateAngleDif;
     }

@@ -64,7 +64,7 @@ class SpiralModBase extends Modifier
   {
     curPos = curPos * (Preferences.downscroll ? -1 : 1);
     curPos *= -0.1;
-    var curposWithOffset:Float = curPos - getOffset();
+    final curposWithOffset:Float = curPos - getOffset();
 
     if (useCos)
     {
@@ -131,7 +131,7 @@ class SpiralScaleMod extends SpiralModBase
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return;
-    var modMathResult:Float = spiralMath((useUnscaledCurpos ? data.curPos_unscaled : data.curPos)) * 0.01;
+    final modMathResult:Float = spiralMath((useUnscaledCurpos ? data.curPos_unscaled : data.curPos)) * 0.01;
     data.scaleX += modMathResult;
     data.scaleY += modMathResult;
   }
@@ -152,7 +152,7 @@ class SpiralSpeedMod extends SpiralModBase
   override function speedMath(lane:Int, curPos:Float, strumLine, isHoldNote = false):Float
   {
     if (currentValue == 0) return 1;
-    var r:Float = spiralMath(curPos);
+    final r:Float = spiralMath(curPos);
     return (r * 0.005) + 1;
   }
 }

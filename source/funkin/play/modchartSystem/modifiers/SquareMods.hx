@@ -25,8 +25,8 @@ class SquareModBase extends Modifier
 
   function squareMath(curPos:Float):Float
   {
-    var mult:Float = multSubmod.value / (ModConstants.strumSize * 2);
-    var timeOffset:Float = offsetY.value * (Preferences.downscroll ? -1 : 1);
+    final mult:Float = multSubmod.value / (ModConstants.strumSize * 2);
+    final timeOffset:Float = offsetY.value * (Preferences.downscroll ? -1 : 1);
     var xVal:Float = sin((curPos + timeOffset) * Math.PI * mult);
     xVal = Math.floor(xVal) + 0.5 + offsetX.value;
     return xVal;
@@ -126,7 +126,7 @@ class SquareScaleMod extends SquareModBase
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
-    var r:Float = squareMath(data.curPos) * currentValue * 0.01;
+    final r:Float = squareMath(data.curPos) * currentValue * 0.01;
     data.scaleX += r;
     data.scaleY += r;
     data.scaleZ += r;
@@ -135,7 +135,7 @@ class SquareScaleMod extends SquareModBase
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
-    var r:Float = squareMath(data.curPos) * currentValue * 0.01;
+    final r:Float = squareMath(data.curPos) * currentValue * 0.01;
     data.scaleX += r;
     data.scaleY += r;
     data.scaleZ += r;

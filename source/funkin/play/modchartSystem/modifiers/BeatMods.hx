@@ -35,15 +35,15 @@ class BeatModBase extends Modifier
 
   function beatMath(curPos:Float):Float
   {
-    var fAccelTime = fAccelTimeSubmod.value;
-    var fTotalTime = fTotalTimeSubmod.value;
+    final fAccelTime = fAccelTimeSubmod.value;
+    final fTotalTime = fTotalTimeSubmod.value;
 
-    var timmy:Float = (beatTime + offset.value) * speed.value;
+    final timmy:Float = (beatTime + offset.value) * speed.value;
 
-    var posMult:Float = mult.value * 2; // Multiplied by 2 to make the effect more pronounced for FNF
+    final posMult:Float = mult.value * 2; // Multiplied by 2 to make the effect more pronounced for FNF
 
     var fBeat = timmy + fAccelTime;
-    var bEvenBeat = (Math.floor(fBeat) % 2) != 0;
+    final bEvenBeat = (Math.floor(fBeat) % 2) != 0;
 
     if (fBeat < 0) return 0;
 
@@ -68,7 +68,7 @@ class BeatModBase extends Modifier
 
     if (bEvenBeat && alternate.value >= 0.5) fAmount *= -1;
 
-    var fShift = 20.0 * fAmount * FlxMath.fastSin((curPos * 0.01 * posMult) + (Math.PI / 2.0));
+    final fShift = 20.0 * fAmount * FlxMath.fastSin((curPos * 0.01 * posMult) + (Math.PI / 2.0));
     return fShift * currentValue;
   }
 }
@@ -214,7 +214,7 @@ class BeatScaleMod extends BeatModBase
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
-    var s:Float = beatMath(data.curPos);
+    final s:Float = beatMath(data.curPos);
     data.scaleX += s * 0.01;
     data.scaleZ += s * 0.01;
     data.scaleY += s * 0.01;
@@ -236,7 +236,7 @@ class BeatScaleXMod extends BeatModBase
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
-    var s:Float = beatMath(data.curPos);
+    final s:Float = beatMath(data.curPos);
     data.scaleX += s * 0.01;
   }
 }
@@ -256,7 +256,7 @@ class BeatScaleYMod extends BeatModBase
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
-    var s:Float = beatMath(data.curPos);
+    final s:Float = beatMath(data.curPos);
     data.scaleY += s * 0.01;
   }
 }
@@ -311,7 +311,7 @@ class BeatSpeedMod extends BeatModBase
   override function speedMath(lane:Int, curPos:Float, strumLine, isHoldNote = false):Float
   {
     if (currentValue == 0) return 1; // skip math if mod is 0
-    var modWouldBe:Float = beatMath(curPos) * 0.025;
-    return modWouldBe + 1;
+    final modWouldBe:Float = beatMath(curPos) * 0.025;
+    return (modWouldBe + 1);
   }
 }

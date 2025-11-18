@@ -58,28 +58,28 @@ class HazardEase extends FlxEase
 
   public static inline function popElastic(t:Float):Float
   {
-    var damp:Float = 1.4;
-    var count:Float = 6;
+    final damp:Float = 1.4;
+    final count:Float = 6;
     return (Math.pow(1000, -(Math.pow(t, damp))) - 0.001) * Math.sin(count * Math.PI * t);
   }
 
   public static inline function tapElastic(t:Float):Float
   {
-    var damp:Float = 1.4;
-    var count:Float = 6;
+    final damp:Float = 1.4;
+    final count:Float = 6;
     return (Math.pow(1000, -(Math.pow((1 - t), damp))) - 0.001) * Math.sin(count * Math.PI * (1 - t));
   }
 
   public static inline function pulseElastic(t:Float):Float
   {
-    var damp:Float = 1.4;
-    var count:Float = 6;
+    final damp:Float = 1.4;
+    final count:Float = 6;
     return (t < .5 ? tapElastic(t * 2) : -popElastic(t * 2 - 1));
   }
 
   public static inline function impulse(t:Float):Float
   {
-    var damp:Float = 0.9;
+    final damp:Float = 0.9;
     t = Math.pow(t, damp);
     return t * (Math.pow(1000, -t) - 0.001) * 18.6;
   }
@@ -380,8 +380,8 @@ class HazardEase extends FlxEase
 
   public static inline function elasticOutIn(t:Float):Float
   {
-    var a:Float = 1;
-    var p:Float = 0.3;
+    final a:Float = 1;
+    final p:Float = 0.3;
     return t < 0.5 ? 0.5 * outElasticInternal(t * 2, a, p) : 0.5 + 0.5 * inElasticInternal(t * 2 - 1, a, p);
   }
 
@@ -417,7 +417,7 @@ class HazardEase extends FlxEase
 
   public static inline function outInBack(t:Float):Float
   {
-    var a:Float = 1.70158;
+    final a:Float = 1.70158;
     return t < 0.5 ? 0.5 * outBackInternal(t * 2, a) : 0.5 + 0.5 * inBackInternal(t * 2 - 1, a);
   }
 

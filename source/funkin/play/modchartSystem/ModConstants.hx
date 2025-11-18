@@ -168,19 +168,19 @@ class ModConstants
   ];
 
   // Sets the REAL hold note to this position - X.
-  public static var holdNoteJankX:Float = 0;
+  public static final holdNoteJankX:Float = 0;
 
   // Sets the REAL hold note to this position - Y.
-  public static var holdNoteJankY:Float = 0;
+  public static final holdNoteJankY:Float = 0;
 
   // size in pixels for each note
-  public static var strumSize:Float = Strumline.NOTE_SPACING;
+  public static final strumSize:Float = Strumline.NOTE_SPACING;
 
   // arrowpathScale
-  public static var arrowPathScale:Float = (0.696774193548387 * 0.25);
+  public static final arrowPathScale:Float = (0.696774193548387 * 0.25);
 
   // the scale of each note, idfk lol
-  public static var noteScale:Float = 0.696774193548387;
+  public static final noteScale:Float = 0.696774193548387;
 
   // Just a silly way to check if a tag is actually a submod or not lol
   public static function isTagSub(tag:String):Bool
@@ -235,21 +235,21 @@ class ModConstants
     strumBaseX += strumlineOffsets[0];
     strumBaseY += strumlineOffsets[1];
 
-    var wasHereOriginally:Vector3D = new Vector3D(strumBaseX, strumBaseY, strumBaseZ);
+    final wasHereOriginally:Vector3D = new Vector3D(strumBaseX, strumBaseY, strumBaseZ);
     return wasHereOriginally;
   }
 
   public static function rotateAround(origin:Vector2, point:Vector2, degrees:Float):Vector2
   {
     if (degrees == 0) return point; // Do nothing if there is no rotation
-    var angle:Float = degrees * FlxAngle.TO_RAD;
-    var ox = origin.x;
-    var oy = origin.y;
-    var px = point.x;
-    var py = point.y;
+    final angle:Float = degrees * FlxAngle.TO_RAD;
+    final ox = origin.x;
+    final oy = origin.y;
+    final px = point.x;
+    final py = point.y;
 
-    var qx = ox + FlxMath.fastCos(angle) * (px - ox) - FlxMath.fastSin(angle) * (py - oy);
-    var qy = oy + FlxMath.fastSin(angle) * (px - ox) + FlxMath.fastCos(angle) * (py - oy);
+    final qx = ox + FlxMath.fastCos(angle) * (px - ox) - FlxMath.fastSin(angle) * (py - oy);
+    final qy = oy + FlxMath.fastSin(angle) * (px - ox) + FlxMath.fastCos(angle) * (py - oy);
 
     return (new Vector2(qx, qy));
   }
@@ -472,7 +472,7 @@ class ModConstants
   public static function getBeatPositionWithDelta():Float
   {
     if (Conductor.instance == null) return 0.0;
-    var timeWithDelta:Float = Conductor.instance.getTimeWithDelta();
+    final timeWithDelta:Float = Conductor.instance.getTimeWithDelta();
     return Conductor.instance.getTimeInSteps(timeWithDelta) / Constants.STEPS_PER_BEAT;
   }
 
@@ -641,8 +641,8 @@ class ModConstants
       strSplit = str.split(')');
       str = strSplit[0];
       strSplit = str.split(',');
-      var ease1 = getEaseFromString(strSplit[0]);
-      var ease2 = getEaseFromString(strSplit[1]);
+      final ease1 = getEaseFromString(strSplit[0]);
+      final ease2 = getEaseFromString(strSplit[1]);
       return easeBlend(ease1, ease2);
     }
 
@@ -653,8 +653,8 @@ class ModConstants
       strSplit = str.split(')');
       str = strSplit[0];
       strSplit = str.split(',');
-      var ease1 = getEaseFromString(strSplit[0]);
-      var ease2 = getEaseFromString(strSplit[1]);
+      final ease1 = getEaseFromString(strSplit[0]);
+      final ease2 = getEaseFromString(strSplit[1]);
       return easeLerp(ease1, ease2);
     }
 
@@ -665,8 +665,8 @@ class ModConstants
       strSplit = str.split(')');
       str = strSplit[0];
       strSplit = str.split(',');
-      var ease1 = getEaseFromString(strSplit[0]);
-      var ease2 = getEaseFromString(strSplit[1]);
+      final ease1 = getEaseFromString(strSplit[0]);
+      final ease2 = getEaseFromString(strSplit[1]);
       return easeMerge(ease1, ease2);
     }
 
@@ -816,8 +816,8 @@ class ModConstants
       offsetY:Float = 0.0):Void
   {
     // attempt to position to playfield skew mods
-    var playfieldSkewOffset_Y:Float = (spr.x + offsetX) - (playfieldX);
-    var playfieldSkewOffset_X:Float = (spr.y + offsetY) - (playfieldY);
+    final playfieldSkewOffset_Y:Float = (spr.x + offsetX) - (playfieldX);
+    final playfieldSkewOffset_X:Float = (spr.y + offsetY) - (playfieldY);
 
     spr.x += playfieldSkewOffset_X * Math.tan(skewX * FlxAngle.TO_RAD);
     spr.y += playfieldSkewOffset_Y * Math.tan(skewY * FlxAngle.TO_RAD);
@@ -890,7 +890,7 @@ class ModConstants
     if (noteWidth == null) noteWidth = note.width;
     if (noteHeight == null) noteHeight = note.height;
     pos.setTo(note.x + (noteWidth * 0.5), note.y + (noteHeight * 0.5), note.getZ() * 0.001);
-    var thisNotePos:Vector3D = perspectiveMath(pos, -(noteWidth * 0.5), -(noteHeight * 0.5), perspectiveOffset);
+    final thisNotePos:Vector3D = perspectiveMath(pos, -(noteWidth * 0.5), -(noteHeight * 0.5), perspectiveOffset);
     note.x = thisNotePos.x;
     note.y = thisNotePos.y;
     if (thisNotePos.z != 0)
@@ -910,7 +910,7 @@ class ModConstants
 
     pos.setTo(note.x + (noteWidth / 2), note.y + (noteHeight / 2), note.getZ() * 0.001);
 
-    var thisNotePos:Vector3D = perspectiveMath(pos, -(noteWidth * 0.5), -(noteHeight * 0.5), perspectiveOffset);
+    final thisNotePos:Vector3D = perspectiveMath(pos, -(noteWidth * 0.5), -(noteHeight * 0.5), perspectiveOffset);
 
     note.x = thisNotePos.x;
     note.y = thisNotePos.y;
@@ -965,11 +965,11 @@ class ModConstants
 
       newz = newz - 1;
 
-      var zRange:Float = zNear - zFar;
-      var tanHalfFOV:Float = fastTan(_FOV * 0.5);
+      final zRange:Float = zNear - zFar;
+      final tanHalfFOV:Float = fastTan(_FOV * 0.5);
 
-      var screenCenterX:Float = (FlxG.width * 0.5) + (perspectiveOffset?.x ?? 0.0);
-      var screenCenterY:Float = (FlxG.height * 0.5) + (perspectiveOffset?.y ?? 0.0);
+      final screenCenterX:Float = (FlxG.width * 0.5) + (perspectiveOffset?.x ?? 0.0);
+      final screenCenterY:Float = (FlxG.height * 0.5) + (perspectiveOffset?.y ?? 0.0);
 
       var xOffsetToCenter:Float = pos.x - screenCenterX; // so the perspective focuses on the center of the screen
       var yOffsetToCenter:Float = pos.y - screenCenterY;
@@ -1021,7 +1021,7 @@ class ModConstants
     else
     {
       // We good to go.
-      var newMod:CustomModifier = new CustomModifier(modName, defaultBaseValue);
+      final newMod:CustomModifier = new CustomModifier(modName, defaultBaseValue);
       return newMod;
     }
   }

@@ -180,7 +180,7 @@ class SawtoothScaleMod extends SawtoothModBase
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
-    var result:Float = ModConstants.mod(data.curPos + offset, mult) * currentValue * -1 * 0.01;
+    final result:Float = ModConstants.mod(data.curPos + offset, mult) * currentValue * -1 * 0.01;
     data.scaleX += result;
     data.scaleY += result;
     data.scaleZ += result;
@@ -273,7 +273,7 @@ class SawtoothSkewYMod extends SawtoothModBase
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return;
-    var result:Float = ModConstants.mod(data.curPos + offset, mult) * currentValue * -1;
+    final result:Float = ModConstants.mod(data.curPos + offset, mult) * currentValue * -1;
     data.skewY += (result);
   }
 

@@ -63,7 +63,7 @@ class LinearYMod extends LinearModifierBase
     if (currentValue == 0) return; // skip math if mod is 0
 
     data.y -= strumResult[data.direction];
-    var curPosToUse:Float = (useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+    final curPosToUse:Float = (useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
 
     data.y += daMath(curPosToUse) * (Preferences.downscroll && flipForDownscroll ? -1 : 1);
   }
@@ -76,7 +76,7 @@ class LinearYMod extends LinearModifierBase
     }
     else
     {
-      var curPosToUse:Float = (useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+      final curPosToUse:Float = (useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
       strumResult[data.direction] = daMath(curPosToUse) * (Preferences.downscroll && flipForDownscroll ? -1 : 1);
       data.y += strumResult[data.direction];
     }
@@ -173,7 +173,7 @@ class LinearScaleMod extends LinearModifierBase
 {
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    var daResult:Float = daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos) * 0.01;
+    final daResult:Float = daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos) * 0.01;
     data.scaleX += daResult;
     data.scaleY += daResult;
     data.scaleZ += daResult;
@@ -310,7 +310,7 @@ class ScaleLinearLegacyMod extends Modifier
     if (isArrowPath || currentValue == 0) return;
     var curPos2:Float = data.curPos_unscaled;
     curPos2 *= Preferences.downscroll ? -1 : 1;
-    var p:Float = curPos2 * -1;
+    final p:Float = curPos2 * -1;
     data.scaleX = FlxMath.lerp(data.scaleX, currentValue, p / 1000 * 2);
     data.scaleY = FlxMath.lerp(data.scaleY, currentValue, p / 1000 * 2);
     data.scaleZ = FlxMath.lerp(data.scaleZ, currentValue, p / 1000 * 2);
