@@ -29,7 +29,7 @@ import funkin.play.notes.NoteHoldCover;
 import funkin.play.notes.NoteSplash;
 import funkin.play.notes.NoteSprite;
 import funkin.play.notes.SustainTrail;
-import funkin.play.notes.SustainTrailMod;
+import funkin.play.notes.SustainTrailWITF;
 import funkin.play.notes.NoteVibrationsHandler;
 import funkin.util.GRhythmUtil;
 import funkin.play.notes.notekind.NoteKind;
@@ -151,7 +151,7 @@ class Strumline extends FlxSpriteGroup
       {
         if (note != null && note.alive && useModSustains)
         {
-          var sussyMod:SustainTrailMod = cast(note, SustainTrailMod);
+          var sussyMod:SustainTrailWITF = cast(note, SustainTrailWITF);
           sussyMod.cullMode = sussyMod.whichStrumNote?.strumExtraModData?.cullModeSustain ?? "none";
         }
       }
@@ -159,7 +159,7 @@ class Strumline extends FlxSpriteGroup
       {
         if (note != null && note.alive && useModSustains)
         {
-          var sussyMod:SustainTrailMod = cast(note, SustainTrailMod);
+          var sussyMod:SustainTrailWITF = cast(note, SustainTrailWITF);
           sussyMod.cullMode = sussyMod.whichStrumNote?.strumExtraModData?.cullModeSustain ?? "none";
         }
       }
@@ -1227,7 +1227,7 @@ class Strumline extends FlxSpriteGroup
       var drawDistanceBack:Float = 1;
       if (mods != null && useModSustains)
       {
-        var sussyMod:SustainTrailMod = cast(holdNote, SustainTrailMod);
+        var sussyMod:SustainTrailWITF = cast(holdNote, SustainTrailWITF);
         drawDistanceBack = 1.0 + (sussyMod?.whichStrumNote?.strumExtraModData?.drawdistanceBack ?? 0.0);
       }
 
@@ -1750,7 +1750,7 @@ class Strumline extends FlxSpriteGroup
     var spiralHolds:Bool = false;
     if (mods != null && cover.holdNote != null && useModSustains)
     {
-      var sussyMod:SustainTrailMod = cast(cover.holdNote, SustainTrailMod);
+      var sussyMod:SustainTrailWITF = cast(cover.holdNote, SustainTrailWITF);
 
       spiralHolds = sussyMod.spiralHolds;
     }
@@ -1777,7 +1777,7 @@ class Strumline extends FlxSpriteGroup
 
         if (mods != null && useModSustains)
         {
-          var sussyMod:SustainTrailMod = cast(daHold, SustainTrailMod);
+          var sussyMod:SustainTrailWITF = cast(daHold, SustainTrailWITF);
 
           holdX = sussyMod.rootData.rootX;
           holdY = sussyMod.rootData.rootY;
@@ -1971,7 +1971,7 @@ class Strumline extends FlxSpriteGroup
       {
         if (holdNote != null && noteStyle.shouldHoldNoteCoverCopyHSV())
         {
-          var sussyMod:SustainTrailMod = cast(holdNote, SustainTrailMod);
+          var sussyMod:SustainTrailWITF = cast(holdNote, SustainTrailWITF);
           cover.setHSV(sussyMod.hsvShader.hue, sussyMod.hsvShader.saturation, sussyMod.hsvShader.value);
         }
         noteCoverSetPos(cover);
@@ -2076,7 +2076,7 @@ class Strumline extends FlxSpriteGroup
         holdNoteSprite.x = ModConstants.holdNoteJankX;
         holdNoteSprite.y = ModConstants.holdNoteJankY;
 
-        var sussyMod:SustainTrailMod = cast(holdNoteSprite, SustainTrailMod);
+        var sussyMod:SustainTrailWITF = cast(holdNoteSprite, SustainTrailWITF);
         sussyMod.whichStrumNote = getByIndex(sussyMod.noteDirection);
         sussyMod.cullMode = sussyMod.whichStrumNote?.strumExtraModData?.cullModeSustain ?? "none";
         sussyMod.clearNoteMods();
@@ -2253,7 +2253,7 @@ class Strumline extends FlxSpriteGroup
 
       if (mods != null && useModSustains)
       {
-        result = new SustainTrailMod(0, 0, noteStyle, false);
+        result = new SustainTrailWITF(0, 0, noteStyle, false);
       }
       else
       {
@@ -2535,10 +2535,10 @@ class Strumline extends FlxSpriteGroup
     }
   }
 
-  // A group containing hold pieces that can be recycled for use in the sustainTrailMod renderer.
-  public var holdPieces:FlxTypedSpriteGroup<SustainTrailModPiece>;
+  // A group containing hold pieces that can be recycled for use in the SustainTrailWITF renderer.
+  public var holdPieces:FlxTypedSpriteGroup<SustainTrailWITFPiece>;
 
-  public var holdPiecesVwoosh:FlxTypedSpriteGroup<SustainTrailModPiece>;
+  public var holdPiecesVwoosh:FlxTypedSpriteGroup<SustainTrailWITFPiece>;
 
   var initPieceCount:Int = 25; // Start with THIS many pieces. More pieces will be created as needed.
 
@@ -2546,7 +2546,7 @@ class Strumline extends FlxSpriteGroup
   {
     for (i in 0...initPieceCount)
     {
-      var result:SustainTrailModPiece = new SustainTrailModPiece(0, 0, noteStyle);
+      var result:SustainTrailWITFPiece = new SustainTrailWITFPiece(0, 0, noteStyle);
       this.holdPieces.add(result);
       result.weBelongTo = this;
     }
@@ -2556,9 +2556,9 @@ class Strumline extends FlxSpriteGroup
    * Custom recycling behavior for hold pieces.
    * @return the revived piece to return.
    */
-  public function constructHoldPiece():SustainTrailModPiece
+  public function constructHoldPiece():SustainTrailWITFPiece
   {
-    var result:SustainTrailModPiece = null;
+    var result:SustainTrailWITFPiece = null;
     result = this.holdPieces.getFirstAvailable();
     if (result != null)
     {
@@ -2566,7 +2566,7 @@ class Strumline extends FlxSpriteGroup
     }
     else
     {
-      result = new SustainTrailModPiece(0, 0, noteStyle);
+      result = new SustainTrailWITFPiece(0, 0, noteStyle);
       this.holdPieces.add(result);
       result.weBelongTo = this;
 

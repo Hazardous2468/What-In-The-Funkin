@@ -49,7 +49,9 @@ import openfl.geom.Vector3D;
  *
  * TODO:
  * Update all grain values for modcharts!
+ * Fix / Check alpha values (holds don't disappear but notes do, see Matoi)
  * Upscroll support!
+ * Fix massive lag spikes when generating new pieces! (maybe modify the suslength to only cover the render distance or something?)
  * Fix for drive modifiers
  * Fix UV flickering when clipping during recalcs
  * Vibrate Effect (make sure there are no visible gaps!),
@@ -58,10 +60,11 @@ import openfl.geom.Vector3D;
  * holdCover support (hold covers positioning doesn't work with these new holds as of now),
  * playfield skew mods (inaccurate positions),
  * performance checks (compare performance to old holds to see if it's even worth replacing with this new system),
+ * Memory leak?
  *
  * **@author Hazard24**
  */
-class SustainTrailMod extends SustainTrail // Extend from SustainTrail for all the sustainTrail logic.
+class SustainTrailWITF extends SustainTrail // Extend from SustainTrail for all the sustainTrail logic.
 {
   // A variable containing information relating to the root / base of this sustain.
   // May be changed in future to instead use this sprites variables instead.
@@ -97,9 +100,9 @@ class SustainTrailMod extends SustainTrail // Extend from SustainTrail for all t
   public var cullMode = TriangleCulling.NONE;
 
   // An array of all the pieces. This array is used to sort the draw order of each piece.
-  var susPieces:Array<SustainTrailModPiece> = [];
+  var susPieces:Array<SustainTrailWITFPiece> = [];
 
-  public function getPieces():Array<SustainTrailModPiece>
+  public function getPieces():Array<SustainTrailWITFPiece>
   {
     return susPieces;
   }
@@ -158,14 +161,14 @@ class SustainTrailMod extends SustainTrail // Extend from SustainTrail for all t
   }
 
   // Check this piece to see if it's graphic needs to be updated.
-  function checkAndUpdatePieceGraphic(piece:SustainTrailModPiece):Void
+  function checkAndUpdatePieceGraphic(piece:SustainTrailWITFPiece):Void
   {
     if (piece.noteStyleWITF != this.noteStyleWITF) piece.setupHoldNoteGraphic(noteStyleWITF);
     if (piece.usingSparrow) piece.animation.play(piece.isEnd ? "cap" : "piece");
   }
 
   // Adds a piece to the array
-  function addPiece():SustainTrailModPiece
+  function addPiece():SustainTrailWITFPiece
   {
     var daPiece = parentStrumline.constructHoldPiece();
     susPieces.push(daPiece);
@@ -272,23 +275,7 @@ class SustainTrailMod extends SustainTrail // Extend from SustainTrail for all t
       if (daPiece.topNoteModData?.clipped ?? 0 > 0)
       {
         daPiece.visible = false;
-        trace('piece ' + daPiece.pieceID + ' fully clipped');
-        /*
-          if (daPiece.isRoot)
-          {
-            // If we are the root, then we need to define a new root piece before we get killed. Do this by getting the next piece in the sorted array
-            if (daPiece.pieceID < susPieces_sorted1.length - 1)
-            {
-              susPieces_sorted1[daPiece.pieceID + 1].isRoot = true;
-              daPiece.isRoot = false;
-            }
-          }
-
-          // this.howManyPieces -= 1;
-          // susPieces_sorted1.remove(daPiece);
-          susPieces.remove(daPiece);
-          daPiece.kill();
-         */
+        // trace('piece ' + daPiece.pieceID + ' fully clipped');
       }
     }
   }
@@ -331,7 +318,7 @@ class SustainTrailMod extends SustainTrail // Extend from SustainTrail for all t
 
   // A copy of the susPieces array, but sorted by the piece index. This is to ensure when updating the clipping, we start from bottom to top.
   // Done as the original array will be sorted by z
-  var susPieces_sorted1:Array<SustainTrailModPiece> = [];
+  var susPieces_sorted1:Array<SustainTrailWITFPiece> = [];
 
   var susPiecesData:Array<NoteData> = [];
 
@@ -443,7 +430,7 @@ class SustainTrailMod extends SustainTrail // Extend from SustainTrail for all t
       var pieceLength:Float = sussy * longBoi / (howManyPieces - 1);
       var curPieceTime:Float = baseTime + (pieceLength * i);
 
-      var daPiece:SustainTrailModPiece;
+      var daPiece:SustainTrailWITFPiece;
       if (needsRecalc)
       {
         daPiece = addPiece();
@@ -789,7 +776,7 @@ class SustainTrailRootPieceData
  * 3: top right     (using topModData)
  *
  */
-class SustainTrailModPiece extends SustainTrail // Extend from SustainTrail for all the sustainTrail render logic. (tbf, could probably just make this it's own class later on)
+class SustainTrailWITFPiece extends SustainTrail // Extend from SustainTrail for all the sustainTrail render logic. (tbf, could probably just make this it's own class later on)
 {
   // The modData, defines the position and information about this piece. Is centered on the strum!
   public var bottomNoteModData:NoteData;
@@ -810,9 +797,9 @@ class SustainTrailModPiece extends SustainTrail // Extend from SustainTrail for 
 
   // Will render with the endcap texture instead of the regular texture.
   public var isEnd:Bool = true;
-  public var previousPiece(default, set):SustainTrailModPiece = null;
+  public var previousPiece(default, set):SustainTrailWITFPiece = null;
 
-  function set_previousPiece(pp:SustainTrailModPiece):SustainTrailModPiece
+  function set_previousPiece(pp:SustainTrailWITFPiece):SustainTrailWITFPiece
   {
     if (previousPiece == pp) return pp;
     this.previousPiece = pp;
@@ -830,7 +817,7 @@ class SustainTrailModPiece extends SustainTrail // Extend from SustainTrail for 
     return this.previousPiece;
   }
 
-  public var parent:SustainTrailMod;
+  public var parent:SustainTrailWITF;
 
   // The pivot which this piece will rotate around when this.angle is changed.
   public var anglePivot:Vector2;
