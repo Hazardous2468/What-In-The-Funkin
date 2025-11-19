@@ -40,8 +40,12 @@ class RotateModBase extends Modifier
     }
     else if (data.noteType == "hold" || data.noteType == "path")
     {
-      r += strumLine.mods.getHoldOffsetX(data.noteType == "path");
+      r += (Strumline.STRUMLINE_SIZE / 2.0);
+      r += data.whichStrumNote.weBelongTo.getNoteXOffset();
       r -= data.whichStrumNote.strumExtraModData.noteStyleOffsetX;
+      r += Strumline.NUDGE * 2; // dunno why multiplying by 2 here works but alright. Might need to fact check this later.
+      // r += strumLine.mods.getHoldOffsetX(data.noteType == "path");
+      // r -= data.whichStrumNote.strumExtraModData.noteStyleOffsetX;
     }
     else
     {

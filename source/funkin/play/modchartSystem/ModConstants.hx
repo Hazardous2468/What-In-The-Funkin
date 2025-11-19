@@ -1115,6 +1115,8 @@ class ModConstants
         newMod = new Old3DHoldsMod(tag);
       case "holdtype":
         newMod = new HoldTypeMod(tag);
+      case "longholdstype":
+        newMod = new LongHoldsTypeMod(tag);
       case "longholds":
         newMod = new LongHoldsMod(tag);
       case "straightholds":

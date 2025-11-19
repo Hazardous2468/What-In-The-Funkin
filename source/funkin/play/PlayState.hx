@@ -758,10 +758,10 @@ class PlayState extends MusicBeatSubState
     {
       return a.coverBehindStrums ? zSortMod_CoverBehindOffset : zSortMod_CoverOffset;
     }
-    else if (Std.isOfType(a, SustainTrailWITF))
+    else if (Std.isOfType(a, SustainTrailWITFPiece))
     {
-      var pcheck:SustainTrailWITF = cast(a, SustainTrailWITF);
-      return pcheck.isArrowPath ? zSortMod_PathOffset : zSortMod_SustainOffset;
+      var pcheck:SustainTrailWITFPiece = cast(a, SustainTrailWITFPiece);
+      return pcheck.parent?.isArrowPath ?? false ? zSortMod_PathOffset : zSortMod_SustainOffset;
     }
     else if (Std.isOfType(a, StrumlineNote))
     {
@@ -770,6 +770,11 @@ class PlayState extends MusicBeatSubState
     else if (Std.isOfType(a, NoteSplash))
     {
       return zSortMod_SplashOffset;
+    }
+    else if (Std.isOfType(a, SustainTrailWITF))
+    {
+      var pcheck:SustainTrailWITF = cast(a, SustainTrailWITF);
+      return pcheck.isArrowPath ? zSortMod_PathOffset : zSortMod_SustainOffset;
     }
     else if (Std.isOfType(a, SustainTrail))
     {

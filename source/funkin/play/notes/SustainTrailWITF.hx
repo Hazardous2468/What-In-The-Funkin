@@ -33,34 +33,35 @@ import openfl.geom.Vector3D;
  * Keep in mind this was developed as downscroll so any comments like "the bottom of the hold" would be the top for upscroll
  *
  * Pros:
- * pieces can be zsorted, allowing holds to go in front and behind each other at the same time.
- * Much cleaner code.
+ * Pieces can be zsorted, allowing holds to go in front and behind each other at the same time.
+ * Cleaner code.
  * Holds can now have their piece visiblity adjusted, no more rendering the entire hold or not at all.
  * More accurate stealth mods: now samples the same data regular notes do, meaning multiple hidden / sudden mods (and custom mods which change stealth) are now supported.
  * Also applies to alpha and color transforms.
  * No more memory leaks with really long, detailed holds.
  * Less intrusive on SustainTrail.hx
  *
- * Though the cons of this system are
+ * Cons:
  * More unstable at the moment.
- * Possibily much more intensive (way more draw calls could lead to worse performance?)
+ * Much more intensive (way more draw calls could lead to worse performance?)
  * No backwards compatibility planned (e.g old3D holds)
  *
  *
  * TODO:
- * Update all grain values for modcharts!
+ * Proper piece culling (cull if outside render distance, fix for cam zoom, cull of z too extreme, etc)
  * Fix / Check alpha values (holds don't disappear but notes do, see Matoi)
+ * Update arrowpath widths for every modchart
  * Upscroll support!
- * Fix massive lag spikes when generating new pieces! (maybe modify the suslength to only cover the render distance or something?)
+ * Fix longHoldsType not working properly (see Final-Hope)
  * Fix for drive modifiers
- * Fix UV flickering when clipping during recalcs
  * Vibrate Effect (make sure there are no visible gaps!),
- * forwardHolds (improve consistency and maybe math?),
- * spiral holds visual issues at the strum when being clipped (probs use same fix for old sustain logic (tiny time offset))
  * holdCover support (hold covers positioning doesn't work with these new holds as of now),
  * playfield skew mods (inaccurate positions),
- * performance checks (compare performance to old holds to see if it's even worth replacing with this new system),
- * Memory leak?
+ * Optimise! - Memory leaks, massive performance drops, and massive lag spikes when generating new pieces!
+ * Performance checks (compare performance to old holds to see if it's even worth replacing with this new system),
+ * Subdivide hold end cap?
+ * ZSort modifier fixes
+ * forwardHolds (improve consistency and maybe math?),
  *
  * **@author Hazard24**
  */
@@ -87,6 +88,9 @@ class SustainTrailWITF extends SustainTrail // Extend from SustainTrail for all 
 
   // A modifier that stretches this hold to make it visually look longer then what it actually is.
   public var longHolds:Float = 0;
+
+  // If set to true, changes longHold behaviour to old WITF behaviour (holds shrink only when being hit)
+  public var longHoldType:Bool = false;
 
   // A modifier that, when enabled, will rotate the pieces to face the direction of travel.
   public var spiralHolds:Bool = false;
@@ -115,11 +119,11 @@ class SustainTrailWITF extends SustainTrail // Extend from SustainTrail for all 
    */
   public function new(noteDirection:NoteDirection, sustainLength:Float, noteStyle:NoteStyle, isArrowPath:Bool)
   {
+    this.isArrowPath = isArrowPath;
     super(noteDirection, sustainLength, noteStyle);
     this.howManyPieces = 0;
     this.active = true;
     this.shader = hsvShader;
-    this.isArrowPath = isArrowPath;
   }
 
   /**
@@ -134,6 +138,15 @@ class SustainTrailWITF extends SustainTrail // Extend from SustainTrail for all 
    */
   public var sharedAnimFrames:Bool = false;
 
+  override public function loadGraphic(graphic, animated = false, frameWidth = 0, frameHeight = 0, unique = false, ?key:String):FlxSprite
+  {
+    if (isArrowPath)
+    {
+      graphic = Paths.image(parentStrumline?.arrowPathFileName ?? 'NOTE_ArrowPath');
+    }
+    return super.loadGraphic(graphic, animated, frameWidth, frameHeight, unique, key);
+  }
+
   override public function setupHoldNoteGraphic(noteStyle:NoteStyle):Void
   {
     usingSparrow = false;
@@ -145,11 +158,12 @@ class SustainTrailWITF extends SustainTrail // Extend from SustainTrail for all 
       sharedAnimFrames = true;
     }
     super.setupHoldNoteGraphic(noteStyle);
-    if (usingSparrow && sharedAnimFrames)
+    if (usingSparrow && (sharedAnimFrames || isArrowPath))
     {
+      var sparrowPath:String = "hold_debug_noteskin/animated_hold_test";
       // Here would be the setup for your animation frames IF you're using sharedAnimFrames!
       // this.frames = Paths.getSparrowAtlas(noteStyle.getHoldNoteAssetPath());
-      this.frames = Paths.getSparrowAtlas("hold_debug_noteskin/animated_hold_test");
+      this.frames = Paths.getSparrowAtlas(sparrowPath);
       this.animation.addByPrefix('idle', 'piece', 24, true);
       this.animation.play("idle");
       this.updateAnimation(0);
@@ -170,7 +184,7 @@ class SustainTrailWITF extends SustainTrail // Extend from SustainTrail for all 
   // Adds a piece to the array
   function addPiece():SustainTrailWITFPiece
   {
-    var daPiece = parentStrumline.constructHoldPiece();
+    var daPiece = parentStrumline.constructHoldPiece(isArrowPath);
     susPieces.push(daPiece);
     return daPiece;
   }
@@ -204,34 +218,44 @@ class SustainTrailWITF extends SustainTrail // Extend from SustainTrail for all 
   var howManyPieces:Int;
 
   /**
-    * Long hold observations:
-    * The long holds modifier in NotITG makes the hold length look longer visually.
-    * However as it approaches the receptors, it shrinks.
-    * At the receptor, it is normal length.
-    * Past the receptor at around -fullSustainLength, the hold shrinks to be 0 length.
-
-   */
-  /**
-   * some magical shit, idk yet
-   * @return Float
+   * A function that returns a multiplier to alter the length of the hold, based on the longHolds and longHoldType variables.
+   * @return A multiplier used on the length of this hold.
    */
   function longHoldMath():Float
   {
     var a:Float = 1;
     if (!isArrowPath && longHolds != 0)
     {
-      var curPos:Float = this.strumTime - getSongPos();
-      curPos *= longHolds;
-
-      // at curpos = -fullSustainLength, return 0
-      // at curpos = 0, normal length, return 1
-      // at curpos = fullSustainLength, return 2
-
-      a = FlxMath.remapToRange(curPos, -fullSustainLength, fullSustainLength, 1, 2);
-      if (longHolds > 0)
+      if (longHoldType) // old WITF styled
       {
+        a = longHolds;
+        final curPos:Float = getSongPos() - this.strumTime;
+        var p:Float = curPos / fullSustainLength;
+        p = FlxMath.bound(p, 0, 1);
+        p = 1 - p;
+        trace("-----");
+        trace(p);
+        trace(a);
+
+        a *= p;
+        a += 1;
+
+        trace(a);
+
         // If positive, prevent negative numbers. Only for if we are positive though cuz the jank caused by negative long holds is funny
-        if (a < 0) a = 0;
+        // if (a < 0) a = 0;
+      }
+      else // NotITG styled
+      {
+        var curPos:Float = this.strumTime - getSongPos();
+        curPos *= longHolds;
+
+        a = FlxMath.remapToRange(curPos, -fullSustainLength, fullSustainLength, 1, 2);
+        if (longHolds > 0)
+        {
+          // If positive, prevent negative numbers. Only for if we are positive though cuz the jank caused by negative long holds is funny
+          if (a < 0) a = 0;
+        }
       }
     }
     return a;
@@ -263,6 +287,7 @@ class SustainTrailWITF extends SustainTrail // Extend from SustainTrail for all 
   // This function checks for any pieces that are fully clipped and then kills them, ready to be recycled elsewhere.
   override public function updateClipping(songTime:Float = 0):Void
   {
+    if (isArrowPath) return;
     if (!clipFromBottom) return;
     for (daPiece in susPieces)
     {
@@ -399,6 +424,7 @@ class SustainTrailWITF extends SustainTrail // Extend from SustainTrail for all 
     this.straightHolds = noteModData.straightHolds;
     this.longHolds = noteModData.longHolds;
     this.grain = noteModData.holdGrain;
+    this.longHoldType = noteModData.longHoldType;
 
     rootData.rootX = noteModData.x;
     rootData.rootY = noteModData.y;
@@ -547,18 +573,19 @@ class SustainTrailWITF extends SustainTrail // Extend from SustainTrail for all 
     }
   }
 
+  // If set to true, will automatically update all the pieces every update(). Otherwise the function must be called externally.
+  public var autoUpdate:Bool = false;
+
   override function update(elapsed):Void
   {
     super.update(elapsed);
-    updatePieces();
+    if (autoUpdate) updatePieces();
   }
 
   override public function draw():Void
   {
     return; // Do nothing. as the drawing logic is handled elsewhere. We only exist to manage all the data between each piece.
   }
-
-  final tinyOffsetForSpiral:Float = 0.01; // in ms
 
   /**
    * A function that will clamp the provided strumTime based on the current status of this hold
@@ -633,6 +660,7 @@ class SustainTrailWITF extends SustainTrail // Extend from SustainTrail for all 
     pieceModData.direction = noteDirection % Strumline.KEY_COUNT;
     pieceModData.whichStrumNote = whichStrumNote;
     pieceModData.noteType = isArrowPath ? "path" : "hold";
+    pieceModData.noteWidth = this.usingSparrow ? this.frameWidth : graphicWidth;
 
     var notePos:Float = parentStrumline.calculateNoteYPos(pieceModData.strumTime);
     pieceModData.curPos_unscaled = notePos;
@@ -866,7 +894,8 @@ class SustainTrailWITFPiece extends SustainTrail // Extend from SustainTrail for
     final curData = bottomSide ? bottomNoteModData : topNoteModData;
     leftSide = !leftSide; // flip fix lol
 
-    final holdWidth = this.usingSparrow ? this.frameWidth : graphicWidth;
+    // final holdWidth = this.usingSparrow ? this.frameWidth : graphicWidth;
+    final holdWidth = curData.noteWidth;
 
     vec3.setTo(curData.x, curData.y, curData.z);
 
@@ -1060,10 +1089,28 @@ class SustainTrailWITFPiece extends SustainTrail // Extend from SustainTrail for
     this.x = ModConstants.holdNoteJankX;
     this.y = ModConstants.holdNoteJankY;
     this.angle = angleMemory;
-    this.alpha = parentStrumline.alpha;
 
     updateUV();
     updateShaderStuff();
+
+    /*
+      if (parent.isArrowPath)
+      {
+        trace("\n-------------------");
+        trace("id: " + pieceID);
+        trace("lane: " + bottomNoteModData.direction);
+        trace("alpha: " + this.alpha);
+        trace("parentAlpha: " + parent.alpha);
+        trace("bottomX: " + bottomNoteModData.x);
+        trace("bottomY: " + bottomNoteModData.y);
+
+        trace("");
+        trace("indices: " + this.indices);
+        trace("uvtData: " + this.uvtData);
+        trace("verts: " + this.vertices);
+        trace("");
+      }
+     */
   }
 
   override function triggerRedraw():Void
@@ -1105,7 +1152,7 @@ class SustainTrailWITFPiece extends SustainTrail // Extend from SustainTrail for
 
     final endCapNudge:Float = (isEnd ? (1 / 8) : 0);
 
-    if (this.usingSparrow && false)
+    if (this.usingSparrow)
     {
       if (parent?.sharedAnimFrames ?? false)
       {
@@ -1139,9 +1186,13 @@ class SustainTrailWITFPiece extends SustainTrail // Extend from SustainTrail for
     }
     else
     {
-      // clipping magic
-      var p:Float = bottomNoteModData.clipped / this.fullSustainLength;
-      // p = 1 - p;
+      // percentage of hold completed.
+      var p:Float = 0;
+      if (parent.hitNote && !parent.missedNote)
+      {
+        p = (parent.getSongPos() - this.strumTime) / this.fullSustainLength;
+        p = FlxMath.bound(p, 0, 1);
+      }
 
       // Bottom Left
       uv[0 * 2] = endCapNudge + 1 / 4 * (noteDirection % 4); // 0%/25%/50%/75% of the way through the image

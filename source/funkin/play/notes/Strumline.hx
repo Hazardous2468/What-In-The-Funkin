@@ -166,7 +166,7 @@ class Strumline extends FlxSpriteGroup
     }
   }
 
-  public var arrowPaths:FlxTypedSpriteGroup<SustainTrail>;
+  public var arrowPaths:FlxTypedSpriteGroup<SustainTrailWITF>;
 
   var notitgPaths:Array<HazardArrowpath> = [];
   var notitgPathSprite:ZSprite;
@@ -339,9 +339,13 @@ class Strumline extends FlxSpriteGroup
 
   function arrowPathSetup():Void
   {
-    this.arrowPaths = new FlxTypedSpriteGroup<SustainTrail>();
-    this.arrowPaths.zIndex = 6;
-    this.add(this.arrowPaths);
+    arrowPaths = new FlxTypedSpriteGroup<SustainTrailWITF>();
+    arrowPaths.zIndex = 6;
+    this.add(arrowPaths);
+
+    pathPieces = new FlxTypedSpriteGroup<SustainTrailWITFPiece>();
+    pathPieces.zIndex = 6;
+    this.add(pathPieces);
 
     notitgPathSprite = new ZSprite();
     notitgPathSprite.x = 0;
@@ -560,9 +564,6 @@ class Strumline extends FlxSpriteGroup
     return KEY_COUNT * Strumline.NOTE_SPACING * noteSpacingScale * strumlineScale.x;
   }
 
-  // This can be changed to make the arrowpath segment into smaller chunks, making it less likely to memory leak when really long and detailed
-  public var pathPieces:Int = 3;
-
   public override function update(elapsed:Float):Void
   {
     super.update(elapsed);
@@ -577,53 +578,39 @@ class Strumline extends FlxSpriteGroup
         notitgPathSprite.loadGraphic(notitgPath.bitmap);
 
         // clear the old
-        arrowPaths.forEach(function(note:SustainTrail) {
+        arrowPaths.forEach(function(note:SustainTrailWITF) {
           arrowPaths.remove(note);
           note.destroy();
         });
-        /*
-            for (i in 0...KEY_COUNT)
-            {
-              var prev:SustainTrail = null;
-              for (p in 0...pathPieces)
-              {
-                var holdNoteSprite:SustainTrail = new SustainTrail(0, 0, noteStyle, true, this);
-                // holdNoteSprite.makeGraphic(10, 20, FlxColor.WHITE);
-                this.arrowPaths.add(holdNoteSprite);
-                holdNoteSprite.weBelongTo = this;
 
-                if (PlayState.instance.allStrumSprites != null && PlayState.instance.noteRenderMode)
-                {
-                  PlayState.instance.allStrumSprites.add(holdNoteSprite);
-                }
+        for (i in 0...KEY_COUNT)
+        {
+          final holdNoteSprite = new SustainTrailWITF(i, 0, noteStyle, true);
+          this.arrowPaths.add(holdNoteSprite);
+          holdNoteSprite.weBelongTo = this;
+          holdNoteSprite.parentStrumline = this;
 
-                if (prev != null)
-                {
-                  holdNoteSprite.previousPiece = prev;
-                }
-                holdNoteSprite.piece = p;
-                holdNoteSprite.renderEnd = (p == (pathPieces - 1));
-                holdNoteSprite.parentStrumline = this;
-                holdNoteSprite.noteData = null;
-                holdNoteSprite.strumTime = 0;
-                holdNoteSprite.noteDirection = i;
-
-                @:privateAccess
-                holdNoteSprite.tinyOffsetForSpiral = 0; // shouldn't need this cuz there shouldn't be any clipping
-
-                var whichStrumNote:StrumlineNote = getByIndex(i);
-                holdNoteSprite.alpha = whichStrumNote?.strumExtraModData?.arrowPathAlpha ?? 0;
-                holdNoteSprite.fullSustainLength = holdNoteSprite.sustainLength = whichStrumNote.strumExtraModData.arrowpathLength
-                  + whichStrumNote.strumExtraModData.arrowpathBackwardsLength;
-
-                holdNoteSprite.missedNote = false;
-                holdNoteSprite.hitNote = false;
-                holdNoteSprite.visible = true;
-                prev = holdNoteSprite;
-              }
+          if (PlayState.instance.allStrumSprites != null && PlayState.instance.noteRenderMode)
+          {
+            PlayState.instance.allStrumSprites.add(holdNoteSprite);
           }
-         */
+
+          final whichStrumNote:StrumlineNote = getByIndex(i);
+          final daLength = whichStrumNote.strumExtraModData.arrowpathLength + whichStrumNote.strumExtraModData.arrowpathBackwardsLength;
+
+          holdNoteSprite.noteData = new SongNoteData(0, i, daLength);
+          holdNoteSprite.strumTime = 0;
+          holdNoteSprite.noteDirection = i;
+          holdNoteSprite.whichStrumNote = whichStrumNote;
+          holdNoteSprite.alpha = whichStrumNote?.strumExtraModData?.arrowPathAlpha ?? 0;
+          holdNoteSprite.fullSustainLength = holdNoteSprite.sustainLength = daLength;
+          holdNoteSprite.missedNote = false;
+          holdNoteSprite.hitNote = false;
+          holdNoteSprite.visible = true;
+        }
+
         generatedArrowPaths = true;
+        trace("generated paths!");
       }
 
       mods.updateSpecialMods();
@@ -666,76 +653,57 @@ class Strumline extends FlxSpriteGroup
   var generatedArrowPaths:Bool = false;
 
   // if set to false, will skip arrowpath update logic
-  public var drawArrowPaths:Bool = true;
+  public var drawArrowPaths(default, set):Bool = true;
+
+  function set_drawArrowPaths(i:Bool):Bool
+  {
+    this.drawArrowPaths = i;
+    if (notitgPathSprite != null) notitgPathSprite.visible = i;
+    if (arrowPaths != null)
+    {
+      arrowPaths.forEach(function(note:SustainTrailWITF) {
+        note.visible = i;
+      });
+    }
+    return i;
+  }
 
   function updateArrowPaths():Void
   {
     if (!generatedArrowPaths) return;
     if (!drawArrowPaths) return;
 
-    /*
-      notitgPathSprite.visible = notitgStyledPath;
-      if (notitgStyledPath)
-      {
-        notitgPath.updateAFT();
+    notitgPathSprite.visible = notitgStyledPath;
+    if (notitgStyledPath)
+    {
+      notitgPath.updateAFT();
 
-        var isPixel:Bool = noteStyle.id.toLowerCase() == "pixel"; // dumb fucking fix lmfao
-        isPixel = false;
-        notitgPathSprite.x = isPixel ? -12 : 0; // temp fix lmao
+      var isPixel:Bool = noteStyle.id.toLowerCase() == "pixel"; // dumb fucking fix lmfao
+      isPixel = false;
+      notitgPathSprite.x = isPixel ? -12 : 0; // temp fix lmao
 
-        notitgPathSprite.y = 0;
+      notitgPathSprite.y = 0;
 
-        arrowPaths.forEach(function(note:SustainTrail) {
-          note.visible = false;
-        });
-        return;
-      }
-
-      var stitchEnds:Bool = true;
-
-      arrowPaths.forEach(function(note:SustainTrail) {
-        note.x = ModConstants.holdNoteJankX;
-        note.y = ModConstants.holdNoteJankY;
-
-        note.visible = drawArrowPaths;
-        // note.alpha = arrowPathAlpha[note.noteDirection];
-        var whichStrumNote:StrumlineNote = getByIndex(note.noteDirection);
-        note.alpha = whichStrumNote?.strumExtraModData?.arrowPathAlpha ?? 0;
-        // ay -= whichStrumNote.strumExtraModData.alphaHoldCoverMod;
-        var length:Float = (whichStrumNote.strumExtraModData.arrowpathLength + whichStrumNote.strumExtraModData.arrowpathBackwardsLength) / (pathPieces);
-        note.fullSustainLength = note.sustainLength = length;
-
-        note.strumTime = ModConstants.getSongPosition();
-        note.strumTime -= whichStrumNote?.strumExtraModData?.arrowpathBackwardsLength ?? 0;
-        note.strumTime += length * note.piece;
-        if (doUpdateClipsInDraw)
-        {
-          note.updateClipping();
-
-          // note.x += 112 / 2 * note.piece;
-
-          // UH OH, SCUFFED CODE ALERT
-          // We sow the end of the arrowpath to the start of the new piece. This is so that we don't have any gaps. Mainly occurs with spiral holds lol
-          // MY NAME IS EDWIN
-          if (note.previousPiece != null && stitchEnds)
-          {
-            // I made the mimic
-            var v_prev:Array<Float> = note.previousPiece.vertices_array;
-            var v:Array<Float> = note.vertices_array;
-
-            // it was difficult, to put the pieces together
-            v[3] = v_prev[v_prev.length - 1];
-            v[2] = v_prev[v_prev.length - 2];
-            v[1] = v_prev[v_prev.length - 3];
-            v[0] = v_prev[v_prev.length - 4];
-
-            // but unfortunately, something went so wrong.
-            @:privateAccess
-            note.setVerts(v);
-          }
-        }
+      arrowPaths.forEach(function(note:SustainTrailWITF) {
+        note.visible = false;
       });
-     */
+      return;
+    }
+
+    arrowPaths.forEach(function(note:SustainTrailWITF) {
+      note.x = ModConstants.holdNoteJankX;
+      note.y = ModConstants.holdNoteJankY;
+      final whichStrumNote:StrumlineNote = note.whichStrumNote ?? getByIndex(note.noteDirection);
+      var length:Float = (whichStrumNote.strumExtraModData.arrowpathLength + whichStrumNote.strumExtraModData.arrowpathBackwardsLength);
+      note.fullSustainLength = note.sustainLength = length;
+      note.visible = drawArrowPaths;
+      note.alpha = whichStrumNote?.strumExtraModData?.arrowPathAlpha ?? 0;
+      note.strumTime = ModConstants.getSongPosition();
+      note.strumTime -= whichStrumNote?.strumExtraModData?.arrowpathBackwardsLength ?? 0;
+
+      note.updatePieces();
+    });
+    // trace("updated paths");
   }
 
   function updatePerspective():Void
@@ -1227,8 +1195,9 @@ class Strumline extends FlxSpriteGroup
       var drawDistanceBack:Float = 1;
       if (mods != null && useModSustains)
       {
-        var sussyMod:SustainTrailWITF = cast(holdNote, SustainTrailWITF);
-        drawDistanceBack = 1.0 + (sussyMod?.whichStrumNote?.strumExtraModData?.drawdistanceBack ?? 0.0);
+        var sussyHold:SustainTrailWITF = cast(holdNote, SustainTrailWITF);
+        drawDistanceBack = 1.0 + (sussyHold?.whichStrumNote?.strumExtraModData?.drawdistanceBack ?? 0.0);
+        sussyHold.updatePieces();
       }
 
       var renderWindowEnd = holdNote.strumTime + holdNote.fullSustainLength + Constants.HIT_WINDOW_MS
@@ -1447,6 +1416,8 @@ class Strumline extends FlxSpriteGroup
 
     if (holdNotes.members.length > 1) holdNotes.members.insertionSort(compareHoldNoteSprites.bind(FlxSort.ASCENDING));
 
+    if (pathPieces.members.length > 1) pathPieces.members.insertionSort(compareHoldPieceSprites.bind(FlxSort.ASCENDING));
+
     if (holdPieces.members.length > 1) holdPieces.members.insertionSort(compareHoldPieceSprites.bind(FlxSort.ASCENDING));
 
     if (strumlineNotes.members.length > 1 && mods != null) strumlineNotes.members.insertionSort(compareStrums.bind(FlxSort.ASCENDING));
@@ -1499,6 +1470,12 @@ class Strumline extends FlxSpriteGroup
     {
       if (holdNote == null) continue;
       holdNote.kill();
+    }
+
+    for (path in arrowPaths.members)
+    {
+      path.clearPiecesArray();
+      @:privateAccess path.triggerRedrawRequest = true;
     }
 
     // Kill any left overs
@@ -2537,8 +2514,10 @@ class Strumline extends FlxSpriteGroup
 
   // A group containing hold pieces that can be recycled for use in the SustainTrailWITF renderer.
   public var holdPieces:FlxTypedSpriteGroup<SustainTrailWITFPiece>;
-
   public var holdPiecesVwoosh:FlxTypedSpriteGroup<SustainTrailWITFPiece>;
+
+  // A group containing path pieces that can be recycled. Different from holdPieces as this group needs to be on a separate layer.
+  public var pathPieces:FlxTypedSpriteGroup<SustainTrailWITFPiece>;
 
   var initPieceCount:Int = 25; // Start with THIS many pieces. More pieces will be created as needed.
 
@@ -2556,10 +2535,11 @@ class Strumline extends FlxSpriteGroup
    * Custom recycling behavior for hold pieces.
    * @return the revived piece to return.
    */
-  public function constructHoldPiece():SustainTrailWITFPiece
+  public function constructHoldPiece(isArrowPath:Bool = false):SustainTrailWITFPiece
   {
     var result:SustainTrailWITFPiece = null;
-    result = this.holdPieces.getFirstAvailable();
+    final grp = isArrowPath ? this.pathPieces : this.holdPieces;
+    result = grp.getFirstAvailable();
     if (result != null)
     {
       result.revive();
@@ -2567,7 +2547,7 @@ class Strumline extends FlxSpriteGroup
     else
     {
       result = new SustainTrailWITFPiece(0, 0, noteStyle);
-      this.holdPieces.add(result);
+      grp.add(result);
       result.weBelongTo = this;
 
       if (PlayState.instance != null)

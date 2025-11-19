@@ -137,11 +137,22 @@ class NoteData
   // Examples: "note", "hurt", "hold", "path", "receptor", "path hold", "my custom note", "roll"
   public var noteType:String = "note";
 
+  // The amount the strumTime has been clipped by. For holds being currently hit.
   public var clipped:Float = 0;
 
+  // For holds
   public var pieceID:Int = 0;
 
+  // Defines how wide this note graphic sprite is. Currently only used for holds
+  public var noteWidth:Float = 0;
+  // Defines how tall this note graphic sprite is. Currently unused
+  public var noteHeight:Float = 0;
+
+  // For holds
   public var previousData:NoteData;
+
+  // If true, uses WITF styled long holds. Else use NotITG styled long holds.
+  public var longHoldType:Bool = false;
 
   // Lower number = more detailed holds
   public var holdGrain:Float = 82;
@@ -275,6 +286,7 @@ class NoteData
     noteType = "note";
 
     clipped = 0;
+    longHoldType = false;
 
     x = 0;
     y = 0;
