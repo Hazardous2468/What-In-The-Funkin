@@ -158,7 +158,7 @@ class AttenuateScaleMod extends AttenuateModBase
 {
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    var daResult:Float = daMath(data) * 0.01;
+    final daResult:Float = daMath(data) * 0.01;
     data.scaleX += daResult;
     data.scaleY += daResult;
     data.scaleZ += daResult;

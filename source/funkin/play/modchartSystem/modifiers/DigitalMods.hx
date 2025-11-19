@@ -28,7 +28,7 @@ class DigitalModBase extends Modifier
   function digitalMath(curPos:Float):Float
   {
     curPos += offset.value;
-    var s:Float = steps.value / 2;
+    final s:Float = steps.value / 2;
 
     var funny:Float = sin(curPos * Math.PI * mult.value / 250) * s;
     // trace("1: " + funny);
@@ -183,7 +183,7 @@ class DigitalScaleMod extends DigitalModBase
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
-    var r:Float = digitalMath(data.curPos) * 0.01;
+    final r:Float = digitalMath(data.curPos) * 0.01;
     data.scaleX += r;
     data.scaleY += r;
     data.scaleZ += r;
@@ -298,7 +298,7 @@ class DigitalSpeedMod extends DigitalModBase
   override function speedMath(lane:Int, curPos:Float, strumLine, isHoldNote = false):Float
   {
     if (currentValue == 0) return 1; // skip math if mod is 0
-    var modWouldBe:Float = digitalMath(curPos);
+    final modWouldBe:Float = digitalMath(curPos);
     return (modWouldBe + 1);
   }
 }

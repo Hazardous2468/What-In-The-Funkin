@@ -603,7 +603,7 @@ class ModHandler
   }
 
   // if true, will do all the traces above ^
-  var traceDebug:Bool = false;
+  final traceDebug:Bool = false;
 
   public function getHoldOffsetX(arrowpath:Bool = false, graphicWidth:Float = 0):Float
   {
@@ -841,7 +841,7 @@ class ModHandler
     pos[0] += Strumline.INITIAL_OFFSET;
     pos[1] = strum.y;
 
-    var offsets:Array<Float> = strum.noteStyle.getStrumlineOffsets();
+    final offsets:Array<Float> = strum.noteStyle.getStrumlineOffsets();
     pos[0] += offsets[0];
     pos[1] += offsets[1];
 

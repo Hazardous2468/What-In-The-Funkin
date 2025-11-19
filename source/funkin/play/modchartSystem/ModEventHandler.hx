@@ -96,7 +96,7 @@ class ModEventHandler
   var lastReportedSongTime:Float = 0;
   var beatTime:Float = 0;
   var lastReportedBeatTime:Float = 0;
-  var backInTimeLeniency:Float = 150; // in Miliseconds. Done because V-Slice sometimes often tries to go backwards in time? (???)
+  final backInTimeLeniency:Float = 150; // in Miliseconds. Done because V-Slice sometimes often tries to go backwards in time? (???)
 
   public function update(elapsed:Float):Void
   {
@@ -274,12 +274,12 @@ class ModEventHandler
       }
       else
       {
-        var subModName:String = mod.subModAliasConvert(subModArr[1]);
-        var isPriority:Bool = subModName == "priority";
+        final subModName:String = mod.subModAliasConvert(subModArr[1]);
+        final isPriority:Bool = subModName == "priority";
         if (isPriority)
         {
-          var startPoint:Float = (type == "value" ? startingValue : mod.modPriority_additive);
-          var finishPoint:Float = startPoint + ((newValue - startPoint) * easeToUse(1.0));
+          final startPoint:Float = (type == "value" ? startingValue : mod.modPriority_additive);
+          final finishPoint:Float = startPoint + ((newValue - startPoint) * easeToUse(1.0));
           if (time == 0) // no tween required!
           {
             mod.modPriority_additive = finishPoint;
@@ -312,8 +312,8 @@ class ModEventHandler
             return null;
           }
 
-          var startPoint:Float = (type == "value" ? startingValue : subMod.value);
-          var finishPoint:Float = startPoint + ((newValue - startPoint) * easeToUse(1.0));
+          final startPoint:Float = (type == "value" ? startingValue : subMod.value);
+          final finishPoint:Float = startPoint + ((newValue - startPoint) * easeToUse(1.0));
           if (time == 0) // no tween required!
           {
             subMod.value = finishPoint;
@@ -338,8 +338,8 @@ class ModEventHandler
     final mod:Modifier = target.modifiers.get(_tag);
     if (mod != null)
     {
-      var startPoint:Float = (type == "value" ? startingValue : mod.currentValue);
-      var finishPoint:Float = startPoint + ((newValue - startPoint) * easeToUse(1.0));
+      final startPoint:Float = (type == "value" ? startingValue : mod.currentValue);
+      final finishPoint:Float = startPoint + ((newValue - startPoint) * easeToUse(1.0));
       var tween:FlxTween = tweenManager.num(startPoint, newValue, time,
         {
           ease: easeToUse,
@@ -404,7 +404,7 @@ class ModEventHandler
         {
           if (time == 0) // no tween required!
           {
-            var v:Float = addValue * easeToUse(1.0);
+            final v:Float = addValue * easeToUse(1.0);
             mod.modPriority_additive += v;
             return null;
           }
@@ -414,12 +414,12 @@ class ModEventHandler
               ease: FlxEase.linear,
               onComplete: function(twn:FlxTween) {
                 modchartTweens.remove(realTag);
-                var v:Float = addValue * easeToUse(1.0);
+                final v:Float = addValue * easeToUse(1.0);
                 mod.modPriority_additive += (v - lastReportedChange);
                 lastReportedChange = v;
               }
             }, function(t) {
-              var v:Float = addValue * easeToUse(t);
+              final v:Float = addValue * easeToUse(t);
               mod.modPriority_additive += (v - lastReportedChange);
               lastReportedChange = v;
             });
@@ -441,7 +441,7 @@ class ModEventHandler
 
           if (time == 0) // no tween required!
           {
-            var v:Float = addValue * easeToUse(1.0);
+            final v:Float = addValue * easeToUse(1.0);
             subMod.value += v;
             return null;
           }
@@ -451,12 +451,12 @@ class ModEventHandler
               ease: FlxEase.linear,
               onComplete: function(twn:FlxTween) {
                 modchartTweens.remove(realTag);
-                var v:Float = addValue * easeToUse(1.0);
+                final v:Float = addValue * easeToUse(1.0);
                 subMod.value += (v - lastReportedChange);
                 lastReportedChange = v;
               }
             }, function(t) {
-              var v:Float = addValue * easeToUse(t);
+              final v:Float = addValue * easeToUse(t);
               subMod.value += (v - lastReportedChange);
               lastReportedChange = v;
             });
@@ -466,12 +466,12 @@ class ModEventHandler
       }
     }
 
-    var mod:Modifier = target.modifiers.get(_tag);
+    final mod:Modifier = target.modifiers.get(_tag);
     if (mod != null)
     {
       if (time == 0)
       {
-        var v:Float = addValue * easeToUse(1.0);
+        final v:Float = addValue * easeToUse(1.0);
         mod.currentValue = mod.currentValue + (v);
         return null;
       }
@@ -483,12 +483,12 @@ class ModEventHandler
             ease: FlxEase.linear,
             onComplete: function(twn:FlxTween) {
               modchartTweens.remove(realTag);
-              var v:Float = addValue * easeToUse(1.0);
+              final v:Float = addValue * easeToUse(1.0);
               mod.currentValue = mod.currentValue + (v - lastReportedChange);
               lastReportedChange = v;
             }
           }, function(t) {
-            var v:Float = addValue * easeToUse(t); // ???, cuz for some silly reason tweenValue was being set incorrectly by the tween function / manager? I don't know lmfao
+            final v:Float = addValue * easeToUse(t); // ???, cuz for some silly reason tweenValue was being set incorrectly by the tween function / manager? I don't know lmfao
             mod.currentValue = mod.currentValue + (v - lastReportedChange);
             lastReportedChange = v;
           });

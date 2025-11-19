@@ -325,8 +325,7 @@ class TornadoSkewXMod extends TornadoModBase
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
-    final r:Float = tornadoMath(data.direction, data.curPos) * currentValue;
-    data.skewX += r;
+    data.skewX += tornadoMath(data.direction, data.curPos) * currentValue;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -361,8 +360,7 @@ class TornadoSkewYMod extends TornadoModBase
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
-    final r:Float = tornadoMath(data.direction, data.curPos) * currentValue;
-    data.skewY += r;
+    data.skewY += tornadoMath(data.direction, data.curPos) * currentValue;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void

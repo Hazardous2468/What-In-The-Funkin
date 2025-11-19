@@ -176,7 +176,7 @@ class CircScaleMod extends CircModBase
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
-    var r:Float = daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos) * -0.01;
+    final r:Float = daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos) * -0.01;
     data.scaleY += r;
     data.scaleX += r;
     data.scaleZ += r;
@@ -299,11 +299,9 @@ class CircSpeedMod extends Modifier
 
   override function speedMath(lane:Int, curPos:Float, strumLine, isHoldNote = false):Float
   {
-    var r:Float = 1;
     var curPos2:Float = curPos * (Preferences.downscroll ? -1 : 1);
     curPos2 += offset.value;
-    var result:Float = curPos2 * curPos2 * currentValue * -0.001;
-
-    return r + result;
+    final result:Float = curPos2 * curPos2 * currentValue * -0.001;
+    return 1 + result;
   }
 }

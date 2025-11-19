@@ -33,7 +33,7 @@ class HourGlassModBase extends Modifier
   {
     if (currentValue == 0) return 0.0; // skip math if mod is 0
 
-    var pos:Float = data.curPos_unscaled * (Preferences.downscroll ? -1 : 1);
+    final pos:Float = data.curPos_unscaled * (Preferences.downscroll ? -1 : 1);
     // var curPos2:Float = data.curPos_unscaled - (data.whichStrumNote?.noteModData?.curPos_unscaled ?? 0);
 
     // Copy of Sudden math
@@ -168,8 +168,7 @@ class HourGlassScaleX extends HourGlassModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    final c:Float = hourGlassMath(data);
-    data.scaleX += c * currentValue;
+    data.scaleX += hourGlassMath(data) * currentValue;
   }
 }
 
@@ -182,8 +181,7 @@ class HourGlassScaleY extends HourGlassModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    final c:Float = hourGlassMath(data);
-    data.scaleY += c * currentValue;
+    data.scaleY += hourGlassMath(data) * currentValue;
   }
 }
 
@@ -199,5 +197,6 @@ class HourGlassScale extends HourGlassModBase
     final c:Float = hourGlassMath(data);
     data.scaleX += c * currentValue;
     data.scaleY += c * currentValue;
+    data.scaleZ += c * currentValue;
   }
 }

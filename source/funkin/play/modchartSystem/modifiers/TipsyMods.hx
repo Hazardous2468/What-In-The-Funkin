@@ -150,8 +150,7 @@ class TipsySkewXMod extends TipsyModBase
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
-    final s:Float = tipsyMath(data.direction, data.curPos);
-    data.skewX += s;
+    data.skewX += tipsyMath(data.direction, data.curPos);
   }
 }
 
@@ -175,8 +174,7 @@ class TipsySkewYMod extends TipsyModBase
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
-    final s:Float = tipsyMath(data.direction, data.curPos);
-    data.skewY += s;
+    data.skewY += tipsyMath(data.direction, data.curPos);
   }
 }
 

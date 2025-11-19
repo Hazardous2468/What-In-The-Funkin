@@ -112,7 +112,7 @@ class HazardArrowpath
 
     for (l in 0...Strumline.KEY_COUNT)
     {
-      var whichStrumNote:StrumlineNote = strum.getByIndex(l % Strumline.KEY_COUNT);
+      final whichStrumNote:StrumlineNote = strum.getByIndex(l % Strumline.KEY_COUNT);
 
       // var arrowPathAlpha:Float = strum.arrowPathAlpha[l];
       var arrowPathAlpha:Float = whichStrumNote?.strumExtraModData?.arrowPathAlpha;
@@ -122,7 +122,7 @@ class HazardArrowpath
       var pathBackLength:Float = whichStrumNote?.strumExtraModData?.arrowpathBackwardsLength ?? 200;
       var holdGrain:Float = ModConstants.defaultPathGrain;
 
-      var fullLength:Float = pathLength + pathBackLength;
+      final fullLength:Float = pathLength + pathBackLength;
       var holdResolution:Int = 2; // Will get set after the first sample to get the path-specific modifiers (mainly grain)
 
       // https://github.com/4mbr0s3-2/Schmovin/blob/main/SchmovinRenderers.hx

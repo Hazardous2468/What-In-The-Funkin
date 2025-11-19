@@ -21,6 +21,7 @@ class OrientModBase extends Modifier
    * If true, forces holds to be affected by this modifier.
    * If false, holds won't be affected by this modifier.
    * If null, then only gets enabled for OrientY.
+   * Doesn't really do anything as holds don't use angleZ or angleX. Use SpiralHolds instead for that.
    */
   var affectHolds:Null<Bool> = false;
 
@@ -91,7 +92,7 @@ class OrientModBase extends Modifier
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
     if (currentValue == 0) return;
-    var orientAngleAmount:Float = (getOrientAngle(data) * currentValue);
+    final orientAngleAmount:Float = (getOrientAngle(data) * currentValue);
     switch (index % 3)
     {
       case 0:

@@ -21,8 +21,8 @@ class FlipMod extends Modifier
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
-    var nd = data.direction % Strumline.KEY_COUNT;
-    var newPos = FlxMath.remapToRange(nd, 0, Strumline.KEY_COUNT, Strumline.KEY_COUNT, -Strumline.KEY_COUNT);
+    final nd = data.direction % Strumline.KEY_COUNT;
+    final newPos = FlxMath.remapToRange(nd, 0, Strumline.KEY_COUNT, Strumline.KEY_COUNT, -Strumline.KEY_COUNT);
     data.x += ModConstants.strumSize * newPos * currentValue;
     data.x -= ModConstants.strumSize * currentValue;
   }
@@ -95,13 +95,12 @@ class BlackSphereInvertMod extends Modifier
     // current value is in degrees!
 
     var retu_val:Float = 1;
-    var speedAffectM:Float = speedaffect.value;
+    final speedAffectM:Float = speedaffect.value;
     var yValue:Float = FlxMath.fastSin(currentValue * Math.PI / 180);
 
     // multiply by the reverse amount for this movement
-    var whichStrummy = strumLine.getByIndex(lane);
-    // var reverseModAmount:Float = whichStrummy.strumExtraModData.reverseMod + whichStrummy.strumExtraModData.reverseModLane; // 0 to 1
-    var reverseModAmount:Float = whichStrummy.noteModData.getReverse();
+    final whichStrummy = strumLine.getByIndex(lane);
+    final reverseModAmount:Float = whichStrummy.noteModData.getReverse();
 
     var reverseMult:Float = FlxMath.remapToRange(reverseModAmount, 0, 1, 1, -1);
 
@@ -126,7 +125,7 @@ class BlackSphereInvertMod extends Modifier
     if (currentValue % 360 == 0) return; // skip math if mod is 0
     // current value is in degrees!
 
-    var lane:Int = data.direction;
+    final lane:Int = data.direction;
 
     var invertValue:Float = 0;
     var yValue:Float = 0;
@@ -175,7 +174,7 @@ class BlackSphereFlipMod extends Modifier
     // current value is in degrees!
 
     var retu_val:Float = 1;
-    var speedAffectM:Float = speedaffect.value;
+    final speedAffectM:Float = speedaffect.value;
     var yValue:Float = FlxMath.fastSin(currentValue * Math.PI / 180);
     if (variant.value >= 1.0)
     {
@@ -187,9 +186,8 @@ class BlackSphereFlipMod extends Modifier
     }
 
     // multiply by the reverse amount for this movement
-    var whichStrummy = strumLine.getByIndex(lane);
-    // var reverseModAmount:Float = whichStrummy.strumExtraModData.reverseMod + whichStrummy.strumExtraModData.reverseModLane; // 0 to 1
-    var reverseModAmount:Float = whichStrummy.noteModData.getReverse();
+    final whichStrummy = strumLine.getByIndex(lane);
+    final reverseModAmount:Float = whichStrummy.noteModData.getReverse();
     var reverseMult:Float = FlxMath.remapToRange(reverseModAmount, 0, 1, 1, -1);
 
     if (!Preferences.downscroll) yValue *= -1;
@@ -202,7 +200,7 @@ class BlackSphereFlipMod extends Modifier
   {
     if (currentValue % 360 == 0) return; // skip math if mod is 0
     // current value is in degrees!
-    var lane:Int = data.direction;
+    final lane:Int = data.direction;
     var invertValue:Float = 0;
     var yValue:Float = 0;
 
@@ -220,8 +218,8 @@ class BlackSphereFlipMod extends Modifier
       if (lane % 2 == 1) yValue *= -1;
     }
 
-    var nd = lane % 4;
-    var newPos = FlxMath.remapToRange(nd, 0, 4, 4, -4);
+    final nd = lane % 4;
+    final newPos = FlxMath.remapToRange(nd, 0, 4, 4, -4);
     data.x += ModConstants.strumSize * newPos * invertValue;
     data.x -= ModConstants.strumSize * invertValue;
 

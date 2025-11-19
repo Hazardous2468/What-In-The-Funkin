@@ -73,14 +73,14 @@ class BangarangMod extends Modifier
 
     var yOffset:Float = 0;
 
-    var speed = PlayState.instance?.currentChart?.scrollSpeed ?? 1.0;
+    final speed = PlayState.instance?.currentChart?.scrollSpeed ?? 1.0;
 
-    var curpos:Float = data.curPos;
+    final curpos:Float = data.curPos;
 
-    var fYOffset = -curpos / speed;
-    var fEffectHeight = FlxG.height;
-    var fScale = FlxMath.remapToRange(fYOffset, 0, fEffectHeight, 0, 1); // scale
-    var fNewYOffset = fYOffset * fScale;
+    final fYOffset = -curpos / speed;
+    final fEffectHeight = FlxG.height;
+    final fScale = FlxMath.remapToRange(fYOffset, 0, fEffectHeight, 0, 1); // scale
+    final fNewYOffset = fYOffset * fScale;
     var fBrakeYAdjust = currentValue * (fNewYOffset - fYOffset);
     fBrakeYAdjust = FlxMath.bound(fBrakeYAdjust, -400, 400); // clamp
 

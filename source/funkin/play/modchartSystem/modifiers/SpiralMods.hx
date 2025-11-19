@@ -134,6 +134,7 @@ class SpiralScaleMod extends SpiralModBase
     final modMathResult:Float = spiralMath((useUnscaledCurpos ? data.curPos_unscaled : data.curPos)) * 0.01;
     data.scaleX += modMathResult;
     data.scaleY += modMathResult;
+    data.scaleZ += modMathResult;
   }
 }
 

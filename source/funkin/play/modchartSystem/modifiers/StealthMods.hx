@@ -24,6 +24,11 @@ class UseOldStealthHoldsModifier extends Modifier
     strumsMod = false;
     pathMod = false;
   }
+  // override function strumMath(data:NoteData, strumLine:Strumline):Void
+  // {
+  //  final whichStrum:StrumlineNote = strumLine.getByIndex(data.direction);
+  //  whichStrum.strumExtraModData.useOldStealthGlowStyle = currentValue >= 0.5;
+  // }
 }
 
 class StealthGlowRedMod extends Modifier

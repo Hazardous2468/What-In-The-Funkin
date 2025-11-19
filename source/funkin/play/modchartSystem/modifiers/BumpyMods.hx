@@ -33,7 +33,7 @@ class BumpyModBase extends Modifier
   {
     if (currentValue == 0) return 0.0; // skip math if mod is 0
     curPos += getOffset();
-    var scrollSpeed = PlayState.instance?.currentChart?.scrollSpeed ?? 1.0;
+    final scrollSpeed = PlayState.instance?.currentChart?.scrollSpeed ?? 1.0;
     return currentValue * sin(curPos / (Strumline.STRUMLINE_SIZE / 3.0) / scrollSpeed * mult.value) * (Strumline.STRUMLINE_SIZE / 2.0);
   }
 
@@ -41,7 +41,7 @@ class BumpyModBase extends Modifier
   {
     if (currentValue == 0) return 0.0; // skip math if mod is 0
     curPos += getOffset();
-    var scrollSpeed = PlayState.instance?.currentChart?.scrollSpeed ?? 1.0;
+    final scrollSpeed = PlayState.instance?.currentChart?.scrollSpeed ?? 1.0;
     return currentValue * cos(curPos / (Strumline.STRUMLINE_SIZE / 3.0) / scrollSpeed * mult.value) * (Strumline.STRUMLINE_SIZE / 2.0);
   }
 
@@ -49,7 +49,7 @@ class BumpyModBase extends Modifier
   {
     if (currentValue == 0) return 0.0; // skip math if mod is 0
     curPos += getOffset();
-    var scrollSpeed = PlayState.instance?.currentChart?.scrollSpeed ?? 1.0;
+    final scrollSpeed = PlayState.instance?.currentChart?.scrollSpeed ?? 1.0;
     return currentValue * tan(curPos / (Strumline.STRUMLINE_SIZE / 3.0) / scrollSpeed * mult.value) * (Strumline.STRUMLINE_SIZE / 2.0);
   }
 }
@@ -358,10 +358,10 @@ class BumpySpeedMod extends BumpyModBase
   override function speedMath(lane:Int, curPos:Float, strumLine, isHoldNote = false):Float
   {
     if (currentValue == 0) return 1; // skip math if mod is 0
-    var bumpyx_Mult:Float = mult.value;
+    final bumpyx_Mult:Float = mult.value;
     curPos += getOffset();
-    var scrollSpeed = PlayState.instance?.currentChart?.scrollSpeed ?? 1.0;
-    var modWouldBe:Float = currentValue * 0.025 * sin(curPos / (Strumline.STRUMLINE_SIZE / 3.0) / scrollSpeed * bumpyx_Mult) * (Strumline.STRUMLINE_SIZE / 2.0);
+    final scrollSpeed = PlayState.instance?.currentChart?.scrollSpeed ?? 1.0;
+    final modWouldBe:Float = currentValue * 0.025 * sin(curPos / (Strumline.STRUMLINE_SIZE / 3.0) / scrollSpeed * bumpyx_Mult) * (Strumline.STRUMLINE_SIZE / 2.0);
     return (modWouldBe + 1);
   }
 }
@@ -454,7 +454,7 @@ class BumpyScaleMod extends BumpyModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    var daBumpyMath:Float = bumpyMath(data.curPos) * 0.01;
+    final daBumpyMath:Float = bumpyMath(data.curPos) * 0.01;
     data.scaleX += daBumpyMath;
     data.scaleY += daBumpyMath;
     data.scaleZ += daBumpyMath;
@@ -697,7 +697,7 @@ class TanBumpyScaleMod extends BumpyModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    var daTanBumpy:Float = tanBumpyMath(data.curPos) * 0.01;
+    final daTanBumpy:Float = tanBumpyMath(data.curPos) * 0.01;
     data.scaleX += daTanBumpy;
     data.scaleY += daTanBumpy;
     data.scaleZ += daTanBumpy;

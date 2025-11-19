@@ -363,7 +363,6 @@ class Drive2Mod extends Modifier
     if (currentValue == 0) return;
     final scrollSpeed:Float = PlayState.instance.currentChart.scrollSpeed;
     final funny:Float = scrollSpeed * -1 * currentValue;
-
     final whichStrum:StrumlineNote = strumLine.getByIndex(lane);
     whichStrum.strumExtraModData.strumPos = funny;
   }
