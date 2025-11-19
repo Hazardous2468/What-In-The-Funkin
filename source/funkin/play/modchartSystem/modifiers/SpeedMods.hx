@@ -72,7 +72,7 @@ class ReverseMod extends Modifier
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    var curVal:Float = getCurVal();
+    final curVal:Float = getCurVal();
     if (targetLane == -1)
     {
       data.whichStrumNote.strumExtraModData.reverseMod = curVal;
@@ -87,8 +87,8 @@ class ReverseMod extends Modifier
     // Compute this only once!
     if (dif == null)
     {
-      var baseY:Float = PlayState.getStrumlineY(strumLine, false);
-      var targetY:Float = PlayState.getStrumlineY(strumLine, true);
+      final baseY:Float = PlayState.getStrumlineY(strumLine, false);
+      final targetY:Float = PlayState.getStrumlineY(strumLine, true);
       dif = targetY - baseY;
     }
 
@@ -156,9 +156,9 @@ class BoostMod extends Modifier
   override function speedMath(lane:Int, curPos:Float, strumLine:Strumline, isHoldNote:Bool = false):Float
   {
     var speed:Float = 1.0; // return value
-    var start:Float = this.startSubmod.value;
-    var finalTargetSpeed:Float = 1.0;
-    var div:Float = start * 2;
+    final start:Float = this.startSubmod.value;
+    final finalTargetSpeed:Float = 1.0;
+    final div:Float = start * 2;
     var curPosEdit:Float = curPos * (Preferences.downscroll ? -1 : 1);
 
     if (curPosEdit <= 0) speed = 1; // past receptors
@@ -274,8 +274,8 @@ class Expand extends Modifier
 
   override function speedMath(lane:Int, curPos:Float, strumLine:Strumline, isHoldNote:Bool = false):Float
   {
-    var b:Float = Conductor.instance.currentBeatTime / 2 * speedSubmod.value;
-    var sine:Float = FlxMath.fastSin(b * Math.PI);
+    final b:Float = Conductor.instance.currentBeatTime / 2 * speedSubmod.value;
+    final sine:Float = FlxMath.fastSin(b * Math.PI);
 
     if (this.currentValue > 0)
     {

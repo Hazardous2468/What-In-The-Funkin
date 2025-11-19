@@ -76,6 +76,9 @@ import funkin.play.modchartSystem.modifiers.HourGlassMods;
 import funkin.play.modchartSystem.modifiers.AngleMods;
 import funkin.play.modchartSystem.modifiers.OrientMods;
 import funkin.play.modchartSystem.modifiers.AttenuateMods;
+import funkin.play.modchartSystem.modifiers.CubicMods;
+import funkin.play.modchartSystem.modifiers.ParabolaMods;
+import funkin.play.modchartSystem.modifiers.AsymptoteMods;
 import funkin.play.modchartSystem.modifiers.*; // if only you worked ;_;
 
 class ModConstants
@@ -84,8 +87,8 @@ class ModConstants
 
   public static final MODCHART_VERSION:String = "v1.0.2";
 
-  public static var defaultHoldGrain = 75;
-  public static var defaultPathGrain = defaultHoldGrain;
+  public static final defaultHoldGrain = 75;
+  public static final defaultPathGrain = defaultHoldGrain;
 
   public static var tooCloseToCameraFix:Float = 0.975; // dumb fix for preventing freak out on z math or something
 
@@ -168,19 +171,19 @@ class ModConstants
   ];
 
   // Sets the REAL hold note to this position - X.
-  public static var holdNoteJankX:Float = 0;
+  public static final holdNoteJankX:Float = 0;
 
   // Sets the REAL hold note to this position - Y.
-  public static var holdNoteJankY:Float = 0;
+  public static final holdNoteJankY:Float = 0;
 
   // size in pixels for each note
-  public static var strumSize:Float = Strumline.NOTE_SPACING;
+  public static final strumSize:Float = Strumline.NOTE_SPACING;
 
   // arrowpathScale
-  public static var arrowPathScale:Float = (0.696774193548387 * 0.25);
+  public static final arrowPathScale:Float = (0.696774193548387 * 0.25);
 
   // the scale of each note, idfk lol
-  public static var noteScale:Float = 0.696774193548387;
+  public static final noteScale:Float = 0.696774193548387;
 
   // Just a silly way to check if a tag is actually a submod or not lol
   public static function isTagSub(tag:String):Bool
@@ -231,25 +234,25 @@ class ModConstants
     var strumBaseZ:Float = 0;
 
     @:privateAccess
-    var strumlineOffsets = strumLine.noteStyle.getStrumlineOffsets();
+    final strumlineOffsets = strumLine.noteStyle.getStrumlineOffsets();
     strumBaseX += strumlineOffsets[0];
     strumBaseY += strumlineOffsets[1];
 
-    var wasHereOriginally:Vector3D = new Vector3D(strumBaseX, strumBaseY, strumBaseZ);
+    final wasHereOriginally:Vector3D = new Vector3D(strumBaseX, strumBaseY, strumBaseZ);
     return wasHereOriginally;
   }
 
   public static function rotateAround(origin:Vector2, point:Vector2, degrees:Float):Vector2
   {
     if (degrees == 0) return point; // Do nothing if there is no rotation
-    var angle:Float = degrees * FlxAngle.TO_RAD;
-    var ox = origin.x;
-    var oy = origin.y;
-    var px = point.x;
-    var py = point.y;
+    final angle:Float = degrees * FlxAngle.TO_RAD;
+    final ox = origin.x;
+    final oy = origin.y;
+    final px = point.x;
+    final py = point.y;
 
-    var qx = ox + FlxMath.fastCos(angle) * (px - ox) - FlxMath.fastSin(angle) * (py - oy);
-    var qy = oy + FlxMath.fastSin(angle) * (px - ox) + FlxMath.fastCos(angle) * (py - oy);
+    final qx = ox + FlxMath.fastCos(angle) * (px - ox) - FlxMath.fastSin(angle) * (py - oy);
+    final qy = oy + FlxMath.fastSin(angle) * (px - ox) + FlxMath.fastCos(angle) * (py - oy);
 
     return (new Vector2(qx, qy));
   }
@@ -266,6 +269,8 @@ class ModConstants
     modName = StringTools.replace(modName, "spiralholds", "holdtype");
     modName = StringTools.replace(modName, "spiralpaths", "arrowpathtype");
     modName = StringTools.replace(modName, "pathstype", "arrowpathtype");
+
+    modName = StringTools.replace(modName, "nonegativescale", "antinegativescale");
 
     modName = StringTools.replace(modName, "autodriven", "jump");
     modName = StringTools.replace(modName, "autodrive", "jump");
@@ -472,7 +477,7 @@ class ModConstants
   public static function getBeatPositionWithDelta():Float
   {
     if (Conductor.instance == null) return 0.0;
-    var timeWithDelta:Float = Conductor.instance.getTimeWithDelta();
+    final timeWithDelta:Float = Conductor.instance.getTimeWithDelta();
     return Conductor.instance.getTimeInSteps(timeWithDelta) / Constants.STEPS_PER_BEAT;
   }
 
@@ -510,14 +515,14 @@ class ModConstants
     {
       for (songNote in chartData)
       {
-        var strumTime:Float = songNote.time;
-        var noteBeat:Float = Conductor.instance.getTimeInSteps(strumTime) / Constants.STEPS_PER_BEAT;
+        final strumTime:Float = songNote.time;
+        final noteBeat:Float = Conductor.instance.getTimeInSteps(strumTime) / Constants.STEPS_PER_BEAT;
         // if outside of range, skip this note
         if (!(startBeat <= noteBeat && endBeat > noteBeat))
         {
           continue;
         }
-        var noteData:Int = songNote.getDirection();
+        final noteData:Int = songNote.getDirection();
         var kind:String = "default";
         if (songNote.kind != null)
         {
@@ -944,7 +949,7 @@ class ModConstants
     // Math isn't perfect (mainly with lack of FOV support), but it's good enough. -Haz
     try
     {
-      var _FOV = Math.PI / 2;
+      final _FOV = Math.PI / 2;
 
       /*
         math from opengl lol
@@ -1021,7 +1026,7 @@ class ModConstants
     else
     {
       // We good to go.
-      var newMod:CustomModifier = new CustomModifier(modName, defaultBaseValue);
+      final newMod:CustomModifier = new CustomModifier(modName, defaultBaseValue);
       return newMod;
     }
   }
@@ -1863,7 +1868,79 @@ class ModConstants
       case "circskewy":
         newMod = new CircSkewYMod(tag);
 
-      // extra mods
+      // parabola mods
+      case "parabolax":
+        newMod = new ParabolaXMod(tag);
+      case "parabolay":
+        newMod = new ParabolaYMod(tag);
+      case "parabolaz":
+        newMod = new ParabolaZMod(tag);
+      case "parabolaangle":
+        newMod = new ParabolaAngleZMod(tag);
+      case "parabolaanglex":
+        newMod = new ParabolaAngleXMod(tag);
+      case "parabolaangley":
+        newMod = new ParabolaAngleYMod(tag);
+      case "parabolascale":
+        newMod = new ParabolaScaleMod(tag);
+      case "parabolascalex":
+        newMod = new ParabolaScaleXMod(tag);
+      case "parabolascaley":
+        newMod = new ParabolaScaleYMod(tag);
+      case "parabolaskewx":
+        newMod = new ParabolaSkewXMod(tag);
+      case "parabolaskewy":
+        newMod = new ParabolaSkewYMod(tag);
+
+      // asymptote mods
+      case "asymptotex":
+        newMod = new AsymptoteXMod(tag);
+      case "asymptotey":
+        newMod = new AsymptoteYMod(tag);
+      case "asymptotez":
+        newMod = new AsymptoteZMod(tag);
+      case "asymptoteanglez":
+        newMod = new AsymptoteAngleZMod(tag);
+      case "asymptoteanglex":
+        newMod = new AsymptoteAngleXMod(tag);
+      case "asymptoteangley":
+        newMod = new AsymptoteAngleYMod(tag);
+      case "asymptotescalex":
+        newMod = new AsymptoteScaleXMod(tag);
+      case "asymptotescaley":
+        newMod = new AsymptoteScaleYMod(tag);
+      case "asymptotescale":
+        newMod = new AsymptoteScaleMod(tag);
+      case "asymptoteskewx":
+        newMod = new AsymptoteSkewXMod(tag);
+      case "asymptoteskewy":
+        newMod = new AsymptoteSkewYMod(tag);
+
+      // cubic mods
+      case "cubicx":
+        newMod = new CubicXMod(tag);
+      case "cubicy":
+        newMod = new CubicYMod(tag);
+      case "cubicz":
+        newMod = new CubicZMod(tag);
+      case "cubicscalex":
+        newMod = new CubicScaleXMod(tag);
+      case "cubicscaley":
+        newMod = new CubicScaleYMod(tag);
+      case "cubicscale":
+        newMod = new CubicScaleMod(tag);
+      case "cubicanglex":
+        newMod = new CubicAngleXMod(tag);
+      case "cubicangley":
+        newMod = new CubicAngleYMod(tag);
+      case "cubicangle":
+        newMod = new CubicAngleZMod(tag);
+      case "cubicskewx":
+        newMod = new CubicSkewXMod(tag);
+      case "cubicskewy":
+        newMod = new CubicSkewYMod(tag);
+
+      // attenuate mods
       case "attenuate":
         newMod = new AttenuateXMod(tag);
       case "attenuatey":
@@ -1916,6 +1993,10 @@ class ModConstants
         newMod = new WaveyZMod(tag);
       case "waveyangle":
         newMod = new WaveyAngleMod(tag);
+      case "waveyanglex":
+        newMod = new WaveyAngleXMod(tag);
+      case "waveyangley":
+        newMod = new WaveyAngleYMod(tag);
       case "waveyscale":
         newMod = new WaveyScaleMod(tag);
       case "waveyscalex":

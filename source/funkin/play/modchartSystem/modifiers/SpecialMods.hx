@@ -204,7 +204,7 @@ class MathCutOffMod extends Modifier
 
   override function specialMath(lane:Int, strumLine:Strumline):Void
   {
-    var whichStrum:StrumlineNote = strumLine.getByIndex(lane);
+    final whichStrum:StrumlineNote = strumLine.getByIndex(lane);
     whichStrum.strumExtraModData.mathCutOff = currentValue;
     // strumLine.mods.mathCutOff[lane] = currentValue;
   }
@@ -222,7 +222,7 @@ class NoteSplashCopyStrumScaleMod extends Modifier
 
   override function specialMath(lane:Int, strumLine:Strumline):Void
   {
-    var whichStrum:StrumlineNote = strumLine.getByIndex(lane);
+    final whichStrum:StrumlineNote = strumLine.getByIndex(lane);
     whichStrum.strumExtraModData.splashCopyStrumScale = currentValue >= 0.5;
   }
 }
@@ -239,7 +239,7 @@ class HoldCoverCopyStrumScaleMod extends Modifier
 
   override function specialMath(lane:Int, strumLine:Strumline):Void
   {
-    var whichStrum:StrumlineNote = strumLine.getByIndex(lane);
+    final whichStrum:StrumlineNote = strumLine.getByIndex(lane);
     whichStrum.strumExtraModData.holdCoverCopyStrumScale = currentValue >= 0.5;
   }
 }
@@ -255,7 +255,7 @@ class DisableHoldMathShortCutMod extends Modifier
 
   override function specialMath(lane:Int, strumLine:Strumline):Void
   {
-    var whichStrum:StrumlineNote = strumLine.getByIndex(lane);
+    final whichStrum:StrumlineNote = strumLine.getByIndex(lane);
     whichStrum.strumExtraModData.noHoldMathShortcut = currentValue;
   }
 }
@@ -271,7 +271,7 @@ class DrawDistanceBackMod extends Modifier
 
   override function specialMath(lane:Int, strumLine:Strumline):Void
   {
-    var whichStrum = strumLine.getByIndex(lane);
+    final whichStrum = strumLine.getByIndex(lane);
     whichStrum.strumExtraModData.drawdistanceBack = currentValue;
   }
 }
@@ -287,7 +287,7 @@ class DrawDistanceMod extends Modifier
 
   override function specialMath(lane:Int, strumLine:Strumline):Void
   {
-    var whichStrum = strumLine.getByIndex(lane);
+    final whichStrum = strumLine.getByIndex(lane);
     whichStrum.strumExtraModData.drawdistanceForward = currentValue;
   }
 }

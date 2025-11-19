@@ -20,8 +20,7 @@ class ArrowpathMod extends Modifier
 
   override function specialMath(lane:Int, strumLine:Strumline):Void
   {
-    // strumLine.arrowPathAlpha[lane] = currentValue;
-    var whichStrum:StrumlineNote = strumLine.getByIndex(lane);
+    final whichStrum:StrumlineNote = strumLine.getByIndex(lane);
     whichStrum.strumExtraModData.arrowPathAlpha = currentValue;
   }
 
@@ -73,8 +72,7 @@ class ArrowpathWidthMod extends Modifier
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (!isArrowPath) return;
-    var valJank:Float = currentValue; // Current value is fucked? idk?!
-    var scaleX:Float = valJank * 0.25; // make it 0.25 smaller then a regular hold
+    final scaleX:Float = currentValue * 0.25; // make it 0.25 smaller then a regular hold
     data.scaleX = scaleX;
     data.scaleY = scaleX; // ?
     data.scaleZ = scaleX;
@@ -147,7 +145,7 @@ class ArrowpathBackLengthMod extends Modifier
 
   override function specialMath(lane:Int, strumLine:Strumline):Void
   {
-    var whichStrum:StrumlineNote = strumLine.getByIndex(lane);
+    final whichStrum:StrumlineNote = strumLine.getByIndex(lane);
     whichStrum.strumExtraModData.arrowpathBackwardsLength = currentValue;
   }
 }
@@ -164,7 +162,7 @@ class ArrowpathFrontLengthMod extends Modifier
 
   override function specialMath(lane:Int, strumLine:Strumline):Void
   {
-    var whichStrum:StrumlineNote = strumLine.getByIndex(lane);
+    final whichStrum:StrumlineNote = strumLine.getByIndex(lane);
     whichStrum.strumExtraModData.arrowpathLength = currentValue;
   }
 }

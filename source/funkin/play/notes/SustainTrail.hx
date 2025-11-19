@@ -22,6 +22,7 @@ import funkin.ui.options.PreferencesMenu;
 import lime.math.Vector2;
 import openfl.display.TriangleCulling;
 import openfl.geom.Vector3D;
+import openfl.display.BitmapData; // for converting data to pass into the shader
 
 /**
  * This is based heavily on the `FlxStrip` class. It uses `drawTriangles()` to clip a sustain note
@@ -439,12 +440,34 @@ class SustainTrail extends ZSprite
     updateStealthGlowV2();
   }
 
+  var shaderColsBitmap:BitmapData; // ToDo, see below:
+
   /**
    * Forwards data to the hsvShader to render stealth transitions smoothly.
    * Hopefully will be updated in the future to use an array instead cuz at the moment, only supports 1 of each type (sudden, hidden, vanish)
    */
   function updateStealthGlowV2():Void
   {
+    /**
+     * Future code:
+     * Grab an array of all the stealth samples in this hold.
+     * Afterwards, we then create a bitmap using the following format:
+     * y 0 = stealth glow value
+     * y 1 = alpha
+     * y 2 = red
+     * y 3 = green
+     * y 4 = blue
+     * y 5 = stealth glow red
+     * y 6 = stealth glow green
+     * y 7 = stealth glow blue
+     * and x represent what piece the data was sampled at
+     *
+     * So if we access shaderColsBitmap[3, 1] and get '0.5', then the 4th piece has an alpha value of 0.5.
+     *
+     * This bitmap data is then forwarded into the shader to then be used to apply to the texture.
+     * Make sure this bitmap data is on another separate channel to avoid overwriting our base graphic.
+     */
+
     if (isArrowPath)
     {
       this.hsvShader.setFloat('_holdHeight', holdResolution);
@@ -479,31 +502,31 @@ class SustainTrail extends ZSprite
     this.hsvShader.setBool('_isHold', true);
     this.hsvShader.setFloat('_holdHeight', holdResolution);
 
-    var holdPosFromReceptor:Float = (distanceFromReceptor_unscaledpos - (whichStrumNote?.noteModData?.curPos_unscaled ?? 0)) * (flipY ? -1 : 1);
+    final holdPosFromReceptor:Float = (distanceFromReceptor_unscaledpos - (whichStrumNote?.noteModData?.curPos_unscaled ?? 0)) * (flipY ? -1 : 1);
 
     // 1.125 works really well for 2.5 scroll speed so let's go from there
     // 2.5 = 1.125
     // 1 = 0.45 (WAIT I RECONGISE THAT NUMBER!!!)
-    var magicNumber:Float = Constants.PIXELS_PER_MS * parentStrumline?.scrollSpeed ?? 1.0;
+    final magicNumber:Float = Constants.PIXELS_PER_MS * parentStrumline?.scrollSpeed ?? 1.0;
 
-    var spacingBetweenEachUVpiece:Float = this.fullSustainLength * magicNumber; // magic number?
+    final spacingBetweenEachUVpiece:Float = this.fullSustainLength * magicNumber; // magic number?
 
     // Sudden math
-    var holdPosFromSuddenStart:Float = holdPosFromReceptor - sStart;
-    var holdPosFromSuddenEnd:Float = holdPosFromReceptor - sEnd;
+    final holdPosFromSuddenStart:Float = holdPosFromReceptor - sStart;
+    final holdPosFromSuddenEnd:Float = holdPosFromReceptor - sEnd;
 
-    var test1:Float = holdPosFromSuddenStart / spacingBetweenEachUVpiece * -1;
-    var test2:Float = holdPosFromSuddenEnd / spacingBetweenEachUVpiece * -1;
+    final test1:Float = holdPosFromSuddenStart / spacingBetweenEachUVpiece * -1;
+    final test2:Float = holdPosFromSuddenEnd / spacingBetweenEachUVpiece * -1;
 
     this.hsvShader.setFloat('_stealthSustainSuddenStart', test2);
     this.hsvShader.setFloat('_stealthSustainSuddenEnd', test1);
 
     // Hidden math
-    var holdPosFromHiddenStart:Float = holdPosFromReceptor - hStart;
-    var holdPosFromHiddenEnd:Float = holdPosFromReceptor - hEnd;
+    final holdPosFromHiddenStart:Float = holdPosFromReceptor - hStart;
+    final holdPosFromHiddenEnd:Float = holdPosFromReceptor - hEnd;
 
-    var test1:Float = holdPosFromHiddenStart / spacingBetweenEachUVpiece * -1;
-    var test2:Float = holdPosFromHiddenEnd / spacingBetweenEachUVpiece * -1;
+    final test1:Float = holdPosFromHiddenStart / spacingBetweenEachUVpiece * -1;
+    final test2:Float = holdPosFromHiddenEnd / spacingBetweenEachUVpiece * -1;
 
     this.hsvShader.setFloat('_stealthSustainHiddenStart', test1);
     this.hsvShader.setFloat('_stealthSustainHiddenEnd', test2);
@@ -516,20 +539,20 @@ class SustainTrail extends ZSprite
     hStart = whichStrumNote?.strumExtraModData?.vanish_HiddenStart ?? 475.0;
     hEnd = whichStrumNote?.strumExtraModData?.vanish_HiddenEnd ?? 397.5;
 
-    var holdPosFromSuddenStart:Float = holdPosFromReceptor - sStart;
-    var holdPosFromSuddenEnd:Float = holdPosFromReceptor - sEnd;
+    final holdPosFromSuddenStart:Float = holdPosFromReceptor - sStart;
+    final holdPosFromSuddenEnd:Float = holdPosFromReceptor - sEnd;
 
-    var test1:Float = holdPosFromSuddenStart / spacingBetweenEachUVpiece * -1;
-    var test2:Float = holdPosFromSuddenEnd / spacingBetweenEachUVpiece * -1;
+    final test1:Float = holdPosFromSuddenStart / spacingBetweenEachUVpiece * -1;
+    final test2:Float = holdPosFromSuddenEnd / spacingBetweenEachUVpiece * -1;
 
     this.hsvShader.setFloat('_stealthSustainVanish_SuddenStart', test2);
     this.hsvShader.setFloat('_stealthSustainVanish_SuddenEnd', test1);
 
-    var holdPosFromHiddenStart:Float = holdPosFromReceptor - hStart;
-    var holdPosFromHiddenEnd:Float = holdPosFromReceptor - hEnd;
+    final holdPosFromHiddenStart:Float = holdPosFromReceptor - hStart;
+    final holdPosFromHiddenEnd:Float = holdPosFromReceptor - hEnd;
 
-    var test1:Float = holdPosFromHiddenStart / spacingBetweenEachUVpiece * -1;
-    var test2:Float = holdPosFromHiddenEnd / spacingBetweenEachUVpiece * -1;
+    final test1:Float = holdPosFromHiddenStart / spacingBetweenEachUVpiece * -1;
+    final test2:Float = holdPosFromHiddenEnd / spacingBetweenEachUVpiece * -1;
 
     this.hsvShader.setFloat('_stealthSustainVanish_HiddenStart', test1);
     this.hsvShader.setFloat('_stealthSustainVanish_HiddenEnd', test2);
@@ -639,8 +662,8 @@ class SustainTrail extends ZSprite
     var scaleX = FlxMath.remapToRange(fakeNote.scale.x, 0, isArrowPath ? ModConstants.arrowPathScale : ModConstants.noteScale, 0, 1);
     var scaleY = FlxMath.remapToRange(fakeNote.scale.y, 0, isArrowPath ? ModConstants.arrowPathScale : ModConstants.noteScale, 0, 1);
 
-    var forwardHolds:Bool = noteModData.usingForwardHolds();
-    var straightHoldsModAmount:Float = noteModData.straightHolds;
+    final forwardHolds:Bool = noteModData.usingForwardHolds();
+    final straightHoldsModAmount:Float = noteModData.straightHolds;
 
     if (isRoot)
     {
@@ -739,10 +762,10 @@ class SustainTrail extends ZSprite
       if (fakeNote.skew.y != 0) tempVec3.y += xPercent_SkewOffset * Math.tan(fakeNote.skew.y * FlxAngle.TO_RAD);
 
       // Rotate
-      var angleY:Float = noteModData.angleY;
+      final angleY:Float = noteModData.angleY;
 
       tempVec2.setTo(tempVec3.x, tempVec3.z);
-      var rotateModPivotPoint:Vector2 = new Vector2(rotatePivot.x, tempVec3.z);
+      final rotateModPivotPoint:Vector2 = new Vector2(rotatePivot.x, tempVec3.z);
       tempVec2 = ModConstants.rotateAround(rotateModPivotPoint, tempVec2, angleY);
       tempVec3.x = tempVec2.x;
       tempVec3.z = tempVec2.y;
@@ -758,7 +781,7 @@ class SustainTrail extends ZSprite
       if (noteModData.skewZ_playfield != 0) tempVec3.z += playfieldSkewOffset_Z * Math.tan(noteModData.skewZ_playfield * FlxAngle.TO_RAD);
 
       tempVec3.z *= 0.001;
-      var thisNotePos:Vector3D = ModConstants.perspectiveMath(tempVec3, 0, 0, noteModData.perspectiveOffset);
+      final thisNotePos:Vector3D = ModConstants.perspectiveMath(tempVec3, 0, 0, noteModData.perspectiveOffset);
       return new Vector2(thisNotePos.x, thisNotePos.y);
     }
   }
@@ -827,7 +850,7 @@ class SustainTrail extends ZSprite
 
     // Moved the first susSample point to be much earlier so that we can also get the current mod values for how we should render he rest of this hold
     // (such as are we using spiral holds for example?)
-    var clippingTimeOffset:Float = clipTimeThing(songTimmy, strumTime);
+    final clippingTimeOffset:Float = clipTimeThing(songTimmy, strumTime);
     extraHoldRootInfo(this.strumTime);
     susSample(this.strumTime + clippingTimeOffset, true, 0);
 
@@ -859,10 +882,10 @@ class SustainTrail extends ZSprite
     }
 
     // Renders the holds to face the direction of travel.
-    var spiralHolds:Bool = noteModData.usingSpiralHolds();
+    final spiralHolds:Bool = noteModData.usingSpiralHolds();
 
-    var holdNoteJankX:Float = ModConstants.holdNoteJankX * -1;
-    var holdNoteJankY:Float = ModConstants.holdNoteJankY * -1;
+    final holdNoteJankX:Float = ModConstants.holdNoteJankX * -1;
+    final holdNoteJankY:Float = ModConstants.holdNoteJankY * -1;
 
     var testCol:Array<Int> = [];
     var vertices:Array<Float> = [];
@@ -908,11 +931,11 @@ class SustainTrail extends ZSprite
       visible = true;
     }
 
-    var sussyLength:Float = fullSustainLength;
-    var holdWidth = graphicWidth;
+    final sussyLength:Float = fullSustainLength;
+    final holdWidth = graphicWidth;
 
-    var bottomHeight:Float = graphic.height * zoom * endOffset;
-    var partHeight:Float = clipHeight - bottomHeight;
+    final bottomHeight:Float = graphic.height * zoom * endOffset;
+    final partHeight:Float = clipHeight - bottomHeight;
 
     var scaleTest = fakeNote.scale.x;
     var widthScaled = holdWidth * scaleTest;
@@ -1110,7 +1133,7 @@ class SustainTrail extends ZSprite
     {
       for (k in 0...holdResolution)
       {
-        var i = (k + 1) * 2;
+        final i = (k + 1) * 2;
 
         // Bottom left
         uvtData[i * 2] = uvtData[0 * 2]; // 0%/25%/50%/75% of the way through the image
@@ -1125,7 +1148,7 @@ class SustainTrail extends ZSprite
     // === END CAP VERTICES ===
     if (renderEnd)
     {
-      var endvertsoftrail:Int = (holdResolution * 2);
+      final endvertsoftrail:Int = (holdResolution * 2);
       var highestNumSoFar:Int = endvertsoftrail + 2;
 
       // TODO - FIX HOLD ENDS MOD SAMPLE TIME!

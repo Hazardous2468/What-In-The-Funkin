@@ -221,7 +221,7 @@ class MiniModifier extends Modifier
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0 || data.noteType == "receptor") return;
-    var tinyVal:Float = currentValue * 0.5;
+    final tinyVal:Float = currentValue * 0.5;
 
     data.scaleX = FlxMath.lerp(data.scaleX, 0.0, tinyVal);
     data.scaleY = FlxMath.lerp(data.scaleY, 0.0, tinyVal);
@@ -235,9 +235,9 @@ class MiniModifier extends Modifier
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
     if (currentValue == 0) return;
-    var tinyVal:Float = currentValue * 0.5;
+    final tinyVal:Float = currentValue * 0.5;
 
-    var scalePointX:Float = (1.5 * Strumline.NOTE_SPACING) + strumLine.x;
+    final scalePointX:Float = (1.5 * Strumline.NOTE_SPACING) + strumLine.x;
     data.x = FlxMath.lerp(data.x, scalePointX, tinyVal);
 
     data.scaleX = FlxMath.lerp(data.scaleX, 0.0, tinyVal);
@@ -532,7 +532,7 @@ class ZoomModifier extends RotateModBase
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 1) return;
-    var curVal:Float = (1 - this.currentValue);
+    final curVal:Float = (1 - this.currentValue);
     if (doX)
     {
       data.x += strumResultX[data.direction];
@@ -554,10 +554,10 @@ class ZoomModifier extends RotateModBase
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
     if (currentValue == 1) return;
-    var curVal:Float = (1 - this.currentValue);
+    final curVal:Float = (1 - this.currentValue);
     if (doX)
     {
-      var memoryX:Float = data.x;
+      final memoryX:Float = data.x;
       data.x = FlxMath.lerp(data.x, getScalePivot_X(data, strumLine), curVal);
       strumResultX[data.direction] = memoryX - data.x;
 
@@ -567,7 +567,7 @@ class ZoomModifier extends RotateModBase
     }
     if (doY)
     {
-      var memoryY:Float = data.y;
+      final memoryY:Float = data.y;
       data.y = FlxMath.lerp(data.y, getScalePivot_Y(data, strumLine), curVal);
       strumResultY[data.direction] = memoryY - data.y;
 

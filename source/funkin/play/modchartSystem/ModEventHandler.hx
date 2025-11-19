@@ -96,7 +96,7 @@ class ModEventHandler
   var lastReportedSongTime:Float = 0;
   var beatTime:Float = 0;
   var lastReportedBeatTime:Float = 0;
-  var backInTimeLeniency:Float = 150; // in Miliseconds. Done because V-Slice sometimes often tries to go backwards in time? (???)
+  final backInTimeLeniency:Float = 150; // in Miliseconds. Done because V-Slice sometimes often tries to go backwards in time? (???)
 
   public function update(elapsed:Float):Void
   {
@@ -137,7 +137,7 @@ class ModEventHandler
     }
     else
     {
-      var modsTarget = ModConstants.grabStrumModTarget(playerTarget);
+      final modsTarget = ModConstants.grabStrumModTarget(playerTarget);
       modsTarget.addCustomMod(mod, makeCopy);
     }
   }
@@ -159,7 +159,7 @@ class ModEventHandler
     // Adding mods to the modHandlers!
     for (i in 0...modEvents.length)
     {
-      var timeEventTest = modEvents[i];
+      final timeEventTest = modEvents[i];
 
       if (timeEventTest.style == "resort" || timeEventTest.style == "func" || timeEventTest.style == "func_tween" || timeEventTest.style == "reset"
         || timeEventTest.style == "perframe") continue;
@@ -177,7 +177,7 @@ class ModEventHandler
       {
         timeEventTest.target.addMod(modifierName);
 
-        var mmm:Float = ModConstants.invertValueCheck(modifierName, timeEventTest.target.invertValues);
+        final mmm:Float = ModConstants.invertValueCheck(modifierName, timeEventTest.target.invertValues);
         timeEventTest.target.modifiers.get(modifierName).currentValue *= mmm;
       }
     }
@@ -249,7 +249,7 @@ class ModEventHandler
 
     tweenCounter++;
 
-    var mmm = ModConstants.invertValueCheck(_tag, target.invertValues);
+    final mmm = ModConstants.invertValueCheck(_tag, target.invertValues);
     newValue *= mmm;
 
     var isSub:Bool = false;
@@ -264,7 +264,7 @@ class ModEventHandler
 
     if (isSub)
     {
-      var mod:Modifier = target.modifiers.get(subModArr[0]);
+      final mod:Modifier = target.modifiers.get(subModArr[0]);
       if (mod == null)
       {
         PlayState.instance.modDebugNotif(subModArr[0] + " is not a valid mod name!", FlxColor.RED);
@@ -272,12 +272,12 @@ class ModEventHandler
       }
       else
       {
-        var subModName:String = mod.subModAliasConvert(subModArr[1]);
-        var isPriority:Bool = subModName == "priority";
+        final subModName:String = mod.subModAliasConvert(subModArr[1]);
+        final isPriority:Bool = subModName == "priority";
         if (isPriority)
         {
-          var startPoint:Float = (type == "value" ? startingValue : mod.modPriority_additive);
-          var finishPoint:Float = startPoint + ((newValue - startPoint) * easeToUse(1.0));
+          final startPoint:Float = (type == "value" ? startingValue : mod.modPriority_additive);
+          final finishPoint:Float = startPoint + ((newValue - startPoint) * easeToUse(1.0));
           if (time == 0) // no tween required!
           {
             mod.modPriority_additive = finishPoint;
@@ -310,8 +310,8 @@ class ModEventHandler
             return null;
           }
 
-          var startPoint:Float = (type == "value" ? startingValue : subMod.value);
-          var finishPoint:Float = startPoint + ((newValue - startPoint) * easeToUse(1.0));
+          final startPoint:Float = (type == "value" ? startingValue : subMod.value);
+          final finishPoint:Float = startPoint + ((newValue - startPoint) * easeToUse(1.0));
           if (time == 0) // no tween required!
           {
             subMod.value = finishPoint;
@@ -333,11 +333,11 @@ class ModEventHandler
       }
     }
 
-    var mod:Modifier = target.modifiers.get(_tag);
+    final mod:Modifier = target.modifiers.get(_tag);
     if (mod != null)
     {
-      var startPoint:Float = (type == "value" ? startingValue : mod.currentValue);
-      var finishPoint:Float = startPoint + ((newValue - startPoint) * easeToUse(1.0));
+      final startPoint:Float = (type == "value" ? startingValue : mod.currentValue);
+      final finishPoint:Float = startPoint + ((newValue - startPoint) * easeToUse(1.0));
       var tween:FlxTween = tweenManager.num(startPoint, newValue, time,
         {
           ease: easeToUse,
@@ -372,7 +372,7 @@ class ModEventHandler
     var realTag:String = ModConstants.modTag(modName.toLowerCase(), target);
 
     tweenCounter++;
-    var mmm = ModConstants.invertValueCheck(_tag, target.invertValues);
+    final mmm = ModConstants.invertValueCheck(_tag, target.invertValues);
     addValue *= mmm;
 
     var isSub:Bool = false;
@@ -388,7 +388,7 @@ class ModEventHandler
 
     if (isSub)
     {
-      var mod:Modifier = target.modifiers.get(subModArr[0]);
+      final mod:Modifier = target.modifiers.get(subModArr[0]);
       if (mod == null)
       {
         PlayState.instance.modDebugNotif(subModArr[0] + " is not a valid mod name!", FlxColor.RED);
@@ -396,13 +396,13 @@ class ModEventHandler
       }
       else
       {
-        var subModName:String = mod.subModAliasConvert(subModArr[1]);
+        final subModName:String = mod.subModAliasConvert(subModArr[1]);
         var isPriority:Bool = subModName == "priority";
         if (isPriority)
         {
           if (time == 0) // no tween required!
           {
-            var v:Float = addValue * easeToUse(1.0);
+            final v:Float = addValue * easeToUse(1.0);
             mod.modPriority_additive += v;
             return null;
           }
@@ -412,12 +412,12 @@ class ModEventHandler
               ease: FlxEase.linear,
               onComplete: function(twn:FlxTween) {
                 modchartTweens.remove(realTag);
-                var v:Float = addValue * easeToUse(1.0);
+                final v:Float = addValue * easeToUse(1.0);
                 mod.modPriority_additive += (v - lastReportedChange);
                 lastReportedChange = v;
               }
             }, function(t) {
-              var v:Float = addValue * easeToUse(t);
+              final v:Float = addValue * easeToUse(t);
               mod.modPriority_additive += (v - lastReportedChange);
               lastReportedChange = v;
             });
@@ -439,7 +439,7 @@ class ModEventHandler
 
           if (time == 0) // no tween required!
           {
-            var v:Float = addValue * easeToUse(1.0);
+            final v:Float = addValue * easeToUse(1.0);
             subMod.value += v;
             return null;
           }
@@ -449,12 +449,12 @@ class ModEventHandler
               ease: FlxEase.linear,
               onComplete: function(twn:FlxTween) {
                 modchartTweens.remove(realTag);
-                var v:Float = addValue * easeToUse(1.0);
+                final v:Float = addValue * easeToUse(1.0);
                 subMod.value += (v - lastReportedChange);
                 lastReportedChange = v;
               }
             }, function(t) {
-              var v:Float = addValue * easeToUse(t);
+              final v:Float = addValue * easeToUse(t);
               subMod.value += (v - lastReportedChange);
               lastReportedChange = v;
             });
@@ -464,12 +464,12 @@ class ModEventHandler
       }
     }
 
-    var mod:Modifier = target.modifiers.get(_tag);
+    final mod:Modifier = target.modifiers.get(_tag);
     if (mod != null)
     {
       if (time == 0)
       {
-        var v:Float = addValue * easeToUse(1.0);
+        final v:Float = addValue * easeToUse(1.0);
         mod.currentValue = mod.currentValue + (v);
         return null;
       }
@@ -481,12 +481,12 @@ class ModEventHandler
             ease: FlxEase.linear,
             onComplete: function(twn:FlxTween) {
               modchartTweens.remove(realTag);
-              var v:Float = addValue * easeToUse(1.0);
+              final v:Float = addValue * easeToUse(1.0);
               mod.currentValue = mod.currentValue + (v - lastReportedChange);
               lastReportedChange = v;
             }
           }, function(t) {
-            var v:Float = addValue * easeToUse(t); // ???, cuz for some silly reason tweenValue was being set incorrectly by the tween function / manager? I don't know lmfao
+            final v:Float = addValue * easeToUse(t); // ???, cuz for some silly reason tweenValue was being set incorrectly by the tween function / manager? I don't know lmfao
             mod.currentValue = mod.currentValue + (v - lastReportedChange);
             lastReportedChange = v;
           });
@@ -572,7 +572,7 @@ class ModEventHandler
   {
     for (i in 0...modEvents.length)
     {
-      var modEvent:ModTimeEvent = modEvents[i];
+      final modEvent:ModTimeEvent = modEvents[i];
       if (modEvent.hasTriggered) continue;
       var tween:FlxTween = null;
 
@@ -606,7 +606,7 @@ class ModEventHandler
             {
               modchartTweenCancel(modEvent.modName.toLowerCase());
             }
-            var finishPoint:Float = modEvent.startValue + ((modEvent.gotoValue - modEvent.startValue) * modEvent.easeToUse(1.0));
+            final finishPoint:Float = modEvent.startValue + ((modEvent.gotoValue - modEvent.startValue) * modEvent.easeToUse(1.0));
             try
             {
               modEvent.tweenFunky(finishPoint);
@@ -622,16 +622,16 @@ class ModEventHandler
             continue;
           case "value":
             // grab current mod value
-            var finishPoint:Float = modEvent.startValue + ((modEvent.gotoValue - modEvent.startValue) * modEvent.easeToUse(1.0));
+            final finishPoint:Float = modEvent.startValue + ((modEvent.gotoValue - modEvent.startValue) * modEvent.easeToUse(1.0));
             setModVal(modEvent.target, modEvent.modName, finishPoint, true);
 
             continue;
           case "tween":
             // grab current mod value
-            var mod:Modifier = figureOutMod(modEvent.target, modEvent.modName);
+            final mod:Modifier = figureOutMod(modEvent.target, modEvent.modName);
             if (mod != null)
             {
-              var finishPoint:Float = mod.currentValue + ((modEvent.gotoValue - mod.currentValue) * modEvent.easeToUse(1.0));
+              final finishPoint:Float = mod.currentValue + ((modEvent.gotoValue - mod.currentValue) * modEvent.easeToUse(1.0));
               setModVal(modEvent.target, modEvent.modName, finishPoint, true);
             }
             else
@@ -701,7 +701,7 @@ class ModEventHandler
               modchartTweenCancel(modEvent.modName.toLowerCase());
             }
 
-            var finishPoint:Float = modEvent.startValue + ((modEvent.gotoValue - modEvent.startValue) * modEvent.easeToUse(1.0));
+            final finishPoint:Float = modEvent.startValue + ((modEvent.gotoValue - modEvent.startValue) * modEvent.easeToUse(1.0));
             tween = tweenManager.num(modEvent.startValue, modEvent.gotoValue, modEvent.timeInBeats,
               {
                 ease: modEvent.easeToUse,
@@ -736,7 +736,7 @@ class ModEventHandler
   // Call this function to cancel every tween that matches this tag
   public function cancelTweensOf(tag:String, target:ModHandler):Void
   {
-    var lookForInString:String = ModConstants.modTag(tag, target);
+    final lookForInString:String = ModConstants.modTag(tag, target);
     // plr3.scale
 
     for (key in modchartTweens.keys())
@@ -774,7 +774,7 @@ class ModEventHandler
   // Call this to reset all mod values and cancel any existing tweens for this player!
   public function resetMods_ForTarget(target:ModHandler):Void
   {
-    var lookForInString:String = ModConstants.targetTag(target);
+    final lookForInString:String = ModConstants.targetTag(target);
 
     // For now, we just clear ALL tweens lol
     for (key in modchartTweens.keys())
@@ -806,7 +806,7 @@ class ModEventHandler
    */
   public function resetModEvent(target:ModHandler, startTime:Float):Void
   {
-    var timeEventTest:ModTimeEvent = new ModTimeEvent();
+    final timeEventTest:ModTimeEvent = new ModTimeEvent();
     timeEventTest.startingBeat = startTime;
     timeEventTest.style = "reset";
     if (target == null) target = PlayState.instance.playerStrumline.mods;
@@ -821,7 +821,7 @@ class ModEventHandler
    */
   public function resortModEvent(target:ModHandler, startTime:Float):Void
   {
-    var timeEventTest:ModTimeEvent = new ModTimeEvent();
+    final timeEventTest:ModTimeEvent = new ModTimeEvent();
     timeEventTest.startingBeat = startTime;
     timeEventTest.style = "resort";
     if (target == null) target = PlayState.instance.playerStrumline.mods;
@@ -901,7 +901,7 @@ class ModEventHandler
       PlayState.instance.modDebugNotif("null target for valueTween,\ndefaulting to player.", FlxColor.ORANGE);
     }
 
-    var timeEventTest:ModTimeEvent = new ModTimeEvent();
+    final timeEventTest:ModTimeEvent = new ModTimeEvent();
 
     if (modName != null) timeEventTest.modName = modName.toLowerCase();
     else
@@ -942,7 +942,7 @@ class ModEventHandler
   {
     // addModEventToTimeline(startTime, 0, FlxEase.linear, 0, tweenName, "func", persist, funky);
 
-    var timeEventTest = new ModTimeEvent();
+    final timeEventTest = new ModTimeEvent();
     if (tweenName != null) timeEventTest.modName = tweenName.toLowerCase();
     else
       timeEventTest.modName = null;
@@ -984,7 +984,7 @@ class ModEventHandler
   public function addModEventToTimeline(?target:ModHandler, startTime:Float, length:Float, ease:Null<Float->Float>, value:Float, modName:String, type:String,
       ?persist:Bool = true, ?funky:Void->Void = null):Void
   {
-    var timeEventTest:ModTimeEvent = new ModTimeEvent();
+    final timeEventTest:ModTimeEvent = new ModTimeEvent();
     if (modName != null) timeEventTest.modName = modName.toLowerCase();
     timeEventTest.gotoValue = value;
     timeEventTest.startingBeat = startTime;

@@ -35,7 +35,7 @@ class DrunkModBase extends Modifier
     time *= speed.value;
     time += time_add.value;
 
-    var returnValue:Float = currentValue * (tan((time) + (noteDir * desync.value) +
+    final returnValue:Float = currentValue * (tan((time) + (noteDir * desync.value) +
       (curPos * 0.45) * (10.0 / FlxG.height) * mult.value * 1.75)) * (ModConstants.strumSize * 0.5);
 
     return returnValue;
@@ -206,10 +206,10 @@ class DrunkScaleMod extends DrunkModBase
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
-    var s:Float = drunkMath(data.direction, data.curPos);
-    data.scaleX += s * 0.01;
-    data.scaleZ += s * 0.01;
-    data.scaleY += s * 0.01;
+    final s:Float = drunkMath(data.direction, data.curPos) * 0.01;
+    data.scaleX += s;
+    data.scaleZ += s;
+    data.scaleY += s;
   }
 }
 
@@ -229,8 +229,7 @@ class DrunkScaleXMod extends DrunkModBase
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
-    var s:Float = drunkMath(data.direction, data.curPos);
-    data.scaleX += s * 0.01;
+    data.scaleX += drunkMath(data.direction, data.curPos) * 0.01;
   }
 }
 
@@ -250,8 +249,7 @@ class DrunkScaleYMod extends DrunkModBase
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
-    var s:Float = drunkMath(data.direction, data.curPos);
-    data.scaleY += s * 0.01;
+    data.scaleY += drunkMath(data.direction, data.curPos) * 0.01;
   }
 }
 
@@ -271,8 +269,7 @@ class DrunkSkewXMod extends DrunkModBase
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
-    var s:Float = drunkMath(data.direction, data.curPos);
-    data.skewX += s;
+    data.skewX += drunkMath(data.direction, data.curPos);
   }
 }
 
@@ -292,8 +289,7 @@ class DrunkSkewYMod extends DrunkModBase
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
-    var s:Float = drunkMath(data.direction, data.curPos);
-    data.skewY += s;
+    data.skewY += drunkMath(data.direction, data.curPos);
   }
 }
 
@@ -308,7 +304,7 @@ class DrunkSpeedMod extends DrunkModBase
   override function speedMath(lane:Int, curPos:Float, strumLine, isHoldNote = false):Float
   {
     if (currentValue == 0) return 1; // skip math if mod is 0
-    var modWouldBe:Float = drunkMath(lane, curPos);
+    final modWouldBe:Float = drunkMath(lane, curPos);
     return (modWouldBe + 1);
   }
 }
@@ -413,7 +409,7 @@ class TanDrunkScaleMod extends DrunkModBase
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
-    var s:Float = tanDrunkMath(data.direction, data.curPos);
+    final s:Float = tanDrunkMath(data.direction, data.curPos);
     data.scaleX += s * 0.01;
     data.scaleZ += s * 0.01;
     data.scaleY += s * 0.01;

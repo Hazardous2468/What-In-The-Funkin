@@ -366,14 +366,14 @@ class RotatingXModifier extends RotateModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    var curVal:Float = currentValue * data.curPos / 180;
+    final curVal:Float = currentValue * data.curPos / 180;
     noteRotateFunc(data, strumLine, "x", curVal);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
     if (this.currentValue % 360 == 0 || affectsStrums.value == 0) return;
-    var curVal:Float = currentValue * data.curPos / 180;
+    final curVal:Float = currentValue * data.curPos / 180;
     strumRotateFunc(data, strumLine, "x", curVal);
   }
 }
@@ -403,14 +403,14 @@ class RotatingYModifier extends RotateModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    var curVal:Float = currentValue * data.curPos / 180;
+    final curVal:Float = currentValue * data.curPos / 180;
     noteRotateFunc(data, strumLine, "y", curVal);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
     if (this.currentValue % 360 == 0 || affectsStrums.value == 0) return;
-    var curVal:Float = currentValue * data.curPos / 180;
+    final curVal:Float = currentValue * data.curPos / 180;
     strumRotateFunc(data, strumLine, "y", curVal);
   }
 }
@@ -440,14 +440,14 @@ class RotatingZModifier extends RotateModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    var curVal:Float = currentValue * data.curPos / 180;
+    final curVal:Float = currentValue * data.curPos / 180;
     noteRotateFunc(data, strumLine, "z", curVal);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
     if (this.currentValue % 360 == 0 || affectsStrums.value == 0) return;
-    var curVal:Float = currentValue * data.curPos / 180;
+    final curVal:Float = currentValue * data.curPos / 180;
     strumRotateFunc(data, strumLine, "z", curVal);
   }
 }

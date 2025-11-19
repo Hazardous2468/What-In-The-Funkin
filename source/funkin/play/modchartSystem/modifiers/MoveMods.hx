@@ -164,9 +164,9 @@ class CenteredXMod extends Modifier
   {
     if (!caluclated || shouldAlwaysReCalculate.value > 0.5)
     {
-      var beforeCenter:Float = strumLine.x;
+      final beforeCenter:Float = strumLine.x;
       strumLine.screenCenter(X);
-      var afterCenter:Float = strumLine.x;
+      final afterCenter:Float = strumLine.x;
       strumLine.x = beforeCenter;
 
       distanceToMove = afterCenter - beforeCenter;
@@ -199,14 +199,14 @@ class CenteredMod extends Modifier
     if (currentValue == 0) return; // skip math if mod is 0
 
     // multiply by the reverse amount for this movement
-    var reverseModAmount:Float = data.getReverse(); // 0 to 1
-    var reverseMult:Float = FlxMath.remapToRange(reverseModAmount, 0, 1, 1, -1);
+    final reverseModAmount:Float = data.getReverse(); // 0 to 1
+    final reverseMult:Float = FlxMath.remapToRange(reverseModAmount, 0, 1, 1, -1);
 
     // Compute this only once!
     if (dif == null)
     {
-      var baseY:Float = PlayState.getStrumlineY(strumLine, false);
-      var targetY:Float = PlayState.getStrumlineY(strumLine, true);
+      final baseY:Float = PlayState.getStrumlineY(strumLine, false);
+      final targetY:Float = PlayState.getStrumlineY(strumLine, true);
       dif = targetY - baseY;
     }
 
@@ -238,7 +238,7 @@ class AlwaysCenterMod extends Modifier
 
     if (useOldMath.value > 0.5)
     {
-      var valchange:Float = currentValue * 0.5;
+      final valchange:Float = currentValue * 0.5;
       var height:Float = 112.0;
       height -= 2.4; // magic number ~
       if (Preferences.downscroll)
@@ -254,8 +254,8 @@ class AlwaysCenterMod extends Modifier
     {
       if (!caluclated || shouldAlwaysReCalculate.value > 0.5)
       {
-        var screenCenter:Float = (FlxG.height / 2) - (ModConstants.strumSize / 2);
-        var differenceBetween:Float = data.y - screenCenter;
+        final screenCenter:Float = (FlxG.height / 2) - (ModConstants.strumSize / 2);
+        final differenceBetween:Float = data.y - screenCenter;
         distanceToMove = differenceBetween;
         caluclated = true;
       }
@@ -275,8 +275,8 @@ class CenteredNotesMod extends Modifier
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
-    var screenCenter:Float = (FlxG.height / 2) - (ModConstants.strumSize / 2) + strumLine.getNoteYOffset();
-    var differenceBetween:Float = data.y - screenCenter;
+    final screenCenter:Float = (FlxG.height / 2) - (ModConstants.strumSize / 2) + strumLine.getNoteYOffset();
+    final differenceBetween:Float = data.y - screenCenter;
     data.y -= currentValue * differenceBetween;
   }
 }
@@ -306,15 +306,15 @@ class JumpMod extends Modifier
 
     // var time:Float = (beatTime + offset.value) % everyBeat.value;
 
-    var time:Float = ModConstants.mod((beatTime + offset.value), everyBeat.value);
+    final time:Float = ModConstants.mod((beatTime + offset.value), everyBeat.value);
 
-    var val:Float = time * Conductor.instance.beatLengthMs;
+    final val:Float = time * Conductor.instance.beatLengthMs;
 
-    var reverseModAmount:Float = data.getReverse();
+    final reverseModAmount:Float = data.getReverse();
     var reverseMult:Float = FlxMath.remapToRange(reverseModAmount, 0, 1, 1, -1);
     reverseMult = FlxMath.lerp(1, reverseMult, reverseAffect.value);
 
-    var scrollSpeed = PlayState.instance.currentChart.scrollSpeed;
+    final scrollSpeed = PlayState.instance.currentChart.scrollSpeed;
     data.y += Constants.PIXELS_PER_MS * scrollSpeed * (Preferences.downscroll ? -1 : 1) * val * currentValue * reverseMult;
   }
 }
@@ -338,11 +338,11 @@ class DriveMod extends Modifier
     if (currentValue == 0) return; // skip math if mod is 0
 
     // multiply by the reverse amount for this movement
-    var reverseModAmount:Float = data.getReverse();
+    final reverseModAmount:Float = data.getReverse();
     var reverseMult:Float = FlxMath.remapToRange(reverseModAmount, 0, 1, 1, -1);
     reverseMult = FlxMath.lerp(1, reverseMult, reverseAffect.value);
 
-    var scrollSpeed = PlayState.instance.currentChart.scrollSpeed;
+    final scrollSpeed = PlayState.instance.currentChart.scrollSpeed;
     data.y += Constants.PIXELS_PER_MS * scrollSpeed * (Preferences.downscroll ? -1 : 1) * currentValue * reverseMult;
   }
 }
@@ -361,10 +361,9 @@ class Drive2Mod extends Modifier
   override function specialMath(lane:Int, strumLine:Strumline):Void
   {
     if (currentValue == 0) return;
-    var scrollSpeed:Float = PlayState.instance.currentChart.scrollSpeed;
-    var funny:Float = scrollSpeed * -1 * currentValue;
-
-    var whichStrum:StrumlineNote = strumLine.getByIndex(lane);
+    final scrollSpeed:Float = PlayState.instance.currentChart.scrollSpeed;
+    final funny:Float = scrollSpeed * -1 * currentValue;
+    final whichStrum:StrumlineNote = strumLine.getByIndex(lane);
     whichStrum.strumExtraModData.strumPos = funny;
   }
 }

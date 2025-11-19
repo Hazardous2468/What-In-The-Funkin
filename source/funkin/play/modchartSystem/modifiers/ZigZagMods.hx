@@ -24,8 +24,8 @@ class ZigZagBaseMod extends Modifier
   function ziggyMath(curPos:Float):Float
   {
     curPos += offset.value * (Preferences.downscroll ? -1 : 1);
-    var mult:Float = ModConstants.strumSize * mult.value;
-    var mm:Float = mult * 2;
+    final mult:Float = ModConstants.strumSize * mult.value;
+    final mm:Float = mult * 2;
 
     var p:Float = curPos;
     if (p < 0)
@@ -34,8 +34,8 @@ class ZigZagBaseMod extends Modifier
       p += mult;
     }
 
-    var ppp:Float = p + (mult / 2);
-    var funny:Float = (ppp + mult) % mm;
+    final ppp:Float = p + (mult / 2);
+    final funny:Float = (ppp + mult) % mm;
     var result:Float = funny - mult;
     if (ppp % mm * 2 >= mm)
     {
@@ -192,7 +192,7 @@ class ZigZagScaleMod extends ZigZagBaseMod
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return;
-    var r:Float = ziggyMath(data.curPos) * currentValue * 0.01;
+    final r:Float = ziggyMath(data.curPos) * currentValue * 0.01;
     data.scaleX += r;
     data.scaleY += r;
     data.scaleZ += r;

@@ -27,7 +27,7 @@ class UseOldStealthHoldsModifier extends Modifier
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    var whichStrum:StrumlineNote = strumLine.getByIndex(data.direction);
+    final whichStrum:StrumlineNote = strumLine.getByIndex(data.direction);
     whichStrum.strumExtraModData.useOldStealthGlowStyle = currentValue >= 0.5;
   }
 }
@@ -119,7 +119,7 @@ class StrumStealthMod extends Modifier
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    var stealthGlow:Float = currentValue * 2; // so it reaches max at 0.5
+    final stealthGlow:Float = currentValue * 2; // so it reaches max at 0.5
     data.stealth += FlxMath.bound(stealthGlow, 0, 1); // clamp
 
     // extra math so alpha doesn't start fading until 0.5
@@ -173,7 +173,7 @@ class StealthMod extends Modifier
       }
       else // Else, acts like how it would in NotITG with 0.5 modValue being full stealth glow, 0.75 being half opacity, and 1 being fully invisible.
       {
-        var stealthGlow:Float = currentValue * 2; // so it reaches max at 0.5
+        final stealthGlow:Float = currentValue * 2; // so it reaches max at 0.5
         data.stealth += FlxMath.bound(stealthGlow * pastReceptors, 0, 1); // clamp
 
         // extra math so alpha doesn't start fading until 0.5
@@ -217,7 +217,7 @@ class SuddenMod extends Modifier
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    var whichStrum:StrumlineNote = strumLine.getByIndex(data.direction);
+    final whichStrum:StrumlineNote = strumLine.getByIndex(data.direction);
     whichStrum.strumExtraModData.suddenModAmount = currentValue;
     whichStrum.strumExtraModData.suddenStart = start.value + offset.value;
     whichStrum.strumExtraModData.suddenEnd = end.value + offset.value;
@@ -250,7 +250,7 @@ class SuddenMod extends Modifier
 
     if (noGlowSubmod.value < 1) // if below 0, then we apply stealth glow.
     {
-      var stealthGlow:Float = a * 2; // so it reaches max at 0.5
+      final stealthGlow:Float = a * 2; // so it reaches max at 0.5
       data.stealth += FlxMath.bound(stealthGlow, 0, 1) * (1.0 - noGlowSubmod.value); // clamp
     }
 
@@ -295,7 +295,7 @@ class HiddenMod extends Modifier
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    var whichStrum:StrumlineNote = strumLine.getByIndex(data.direction);
+    final whichStrum:StrumlineNote = strumLine.getByIndex(data.direction);
     whichStrum.strumExtraModData.hiddenModAmount = currentValue;
     whichStrum.strumExtraModData.hiddenStart = start.value + offset.value;
     whichStrum.strumExtraModData.hiddenEnd = end.value + offset.value;
@@ -304,7 +304,7 @@ class HiddenMod extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    var useOldStealthGlowStyle:Bool = data.whichStrumNote.strumExtraModData.useOldStealthGlowStyle;
+    final useOldStealthGlowStyle:Bool = data.whichStrumNote.strumExtraModData.useOldStealthGlowStyle;
     if (isArrowPath || data.noteType == "receptor" || (isHoldNote && !useOldStealthGlowStyle)) return;
 
     var curPos2:Float = data.curPos_unscaled - (data.whichStrumNote?.noteModData?.curPos_unscaled ?? 0);
@@ -328,12 +328,12 @@ class HiddenMod extends Modifier
 
     if (noGlowSubmod.value < 1) // if below 1 -> then we apply stealth glow.
     {
-      var stealthGlow:Float = a * 2; // so it reaches max at 0.5
+      final stealthGlow:Float = a * 2; // so it reaches max at 0.5
       data.stealth += FlxMath.bound(stealthGlow, 0, 1) * (1.0 - noGlowSubmod.value); // clamp
     }
 
     // extra math so alpha doesn't start fading until 0.5
-    var subtractAlpha:Float = FlxMath.bound((a - 0.5) * 2, 0, 1);
+    final subtractAlpha:Float = FlxMath.bound((a - 0.5) * 2, 0, 1);
     data.alpha -= subtractAlpha;
   }
 }
@@ -377,11 +377,11 @@ class VanishMod extends Modifier
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    var whichStrum:StrumlineNote = strumLine.getByIndex(data.direction);
+    final whichStrum:StrumlineNote = strumLine.getByIndex(data.direction);
     whichStrum.strumExtraModData.vanishModAmount = currentValue;
 
-    var sizeThingy:Float = size.value / 2;
-    var midPoint:Float = (start.value + end.value) / 2;
+    final sizeThingy:Float = size.value / 2;
+    final midPoint:Float = (start.value + end.value) / 2;
 
     whichStrum.strumExtraModData.vanish_HiddenStart = start.value + offset.value;
     whichStrum.strumExtraModData.vanish_HiddenEnd = midPoint + sizeThingy + offset.value;
@@ -394,7 +394,7 @@ class VanishMod extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    var useOldStealthGlowStyle:Bool = data.whichStrumNote.strumExtraModData.useOldStealthGlowStyle;
+    final useOldStealthGlowStyle:Bool = data.whichStrumNote.strumExtraModData.useOldStealthGlowStyle;
     if (isArrowPath || data.noteType == "receptor" || (isHoldNote && !useOldStealthGlowStyle)) return;
 
     var curPos2:Float = data.curPos_unscaled - (data.whichStrumNote?.noteModData?.curPos_unscaled ?? 0);
@@ -406,8 +406,8 @@ class VanishMod extends Modifier
       if (curPos2 < 0) return;
     }
 
-    var midPoint:Float = (start.value + end.value) / 2;
-    var sizeThingy:Float = size.value / 2;
+    final midPoint:Float = (start.value + end.value) / 2;
+    final sizeThingy:Float = size.value / 2;
 
     var a:Float = FlxMath.remapToRange(curPos2, start.value + offset.value, midPoint + sizeThingy + offset.value, 0, 1);
 
@@ -428,12 +428,12 @@ class VanishMod extends Modifier
 
     if (noGlowSubmod.value < 1) // if below 1, then we apply stealth glow.
     {
-      var stealthGlow:Float = result * 2; // so it reaches max at 0.5
+      final stealthGlow:Float = result * 2; // so it reaches max at 0.5
       data.stealth += FlxMath.bound(stealthGlow, 0, 1) * (1.0 - noGlowSubmod.value); // clamp
     }
 
     // extra math so alpha doesn't start fading until 0.5
-    var subtractAlpha:Float = FlxMath.bound((result - 0.5) * 2, 0, 1);
+    final subtractAlpha:Float = FlxMath.bound((result - 0.5) * 2, 0, 1);
     data.alpha -= subtractAlpha;
   }
 }
@@ -493,12 +493,12 @@ class BlinkMod extends Modifier
 
     if (noGlowSubmod.value < 1) // if below 0.5 -> then we apply stealth glow.
     {
-      var stealthGlow:Float = a * 2; // so it reaches max at 0.5
+      final stealthGlow:Float = a * 2; // so it reaches max at 0.5
       data.stealth += FlxMath.bound(stealthGlow, 0, 1) * (1.0 - noGlowSubmod.value); // clamp
     }
 
     // extra math so alpha doesn't start fading until 0.5
-    var subtractAlpha:Float = FlxMath.bound((a - 0.5) * 2, 0, 1);
+    final subtractAlpha:Float = FlxMath.bound((a - 0.5) * 2, 0, 1);
     data.alpha -= subtractAlpha;
   }
 }
@@ -550,7 +550,7 @@ class StealthHoldsMod extends Modifier
       }
       else // Else, acts like how it would in NotITG with 0.5 modValue being full stealth glow, 0.75 being half opacity, and 1 being fully invisible.
       {
-        var stealthGlow:Float = currentValue * 2; // so it reaches max at 0.5
+        final stealthGlow:Float = currentValue * 2; // so it reaches max at 0.5
         data.stealth += FlxMath.bound(stealthGlow * pastReceptors, 0, 1); // clamp
 
         // extra math so alpha doesn't start fading until 0.5
@@ -636,7 +636,7 @@ class AlphaNoteSplashModifier extends Modifier
 
   override function specialMath(lane:Int, strumLine:Strumline):Void
   {
-    var whichStrum:StrumlineNote = strumLine.getByIndex(lane);
+    final whichStrum:StrumlineNote = strumLine.getByIndex(lane);
     whichStrum.strumExtraModData.alphaSplashMod = currentValue;
     // strumLine.alphaSplashMod[lane] = currentValue;
   }
@@ -653,7 +653,7 @@ class AlphaHoldCoverModifier extends Modifier
 
   override function specialMath(lane:Int, strumLine:Strumline):Void
   {
-    var whichStrum:StrumlineNote = strumLine.getByIndex(lane);
+    final whichStrum:StrumlineNote = strumLine.getByIndex(lane);
     whichStrum.strumExtraModData.alphaHoldCoverMod = currentValue;
     // strumLine.alphaHoldCoverMod[lane] = currentValue;
   }

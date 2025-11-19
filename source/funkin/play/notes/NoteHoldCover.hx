@@ -75,7 +75,7 @@ class NoteHoldCover extends FlxTypedSpriteGroup<ZSprite>
       trace('WARNING: NoteHoldCover failed to initialize all animations.');
     }
 
-    var holdOrigin = noteStyle.getHoldCoverOrigin();
+    final holdOrigin = noteStyle.getHoldCoverOrigin();
     if (holdOrigin == null)
     {
       autoOrigin = true;
@@ -110,7 +110,7 @@ class NoteHoldCover extends FlxTypedSpriteGroup<ZSprite>
 
   public function playStart():Void
   {
-    var direction:NoteDirection = holdNote.noteDirection;
+    final direction:NoteDirection = holdNote.noteDirection;
     holdNoteDir = direction;
     glow.animation.play('holdCoverStart${direction.colorName.toTitleCase()}');
     glow.shader = hsvShader;
@@ -118,14 +118,14 @@ class NoteHoldCover extends FlxTypedSpriteGroup<ZSprite>
 
   public function playContinue():Void
   {
-    var direction:NoteDirection = holdNote?.noteDirection ?? holdNoteDir;
+    final direction:NoteDirection = holdNote?.noteDirection ?? holdNoteDir;
     glow.animation.play('holdCover${direction.colorName.toTitleCase()}');
     glow.shader = hsvShader;
   }
 
   public function playEnd():Void
   {
-    var direction:NoteDirection = holdNote?.noteDirection ?? holdNoteDir;
+    final direction:NoteDirection = holdNote?.noteDirection ?? holdNoteDir;
     glow.animation.play('holdCoverEnd${direction.colorName.toTitleCase()}');
     glow.shader = hsvShader;
   }

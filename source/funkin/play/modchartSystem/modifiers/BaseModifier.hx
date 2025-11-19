@@ -270,7 +270,7 @@ class Modifier
 
   public function getSubVal(name):Float
   {
-    var sub = subValues.get(name);
+    final sub = subValues.get(name);
     if (sub != null) return sub.value;
     else
     {
@@ -288,7 +288,7 @@ class Modifier
     }
     else
     {
-      var sub = subValues.get(name);
+      final sub = subValues.get(name);
       if (sub != null)
       {
         sub.value = newval;
@@ -313,7 +313,7 @@ class Modifier
       this.modPriority_additive = newval;
       return;
     }
-    var sub = subValues.get(name);
+    final sub = subValues.get(name);
     if (sub != null)
     {
       sub.baseValue = newval;
@@ -333,7 +333,7 @@ class Modifier
   // Creates a new subvalue modifier and automatically adds it to the subValues map. Returns the newly created subMod.
   public function createSubMod(name:String, startVal:Float, ?aliases:Array<String>):ModifierSubValue
   {
-    var newSubMod:ModifierSubValue = new ModifierSubValue(startVal);
+    final newSubMod:ModifierSubValue = new ModifierSubValue(startVal);
     newSubMod.value = startVal;
     newSubMod.baseValue = startVal;
     newSubMod.parentMod = this;

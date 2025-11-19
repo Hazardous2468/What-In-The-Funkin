@@ -21,6 +21,7 @@ class OrientModBase extends Modifier
    * If true, forces holds to be affected by this modifier.
    * If false, holds won't be affected by this modifier.
    * If null, then only gets enabled for OrientY.
+   * Doesn't really do anything as holds don't use angleZ or angleX. Use SpiralHolds instead for that.
    */
   var affectHolds:Null<Bool> = false;
 
@@ -84,14 +85,14 @@ class OrientModBase extends Modifier
 
   override function specialMath(lane:Int, strumLine:Strumline):Void
   {
-    var whichStrum:StrumlineNote = strumLine.getByIndex(lane);
+    final whichStrum:StrumlineNote = strumLine.getByIndex(lane);
     whichStrum.strumExtraModData.orientExtraMath[index] = currentValue;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
     if (currentValue == 0) return;
-    var orientAngleAmount:Float = (getOrientAngle(data) * currentValue);
+    final orientAngleAmount:Float = (getOrientAngle(data) * currentValue);
     switch (index % 3)
     {
       case 0:
@@ -164,7 +165,7 @@ class OrientModBase extends Modifier
       // Make it look nicer when reversed.
       if (reverseFix)
       {
-        var reverseModAmount:Float = data.getReverse(); // 0 to 1
+        final reverseModAmount:Float = data.getReverse(); // 0 to 1
         if (reverseModAmount > 0.5)
         {
           a *= -1;
@@ -172,7 +173,7 @@ class OrientModBase extends Modifier
         }
       }
 
-      var calculateAngleDif:Float = FlxAngle.degreesFromOrigin(a, b);
+      final calculateAngleDif:Float = FlxAngle.degreesFromOrigin(a, b);
       data.lastKnownOrientAngle[index] = calculateAngleDif;
       return calculateAngleDif;
     }
