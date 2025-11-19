@@ -1416,7 +1416,7 @@ class Strumline extends FlxSpriteGroup
 
     if (holdNotes.members.length > 1) holdNotes.members.insertionSort(compareHoldNoteSprites.bind(FlxSort.ASCENDING));
 
-    if (pathPieces.members.length > 1) pathPieces.members.insertionSort(compareHoldPieceSprites.bind(FlxSort.ASCENDING));
+    if (pathPieces != null) if (pathPieces.members.length > 1) pathPieces.members.insertionSort(compareHoldPieceSprites.bind(FlxSort.ASCENDING));
 
     if (holdPieces.members.length > 1) holdPieces.members.insertionSort(compareHoldPieceSprites.bind(FlxSort.ASCENDING));
 
@@ -1472,17 +1472,22 @@ class Strumline extends FlxSpriteGroup
       holdNote.kill();
     }
 
-    for (path in arrowPaths.members)
+    if (arrowPaths != null)
     {
-      path.clearPiecesArray();
-      @:privateAccess path.triggerRedrawRequest = true;
+      for (path in arrowPaths.members)
+      {
+        path.clearPiecesArray();
+        @:privateAccess path.triggerRedrawRequest = true;
+      }
     }
-
-    // Kill any left overs
-    for (holdPiece in holdPieces.members)
+    if (holdPieces != null)
     {
-      if (holdPiece == null) continue;
-      holdPiece.kill();
+      // Kill any left overs
+      for (holdPiece in holdPieces.members)
+      {
+        if (holdPiece == null) continue;
+        holdPiece.kill();
+      }
     }
 
     for (splash in noteSplashes)
