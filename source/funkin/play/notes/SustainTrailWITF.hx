@@ -382,6 +382,7 @@ class SustainTrailWITF extends SustainTrail // Extend from SustainTrail for all 
    * This function is responsible for going through each piece of this sustain,
    * properly setting their noteData's and then updating their verts,
    * stitching them all together to create one seamless sustain strip.
+   * Hold pieces are constructed from bottom to top (closest piece first, furthest piece last).
    */
   public function updatePieces():Void
   {
@@ -404,6 +405,8 @@ class SustainTrailWITF extends SustainTrail // Extend from SustainTrail for all 
       if (susPieces.length > 0) clearPiecesArray();
       return; // Oh, we... don't have any length. Nothing to render then!
     }
+
+    // Step 0: Before anything, check if we are even in render distance.
 
     // Step 1: Calculate the root of the hold to get all the hold meta data like grain or long holds!
     this.noteModData = sampleNotePosition(this.noteModData, this.strumTime, true, true);
@@ -436,7 +439,6 @@ class SustainTrailWITF extends SustainTrail // Extend from SustainTrail for all 
 
     susPiecesData = [this.noteModData];
 
-    // long hold math:
     final longBoi:Float = longHoldMath();
     // trace(longBoi);
 
@@ -446,26 +448,43 @@ class SustainTrailWITF extends SustainTrail // Extend from SustainTrail for all 
       if (howMany < 1) howMany = 1; // Must ALWAYS have one piece.
       howMany += 1; // Add one for the end cap.
       this.howManyPieces = howMany;
-
       trace("New piece amount: " + howMany);
+
+      for (i in 0...howMany)
+      {
+        var daPiece:SustainTrailWITFPiece = susPieces_sorted1[i];
+        if (needsRecalc)
+        {
+          daPiece = addPiece();
+          susPieces_sorted1.push(daPiece);
+          daPiece.noteDirection = this.noteDirection;
+          daPiece.parentStrumline = this.parentStrumline;
+          daPiece.noteData = this.noteData; // not to be confused with noteModData
+          daPiece.pieceID = i;
+          daPiece.parent = this;
+          daPiece.anglePivot = this.anglePivot;
+          daPiece.readyToDraw = false;
+        }
+      }
     }
 
+    var howManyPiecesInRange:Int = this.howManyPieces;
+    // Instead of using howManyPieces, we instead use a variable called 'howManyPiecesInRange'
+    // That way we only calculate pieces that are within our render range.
+    final drawDistanceForward:Float = 1 + (whichStrumNote?.strumExtraModData?.drawdistanceForward ?? 0);
+    @:privateAccess var renderDistanceMs = parentStrumline.renderDistanceMs;
+    renderDistanceMs -= strumTime - getSongPos();
+    var renderWindow:Float = (renderDistanceMs * drawDistanceForward);
+    howManyPiecesInRange = Math.floor(renderWindow / grain * scrollSpeed); // calculate how many pieces
+    howManyPiecesInRange = Std.int(FlxMath.bound(howManyPiecesInRange, 0, this.howManyPieces));
+
     // Step 3: Calculate the note data for each step of the sustain!
-    for (i in 0...howManyPieces)
+    for (i in 0...howManyPiecesInRange)
     {
       var pieceLength:Float = sussy * longBoi / (howManyPieces - 1);
       var curPieceTime:Float = baseTime + (pieceLength * i);
 
-      var daPiece:SustainTrailWITFPiece;
-      if (needsRecalc)
-      {
-        daPiece = addPiece();
-        susPieces_sorted1.push(daPiece);
-      }
-      else
-      {
-        daPiece = susPieces_sorted1[i];
-      }
+      var daPiece:SustainTrailWITFPiece = susPieces_sorted1[i];
       if (daPiece == null)
       {
         // Something is wrong! Abort everything and try again!
@@ -536,7 +555,7 @@ class SustainTrailWITF extends SustainTrail // Extend from SustainTrail for all 
       if (i == 0)
       {
         daPiece.bottomNoteModData = susPiecesData[0]; // We already calculated the root for all the meta data!
-        daPiece.previousPiece = null;
+        daPiece.previousPiece = null; // No piece before this as we are the root!
       }
       else
       {
@@ -557,6 +576,9 @@ class SustainTrailWITF extends SustainTrail // Extend from SustainTrail for all 
       daPiece.topNoteModData = sampleNotePosition(daPiece.topNoteModData, daPiece.strumTime + daPiece.sustainLength, false, true);
       susPiecesData.push(daPiece.topNoteModData);
       // if (!daPiece.isEnd) daPiece.nextPiece = susPieces_sorted1[i + 1];
+
+      daPiece.updateClipAndStitch();
+      daPiece.readyToDraw = true;
     }
 
     triggerRedrawRequest = false;
@@ -566,11 +588,11 @@ class SustainTrailWITF extends SustainTrail // Extend from SustainTrail for all 
      * We *could* do it during the above loop but would rather wait for all the data to be ready
      * so we can look at future or previous pieces with ease if needed (e.g. for spiral holds)
      */
-    for (piece in susPieces_sorted1)
-    {
-      piece.updateClipAndStitch();
-      piece.readyToDraw = true;
-    }
+    // for (piece in susPieces_sorted1)
+    // {
+    //  piece.updateClipAndStitch();
+    //  piece.readyToDraw = true;
+    // }
   }
 
   // If set to true, will automatically update all the pieces every update(). Otherwise the function must be called externally.

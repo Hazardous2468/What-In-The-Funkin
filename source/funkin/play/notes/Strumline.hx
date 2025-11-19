@@ -653,19 +653,19 @@ class Strumline extends FlxSpriteGroup
   var generatedArrowPaths:Bool = false;
 
   // if set to false, will skip arrowpath update logic
-  public var drawArrowPaths(default, set):Bool = true;
+  public var drawArrowPaths(default, set):Bool = false; // Temporarily disabled due to major performance issues.
 
-  function set_drawArrowPaths(i:Bool):Bool
+  function set_drawArrowPaths(newVal:Bool):Bool
   {
-    this.drawArrowPaths = i;
-    if (notitgPathSprite != null) notitgPathSprite.visible = i;
+    this.drawArrowPaths = newVal;
+    if (notitgPathSprite != null) notitgPathSprite.visible = newVal && this.visible;
     if (arrowPaths != null)
     {
       arrowPaths.forEach(function(note:SustainTrailWITF) {
-        note.visible = i;
+        note.visible = newVal && this.visible;
       });
     }
-    return i;
+    return newVal;
   }
 
   function updateArrowPaths():Void
