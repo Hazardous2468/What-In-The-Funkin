@@ -19,35 +19,20 @@ import flixel.math.FlxPoint;
  */
 class Controls extends FlxActionSet
 {
-  /**
+  /*
    * A list of actions that a player would invoke via some input device.
    * Uses FlxActions to funnel various inputs to a single action.
    */
   var _ui_up = new FunkinAction(Action.UI_UP);
-
   var _ui_left = new FunkinAction(Action.UI_LEFT);
   var _ui_right = new FunkinAction(Action.UI_RIGHT);
   var _ui_down = new FunkinAction(Action.UI_DOWN);
-  var _ui_upP = new FunkinAction(Action.UI_UP_P);
-  var _ui_leftP = new FunkinAction(Action.UI_LEFT_P);
-  var _ui_rightP = new FunkinAction(Action.UI_RIGHT_P);
-  var _ui_downP = new FunkinAction(Action.UI_DOWN_P);
-  var _ui_upR = new FunkinAction(Action.UI_UP_R);
-  var _ui_leftR = new FunkinAction(Action.UI_LEFT_R);
-  var _ui_rightR = new FunkinAction(Action.UI_RIGHT_R);
-  var _ui_downR = new FunkinAction(Action.UI_DOWN_R);
+
   var _note_up = new FunkinAction(Action.NOTE_UP);
   var _note_left = new FunkinAction(Action.NOTE_LEFT);
   var _note_right = new FunkinAction(Action.NOTE_RIGHT);
   var _note_down = new FunkinAction(Action.NOTE_DOWN);
-  var _note_upP = new FunkinAction(Action.NOTE_UP_P);
-  var _note_leftP = new FunkinAction(Action.NOTE_LEFT_P);
-  var _note_rightP = new FunkinAction(Action.NOTE_RIGHT_P);
-  var _note_downP = new FunkinAction(Action.NOTE_DOWN_P);
-  var _note_upR = new FunkinAction(Action.NOTE_UP_R);
-  var _note_leftR = new FunkinAction(Action.NOTE_LEFT_R);
-  var _note_rightR = new FunkinAction(Action.NOTE_RIGHT_R);
-  var _note_downR = new FunkinAction(Action.NOTE_DOWN_R);
+
   var _accept = new FunkinAction(Action.ACCEPT);
   var _back = new FunkinAction(Action.BACK);
   var _pause = new FunkinAction(Action.PAUSE);
@@ -72,6 +57,7 @@ class Controls extends FlxActionSet
   #if FEATURE_STAGE_EDITOR
   var _debug_stage = new FunkinAction(Action.DEBUG_STAGE);
   #end
+  var _debug_display = new FunkinAction(Action.DEBUG_DISPLAY);
   var _volume_up = new FunkinAction(Action.VOLUME_UP);
   var _volume_down = new FunkinAction(Action.VOLUME_DOWN);
   var _volume_mute = new FunkinAction(Action.VOLUME_MUTE);
@@ -141,26 +127,6 @@ class Controls extends FlxActionSet
   inline function get_UI_DOWN_R()
     return _ui_down.checkJustReleased();
 
-  public var UI_UP_GAMEPAD(get, never):Bool;
-
-  inline function get_UI_UP_GAMEPAD()
-    return _ui_up.checkPressedGamepad();
-
-  public var UI_LEFT_GAMEPAD(get, never):Bool;
-
-  inline function get_UI_LEFT_GAMEPAD()
-    return _ui_left.checkPressedGamepad();
-
-  public var UI_RIGHT_GAMEPAD(get, never):Bool;
-
-  inline function get_UI_RIGHT_GAMEPAD()
-    return _ui_right.checkPressedGamepad();
-
-  public var UI_DOWN_GAMEPAD(get, never):Bool;
-
-  inline function get_UI_DOWN_GAMEPAD()
-    return _ui_down.checkPressedGamepad();
-
   public var NOTE_UP(get, never):Bool;
 
   inline function get_NOTE_UP()
@@ -224,22 +190,62 @@ class Controls extends FlxActionSet
   public var ACCEPT(get, never):Bool;
 
   inline function get_ACCEPT()
-    return _accept.check();
+    return _accept.checkPressed();
+
+  public var ACCEPT_P(get, never):Bool;
+
+  inline function get_ACCEPT_P()
+    return _accept.checkJustPressed();
+
+  public var ACCEPT_R(get, never):Bool;
+
+  inline function get_ACCEPT_R()
+    return _accept.checkJustReleased();
 
   public var BACK(get, never):Bool;
 
   inline function get_BACK()
-    return _back.check();
+    return _back.checkPressed();
+
+  public var BACK_P(get, never):Bool;
+
+  inline function get_BACK_P()
+    return _back.checkJustPressed();
+
+  public var BACK_R(get, never):Bool;
+
+  inline function get_BACK_R()
+    return _back.checkJustReleased();
 
   public var PAUSE(get, never):Bool;
 
   inline function get_PAUSE()
-    return _pause.check();
+    return _pause.checkPressed();
+
+  public var PAUSE_P(get, never):Bool;
+
+  inline function get_PAUSE_P()
+    return _pause.checkJustPressed();
+
+  public var PAUSE_R(get, never):Bool;
+
+  inline function get_PAUSE_R()
+    return _pause.checkJustReleased();
 
   public var RESET(get, never):Bool;
 
   inline function get_RESET()
-    return _reset.check();
+    return _reset.checkPressed();
+
+  public var RESET_P(get, never):Bool;
+
+  inline function get_RESET_P()
+    return _reset.checkJustPressed();
+
+  public var RESET_R(get, never):Bool;
+
+  inline function get_RESET_R()
+    return _reset.checkJustReleased();
 
   public var WINDOW_FULLSCREEN(get, never):Bool;
 
@@ -309,6 +315,11 @@ class Controls extends FlxActionSet
     return _debug_stage.check();
   #end
 
+  public var DEBUG_DISPLAY(get, never):Bool;
+
+  inline function get_DEBUG_DISPLAY()
+    return _debug_display.check();
+
   public var VOLUME_UP(get, never):Bool;
 
   inline function get_VOLUME_UP()
@@ -352,6 +363,7 @@ class Controls extends FlxActionSet
     #if FEATURE_DEBUG_MENU add(_debug_menu); #end
     #if FEATURE_CHART_EDITOR add(_debug_chart); #end
     #if FEATURE_STAGE_EDITOR add(_debug_stage); #end
+    add(_debug_display);
     add(_volume_up);
     add(_volume_down);
     add(_volume_mute);
@@ -480,6 +492,7 @@ class Controls extends FlxActionSet
       #if FEATURE_DEBUG_MENU case DEBUG_MENU: _debug_menu; #end
       #if FEATURE_CHART_EDITOR case DEBUG_CHART: _debug_chart; #end
       #if FEATURE_STAGE_EDITOR case DEBUG_STAGE: _debug_stage; #end
+      case DEBUG_DISPLAY: _debug_display;
       case VOLUME_UP: _volume_up;
       case VOLUME_DOWN: _volume_down;
       case VOLUME_MUTE: _volume_mute;
@@ -495,9 +508,8 @@ class Controls extends FlxActionSet
    * Calls a function passing each action bound by the specified control
    * @param control
    * @param func
-   * @return ->Void)
    */
-  function forEachBound(control:Control, func:FlxActionDigital->FlxInputState->Void)
+  function forEachBound(control:Control, func:FunkinAction->FlxInputState->Void):Void
   {
     switch (control)
     {
@@ -534,13 +546,21 @@ class Controls extends FlxActionSet
         func(_note_down, JUST_PRESSED);
         func(_note_down, JUST_RELEASED);
       case ACCEPT:
+        func(_accept, PRESSED);
         func(_accept, JUST_PRESSED);
+        func(_accept, JUST_RELEASED);
       case BACK:
+        func(_back, PRESSED);
         func(_back, JUST_PRESSED);
+        func(_back, JUST_RELEASED);
       case PAUSE:
+        func(_pause, PRESSED);
         func(_pause, JUST_PRESSED);
+        func(_pause, JUST_RELEASED);
       case RESET:
+        func(_reset, PRESSED);
         func(_reset, JUST_PRESSED);
+        func(_reset, JUST_RELEASED);
       #if FEATURE_SCREENSHOTS
       case WINDOW_SCREENSHOT:
         func(_window_screenshot, JUST_PRESSED);
@@ -573,6 +593,8 @@ class Controls extends FlxActionSet
       case DEBUG_STAGE:
         func(_debug_stage, JUST_PRESSED);
       #end
+      case DEBUG_DISPLAY:
+        func(_debug_display, JUST_PRESSED);
       case VOLUME_UP:
         func(_volume_up, JUST_PRESSED);
       case VOLUME_DOWN:
@@ -582,7 +604,7 @@ class Controls extends FlxActionSet
     }
   }
 
-  public function replaceBinding(control:Control, device:Device, toAdd:Int, toRemove:Int)
+  public function replaceBinding(control:Control, device:Device, toAdd:Int, toRemove:Int):Void
   {
     if (toAdd == toRemove) return;
 
@@ -596,7 +618,7 @@ class Controls extends FlxActionSet
     }
   }
 
-  function replaceKey(action:FlxActionDigital, toAdd:FlxKey, toRemove:FlxKey, state:FlxInputState)
+  function replaceKey(action:FlxActionDigital, toAdd:FlxKey, toRemove:FlxKey, state:FlxInputState):Void
   {
     if (action.inputs.length == 0)
     {
@@ -647,7 +669,7 @@ class Controls extends FlxActionSet
     }
   }
 
-  function replaceButton(action:FlxActionDigital, deviceID:Int, toAdd:FlxGamepadInputID, toRemove:FlxGamepadInputID, state:FlxInputState)
+  function replaceButton(action:FlxActionDigital, deviceID:Int, toAdd:FlxGamepadInputID, toRemove:FlxGamepadInputID, state:FlxInputState):Void
   {
     if (action.inputs.length == 0)
     {
@@ -675,7 +697,7 @@ class Controls extends FlxActionSet
     }
   }
 
-  public function copyFrom(controls:Controls, ?device:Device)
+  public function copyFrom(controls:Controls, ?device:Device):Void
   {
     for (name in controls.byName.keys())
     {
@@ -702,7 +724,7 @@ class Controls extends FlxActionSet
     }
   }
 
-  inline public function copyTo(controls:Controls, ?device:Device)
+  inline public function copyTo(controls:Controls, ?device:Device):Void
   {
     controls.copyFrom(this, device);
   }
@@ -725,7 +747,7 @@ class Controls extends FlxActionSet
    * Sets all actions that pertain to the binder to trigger when the supplied keys are used.
    * If binder is a literal you can inline this
    */
-  public function bindKeys(control:Control, keys:Array<FlxKey>)
+  public function bindKeys(control:Control, keys:Array<FlxKey>):Void
   {
     forEachBound(control, function(action, state) addKeys(action, keys, state));
   }
@@ -734,12 +756,12 @@ class Controls extends FlxActionSet
    * Sets all actions that pertain to the binder to trigger when the supplied keys are used.
    * If binder is a literal you can inline this
    */
-  public function unbindKeys(control:Control, keys:Array<FlxKey>)
+  public function unbindKeys(control:Control, keys:Array<FlxKey>):Void
   {
     forEachBound(control, function(action, _) removeKeys(action, keys));
   }
 
-  static function addKeys(action:FlxActionDigital, keys:Array<FlxKey>, state:FlxInputState)
+  static function addKeys(action:FlxActionDigital, keys:Array<FlxKey>, state:FlxInputState):Void
   {
     for (key in keys)
     {
@@ -748,7 +770,7 @@ class Controls extends FlxActionSet
     }
   }
 
-  static function removeKeys(action:FlxActionDigital, keys:Array<FlxKey>)
+  static function removeKeys(action:FlxActionDigital, keys:Array<FlxKey>):Void
   {
     var i = action.inputs.length;
     while (i-- > 0)
@@ -796,6 +818,7 @@ class Controls extends FlxActionSet
     #if FEATURE_STAGE_EDITOR
     bindKeys(Control.DEBUG_STAGE, getDefaultKeybinds(scheme, Control.DEBUG_STAGE));
     #end
+    bindKeys(Control.DEBUG_DISPLAY, getDefaultKeybinds(scheme, Control.DEBUG_DISPLAY));
     bindKeys(Control.VOLUME_UP, getDefaultKeybinds(scheme, Control.VOLUME_UP));
     bindKeys(Control.VOLUME_DOWN, getDefaultKeybinds(scheme, Control.VOLUME_DOWN));
     bindKeys(Control.VOLUME_MUTE, getDefaultKeybinds(scheme, Control.VOLUME_MUTE));
@@ -832,6 +855,7 @@ class Controls extends FlxActionSet
           #if FEATURE_DEBUG_MENU case Control.DEBUG_MENU: return [GRAVEACCENT]; #end
           #if FEATURE_CHART_EDITOR case Control.DEBUG_CHART: return []; #end
           #if FEATURE_STAGE_EDITOR case Control.DEBUG_STAGE: return []; #end
+          case Control.DEBUG_DISPLAY: return [F6];
           case Control.VOLUME_UP: return [PLUS, NUMPADPLUS];
           case Control.VOLUME_DOWN: return [MINUS, NUMPADMINUS];
           case Control.VOLUME_MUTE: return [ZERO, NUMPADZERO];
@@ -863,6 +887,7 @@ class Controls extends FlxActionSet
           #if FEATURE_DEBUG_MENU case Control.DEBUG_MENU: return [GRAVEACCENT]; #end
           #if FEATURE_CHART_EDITOR case Control.DEBUG_CHART: return []; #end
           #if FEATURE_STAGE_EDITOR case Control.DEBUG_STAGE: return []; #end
+          case Control.DEBUG_DISPLAY: return [F6];
           case Control.VOLUME_UP: return [PLUS];
           case Control.VOLUME_DOWN: return [MINUS];
           case Control.VOLUME_MUTE: return [ZERO];
@@ -894,6 +919,7 @@ class Controls extends FlxActionSet
           #if FEATURE_DEBUG_MENU case Control.DEBUG_MENU: return []; #end
           #if FEATURE_CHART_EDITOR case Control.DEBUG_CHART: return []; #end
           #if FEATURE_STAGE_EDITOR case Control.DEBUG_STAGE: return []; #end
+          case Control.DEBUG_DISPLAY: return [];
           case Control.VOLUME_UP: return [NUMPADPLUS];
           case Control.VOLUME_DOWN: return [NUMPADMINUS];
           case Control.VOLUME_MUTE: return [NUMPADZERO];
@@ -905,7 +931,7 @@ class Controls extends FlxActionSet
     return [];
   }
 
-  function removeKeyboard()
+  function removeKeyboard():Void
   {
     for (action in this.digitalActions)
     {
@@ -923,16 +949,6 @@ class Controls extends FlxActionSet
     gamepadsAdded.push(id);
 
     fromSaveData(padData, Gamepad(id));
-  }
-
-  public function getGamepadIds():Array<Int>
-  {
-    return gamepadsAdded;
-  }
-
-  public function getGamepads():Array<FlxGamepad>
-  {
-    return [for (id in gamepadsAdded) FlxG.gamepads.getByID(id)];
   }
 
   inline function addGamepadLiteral(id:Int, ?buttonMap:Map<Control, Array<FlxGamepadInputID>>):Void
@@ -958,7 +974,7 @@ class Controls extends FlxActionSet
     gamepadsAdded.remove(deviceID);
   }
 
-  public function addDefaultGamepad(id):Void
+  public function addDefaultGamepad(id:Int):Void
   {
     addGamepadLiteral(id, [
       Control.ACCEPT => getDefaultGamepadBinds(Control.ACCEPT),
@@ -996,37 +1012,38 @@ class Controls extends FlxActionSet
       #if FEATURE_STAGE_EDITOR
       Control.DEBUG_STAGE => getDefaultGamepadBinds(Control.DEBUG_STAGE),
       #end
+      Control.DEBUG_DISPLAY => getDefaultGamepadBinds(Control.DEBUG_DISPLAY),
     ]);
   }
 
   function getDefaultGamepadBinds(control:Control):Array<FlxGamepadInputID>
   {
-    switch (control)
+    return switch (control)
     {
       case Control.ACCEPT:
-        return [#if switch B #else A #end];
+        [A];
       case Control.BACK:
-        return [#if switch A #else B #end];
+        [B];
       case Control.UI_UP:
-        return [DPAD_UP, LEFT_STICK_DIGITAL_UP];
+        [DPAD_UP, LEFT_STICK_DIGITAL_UP];
       case Control.UI_DOWN:
-        return [DPAD_DOWN, LEFT_STICK_DIGITAL_DOWN];
+        [DPAD_DOWN, LEFT_STICK_DIGITAL_DOWN];
       case Control.UI_LEFT:
-        return [DPAD_LEFT, LEFT_STICK_DIGITAL_LEFT];
+        [DPAD_LEFT, LEFT_STICK_DIGITAL_LEFT];
       case Control.UI_RIGHT:
-        return [DPAD_RIGHT, LEFT_STICK_DIGITAL_RIGHT];
+        [DPAD_RIGHT, LEFT_STICK_DIGITAL_RIGHT];
       case Control.NOTE_UP:
-        return [DPAD_UP, Y, LEFT_STICK_DIGITAL_UP, RIGHT_STICK_DIGITAL_UP];
+        [DPAD_UP, Y, LEFT_STICK_DIGITAL_UP, RIGHT_STICK_DIGITAL_UP];
       case Control.NOTE_DOWN:
-        return [DPAD_DOWN, A, LEFT_STICK_DIGITAL_DOWN, RIGHT_STICK_DIGITAL_DOWN];
+        [DPAD_DOWN, A, LEFT_STICK_DIGITAL_DOWN, RIGHT_STICK_DIGITAL_DOWN];
       case Control.NOTE_LEFT:
-        return [DPAD_LEFT, X, LEFT_STICK_DIGITAL_LEFT, RIGHT_STICK_DIGITAL_LEFT];
+        [DPAD_LEFT, X, LEFT_STICK_DIGITAL_LEFT, RIGHT_STICK_DIGITAL_LEFT];
       case Control.NOTE_RIGHT:
-        return [DPAD_RIGHT, B, LEFT_STICK_DIGITAL_RIGHT, RIGHT_STICK_DIGITAL_RIGHT];
+        [DPAD_RIGHT, B, LEFT_STICK_DIGITAL_RIGHT, RIGHT_STICK_DIGITAL_RIGHT];
       case Control.PAUSE:
-        return [START];
+        [START];
       case Control.RESET:
-        return [FlxGamepadInputID.BACK]; // Back (i.e. Select)
+        [FlxGamepadInputID.BACK]; // Back (i.e. Select)
       case Control.WINDOW_FULLSCREEN:
         [];
       #if FEATURE_SCREENSHOTS
@@ -1034,19 +1051,19 @@ class Controls extends FlxActionSet
         [];
       #end
       case Control.CUTSCENE_ADVANCE:
-        return [A];
+        [A];
       case Control.FREEPLAY_FAVORITE:
-        return [Y]; // Back (i.e. Select)
+        [Y]; // Back (i.e. Select)
       case Control.FREEPLAY_LEFT:
-        return [LEFT_SHOULDER];
+        [LEFT_SHOULDER];
       case Control.FREEPLAY_RIGHT:
-        return [RIGHT_SHOULDER];
+        [RIGHT_SHOULDER];
       case Control.FREEPLAY_CHAR_SELECT:
-        return [X];
+        [X];
       case Control.FREEPLAY_JUMP_TO_TOP:
-        return [RIGHT_STICK_DIGITAL_UP];
+        [RIGHT_STICK_DIGITAL_UP];
       case Control.FREEPLAY_JUMP_TO_BOTTOM:
-        return [RIGHT_STICK_DIGITAL_DOWN];
+        [RIGHT_STICK_DIGITAL_DOWN];
       case Control.VOLUME_UP:
         [];
       case Control.VOLUME_DOWN:
@@ -1065,17 +1082,18 @@ class Controls extends FlxActionSet
       case Control.DEBUG_STAGE:
         [];
       #end
+      case Control.DEBUG_DISPLAY:
+        [];
       default:
-        // Fallthrough.
+        [];
     }
-    return [];
   }
 
   /**
    * Sets all actions that pertain to the binder to trigger when the supplied keys are used.
    * If binder is a literal you can inline this
    */
-  public function bindButtons(control:Control, id, buttons)
+  public function bindButtons(control:Control, id:Int, buttons):Void
   {
     forEachBound(control, function(action, state) addButtons(action, buttons, state, id));
   }
@@ -1084,12 +1102,12 @@ class Controls extends FlxActionSet
    * Sets all actions that pertain to the binder to trigger when the supplied keys are used.
    * If binder is a literal you can inline this
    */
-  public function unbindButtons(control:Control, gamepadID:Int, buttons)
+  public function unbindButtons(control:Control, gamepadID:Int, buttons):Void
   {
     forEachBound(control, function(action, _) removeButtons(action, gamepadID, buttons));
   }
 
-  inline static function addButtons(action:FlxActionDigital, buttons:Array<FlxGamepadInputID>, state, id)
+  inline static function addButtons(action:FlxActionDigital, buttons:Array<FlxGamepadInputID>, state, id:Int):Void
   {
     for (button in buttons)
     {
@@ -1098,7 +1116,7 @@ class Controls extends FlxActionSet
     }
   }
 
-  static function removeButtons(action:FlxActionDigital, gamepadID:Int, buttons:Array<FlxGamepadInputID>)
+  static function removeButtons(action:FlxActionDigital, gamepadID:Int, buttons:Array<FlxGamepadInputID>):Void
   {
     var i = action.inputs.length;
     while (i-- > 0)
@@ -1126,17 +1144,6 @@ class Controls extends FlxActionSet
         }
     }
     return list;
-  }
-
-  public function removeDevice(device:Device)
-  {
-    switch (device)
-    {
-      case Keys:
-        setKeyboardScheme(None);
-      case Gamepad(id):
-        removeGamepad(id);
-    }
   }
 
   /**
@@ -1221,7 +1228,7 @@ class Controls extends FlxActionSet
     return isEmpty ? null : data;
   }
 
-  static function isDevice(input:FlxActionInput, device:Device)
+  static function isDevice(input:FlxActionInput, device:Device):Bool
   {
     return switch (device)
     {
@@ -1230,7 +1237,7 @@ class Controls extends FlxActionSet
     }
   }
 
-  inline static function isGamepad(input:FlxActionInput, deviceID:Int)
+  inline static function isGamepad(input:FlxActionInput, deviceID:Int):Bool
   {
     return input.device == GAMEPAD && (deviceID == FlxInputDeviceID.ALL || input.deviceID == deviceID);
   }
@@ -1344,14 +1351,8 @@ class FunkinAction extends FlxActionDigital
 
   public function checkMultiFiltered(?filterTriggers:Array<FlxInputState>, ?filterDevices:Array<FlxInputDevice>):Bool
   {
-    if (filterTriggers == null)
-    {
-      filterTriggers = [PRESSED, JUST_PRESSED];
-    }
-    if (filterDevices == null)
-    {
-      filterDevices = [];
-    }
+    filterTriggers ??= [PRESSED, JUST_PRESSED];
+    filterDevices ??= [];
 
     // Perform checkFiltered for each combination.
     for (i in filterTriggers)
@@ -1382,11 +1383,10 @@ class FunkinAction extends FlxActionDigital
    * @param action The action to check for.
    * @param filterTrigger Optionally filter by trigger condition (`JUST_PRESSED`, `PRESSED`, `JUST_RELEASED`, `RELEASED`).
    * @param filterDevice Optionally filter by device (`KEYBOARD`, `MOUSE`, `GAMEPAD`, `OTHER`).
+   * @return bool if our input has been triggered
    */
   public function checkFiltered(?filterTrigger:FlxInputState, ?filterDevice:FlxInputDevice):Bool
   {
-    // The normal
-
     // Make sure we only update the inputs once per frame.
     var key = '${filterTrigger}:${filterDevice}';
     var cacheEntry = cache.get(key);
@@ -1395,20 +1395,22 @@ class FunkinAction extends FlxActionDigital
     {
       return cacheEntry.value;
     }
-    // Use a for loop instead so we can remove inputs while iterating.
 
-    // We don't return early because we need to call check() on ALL inputs.
-    var result = false;
-    var len = inputs != null ? inputs.length : 0;
-    for (i in 0...len)
+    _x = null;
+    _y = null;
+
+    _timestamp = FlxG.game.ticks;
+    triggered = false;
+
+    var i = inputs?.length ?? 0;
+    while (i-- > 0) // Iterate backwards, since we may remove items
     {
-      var j = len - i - 1;
-      var input = inputs[j];
+      var input = inputs[i];
 
       // Filter out dead inputs.
       if (input.destroyed)
       {
-        inputs.splice(j, 1);
+        inputs.remove(input);
         continue;
       }
 
@@ -1430,14 +1432,13 @@ class FunkinAction extends FlxActionDigital
       // Check whether the input has triggered.
       if (input.check(this))
       {
-        result = true;
+        triggered = true;
       }
     }
 
-    // We need to cache this result.
-    cache.set(key, {timestamp: FlxG.game.ticks, value: result});
+    cache.set(key, {timestamp: FlxG.game.ticks, value: triggered});
 
-    return result;
+    return triggered;
   }
 }
 
@@ -1458,10 +1459,10 @@ enum Control
   UI_DOWN;
   UI_UP;
   UI_RIGHT;
-  RESET;
   ACCEPT;
   BACK;
   PAUSE;
+  RESET;
   // CUTSCENE
   CUTSCENE_ADVANCE;
   // FREEPLAY
@@ -1482,6 +1483,7 @@ enum Control
   #if FEATURE_DEBUG_MENU DEBUG_MENU; #end
   #if FEATURE_CHART_EDITOR DEBUG_CHART; #end
   #if FEATURE_STAGE_EDITOR DEBUG_STAGE; #end
+  DEBUG_DISPLAY;
 }
 
 enum abstract Action(String) to String from String
@@ -1491,27 +1493,11 @@ enum abstract Action(String) to String from String
   var NOTE_LEFT = "note_left";
   var NOTE_RIGHT = "note_right";
   var NOTE_DOWN = "note_down";
-  var NOTE_UP_P = "note_up-press";
-  var NOTE_LEFT_P = "note_left-press";
-  var NOTE_RIGHT_P = "note_right-press";
-  var NOTE_DOWN_P = "note_down-press";
-  var NOTE_UP_R = "note_up-release";
-  var NOTE_LEFT_R = "note_left-release";
-  var NOTE_RIGHT_R = "note_right-release";
-  var NOTE_DOWN_R = "note_down-release";
   // UI
   var UI_UP = "ui_up";
   var UI_LEFT = "ui_left";
   var UI_RIGHT = "ui_right";
   var UI_DOWN = "ui_down";
-  var UI_UP_P = "ui_up-press";
-  var UI_LEFT_P = "ui_left-press";
-  var UI_RIGHT_P = "ui_right-press";
-  var UI_DOWN_P = "ui_down-press";
-  var UI_UP_R = "ui_up-release";
-  var UI_LEFT_R = "ui_left-release";
-  var UI_RIGHT_R = "ui_right-release";
-  var UI_DOWN_R = "ui_down-release";
   var ACCEPT = "accept";
   var BACK = "back";
   var PAUSE = "pause";
@@ -1544,6 +1530,7 @@ enum abstract Action(String) to String from String
   #if FEATURE_STAGE_EDITOR
   var DEBUG_STAGE = "debug_stage";
   #end
+  var DEBUG_DISPLAY = "debug_display";
 }
 
 enum Device

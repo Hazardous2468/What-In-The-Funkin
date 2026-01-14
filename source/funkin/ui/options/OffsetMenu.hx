@@ -19,6 +19,7 @@ import funkin.graphics.FunkinSprite;
 import funkin.data.song.SongData.SongNoteData;
 import funkin.data.notestyle.NoteStyleRegistry;
 import funkin.play.notes.notestyle.NoteStyle;
+import funkin.play.notes.NoteSplash;
 import funkin.ui.options.items.NumberPreferenceItem;
 import haxe.Int64;
 import flixel.FlxSprite;
@@ -294,6 +295,14 @@ class OffsetMenu extends Page<OptionsState.OptionsMenuPageName>
     createButtonItem('Offset Calibration', function() {
       // Reset calibration state and start another one.
 
+      testStrumline.alpha = 0;
+
+      testStrumline.clean();
+      testStrumline.noteData = [];
+      testStrumline.nextNoteIndex = 0;
+      @:privateAccess
+      if (OptionsState.instance.optionsCodex.currentPage != this) return;
+
       jumpInText.text = 'Press any key to the beat!\nThe arrow will start to sync to the receptor.';
       #if mobile
       jumpInText.text = 'Tap to the beat!\nThe arrow will start to sync to the receptor.';
@@ -326,6 +335,8 @@ class OffsetMenu extends Page<OptionsState.OptionsMenuPageName>
     createButtonItem('Test', function() {
       // Reset testing state and start another one.
       // We do not reset the offset here, so the player can test their current offset.
+      @:privateAccess
+      if (OptionsState.instance.optionsCodex.currentPage != this) return;
 
       shouldOffset = 1;
       testStrumline.clean();
@@ -363,8 +374,10 @@ class OffsetMenu extends Page<OptionsState.OptionsMenuPageName>
         testStrumline.setNoteSpacing(playerNoteSpacing);
         testStrumline.width *= 2;
 
+        var height = testStrumline.strumlineNotes.members[0].height;
+
         testStrumline.x = (FlxG.width - testStrumline.width) / 2 + Constants.STRUMLINE_X_OFFSET;
-        testStrumline.y = (FlxG.height - testStrumline.height) * 0.95 - Constants.STRUMLINE_Y_OFFSET;
+        testStrumline.y = (FlxG.height - height) * 0.95 - Constants.STRUMLINE_Y_OFFSET;
         testStrumline.y -= 10;
       }
       else
@@ -395,8 +408,7 @@ class OffsetMenu extends Page<OptionsState.OptionsMenuPageName>
       {
       #end
         var height = testStrumline.strumlineNotes.members[0].height;
-        testStrumline.y = Preferences.downscroll ? FlxG.height - (height + 45) - Constants.STRUMLINE_Y_OFFSET : (height / 2)
-        - Constants.STRUMLINE_Y_OFFSET;
+        testStrumline.y = Preferences.downscroll ? FlxG.height - (height + 45) - Constants.STRUMLINE_Y_OFFSET : (height / 2) - Constants.STRUMLINE_Y_OFFSET;
         if (Preferences.downscroll) jumpInText.y = FlxG.height - 425;
         testStrumline.isDownscroll = Preferences.downscroll;
       #if mobile
@@ -428,8 +440,8 @@ class OffsetMenu extends Page<OptionsState.OptionsMenuPageName>
   }
 
   /**
-   * Callback executed when one of the note keys is pressed.
-   */
+     * Callback executed when one of the note keys is pressed.
+     */
   function onKeyPress(event:PreciseInputEvent):Void
   {
     // Do the minimal possible work here.
@@ -437,8 +449,8 @@ class OffsetMenu extends Page<OptionsState.OptionsMenuPageName>
   }
 
   /**
-   * Callback executed when one of the note keys is released.
-   */
+     * Callback executed when one of the note keys is released.
+     */
   function onKeyRelease(event:PreciseInputEvent):Void
   {
     // Do the minimal possible work here.
@@ -514,11 +526,11 @@ class OffsetMenu extends Page<OptionsState.OptionsMenuPageName>
   var _lastDirection:Int = 0;
 
   /* Adds a difference in milliseconds to the list.
-    If there are more than 4 differences, it calculates the average and sets the global offset.
-    This is used for calibrating the offset based on user input.
-    @param ms The difference in milliseconds to add.
-    @see Preferences.globalOffset
-   */
+      If there are more than 4 differences, it calculates the average and sets the global offset.
+      This is used for calibrating the offset based on user input.
+      @param ms The difference in milliseconds to add.
+      @see Preferences.globalOffset
+     */
   public function addDifference(ms:Float):Void
   {
     differences.push(ms);
@@ -595,7 +607,7 @@ class OffsetMenu extends Page<OptionsState.OptionsMenuPageName>
     _lastTime = FlxG.sound.music.time;
 
     // Back logic
-    if (controls.BACK && shouldOffset == 1)
+    if (controls.BACK_P && shouldOffset == 1)
     {
       exitCalibration(true);
       return;
@@ -841,9 +853,9 @@ class OffsetMenu extends Page<OptionsState.OptionsMenuPageName>
     }
 
     /*debugBeatText.x = receptor.x + receptor.width * 2;
-      debugBeatText.y = receptor.y - 20;
+        debugBeatText.y = receptor.y - 20;
 
-          debugBeatText.text = 'Beat: ' + b; */
+            debugBeatText.text = 'Beat: ' + b; */
 
     // receptor.angle += angleVel * elapsed;
 
@@ -892,6 +904,10 @@ class OffsetMenu extends Page<OptionsState.OptionsMenuPageName>
     {
       // \n to signify a line break (because the original text has 3 lines)
       jumpInText.text = 'Perfect!\n';
+      var notesplash:NoteSplash = new NoteSplash(NoteStyleRegistry.instance.fetchEntry(Constants.DEFAULT_NOTE_STYLE));
+      notesplash.play(note.direction, 0);
+      notesplash.setPosition(note.x, note.y);
+      add(notesplash);
     }
     else
     {
@@ -904,9 +920,9 @@ class OffsetMenu extends Page<OptionsState.OptionsMenuPageName>
   }
 
   /**
-   * PreciseInputEvents are put into a queue between update() calls,
-   * and then processed here.
-   */
+     * PreciseInputEvents are put into a queue between update() calls,
+     * and then processed here.
+     */
   function processInputQueue():Void
   {
     if (inputPressQueue.length + inputReleaseQueue.length == 0 || shouldOffset != 1) return;
@@ -922,7 +938,7 @@ class OffsetMenu extends Page<OptionsState.OptionsMenuPageName>
     {
       var input:PreciseInputEvent = inputPressQueue.shift();
 
-      testStrumline.pressKey(input.noteDirection);
+      testStrumline.pressKey(input.noteDirection, input.keyCode);
 
       var notesInDirection:Array<NoteSprite> = notesByDirection[input.noteDirection];
 
@@ -954,7 +970,7 @@ class OffsetMenu extends Page<OptionsState.OptionsMenuPageName>
       // Play the strumline animation.
       testStrumline.playStatic(input.noteDirection);
 
-      testStrumline.releaseKey(input.noteDirection);
+      testStrumline.releaseKey(input.noteDirection, input.keyCode);
     }
 
     testStrumline.noteVibrations.tryNoteVibration();

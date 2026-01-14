@@ -89,7 +89,7 @@ class PlayerData
     updateVersionToLatest();
 
     var writer = new json2object.JsonWriter<PlayerData>();
-    return writer.write(this, pretty ? '  ' : null);
+    return writer.write(this, pretty ? ' ' : null);
   }
 
   public function updateVersionToLatest():Void
@@ -102,6 +102,10 @@ class PlayerFreeplayDJData
 {
   var assetPath:String;
   var animations:Array<AnimationData>;
+
+  @:optional
+  @:default(false)
+  var applyStageMatrix:Bool;
 
   @:optional
   @:default("BOYFRIEND")
@@ -130,6 +134,14 @@ class PlayerFreeplayDJData
   @:optional
   var fistPump:Null<PlayerFreeplayDJFistPumpData>;
 
+  @:optional
+  @:default("animateatlas")
+  public var renderType:Null<String>;
+
+  @:optional
+  @:default("")
+  public var scriptClass:Null<String>;
+
   public function new()
   {
     animationMap = new Map();
@@ -149,9 +161,15 @@ class PlayerFreeplayDJData
     }
   }
 
-  public function getAtlasPath():String
+  public inline function getAssetPath():String
+    return assetPath; // return assetPath;
+
+  public inline function getAnimationsList():Array<AnimationData>
+    return animations;
+
+  public function useApplyStageMatrix():Bool
   {
-    return Paths.animateAtlas(assetPath);
+    return applyStageMatrix;
   }
 
   public function getFreeplayDJText(index:Int):String
@@ -333,6 +351,10 @@ typedef PlayerResultsAnimationData =
    * `sparrow` or `animate` or whatever
    */
   var renderType:String;
+
+  @:optional
+  @:default(false)
+  var applyStageMatrix:Bool;
 
   @:optional
   var assetPath:Null<String>;

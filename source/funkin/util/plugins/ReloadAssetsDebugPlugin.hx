@@ -97,9 +97,9 @@ class ReloadAssetsDebugPlugin extends FlxBasic
 
   #if android
   @:noCompletion
-  function onActivityResult(resultCode:Int, requestCode:Int):Void
+  function onActivityResult(requestCode:Int, resultCode:Int):Void
   {
-    if (resultCode == CallbackUtil.DATA_FOLDER_CLOSED)
+    if (requestCode == CallbackUtil.DATA_FOLDER_CLOSED)
     {
       reload();
     }

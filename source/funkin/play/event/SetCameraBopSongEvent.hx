@@ -7,7 +7,7 @@ import funkin.data.event.SongEventSchema;
 import funkin.data.event.SongEventSchema.SongEventFieldType;
 
 /**
- * This class represents a handler for configuring camera bop intensity and rate.
+ * This class handles song events which change how the camera bops to the beat of the song.
  *
  * Example: Bop the camera twice as hard, once per beat (rather than once every four beats).
  * ```
@@ -74,7 +74,7 @@ class SetCameraBopSongEvent extends SongEvent
       {
         name: 'intensity',
         title: 'Intensity',
-        defaultValue: 1.0,
+        defaultValue: Constants.DEFAULT_BOP_INTENSITY,
         min: 0,
         step: 0.1,
         type: SongEventFieldType.FLOAT,
@@ -83,7 +83,7 @@ class SetCameraBopSongEvent extends SongEvent
       {
         name: 'offset',
         title: 'Offset',
-        defaultValue: 0,
+        defaultValue: Constants.DEFAULT_ZOOM_OFFSET,
         step: 1,
         type: SongEventFieldType.INTEGER,
         units: 'beats'
@@ -91,7 +91,7 @@ class SetCameraBopSongEvent extends SongEvent
       {
         name: 'rate',
         title: 'Rate',
-        defaultValue: 4,
+        defaultValue: Constants.DEFAULT_ZOOM_RATE,
         min: 0,
         step: 1,
         type: SongEventFieldType.INTEGER,

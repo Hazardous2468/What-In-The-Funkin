@@ -24,23 +24,35 @@ class NoteKind implements INoteScriptedClass
   public var noteStyleId:Null<String>;
 
   /**
+   * Whether or not the sing animation should play.
+   */
+  public var noanim:Bool;
+
+  /**
+   * The animation suffix to use.
+   */
+  public var suffix:String;
+
+  /**
    * Custom parameters for the chart editor
    */
   public var params:Array<NoteKindParam>;
 
   /**
-   * If this note kind is scoreable (ie, counted towards score and accuracy)
-   * Only accessible in scripts
-   * Defaults to true
+   * Set this to `false` to disable scoring for this note.
+   * The note will no longer count towards ratings, points, or accuracy.
+   * @default `true` to enable scoring.
    */
-  public var scoreable:Bool = true;
+  public var scoreable(default, default):Bool = true;
 
-  public function new(noteKind:String, description:String = "", ?noteStyleId:String, ?params:Array<NoteKindParam>)
+  public function new(noteKind:String, description:String = "", ?noteStyleId:String, ?params:Array<NoteKindParam>, ?noanim:Bool, ?suffix:String)
   {
     this.noteKind = noteKind;
     this.description = description;
     this.noteStyleId = noteStyleId;
     this.params = params ?? [];
+    this.noanim = noanim ?? false;
+    this.suffix = suffix ?? '';
   }
 
   public function toString():String
@@ -50,9 +62,10 @@ class NoteKind implements INoteScriptedClass
 
   /**
    * Retrieve all notes of this kind
+   * @param visibleCheck If true, only visible notes will be returned
    * @return Array<NoteSprite>
    */
-  function getNotes():Array<NoteSprite>
+  function getNotes(visibleCheck:Bool = false):Array<NoteSprite>
   {
     var allNotes:Array<NoteSprite> = PlayState.instance.playerStrumline.notes.members.concat(PlayState.instance.opponentStrumline.notes.members);
 
@@ -62,7 +75,20 @@ class NoteKind implements INoteScriptedClass
     }
 
     return allNotes.filter(function(note:NoteSprite) {
-      return note != null && note.noteData.kind == this.noteKind;
+      return note != null && note.noteData.kind == this.noteKind && (!visibleCheck || note.visible);
+    });
+  }
+
+  /**
+   * Retrieve all notes NOT of this kind
+   * @param visibleCheck If true, only visible notes will be returned
+   * @return Array<NoteSprite>
+   */
+  function getOtherNotes(visibleCheck:Bool = false):Array<NoteSprite>
+  {
+    var allNotes:Array<NoteSprite> = PlayState.instance.playerStrumline.notes.members.concat(PlayState.instance.opponentStrumline.notes.members);
+    return allNotes.filter(function(note:NoteSprite) {
+      return note != null && note.noteData.kind != this.noteKind && (!visibleCheck || note.visible);
     });
   }
 

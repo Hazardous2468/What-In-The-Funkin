@@ -4,11 +4,27 @@ import funkin.data.song.SongData.SongEventData;
 import funkin.data.event.SongEventSchema;
 
 /**
- * This class represents a handler for a type of song event.
- * It is used by the ScriptedSongEvent class to handle user-defined events.
+ * This class provides a handler for a type of song event.
+ * It is used by the ScriptedSongEvent class to handle user-defined events,
+ * and also used by other classes in this package to provide default behavior for built-in events.
  */
 class SongEvent
 {
+  /**
+   * These variables are used in two different events (and may be in more), and in order not to create unnecessary variables, we store them here
+   */
+  public static final DEFAULT_EASE:String = 'linear';
+
+  /**
+   * The default ease direction for events which use FlxEase.
+   */
+  public static final DEFAULT_EASE_DIR:String = 'In';
+
+  /**
+   * A regular expression to detect the current ease direction for ease function names from FlxEase.
+   */
+  public static final EASE_TYPE_DIR_REGEX:EReg = ~/(In|Out|InOut)$/i;
+
   /**
    * The internal song event ID that this handler is responsible for.
    */
@@ -40,6 +56,7 @@ class SongEvent
   /**
    * Retrieves the asset path to the icon this event type should use in the chart editor.
    * To customize this, override getIconPath().
+   * @return The path to the icon to display.
    */
   public function getIconPath():String
   {

@@ -44,7 +44,7 @@ class Preferences
     #else
     var save:Save = Save.instance;
     save.options.framerate = value;
-    save.flush();
+    Save.system.flush();
     FlxG.updateFramerate = value;
     FlxG.drawFramerate = value;
     return value;
@@ -74,7 +74,7 @@ class Preferences
 
     var save:Save = Save.instance;
     save.options.naughtyness = value;
-    save.flush();
+    Save.system.flush();
     return value;
   }
 
@@ -93,7 +93,7 @@ class Preferences
   {
     var save:Save = Save.instance;
     save.options.downscroll = value;
-    save.flush();
+    Save.system.flush();
     return value;
   }
 
@@ -112,7 +112,7 @@ class Preferences
   {
     var save:Save = Save.instance;
     save.options.flashingLights = value;
-    save.flush();
+    Save.system.flush();
     return value;
   }
 
@@ -131,57 +131,33 @@ class Preferences
   {
     var save:Save = Save.instance;
     save.options.zoomCamera = value;
-    save.flush();
+    Save.system.flush();
     return value;
   }
 
   /**
    * If enabled, an FPS and memory counter will be displayed even if this is not a debug build.
-   * Always disabled on mobile.
+   * Always disabled on release mobile builds.
    * @default `Off`
    */
   public static var debugDisplay(get, set):DebugDisplayMode;
 
   static function get_debugDisplay():DebugDisplayMode
   {
-    #if mobile
-    return DebugDisplayMode.OFF;
+    #if NO_FEATURE_DEBUG_DISPLAY
+    return DebugDisplayMode.Off;
     #end
-    var value = Save?.instance?.options?.debugDisplay ?? 'Off';
 
-    return switch (value)
-    {
-      case "Simple":
-        DebugDisplayMode.SIMPLE;
-      case "Advanced":
-        DebugDisplayMode.ADVANCED;
-      default:
-        DebugDisplayMode.OFF;
-    };
+    return Save?.instance?.options?.debugDisplay ?? 'Off';
   }
 
   static function set_debugDisplay(value:DebugDisplayMode):DebugDisplayMode
   {
-    var string;
-
-    switch (value)
-    {
-      case DebugDisplayMode.SIMPLE:
-        string = "Simple";
-      case DebugDisplayMode.ADVANCED:
-        string = "Advanced";
-      default:
-        string = "Off";
-    };
-
-    if (string != Save.instance.options.debugDisplay)
-    {
-      setDebugDisplayMode(value);
-    }
+    if (value != Save.instance.options.debugDisplay) setDebugDisplayMode(value);
 
     var save = Save.instance;
-    save.options.debugDisplay = string;
-    save.flush();
+    save.options.debugDisplay = value;
+    Save.system.flush();
     return value;
   }
 
@@ -202,7 +178,7 @@ class Preferences
 
     var save:Save = Save.instance;
     save.options.debugDisplayBGOpacity = value;
-    save.flush();
+    Save.system.flush();
     return value;
   }
 
@@ -243,7 +219,7 @@ class Preferences
 
     var save:Save = Save.instance;
     save.options.hapticsMode = string;
-    save.flush();
+    Save.system.flush();
     return value;
   }
 
@@ -262,7 +238,7 @@ class Preferences
   {
     var save:Save = Save.instance;
     save.options.hapticsIntensityMultiplier = value;
-    save.flush();
+    Save.system.flush();
     return value;
   }
 
@@ -276,7 +252,7 @@ class Preferences
   static function get_autoPause():Bool
   {
     #if mobile
-    return true;
+    return false;
     #end
     return Save?.instance?.options?.autoPause ?? true;
   }
@@ -287,7 +263,7 @@ class Preferences
 
     var save:Save = Save.instance;
     save.options.autoPause = value;
-    save.flush();
+    Save.system.flush();
     return value;
   }
 
@@ -306,7 +282,7 @@ class Preferences
   {
     var save:Save = Save.instance;
     save.options.autoFullscreen = value;
-    save.flush();
+    Save.system.flush();
     return value;
   }
 
@@ -326,7 +302,7 @@ class Preferences
   {
     var save:Save = Save.instance;
     save.options.globalOffset = value;
-    save.flush();
+    Save.system.flush();
     return value;
   }
 
@@ -373,7 +349,7 @@ class Preferences
 
     var save:Save = Save.instance;
     save.options.vsyncMode = string;
-    save.flush();
+    Save.system.flush();
     return value;
   }
 
@@ -395,7 +371,7 @@ class Preferences
 
     var save:Save = Save.instance;
     save.options.unlockedFramerate = value;
-    save.flush();
+    Save.system.flush();
     return value;
   }
 
@@ -435,7 +411,7 @@ class Preferences
   {
     var save:Save = Save.instance;
     save.options.strumlineBackgroundOpacity = value;
-    save.flush();
+    Save.system.flush();
     return value;
   }
 
@@ -454,7 +430,7 @@ class Preferences
   {
     var save:Save = Save.instance;
     save.options.screenshot.shouldHideMouse = value;
-    save.flush();
+    Save.system.flush();
     return value;
   }
 
@@ -473,7 +449,7 @@ class Preferences
   {
     var save:Save = Save.instance;
     save.options.screenshot.fancyPreview = value;
-    save.flush();
+    Save.system.flush();
     return value;
   }
 
@@ -492,7 +468,7 @@ class Preferences
   {
     var save:Save = Save.instance;
     save.options.screenshot.previewOnSave = value;
-    save.flush();
+    Save.system.flush();
     return value;
   }
 
@@ -526,16 +502,13 @@ class Preferences
     #end
   }
 
-  static function setDebugDisplayMode(mode:DebugDisplayMode):Void
+  public static function setDebugDisplayMode(mode:DebugDisplayMode):Void
   {
-    if (FlxG.game.parent.contains(Main.debugDisplay))
-    {
-      FlxG.game.parent.removeChild(Main.debugDisplay);
-    }
+    if (FlxG.game.parent.contains(Main.debugDisplay)) FlxG.game.parent.removeChild(Main.debugDisplay);
 
-    if (mode == DebugDisplayMode.OFF) return;
+    if (mode == DebugDisplayMode.Off) return;
 
-    Main.debugDisplay.isAdvanced = (mode == DebugDisplayMode.ADVANCED);
+    Main.debugDisplay.isAdvanced = (mode == DebugDisplayMode.Advanced);
 
     FlxG.game.parent.addChild(Main.debugDisplay);
   }
@@ -545,6 +518,25 @@ class Preferences
     if (Main.debugDisplay == null) return;
 
     Main.debugDisplay.backgroundOpacity = value;
+  }
+
+  /**
+   * If enabled, subtitles will appear during some songs and cutscenes.
+   * @default `true`
+   */
+  public static var subtitles(get, set):Bool;
+
+  static function get_subtitles():Bool
+  {
+    return Save?.instance?.options?.subtitles ?? true;
+  }
+
+  static function set_subtitles(value:Bool):Bool
+  {
+    var save:Save = Save.instance;
+    save.options.subtitles = value;
+    Save.system.flush();
+    return value;
   }
 
   #if mobile
@@ -565,7 +557,7 @@ class Preferences
 
     var save:Save = Save.instance;
     save.mobileOptions.screenTimeout = value;
-    save.flush();
+    Save.system.flush();
     return value;
   }
 
@@ -584,7 +576,7 @@ class Preferences
   {
     var save:Save = Save.instance;
     save.mobileOptions.controlsScheme = value;
-    save.flush();
+    Save.system.flush();
     return value;
   }
 
@@ -609,7 +601,7 @@ class Preferences
   {
     var save:Save = Save.instance;
     save.mobileOptions.noAds = value;
-    save.flush();
+    Save.system.flush();
     return value;
   }
   #end

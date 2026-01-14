@@ -38,11 +38,7 @@ typedef RegistryTypeParams =
  */
 class RegistryMacro
 {
-  #if ios
-  static final DATA_FILE_BASE_PATH:String = "../../../../../assets/preload/data";
-  #else
   static final DATA_FILE_BASE_PATH:String = "assets/preload/data";
-  #end
 
   /**
    * Builds the registry class.
@@ -105,26 +101,34 @@ class RegistryMacro
    */
   static function getTypeParams(cls:ClassType):RegistryTypeParams
   {
+    var params:Array<Type> = [];
+    var typeParams:Array<Any> = [];
     switch (cls.superClass.t.get().kind)
     {
-      case KGenericInstance(_, params):
-        var typeParams:Array<Any> = [];
-        for (param in params)
-        {
-          switch (param)
-          {
-            case TInst(t, _):
-              typeParams.push(t.get());
-            case TType(t, _):
-              typeParams.push(t.get());
-            default:
-              throw 'Not a class';
-          }
-        }
-        return {entryType: typeParams[0], dataType: typeParams[1]};
+      case KGenericInstance(_, _params):
+        params = _params;
+      case KGeneric:
+        // For some reason the only case where it's KGeneric
+        // is on the language server so we have to handle it too.
+        // This seems to be somehow related to the broken code completion.
+        params = cls.superClass.params;
       default:
         throw '${cls.name}: Could not interpret type parameters of Registry class.';
     }
+
+    for (param in params)
+    {
+      switch (param)
+      {
+        case TInst(t, _):
+          typeParams.push(t.get());
+        case TType(t, _):
+          typeParams.push(t.get());
+        default:
+          throw 'Not a class';
+      }
+    }
+    return {entryType: typeParams[0], dataType: typeParams[1]};
   }
 
   /**
@@ -147,7 +151,13 @@ class RegistryMacro
     var newJsonParser:String = 'new json2object.JsonParser<${dataType.module}.${dataType.name}>()';
 
     var dataFilePath:String = getRegistryDataFilePath(cls, fields);
-    var baseGameEntryIds:Array<Expr> = listBaseGameEntryIds('${DATA_FILE_BASE_PATH}/${dataFilePath}/');
+
+    var dataPath:String = DATA_FILE_BASE_PATH;
+    #if ios
+    if (!sys.FileSystem.exists(dataPath)) dataPath = "../../../../../" + dataPath;
+    #end
+
+    var baseGameEntryIds:Array<Expr> = listBaseGameEntryIds('${dataPath}/${dataFilePath}/');
 
     return (macro class TempClass
       {
@@ -182,7 +192,7 @@ class RegistryMacro
           switch (this.loadEntryFile(id))
           {
             case {fileName: fileName, contents: contents}:
-              parser.fromJson(contents.substring(contents.indexOf("{"), contents.lastIndexOf("}") + 1), fileName);
+              parser.fromJson(funkin.util.SerializerUtil.sanitizeJSON(contents), fileName);
             default:
               return null;
           }

@@ -45,10 +45,22 @@ class SustainTrail extends ZSprite
   public var noteDirection:NoteDirection = 0;
   public var sustainLength(default, set):Float = 0; // millis
   public var fullSustainLength:Float = 0;
-  public var noteData:Null<SongNoteData>;
   public var parentStrumline:Strumline;
 
   public var cover:NoteHoldCover = null;
+
+  /**
+   * The note data associated with this hold note sprite.
+   * This is used to store the strum time, length, and other properties.
+   */
+  public var noteData:Null<SongNoteData>;
+
+  /**
+   * Set this to `false` to disable scoring for this note.
+   * The note will no longer count towards ratings, points, or accuracy.
+   * @default `true` to enable scoring.
+   */
+  public var scoreable:Bool = true;
 
   /**
    * The Y Offset of the note.
@@ -1513,6 +1525,7 @@ class SustainTrail extends ZSprite
   {
     super.kill();
 
+    if (!((cover?.animation?.name ?? "").startsWith("holdCoverEnd"))) cover?.playEnd();
     strumTime = 0;
     noteDirection = 0;
     sustainLength = 0;

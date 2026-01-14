@@ -46,7 +46,7 @@ class PolymodHandler
    * Using more complex rules allows mods from older compatible versions to stay functioning,
    * while preventing mods made for future versions from being installed.
    */
-  public static final API_VERSION_RULE:String = ">=0.6.3 <0.8.0";
+  public static final API_VERSION_RULE:String = ">=0.8.0 <0.9.0";
 
   /**
    * Where relative to the executable that mods are located.
@@ -105,7 +105,7 @@ class PolymodHandler
     createModRoot();
     #end
     trace('Initializing Polymod (using configured mods)...');
-    loadModsById(Save.instance.enabledModIds);
+    loadModsById(Save.instance.enabledModIds.value);
   }
 
   /**
@@ -194,7 +194,7 @@ class PolymodHandler
     loadedModIds = [];
     for (mod in loadedModList)
     {
-      trace('  * ${mod.title} v${mod.modVersion} [${mod.id}]');
+      trace(' * ${mod.title} v${mod.modVersion} [${mod.id}]');
       loadedModIds.push(mod.id);
     }
 
@@ -203,35 +203,35 @@ class PolymodHandler
     trace('Installed mods have replaced ${fileList.length} images.');
     for (item in fileList)
     {
-      trace('  * $item');
+      trace(' * $item');
     }
 
     fileList = Polymod.listModFiles(PolymodAssetType.TEXT);
     trace('Installed mods have added/replaced ${fileList.length} text files.');
     for (item in fileList)
     {
-      trace('  * $item');
+      trace(' * $item');
     }
 
     fileList = Polymod.listModFiles(PolymodAssetType.AUDIO_MUSIC);
     trace('Installed mods have replaced ${fileList.length} music files.');
     for (item in fileList)
     {
-      trace('  * $item');
+      trace(' * $item');
     }
 
     fileList = Polymod.listModFiles(PolymodAssetType.AUDIO_SOUND);
     trace('Installed mods have replaced ${fileList.length} sound files.');
     for (item in fileList)
     {
-      trace('  * $item');
+      trace(' * $item');
     }
 
     fileList = Polymod.listModFiles(PolymodAssetType.AUDIO_GENERIC);
     trace('Installed mods have replaced ${fileList.length} generic audio files.');
     for (item in fileList)
     {
-      trace('  * $item');
+      trace(' * $item');
     }
     #end
   }
@@ -273,6 +273,11 @@ class PolymodHandler
     Polymod.addImportAlias('funkin.data.dialogue.speaker.SpeakerRegistry', funkin.data.dialogue.SpeakerRegistry);
     Polymod.addImportAlias('funkin.play.character.CharacterDataParser', funkin.data.character.CharacterData.CharacterDataParser);
     Polymod.addImportAlias('funkin.play.character.CharacterData.CharacterDataParser', funkin.data.character.CharacterData.CharacterDataParser);
+
+    // `FlxAtlasSprite` was merged into `FunkinSprite` and then removed.
+    // We add the import alias here so mods don't error out as much.
+    Polymod.addImportAlias('funkin.graphics.adobeanimate.FlxAtlasSprite', funkin.graphics.FunkinSprite);
+    Polymod.addImportAlias('funkin.modding.base.ScriptedFlxAtlasSprite', funkin.graphics.ScriptedFunkinSprite);
 
     // `funkin.util.FileUtil` has unrestricted access to the file system.
     Polymod.addImportAlias('funkin.util.FileUtil', funkin.util.FileUtilSandboxed);
@@ -325,16 +330,27 @@ class PolymodHandler
     // Disable access to In-App Purchases Util
     Polymod.blacklistImport('funkin.mobile.util.InAppPurchasesUtil');
 
-    // Disable access to Admob Extension
-    for (cls in ClassMacro.listClassesInPackage('extension.admob'))
+    // Disable access to In-App Reviews Util
+    Polymod.blacklistImport('funkin.mobile.util.InAppReviewUtil');
+
+    // Disable access to AndroidTools Extension
+    for (cls in ClassMacro.listClassesInPackage('extension.androidtools'))
     {
       if (cls == null) continue;
       var className:String = Type.getClassName(cls);
       Polymod.blacklistImport(className);
     }
 
-    // Disable access to AndroidTools Extension
-    for (cls in ClassMacro.listClassesInPackage('extension.androidtools'))
+    // Disable access to Haptics Extension
+    for (cls in ClassMacro.listClassesInPackage('extension.haptics'))
+    {
+      if (cls == null) continue;
+      var className:String = Type.getClassName(cls);
+      Polymod.blacklistImport(className);
+    }
+
+    // Disable access to Admob Extension
+    for (cls in ClassMacro.listClassesInPackage('extension.admob'))
     {
       if (cls == null) continue;
       var className:String = Type.getClassName(cls);
@@ -349,8 +365,16 @@ class PolymodHandler
       Polymod.blacklistImport(className);
     }
 
-    // Disable access to Haptics Extension
-    for (cls in ClassMacro.listClassesInPackage('extension.haptics'))
+    // Disable access to IARCore Extension
+    for (cls in ClassMacro.listClassesInPackage('extension.iarcore'))
+    {
+      if (cls == null) continue;
+      var className:String = Type.getClassName(cls);
+      Polymod.blacklistImport(className);
+    }
+
+    // Disable access to WebViewCore Extension
+    for (cls in ClassMacro.listClassesInPackage('extension.webviewcore'))
     {
       if (cls == null) continue;
       var className:String = Type.getClassName(cls);
@@ -445,6 +469,11 @@ class PolymodHandler
       var className:String = Type.getClassName(cls);
       Polymod.blacklistImport(className);
     }
+
+    // External classes for android that bridge to private JNI methods & callbacks
+    Polymod.blacklistImport('funkin.external.android.CallbackUtil');
+    Polymod.blacklistImport('funkin.external.android.DataFolderUtil');
+    Polymod.blacklistImport('funkin.external.android.JNIUtil');
   }
 
   /**
@@ -495,6 +524,7 @@ class PolymodHandler
         'week6' => 'week6',
         'week7' => 'week7',
         'weekend1' => 'weekend1',
+        'sserafim' => 'sserafim'
       ],
       coreAssetRedirect: CORE_FOLDER,
     }
@@ -537,7 +567,7 @@ class PolymodHandler
    */
   public static function getEnabledMods():Array<ModMetadata>
   {
-    var modIds:Array<String> = Save.instance.enabledModIds;
+    var modIds:Array<String> = Save.instance.enabledModIds.value;
     var modMetadata:Array<ModMetadata> = getAllMods();
     var enabledMods:Array<ModMetadata> = [];
     for (item in modMetadata)
@@ -587,7 +617,8 @@ class PolymodHandler
     FreeplayStyleRegistry.instance.loadEntries();
 
     CharacterDataParser.loadCharacterCache(); // TODO: Migrate characters to BaseRegistry.
-    NoteKindManager.loadScripts();
+    NoteKindManager.initialize();
     ModuleHandler.loadModuleCache();
+    ModuleHandler.callOnCreate();
   }
 }

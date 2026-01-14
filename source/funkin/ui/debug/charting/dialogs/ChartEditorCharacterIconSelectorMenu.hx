@@ -1,5 +1,6 @@
 package funkin.ui.debug.charting.dialogs;
 
+#if FEATURE_CHART_EDITOR
 import flixel.math.FlxPoint;
 import funkin.play.character.BaseCharacter.CharacterType;
 import funkin.data.character.CharacterData;
@@ -115,14 +116,19 @@ class ChartEditorCharacterIconSelectorMenu extends ChartEditorBaseMenu
       charButton.onClick = _ -> {
         switch (charType)
         {
-          case BF: chartEditorState.currentSongMetadata.playData.characters.player = charId;
+          case BF:
+            chartEditorState.currentSongMetadata.playData.characters.player = charId;
+            chartEditorState.playerPreviewDirty = true;
           case GF: chartEditorState.currentSongMetadata.playData.characters.girlfriend = charId;
-          case DAD: chartEditorState.currentSongMetadata.playData.characters.opponent = charId;
+          case DAD:
+            chartEditorState.currentSongMetadata.playData.characters.opponent = charId;
+            chartEditorState.opponentPreviewDirty = true;
           default: throw 'Invalid charType: ' + charType;
         };
 
         defaultText = (charId != "") ? '${charData.name} [${charId}]' : 'None';
         chartEditorState.healthIconsDirty = true;
+
         chartEditorState.refreshToolbox(ChartEditorState.CHART_EDITOR_TOOLBOX_METADATA_LAYOUT);
       };
 
@@ -147,3 +153,4 @@ class ChartEditorCharacterIconSelectorMenu extends ChartEditorBaseMenu
     return menu;
   }
 }
+#end
