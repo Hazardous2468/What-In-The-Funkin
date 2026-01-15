@@ -4,17 +4,15 @@ package funkin.modding.events;
 enum abstract ScriptEventType(String) from String to String
 {
   /**
-   * Called in playstate song creation.
-   * Used to modify the song's modchart event handler before it gets applied.
-   * Essential for modcharting in hxscript!
-   *
+   * Called in playstate song creation, right after the modchart event handler is first created.
+   * This function is only called once.
    * This event is not cancelable.
    */
   var MODCHART_SETUP = "MODCHART_SETUP";
 
   /**
-   * Called in playstate song creation.
-   * Used to modify the song's modchart event handler before it gets applied.
+   * This function gets called every time the modchart event handler requests to see the timeline of events for this song.
+   * Use this function to fill out the event handler with the events of the song!
    * Essential for modcharting in hxscript!
    *
    * This event is not cancelable.
@@ -22,7 +20,9 @@ enum abstract ScriptEventType(String) from String to String
   var MODCHART_TIMELINE = "MODCHART_TIMELINE";
 
   /**
-   * called when going back in time to reset all mods back to default
+   * Called when going back in time to reset all mods back to their default starting values.
+   *
+   * This event is not cancelable.
    */
   var MODCHART_RESET = "MODCHART_RESET";
 

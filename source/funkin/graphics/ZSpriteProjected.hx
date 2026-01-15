@@ -396,8 +396,8 @@ class ZSpriteProjected extends ZSprite
         var uvY:Float = yPercent;
 
         var curFrame = this.frame;
-        uvX = FlxMath.remapToRange(xPercent, 0, 1, curFrame.uv.x, curFrame.uv.width);
-        uvY = FlxMath.remapToRange(yPercent, 0, 1, curFrame.uv.y, curFrame.uv.height);
+        uvX = FlxMath.remapToRange(xPercent, 0, 1, curFrame.uv.left, curFrame.uv.right);
+        uvY = FlxMath.remapToRange(yPercent, 0, 1, curFrame.uv.top, curFrame.uv.bottom);
 
         // todo: add repeat texture to here instead so that we can use frameBorderCut to determine if we repeat the entire atlas, or just the current frame
 

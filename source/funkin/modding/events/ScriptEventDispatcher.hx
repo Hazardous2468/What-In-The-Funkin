@@ -157,6 +157,16 @@ class ScriptEventDispatcher
       var t:IPlayStateScriptedClass = cast(target, IPlayStateScriptedClass);
       switch (event.type)
       {
+        case MODCHART_SETUP:
+          t.onModchartSetup(cast event);
+          return;
+        case MODCHART_TIMELINE:
+          t.onModchartTimeline(cast event);
+          return;
+        case MODCHART_RESET:
+          t.onModchartReset(cast event);
+          return;
+
         case NOTE_GHOST_MISS:
           t.onNoteGhostMiss(cast event);
           return;
@@ -193,14 +203,6 @@ class ScriptEventDispatcher
         case SONG_LOADED:
           t.onSongLoaded(cast event);
           return;
-        case MODCHART_RESET:
-          t.onModchartReset(cast event);
-        case MODCHART_SETUP:
-          t.onModchartSetup(cast event);
-          return;
-        case MODCHART_TIMELINE:
-          t.onModchartTimeline(cast event);
-          return;
         default: // Continue;
       }
     }
@@ -208,6 +210,10 @@ class ScriptEventDispatcher
     {
       // If the target doesn't support the event, stop trying to dispatch.
       if ([
+        ScriptEventType.MODCHART_SETUP,
+        ScriptEventType.MODCHART_TIMELINE,
+        ScriptEventType.MODCHART_RESET,
+
         ScriptEventType.NOTE_GHOST_MISS,
         ScriptEventType.SONG_START,
         ScriptEventType.SONG_END,

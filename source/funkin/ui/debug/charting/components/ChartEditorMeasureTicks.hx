@@ -95,12 +95,18 @@ class ChartEditorMeasureTicks extends FlxTypedSpriteGroup<FlxSprite>
     {
       case Light: ChartEditorThemeHandler.MEASTURE_TICKS_BACKING_COLOR_LIGHT;
       case Dark: ChartEditorThemeHandler.MEASTURE_TICKS_BACKING_COLOR_DARK;
+      case LightQuant: ChartEditorThemeHandler.GRID_BEAT_DIVIDER_COLOR_LIGHTQUANT;
+      case DarkQuant: ChartEditorThemeHandler.GRID_BEAT_DIVIDER_COLOR_DARKQUANT;
+      case Hazard: ChartEditorThemeHandler.GRID_BEAT_DIVIDER_COLOR_HAZARD;
       default: ChartEditorThemeHandler.MEASTURE_TICKS_BACKING_COLOR_LIGHT;
     };
     var dividerColor:FlxColor = switch (chartEditorState.currentTheme)
     {
       case Light: ChartEditorThemeHandler.GRID_MEASURE_DIVIDER_COLOR_LIGHT;
       case Dark: ChartEditorThemeHandler.GRID_MEASURE_DIVIDER_COLOR_DARK;
+      case LightQuant: ChartEditorThemeHandler.GRID_MEASURE_DIVIDER_COLOR_LIGHTQUANT;
+      case DarkQuant: ChartEditorThemeHandler.GRID_MEASURE_DIVIDER_COLOR_DARKQUANT;
+      case Hazard: ChartEditorThemeHandler.GRID_MEASURE_DIVIDER_COLOR_HAZARD;
       default: ChartEditorThemeHandler.GRID_MEASURE_DIVIDER_COLOR_LIGHT;
     };
 
@@ -244,6 +250,9 @@ class ChartEditorMeasureTicks extends FlxTypedSpriteGroup<FlxSprite>
     {
       case Light: ChartEditorThemeHandler.GRID_MEASURE_DIVIDER_COLOR_LIGHT;
       case Dark: ChartEditorThemeHandler.GRID_MEASURE_DIVIDER_COLOR_DARK;
+      case DarkQuant: ChartEditorThemeHandler.GRID_MEASURE_DIVIDER_COLOR_DARKQUANT;
+      case LightQuant: ChartEditorThemeHandler.GRID_MEASURE_DIVIDER_COLOR_LIGHTQUANT;
+      case Hazard: ChartEditorThemeHandler.GRID_MEASURE_DIVIDER_COLOR_HAZARD;
       default: ChartEditorThemeHandler.GRID_MEASURE_DIVIDER_COLOR_LIGHT;
     };
 

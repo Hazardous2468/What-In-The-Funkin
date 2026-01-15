@@ -17,6 +17,7 @@ import flixel.sound.FlxSound;
 import flixel.text.FlxText;
 import flixel.tweens.FlxTween;
 import flixel.tweens.FlxEase;
+import funkin.ui.MusicBeatSubState;
 import flixel.ui.FlxBar;
 import flixel.util.FlxColor;
 import flixel.util.FlxSort;
@@ -2729,7 +2730,7 @@ class PlayState extends MusicBeatSubState
       }
 
       // cuz we cleared the timeline, we need to grab the timelines from the hxscripts again
-      dispatchEvent(new ScriptEvent(MODCHART_TIMELINE));
+      dispatchEvent(new ScriptEvent(MODCHART_TIMELINE, false));
 
       for (strumLine in allStrumLines)
       {
@@ -2874,7 +2875,7 @@ class PlayState extends MusicBeatSubState
       {
         lua.call('setUp', []);
       }
-      dispatchEvent(new ScriptEvent(MODCHART_SETUP));
+      dispatchEvent(new ScriptEvent(MODCHART_SETUP, false));
 
       for (strumLine in allStrumLines)
       {
@@ -2887,7 +2888,7 @@ class PlayState extends MusicBeatSubState
       modchartEventHandler.setupEvents();
       setUpModTXT();
 
-      dispatchEvent(new ScriptEvent(MODCHART_RESET));
+      dispatchEvent(new ScriptEvent(MODCHART_RESET, false));
     }
     #if mobile
     if (Preferences.controlsScheme == FunkinHitboxControlSchemes.Arrows && !ControlsHandler.usingExternalInputDevice)
@@ -3097,7 +3098,7 @@ class PlayState extends MusicBeatSubState
       {
         lua.call('modsTimeline', []);
       }
-      dispatchEvent(new ScriptEvent(MODCHART_TIMELINE));
+      dispatchEvent(new ScriptEvent(MODCHART_TIMELINE, false));
       modchartEventHandler.setupEvents();
     }
 
@@ -3750,7 +3751,7 @@ class PlayState extends MusicBeatSubState
       {
         var input:PreciseInputEvent = inputPressQueue[i]; // return first input but don't pop it!
 
-        customStrummer.pressKey(input.noteDirection);
+        customStrummer.pressKey(input.noteDirection, input.keyCode);
 
         var notesInDirection:Array<NoteSprite> = notesByDirection[input.noteDirection];
 
