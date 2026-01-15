@@ -1,4 +1,6 @@
-Fork specific issues (V1.0.0a):
+Fork specific issues (V1.0.3):
+
+- Hold covers for groovin (and maybe simple) notestyle are incorrectly positioned outside of WITF
 
 - Hitting a hold early will sometimes make them bug out visually
 
@@ -14,7 +16,6 @@ Fork specific issues (V1.0.0a):
 
 - Incorrect animation speeds with zSort enabled
 
-- Metamods menu softlocks the story menu state
 - Metamods will not apply turn/chart modifiers unless you enter and exit the menu
 - The 'random' chart shuffle may take ages to load. Will be overhauled in a later fix
 - Chaos mode is still a WIP so there are some issues with it that will be eventually fixed

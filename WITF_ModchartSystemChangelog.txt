@@ -1,3 +1,13 @@
+v1.0.3:
+
+Updated to latest version of FNF (v0.8.1)
+Updated Anby's notestyle (SimpleSimple notestyle)
+Deprecated setFilters properly
+Fixed Meta Mods soft locking in story-mode menu
+
+
+
+
 v1.0.2:
 
 Swapped FlxText in favour of FlxBitmapText for debug text. Game will no longer crash and burn having to constantly regen the text sprites every frame.

@@ -1133,7 +1133,7 @@ class FlxCamera extends FlxBasic
 
   function hazFilterResizeFix()
   {
-    if (!filtersEnabled) return;
+    if (!filtersEnabled || flashSprite?.filters ?? null == null) return;
     if (filterRefresh)
     {
       // trace("Window resized, reapplying shaders!");
