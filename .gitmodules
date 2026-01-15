@@ -1,7 +1,10 @@
 [submodule "assets"]
+	url = https://github.com/Hazardous2468/WITF.Assets.git
+	branch = WITF_Assets
 	path = assets
-	url = https://github.com/FunkinCrew/Funkin.assets
+
 [submodule "art"]
 	path = art
-	url = https://github.com/FunkinCrew/Funkin.art
+	url = https://github.com/Hazardous2468/WITF.Assets.git
+	branch = WITF_Art
 	shallow = true
