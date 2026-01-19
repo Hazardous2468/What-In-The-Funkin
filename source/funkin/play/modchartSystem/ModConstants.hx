@@ -863,7 +863,7 @@ class ModConstants
       modsTarget = invertStrumlineTarget ? PlayState.instance.playerStrumline.mods : PlayState.instance.opponentStrumline.mods;
       return modsTarget;
     }
-    else if (playerTarget == "bf" || playerTarget == "boyfriend" || playerTarget == "1")
+    else if (playerTarget == "bf" || playerTarget == "boyfriend" || playerTarget == "1" || playerTarget == "player")
     {
       modsTarget = invertStrumlineTarget ? PlayState.instance.opponentStrumline.mods : PlayState.instance.playerStrumline.mods;
       return modsTarget;
