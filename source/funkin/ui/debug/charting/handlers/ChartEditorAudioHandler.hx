@@ -162,6 +162,8 @@ class ChartEditorAudioHandler
     var instTrack:Null<FunkinSound> = SoundUtil.buildSoundFromBytes(instTrackData);
     if (instTrack == null) return false;
 
+    instTrack.important = true;
+
     stopExistingInstrumental(state);
     state.audioInstTrack = instTrack;
     state.postLoadInstrumental();
@@ -193,6 +195,8 @@ class ChartEditorAudioHandler
 
     // early return
     if (vocalTrack == null) return false;
+
+    vocalTrack.important = true;
 
     switch (charType)
     {
@@ -282,6 +286,40 @@ class ChartEditorAudioHandler
     snd.autoDestroy = true;
     snd.play(true);
     snd.volume = volume;
+  }
+
+  /**
+   * Play one of two stretchy sounds.
+   * Since some configurations can play this frequently, we limit to one of each of the two alternating sounds at a time.
+   * @param state
+   * @param volume
+   */
+  public static function playStretchySound(state:ChartEditorState, volume:Float = 1.0):Void
+  {
+    if (state.stretchySounds)
+    {
+      if (state.stretchySound1 == null) state.stretchySound1 = FunkinSound.load(Paths.sound('chartingSounds/stretch1_UI'));
+      if (state.stretchySound1 == null) return;
+
+      // Prevent spam playing that could cause issues.
+      if (state.stretchySound1?.isPlaying ?? false || state.stretchySound2?.isPlaying ?? false) return;
+
+      state.stretchySounds = !state.stretchySounds;
+      state.stretchySound1.play(true);
+      state.stretchySound1.volume = volume;
+    }
+    else
+    {
+      if (state.stretchySound2 == null) state.stretchySound2 = FunkinSound.load(Paths.sound('chartingSounds/stretch2_UI'));
+      if (state.stretchySound2 == null) return;
+
+      // Prevent spam playing that could cause issues.
+      if (state.stretchySound1?.isPlaying ?? false || state.stretchySound2?.isPlaying ?? false) return;
+
+      state.stretchySounds = !state.stretchySounds;
+      state.stretchySound2.play(true);
+      state.stretchySound2.volume = volume;
+    }
   }
 
   public static function wipeInstrumentalData(state:ChartEditorState):Void

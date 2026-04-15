@@ -285,7 +285,7 @@ class ChartEditorEventDataToolbox extends ChartEditorBaseToolbox
         case ENUM:
           var dropDown:DropDown = new DropDown();
           dropDown.id = field.name;
-          dropDown.width = 157.0;
+          dropDown.width = 150.0;
           dropDown.dropdownSize = 10;
           dropDown.dropdownWidth = 157;
           dropDown.searchable = true;
@@ -320,8 +320,8 @@ class ChartEditorEventDataToolbox extends ChartEditorBaseToolbox
           input.percentWidth = 100;
           if (field.collapsible != null)
           {
-            var targetFrame:Frame = cast parent;
-            targetFrame.collapsible = field.collapsible;
+            var targetFrame:Frame = cast(input, Frame);
+            if (targetFrame != null) targetFrame.collapsible = field.collapsible;
           }
 
           var frameVBox:VBox = new VBox();
@@ -374,7 +374,7 @@ class ChartEditorEventDataToolbox extends ChartEditorBaseToolbox
       {
         if (field.type == FRAME) return;
 
-        var value = event.target.value;
+        var value:Any = event.target.value;
         if (field.type == ENUM)
         {
           var drp:DropDown = cast event.target;

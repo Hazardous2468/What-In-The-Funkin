@@ -94,6 +94,12 @@ class ControlsMenu extends Page<OptionsState.OptionsMenuPageName>
     {
       var control = controlList[i];
       var name = control.getName();
+      // Don't spoil that you can play different characters until the player has unlocked one
+      if (control == FREEPLAY_CHAR_SELECT && funkin.data.freeplay.player.PlayerRegistry.instance.countUnlockedCharacters() <= 1)
+      {
+        continue;
+      }
+
       if (currentHeader != "UI_" && name.indexOf("UI_") == 0)
       {
         currentHeader = "UI_";
@@ -443,7 +449,6 @@ class ControlsMenu extends Page<OptionsState.OptionsMenuPageName>
     // Shift left on the grid if the item on the right is bound and the item on the left is unbound.
     if (controlGrid.selectedIndex % 2 == 1)
     {
-      trace('Modified item on right side of grid');
       if (leftItem != null && input != FlxKey.NONE && leftItem.input == FlxKey.NONE)
       {
         trace('Left item is unbound and right item is not!');
@@ -458,7 +463,6 @@ class ControlsMenu extends Page<OptionsState.OptionsMenuPageName>
     }
     else
     {
-      trace('Modified item on left side of grid');
       if (rightItem != null && input == FlxKey.NONE && rightItem.input != FlxKey.NONE)
       {
         trace('Left item is unbound and right item is not!');

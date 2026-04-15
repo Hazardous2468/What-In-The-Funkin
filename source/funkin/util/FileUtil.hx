@@ -3,6 +3,7 @@ package funkin.util;
 import haxe.zip.Entry;
 import lime.utils.Bytes;
 import lime.ui.FileDialog;
+import openfl.Lib;
 import openfl.net.FileFilter;
 import haxe.io.Path;
 import openfl.net.FileReference;
@@ -54,14 +55,15 @@ class FileUtil
    */
   public static var PROTECTED_PATHS(get, never):Array<String>;
 
-  public static function get_PROTECTED_PATHS():Array<String>
+  static function get_PROTECTED_PATHS():Array<String>
   {
     final protected:Array<String> = ['', '.', 'assets', 'assets/*', 'backups', 'backups/*', 'manifest', 'manifest/*', 'plugins', 'plugins/*', 'Funkin.exe', 'Funkin', 'icon.ico', 'libvlc.dll', 'libvlccore.dll', 'lime.ndll', 'scores.json'];
 
     #if sys
     for (i in 0...protected.length)
     {
-      protected[i] = sys.FileSystem.fullPath(Path.join([gameDirectory, protected[i]]));
+      // On Linux 'fullPath' just makes most of these null which actually just makes the paths unprotected
+      protected[i] = #if !linux sys.FileSystem.fullPath #end (Path.join([gameDirectory, protected[i]]));
     }
     #end
 
@@ -158,7 +160,6 @@ class FileUtil
 
   /**
    * Browses for a directory, then calls `onSelect(path)` when a path chosen.
-   * Note that on HTML5 this will immediately fail.
    *
    * @param typeFilter TODO What does this do?
    * @return Whether the file dialog was opened successfully.
@@ -166,19 +167,7 @@ class FileUtil
   public static function browseForDirectory(?typeFilter:Array<FileFilter>, onSelect:(String) -> Void, ?onCancel:() -> Void, ?defaultPath:String,
       ?dialogTitle:String):Bool
   {
-    #if desktop
-    var filter:Null<String> = convertTypeFilter(typeFilter);
-    var fileDialog:FileDialog = new FileDialog();
-    fileDialog.onSelect.add(onSelect);
-    if (onCancel != null)
-    {
-      fileDialog.onCancel.add(onCancel);
-    }
-
-    fileDialog.browse(OPEN_DIRECTORY, filter, defaultPath, dialogTitle);
-
-    return true;
-    #else
+    #if html5
     trace('WARNING: browseForDirectory not implemented for this platform');
 
     if (onCancel != null)
@@ -187,6 +176,26 @@ class FileUtil
     }
 
     return false;
+    #else
+    FileDialog.openDirectory(Lib.current.stage.window, function(filepaths:Array<String>):Void
+    {
+      if (filepaths.length > 0)
+      {
+        if (onSelect != null)
+        {
+          onSelect(filepaths[0]);
+        }
+      }
+      else
+      {
+        if (onCancel != null)
+        {
+          onCancel();
+        }
+      }
+    }, defaultPath, false);
+
+    return true;
     #end
   }
 
@@ -199,19 +208,7 @@ class FileUtil
   public static function browseForMultipleFiles(?typeFilter:Array<FileFilter>, onSelect:(Array<String>) -> Void, ?onCancel:() -> Void, ?defaultPath:String,
       ?dialogTitle:String):Bool
   {
-    #if desktop
-    var filter:Null<String> = convertTypeFilter(typeFilter);
-    var fileDialog:FileDialog = new FileDialog();
-    fileDialog.onSelectMultiple.add(onSelect);
-    if (onCancel != null)
-    {
-      fileDialog.onCancel.add(onCancel);
-    }
-
-    fileDialog.browse(OPEN_MULTIPLE, filter, defaultPath, dialogTitle);
-
-    return true;
-    #else
+    #if html5
     trace('WARNING: browseForMultipleFiles not implemented for this platform');
 
     if (onCancel != null)
@@ -220,12 +217,32 @@ class FileUtil
     }
 
     return false;
+    #else
+    FileDialog.openFile(Lib.current.stage.window, function(filepaths:Array<String>, filter):Void
+    {
+      if (filepaths.length > 0)
+      {
+        if (onSelect != null)
+        {
+          onSelect(filepaths);
+        }
+      }
+      else
+      {
+        if (onCancel != null)
+        {
+          onCancel();
+        }
+      }
+    }, @:privateAccess openfl.filesystem.File.__getFilterTypes(typeFilter ?? []),
+      defaultPath, true);
+
+    return true;
     #end
   }
 
   /**
    * Browses for a file location to save to, then calls `onSave(path)` when a path chosen.
-   * Note that on HTML5 you can't do much with this, you should call `saveFile(resource:haxe.io.Bytes)` instead.
    *
    * @param typeFilter TODO What does this do?
    * @return Whether the file dialog was opened successfully.
@@ -233,19 +250,7 @@ class FileUtil
   public static function browseForSaveFile(?typeFilter:Array<FileFilter>, onSelect:(String) -> Void, ?onCancel:() -> Void, ?defaultPath:String,
       ?dialogTitle:String):Bool
   {
-    #if desktop
-    var filter:Null<String> = convertTypeFilter(typeFilter);
-    var fileDialog:FileDialog = new FileDialog();
-    fileDialog.onSelect.add(onSelect);
-    if (onCancel != null)
-    {
-      fileDialog.onCancel.add(onCancel);
-    }
-
-    fileDialog.browse(SAVE, filter, defaultPath, dialogTitle);
-
-    return true;
-    #else
+    #if html5
     trace('WARNING: browseForSaveFile not implemented for this platform');
 
     if (onCancel != null)
@@ -254,6 +259,25 @@ class FileUtil
     }
 
     return false;
+    #else
+    FileDialog.saveFile(Lib.current.stage.window, function(filepath:String, filter):Void
+    {
+      if (filepath != null)
+      {
+        if (onSelect != null)
+        {
+          onSelect(filepath);
+        }
+      }
+      else
+      {
+        if (onCancel != null)
+        {
+          onCancel();
+        }
+      }
+    }, @:privateAccess openfl.filesystem.File.__getFilterTypes(typeFilter ?? []), defaultPath);
+    return true;
     #end
   }
 
@@ -266,39 +290,7 @@ class FileUtil
   public static function saveFile(data:Bytes, ?typeFilter:Array<FileFilter>, ?onSave:(String) -> Void, ?onCancel:() -> Void, ?defaultFileName:String,
       ?dialogTitle:String):Bool
   {
-    #if desktop
-    var filter:Null<String> = convertTypeFilter(typeFilter);
-    var fileDialog:FileDialog = new FileDialog();
-    if (onSave != null)
-    {
-      fileDialog.onSave.add(onSave);
-    }
-
-    if (onCancel != null)
-    {
-      fileDialog.onCancel.add(onCancel);
-    }
-
-    fileDialog.save(data, filter, defaultFileName, dialogTitle);
-
-    return true;
-    #elseif html5
-    var filter:Null<String> = defaultFileName != null ? Path.extension(defaultFileName) : null;
-    var fileDialog:FileDialog = new FileDialog();
-    if (onSave != null)
-    {
-      fileDialog.onSave.add(onSave);
-    }
-
-    if (onCancel != null)
-    {
-      fileDialog.onCancel.add(onCancel);
-    }
-
-    fileDialog.save(data, filter, defaultFileName, dialogTitle);
-
-    return true;
-    #else
+    #if html5
     trace('WARNING: saveFile not implemented for this platform');
 
     if (onCancel != null)
@@ -307,6 +299,32 @@ class FileUtil
     }
 
     return false;
+    #else
+    FileDialog.saveFile(Lib.current.stage.window, function(filepath:String, filter):Void
+    {
+      if (filepath != null)
+      {
+        if (data != null)
+        {
+          Bytes.toFile(filepath, data);
+        }
+
+        if (onSave != null)
+        {
+          onSave(filepath);
+        }
+      }
+      else
+      {
+        if (onCancel != null)
+        {
+          onCancel();
+        }
+      }
+    }, @:privateAccess openfl.filesystem.File.__getFilterTypes(typeFilter ?? []),
+      defaultFileName);
+
+    return true;
     #end
   }
 
@@ -1235,8 +1253,7 @@ class FileUtil
 /**
  * Utilities for reading and writing files on various platforms.
  * Wrapper for `FileUtil` that sanitizes paths for script safety.
- */
-@:nullSafety
+ */ @:nullSafety
 class FileUtilSandboxed
 {
   /**
@@ -1294,8 +1311,26 @@ class FileUtilSandboxed
 
     #if sys
     // TODO: figure out how to get "real" path of symlinked paths
-    final realPath:String = sys.FileSystem.fullPath(Path.join([FileUtil.gameDirectory, sanitized.join('/')]));
-    if (!realPath.startsWith(FileUtil.gameDirectory))
+    #if linux
+    // The implementation on Linux fails if the path doesn't exist
+    var realPath:Null<String> = null;
+    var unresolvedSegments:Array<String> = [];
+    while (realPath == null && sanitized.length > 0)
+    {
+      realPath = sys.FileSystem.fullPath(Path.join([FileUtil.gameDirectory].concat(sanitized)));
+      if (realPath == null) unresolvedSegments.unshift(sanitized.pop() ?? continue);
+    }
+
+    if (unresolvedSegments.length > 0)
+    {
+      if (realPath != null) unresolvedSegments.unshift(realPath);
+      realPath = Path.join(unresolvedSegments);
+    }
+    #else
+    final realPath:Null<String> = sys.FileSystem.fullPath(Path.join([FileUtil.gameDirectory].concat(sanitized)));
+    #end
+
+    if (realPath == null || !realPath.startsWith(FileUtil.gameDirectory))
     {
       return FileUtil.gameDirectory;
     }

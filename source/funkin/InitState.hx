@@ -137,7 +137,7 @@ class InitState extends FlxState
 
       #if mobile
       // Setup Mobile FNFC launcher.
-      funkin.mobile.util.FNFCUtil.init();
+      funkin.mobile.util.FNFCProvider.init();
       #end
 
       SongEventHelper.generateEaseGraphsBitmaps();
@@ -311,19 +311,34 @@ class InitState extends FlxState
   #if FEATURE_LOST_FOCUS_VOLUME
   @:noCompletion var _lastFocusVolume:Null<Float>;
 
-  function onLostFocus()
+  function onLostFocus():Void
   {
     if (FlxG.sound.muted || FlxG.sound.volume == 0 || FlxG.autoPause) return;
     _lastFocusVolume = FlxG.sound.volume;
     FlxG.sound.volume *= Constants.LOST_FOCUS_VOLUME_MULTIPLIER;
   }
+  #end
 
-  function onGainFocus()
+  function onGainFocus():Void
   {
+    #if !mobile
+    if (Preferences.unlockedFramerate)
+    {
+      FlxG.updateFramerate = 0;
+      FlxG.drawFramerate = 0;
+    }
+    else
+    {
+      FlxG.updateFramerate = Preferences.framerate;
+      FlxG.drawFramerate = Preferences.framerate;
+    }
+    #end
+
+    #if FEATURE_LOST_FOCUS_VOLUME
     if (FlxG.sound.muted || FlxG.autoPause) return;
     if (_lastFocusVolume != null) FlxG.sound.volume = _lastFocusVolume;
+    #end
   }
-  #end
 
   /**
    * Start the game.
@@ -411,7 +426,6 @@ class InitState extends FlxState
   function startGameNormally():Void
   {
     var params:CLIParams = CLIUtil.processArgs();
-    trace('Command line args: ${params}');
 
     if (params.chart.shouldLoadChart)
     {
@@ -445,7 +459,7 @@ class InitState extends FlxState
     {
       // FlxG.sound.cache(Paths.music('freakyMenu/freakyMenu'));
       #if mobile
-      funkin.mobile.util.FNFCUtil.onFNFCOpen.add(function(fnfcFile:String)
+      funkin.mobile.util.FNFCProvider.onFNFCOpen.add(function(fnfcFile:String)
       {
         flixel.tweens.FlxTween.globalManager.clear();
         flixel.util.FlxTimer.globalManager.clear();
@@ -459,7 +473,7 @@ class InitState extends FlxState
         FlxG.switchState(() -> new ChartPlaytestMenu(fnfcFile));
       });
 
-      final fnfcFile = funkin.mobile.util.FNFCUtil.queryFNFC();
+      final fnfcFile = funkin.mobile.util.FNFCProvider.queryFNFC();
       if (fnfcFile != null)
       {
         trace('launching FNFC from $fnfcFile');
@@ -574,7 +588,7 @@ class InitState extends FlxState
     //
     // FLIXEL DEBUG SETUP
     //
-    #if FEATURE_DEBUG_FUNCTIONS
+    #if (FEATURE_DEBUG_FUNCTIONS && !FLX_NO_DEBUG)
     trace('Initializing Flixel debugger...');
 
     #if !debug

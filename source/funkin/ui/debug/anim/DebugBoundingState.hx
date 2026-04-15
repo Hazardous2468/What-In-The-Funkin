@@ -93,10 +93,7 @@ class DebugBoundingState extends FlxState
     var viewDropdown:DropDown = offsetEditorDialog.findComponent("swapper", DropDown);
     viewDropdown.onChange = function(e:UIEvent)
     {
-      trace(e.type);
       curView = cast e?.data?.curView;
-      trace(e.data);
-      // trace(e.data);
     };
 
     offsetAnimationDropdown = offsetEditorDialog.findComponent("animationDropdown", DropDown);
@@ -451,7 +448,8 @@ class DebugBoundingState extends FlxState
     // Plays the idle animation
     if (FlxG.keys.justPressed.SPACE)
     {
-      offsetAnimationDropdown.value = {id: 'idle', text: 'idle'};
+      if (swagChar?.hasAnimation('danceLeft')) offsetAnimationDropdown.value = {id: 'danceLeft', text: 'danceLeft'};
+      else offsetAnimationDropdown.value = {id: 'idle', text: 'idle'};
 
       playCharacterAnimation(currentAnimationName, true);
     }
@@ -568,21 +566,18 @@ class DebugBoundingState extends FlxState
     for (i in swagChar.animationOffsets.keys())
     {
       characterAnimNames.push(i);
-      trace(i);
-      trace(swagChar.animationOffsets[i]);
     }
 
     offsetAnimationDropdown.dataSource.clear();
 
     for (charAnim in characterAnimNames)
     {
-      trace('Adding ${charAnim} to HaxeUI dropdown');
       offsetAnimationDropdown.dataSource.add({id: charAnim, text: charAnim});
     }
 
     offsetAnimationDropdown.selectedIndex = 0;
 
-    trace('Added ${offsetAnimationDropdown.dataSource.size} to HaxeUI dropdown');
+    trace('Added ${offsetAnimationDropdown.dataSource.size} animations to HaxeUI dropdown');
 
     offsetAnimationDropdown.onChange = function(event:UIEvent)
     {
@@ -607,7 +602,6 @@ class DebugBoundingState extends FlxState
     // var animName = characterAnimNames[Std.parseInt(str)];
     var animName = str;
     swagChar.playAnimation(animName, true); // trace();
-    trace(swagChar.animationOffsets.get(animName));
 
     txtOffsetShit.text = 'Offset: ' + swagChar.animOffsets;
     txtOffsetShit.y = FlxG.height - 20 - txtOffsetShit.height;

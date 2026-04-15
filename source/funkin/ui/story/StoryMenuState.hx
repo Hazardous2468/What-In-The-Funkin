@@ -9,6 +9,7 @@ import flixel.tweens.FlxTween;
 import flixel.math.FlxMath;
 import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
+import flixel.util.FlxStringUtil;
 import funkin.audio.FunkinSound;
 import funkin.data.story.level.LevelRegistry;
 import funkin.data.song.SongRegistry;
@@ -324,7 +325,8 @@ class StoryMenuState extends MusicBeatState
 
     highScoreLerp = Std.int(MathUtil.snap(MathUtil.smoothLerpPrecision(highScoreLerp, highScore, elapsed, 0.307), highScore, 1));
 
-    scoreText.text = 'LEVEL SCORE: ${Math.round(highScoreLerp)}';
+    var commaSeparated:Bool = true;
+    scoreText.text = 'LEVEL SCORE: ${FlxStringUtil.formatMoney(highScoreLerp, false, commaSeparated)}';
 
     levelTitleText.text = currentLevel.getTitle();
 
@@ -507,7 +509,7 @@ class StoryMenuState extends MusicBeatState
   {
     // "For now, NO erect in story mode" -Dave
 
-    var difficultyList:Array<String> = Constants.DEFAULT_DIFFICULTY_LIST;
+    var difficultyList:Array<String> = currentLevel.getDifficulties().filter(e -> Constants.DEFAULT_DIFFICULTY_LIST.contains(e));
     // Use this line to displays all difficulties
     // var difficultyList:Array<String> = currentLevel.getDifficulties();
     var currentIndex:Int = difficultyList.indexOf(currentDifficultyId);

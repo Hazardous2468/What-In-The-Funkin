@@ -57,7 +57,7 @@ class StageEditorCharacterToolbox extends StageEditorDefaultToolbox
     charCamX.onChange = charCamY.onChange = function(_)
     {
       if (state.selectedChar == null) return;
-      state.charCamOffsets[state.selectedChar.characterType] = [charCamX.pos, charCamY.pos];
+      state.charCamOffsets[state.selectedChar.characterType] = [charCamX.pos ?? 0, charCamY.pos ?? 0];
       state.updateMarkerPos();
     }
 
@@ -139,8 +139,8 @@ class StageEditorCharacterToolbox extends StageEditorDefaultToolbox
   public function repositionCharacter()
   {
     if (stageEditorState.selectedChar == null) return;
-    stageEditorState.selectedChar.x = charPosX.pos - stageEditorState.selectedChar.characterOrigin.x + stageEditorState.selectedChar.globalOffsets[0];
-    stageEditorState.selectedChar.y = charPosY.pos - stageEditorState.selectedChar.characterOrigin.y + stageEditorState.selectedChar.globalOffsets[1];
+    stageEditorState.selectedChar.x = charPosX.pos - stageEditorState.selectedChar.characterOrigin.x;
+    stageEditorState.selectedChar.y = charPosY.pos - stageEditorState.selectedChar.characterOrigin.y;
 
     stageEditorState.selectedChar.setScale(stageEditorState.selectedChar.getBaseScale() * charScale.pos);
     stageEditorState.updateMarkerPos();

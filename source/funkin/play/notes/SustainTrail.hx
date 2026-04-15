@@ -154,6 +154,7 @@ class SustainTrail extends ZSprite
     this.isArrowPath = isArrowPath;
     this.parentStrumline = parentStrum;
 
+    // BASIC SETUP
     this.sustainLength = sustainLength;
     this.fullSustainLength = sustainLength;
     this.noteDirection = noteDirection;
@@ -327,7 +328,6 @@ class SustainTrail extends ZSprite
   {
     if (s < 0.0) s = 0.0;
 
-    if (sustainLength == s) return s;
     this.sustainLength = s;
     triggerRedraw();
     return this.sustainLength;

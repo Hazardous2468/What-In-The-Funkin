@@ -51,7 +51,6 @@ import funkin.play.components.HealthIcon;
 import funkin.play.components.PopUpStuff;
 import funkin.play.components.Subtitles;
 import funkin.play.cutscene.dialogue.Conversation;
-import funkin.play.cutscene.VanillaCutscenes;
 import funkin.play.cutscene.VideoCutscene;
 import funkin.play.cutscene.dialogue.Conversation;
 import funkin.play.modchartSystem.DebugNotification;
@@ -261,9 +260,10 @@ class PlayState extends MusicBeatSubState
 
   /**
    * The player's current score.
-   * TODO: Move this to its own class.
+   * This needs to be a float because you gain partial points as you hold a hold note,
+   * possibly less than one point each update depending on your framerate.
    */
-  public var songScore:Int = 0;
+  public var songScore:Float = 0;
 
   /**
    * Start at this point in the song once the countdown is done.
@@ -647,6 +647,11 @@ class PlayState extends MusicBeatSubState
    * The camera which contains, and controls visibility of, pause menu.
    */
   public var camPause:FunkinCamera;
+
+  /**
+   * The camera which contains, and controls visibility of, the fade out to the results screen.
+   */
+  public var camTransition:FunkinCamera;
 
   /**
    * The combo popups. Includes the real-time combo counter and the rating.
@@ -1138,8 +1143,6 @@ class PlayState extends MusicBeatSubState
     previousCameraFollowPoint = params.cameraFollowPoint;
     mirrorSongData = params.mirrored ?? false;
 
-    trace("Params: " + mirrorSongData + ", " + isBotPlayMode);
-
     // Basic object initialization
 
     // TODO: Add something to toggle this on!
@@ -1165,6 +1168,7 @@ class PlayState extends MusicBeatSubState
     camCutouts = new FunkinCamera('playStateCamCutouts');
     camSubtitles = new FunkinCamera('playStateCamSubtitles');
     camPause = new FunkinCamera('playStateCamPause');
+    camTransition = new FunkinCamera('playStateCamTransition');
 
     var currentChart = currentSong.getDifficulty(currentDifficulty, currentVariation);
     var noteStyleId:Null<String> = currentChart?.noteStyle;
@@ -1316,19 +1320,10 @@ class PlayState extends MusicBeatSubState
     // This gets set back to false when the chart actually starts.
     startingSong = true;
 
-    // TODO: We hardcoded the transition into Winter Horrorland. Do this with a ScriptedSong instead.
-    if ((currentSong.id ?? '').toLowerCase() == 'winter-horrorland')
-    {
-      // VanillaCutscenes will call startCountdown later.
-      VanillaCutscenes.playHorrorStartCutscene();
-    }
-    else
-    {
-      // Call a script event to start the countdown.
-      // Songs with cutscenes should call event.cancel().
-      // As long as they call `PlayState.instance.startCountdown()` later, the countdown will start.
-      startCountdown();
-    }
+    // Call a script event to start the countdown.
+    // Songs with cutscenes should call event.cancel().
+    // As long as they call `PlayState.instance.startCountdown()` later, the countdown will start.
+    startCountdown();
 
     // Create the pause button.
     #if mobile
@@ -1496,7 +1491,7 @@ class PlayState extends MusicBeatSubState
       cameraZoomRate = Constants.DEFAULT_ZOOM_RATE;
 
       health = Constants.HEALTH_STARTING;
-      songScore = 0;
+      songScore = 0.0;
       Highscore.tallies.combo = 0;
 
       // so the song doesn't start too early :D
@@ -1627,8 +1622,6 @@ class PlayState extends MusicBeatSubState
     FlxG.watch.addQuick('health', health);
     FlxG.watch.addQuick('cameraBopIntensity', cameraBopIntensity);
 
-    // TODO: Add a song event for Handle GF dance speed.
-
     // Handle player death.
     if (!isInCutscene && !disableKeys)
     {
@@ -1745,17 +1738,25 @@ class PlayState extends MusicBeatSubState
      */
   function pause(mode:PauseMode = Standard, lostFocus:Bool = false):Void
   {
-    if (!mayPauseGame || justUnpaused || isGamePaused || isPlayerDying) return;
+    if (!mayPauseGame || justUnpaused || isGamePaused || isPlayerDying || isSongEnd) return;
 
     switch (mode)
     {
       case Conversation:
         preparePauseUI();
-        openPauseSubState(Conversation, camPause, lostFocus, () -> currentConversation?.pauseMusic());
+
+        final event = new PauseScriptEvent(false);
+        dispatchEvent(event);
+
+        if (!event.eventCanceled) openPauseSubState(Conversation, camPause, lostFocus, () -> currentConversation?.pauseMusic());
 
       case Cutscene:
         preparePauseUI();
-        openPauseSubState(Cutscene, camPause, lostFocus, () -> VideoCutscene.pauseVideo());
+
+        final event = new PauseScriptEvent(false);
+        dispatchEvent(event);
+
+        if (!event.eventCanceled) openPauseSubState(Cutscene, camPause, lostFocus, () -> VideoCutscene.pauseVideo());
 
       default: // also known as standard
         if (!isInCountdown || isInCutscene) return;
@@ -1837,7 +1838,7 @@ class PlayState extends MusicBeatSubState
 
     vwooshTimer.cancel();
 
-    songScore = 0;
+    songScore = 0.0;
     updateScoreText();
 
     health = Constants.HEALTH_STARTING;
@@ -1893,7 +1894,7 @@ class PlayState extends MusicBeatSubState
           dispatchEvent(eventEvent);
 
           // Calling event.cancelEvent() skips the event. Neat!
-          if (!eventEvent.eventCanceled)
+          if (!eventEvent.eventCanceled && !shouldSubstatePause)
           {
             SongEventRegistry.handleEvent(event);
           }
@@ -1904,14 +1905,16 @@ class PlayState extends MusicBeatSubState
 
   public override function dispatchEvent(event:ScriptEvent):Void
   {
-    // ORDER: Module, Song, Note, Stage, Conversation, Character
+    // ORDER: Module, Song, Events, Notes, Stage, Conversation, Characters
     // Modules should get the first chance to cancel the event.
 
     // super.dispatchEvent(event) dispatches event to module scripts.
     super.dispatchEvent(event);
-
     // Dispatch event to song script.
     ScriptEventDispatcher.callEvent(currentSong, event);
+
+    // Dispatch event to event notes
+    if (songEvents != null && songEvents.length > 0) SongEventRegistry.callEvent(event);
 
     // Dispatch event to note kind scripts
     NoteKindManager.callEvent(event);
@@ -2245,8 +2248,11 @@ class PlayState extends MusicBeatSubState
     }
 
     // Only bop camera if zoom level is below 135%
+    // This is an arbitrary number chosen so that the camera doesn't move insanely far in when the bop speed is fast.
+    final MAX_RELATIVE_CAM_ZOOM:Float = 1.35;
+
     if (Preferences.zoomCamera
-      && FlxG.camera.zoom < (1.35 * FlxCamera.defaultZoom)
+      && camHUD.zoom < (MAX_RELATIVE_CAM_ZOOM * defaultHUDCameraZoom)
       && cameraZoomRate > 0
       && (Conductor.instance.currentStep + cameraZoomRateOffset * Constants.STEPS_PER_BEAT) % (cameraZoomRate * Constants.STEPS_PER_BEAT) == 0)
     {
@@ -2373,6 +2379,7 @@ class PlayState extends MusicBeatSubState
     camCutouts.bgColor.alpha = 0; // Show the game scene behind the camera.
     if (Preferences.subtitles) camSubtitles.bgColor.alpha = 0; // Show the game scene behind the camera.
     camPause.bgColor.alpha = 0; // Show the game scene behind the camera.
+    camTransition.bgColor.alpha = 0;
 
     if (isModchartSong)
     {
@@ -2398,6 +2405,7 @@ class PlayState extends MusicBeatSubState
     FlxG.cameras.add(camCutscene, false);
     FlxG.cameras.add(camCutouts, false);
     if (Preferences.subtitles) FlxG.cameras.add(camSubtitles, false);
+    FlxG.cameras.add(camTransition, false);
     FlxG.cameras.add(camPause, false);
 
     // Configure camera follow point.
@@ -3321,7 +3329,6 @@ class PlayState extends MusicBeatSubState
 
     if (vocals != null)
     {
-      trace('Playing vocals...');
       add(vocals);
 
       vocals.time = startTimestamp - Conductor.instance.instrumentalOffset;
@@ -3401,9 +3408,9 @@ class PlayState extends MusicBeatSubState
     }
     else
     {
-      // TODO: Add an option for this maybe?
-      var commaSeparated:Bool = true;
-      scoreText.text = 'Score: ${FlxStringUtil.formatMoney(songScore, false, commaSeparated)}';
+      final SHOW_DECIMALS:Bool = false;
+      final COMMA_SEPARATED:Bool = true;
+      scoreText.text = 'Score: ${FlxStringUtil.formatMoney(songScore, SHOW_DECIMALS, COMMA_SEPARATED)}';
     }
   }
 
@@ -3571,6 +3578,16 @@ class PlayState extends MusicBeatSubState
         // Calling event.cancelEvent() skips all the other logic! Neat!
         if (event.eventCanceled) continue;
 
+        if (vocals != null)
+        {
+          if (vocals.legacyVoiceSystem)
+          {
+            if (vocals.legacyVoiceUsesPlayer) vocals.playerVolume = playerVocalsVolume;
+            else
+              vocals.opponentVolume = opponentVocalsVolume;
+          }
+        }
+
         // Command the opponent to hit the note on time.
         // NOTE: This is what handles the strumline and cleaning up the note itself!
         opponentStrumline.hitNote(note);
@@ -3678,7 +3695,7 @@ class PlayState extends MusicBeatSubState
         if (!isBotPlayMode && holdNote.scoreable)
         {
           health += Constants.HEALTH_HOLD_BONUS_PER_SECOND * elapsed;
-          songScore += Std.int(Constants.SCORE_HOLD_BONUS_PER_SECOND * elapsed);
+          songScore += Constants.SCORE_HOLD_BONUS_PER_SECOND * elapsed;
         }
 
         // Make sure the player keeps singing while the note is held by the bot.
@@ -3711,7 +3728,7 @@ class PlayState extends MusicBeatSubState
             // If the base note of the hold was missed, don't penalize them more on top of that.
             var healthChangeMax = Constants.HEALTH_HOLD_DROP_PENALTY_MAX - (holdNote.hitNote ? -Constants.HEALTH_MISS_PENALTY : 0);
             var healthChange = healthChangeUncapped.clamp(healthChangeMax, 0);
-            var scoreChange = Std.int(Constants.SCORE_HOLD_DROP_PENALTY_PER_SECOND * remainingLengthSec);
+            var scoreChange:Float = Constants.SCORE_HOLD_DROP_PENALTY_PER_SECOND * remainingLengthSec;
 
             var event:HoldNoteScriptEvent = new HoldNoteScriptEvent(NOTE_HOLD_DROP, holdNote, healthChange, scoreChange, true, Highscore.tallies.combo);
             dispatchEvent(event);
@@ -3725,7 +3742,11 @@ class PlayState extends MusicBeatSubState
             // Play the miss sound.
             if (event.playSound)
             {
-              if (vocals != null) vocals.playerVolume = 0;
+              if (vocals != null)
+              {
+                if (vocals.legacyVoiceSystem && !vocals.legacyVoiceUsesPlayer) vocals.opponentVolume = 0;
+                vocals.playerVolume = 0;
+              }
               FunkinSound.playOnce(Paths.soundRandom('missnote', 1, 3), FlxG.random.float(0.5, 0.6));
             }
           }
@@ -3935,9 +3956,7 @@ class PlayState extends MusicBeatSubState
       if (targetNote == null) continue;
 
       // Judge and hit the note.
-      // trace('Hit note! ${targetNote.noteData}');
       goodNoteHit(targetNote, input);
-      // trace('Score: ${songScore}');
 
       notesInDirection.remove(targetNote);
 
@@ -4011,7 +4030,11 @@ class PlayState extends MusicBeatSubState
     playerStrumline.hitNote(note, !event.isComboBreak);
     if (event.doesNotesplash) playerStrumline.playNoteSplash(note.noteData.getDirection(), note);
     if (note.isHoldNote && note.holdNoteSprite != null) playerStrumline.playNoteHoldCover(note.holdNoteSprite);
-    if (vocals != null) vocals.playerVolume = playerVocalsVolume;
+    if (vocals != null)
+    {
+      if (vocals.legacyVoiceSystem && !vocals.legacyVoiceUsesPlayer) vocals.opponentVolume = opponentVocalsVolume;
+      vocals.playerVolume = playerVocalsVolume;
+    }
 
     // Display the combo meter and add the calculation to the score.
     if (note.scoreable)
@@ -4064,7 +4087,7 @@ class PlayState extends MusicBeatSubState
     var event:GhostMissNoteScriptEvent = new GhostMissNoteScriptEvent(direction, // Direction missed in.
       hasPossibleNotes, // Whether there was a note you could have hit.
       Constants.HEALTH_GHOST_MISS_PENALTY, // How much health to add (negative).
-      - 10 // Amount of score to add (negative).
+      Constants.SCORE_GHOST_MISS_PENALTY // Amount of score to add (negative).
     );
     dispatchEvent(event);
 
@@ -4186,7 +4209,7 @@ class PlayState extends MusicBeatSubState
   /**
      * Handles applying health, score, and ratings.
      */
-  function applyScore(score:Int, daRating:String, healthChange:Float, isComboBreak:Bool)
+  function applyScore(score:Float, daRating:String, healthChange:Float, isComboBreak:Bool)
   {
     switch (daRating)
     {
@@ -4343,7 +4366,7 @@ class PlayState extends MusicBeatSubState
     {
       // crackhead double thingie, sets whether was new highscore, AND saves the song!
       var data = {
-        score: songScore,
+        score: Std.int(songScore),
         tallies: {
           sick: Highscore.tallies.sick,
           good: Highscore.tallies.good,
@@ -4361,7 +4384,7 @@ class PlayState extends MusicBeatSubState
       Highscore.talliesLevel = Highscore.combineTallies(Highscore.tallies, Highscore.talliesLevel);
 
       #if FEATURE_NEWGROUNDS
-      Leaderboards.submitSongScore(currentSong.id, suffixedDifficulty, songScore);
+      Leaderboards.submitSongScore(currentSong.id, suffixedDifficulty, Std.int(songScore));
       #end
 
       if (!isPracticeMode && !isBotPlayMode)
@@ -4392,7 +4415,7 @@ class PlayState extends MusicBeatSubState
 
       // Determine the score rank for this song we just finished.
       var scoreRank:Null<ScoringRank> = Scoring.calculateRank({
-        score: songScore,
+        score: Std.int(songScore),
         tallies: {
           sick: Highscore.tallies.sick,
           good: Highscore.tallies.good,
@@ -4427,7 +4450,7 @@ class PlayState extends MusicBeatSubState
     {
       isNewHighscore = false;
 
-      PlayStatePlaylist.campaignScore += songScore;
+      PlayStatePlaylist.campaignScore += Std.int(songScore);
 
       // Pop the next song ID from the list.
       // Returns null if the list is empty.
@@ -4551,7 +4574,7 @@ class PlayState extends MusicBeatSubState
     {
       if (isSubState)
       {
-        if (isPlaytestResults)
+        if (isPlaytestResults && !isBotPlayMode)
         {
           moveToResultsScreen(false, prevScoreData);
         }
@@ -4725,13 +4748,11 @@ class PlayState extends MusicBeatSubState
     FlxG.camera.targetOffset.x += 20;
 
     // Replace zoom animation with a fade out for now.
-    FlxG.camera.fade(FlxColor.BLACK, 0.6);
+    FlxTween.tween(camHUD, {alpha: 0}, 0.6);
 
-    FlxTween.tween(camHUD, {alpha: 0}, 0.6, {
-      onComplete: function(_)
-      {
-        moveToResultsScreen(isNewHighscore, prevScoreData);
-      }
+    camTransition.fade(FlxColor.BLACK, 0.6, false, function()
+    {
+      moveToResultsScreen(isNewHighscore, prevScoreData);
     });
 
     // Zoom in on Girlfriend (or BF if no GF)
@@ -4785,7 +4806,7 @@ class PlayState extends MusicBeatSubState
       title: PlayStatePlaylist.isStoryMode ? ('${PlayStatePlaylist.campaignTitle}') : ('${currentChart.songName} by ${currentChart.songArtist}'),
       prevScoreData: prevScoreData,
       scoreData: {
-        score: PlayStatePlaylist.isStoryMode ? PlayStatePlaylist.campaignScore : songScore,
+        score: PlayStatePlaylist.isStoryMode ? PlayStatePlaylist.campaignScore : Std.int(songScore),
         tallies: {
           sick: talliesToUse.sick,
           good: talliesToUse.good,
@@ -4866,9 +4887,11 @@ class PlayState extends MusicBeatSubState
       @:nullSafety(Off)
       FlxG.camera.target = null;
 
+      var adjustedDuration:Float = duration / playbackRate;
+
       // Follow tween! Caching it so we can cancel/pause it later if needed.
       var followPos:FlxPoint = cameraFollowPoint.getPosition() - FlxPoint.weak(FlxG.camera.width * 0.5, FlxG.camera.height * 0.5);
-      cameraFollowTween = FlxTween.tween(FlxG.camera.scroll, {x: followPos.x, y: followPos.y}, duration, {
+      cameraFollowTween = FlxTween.tween(FlxG.camera.scroll, {x: followPos.x, y: followPos.y}, adjustedDuration, {
         ease: ease,
         onComplete: function(_)
         {
@@ -4906,7 +4929,8 @@ class PlayState extends MusicBeatSubState
     else
     {
       // Zoom tween! Caching it so we can cancel/pause it later if needed.
-      cameraZoomTween = FlxTween.tween(this, {currentCameraZoom: targetZoom}, duration, {ease: ease});
+      var adjustedDuration:Float = duration / playbackRate;
+      cameraZoomTween = FlxTween.tween(this, {currentCameraZoom: targetZoom}, adjustedDuration, {ease: ease});
     }
   }
 
@@ -4932,7 +4956,7 @@ class PlayState extends MusicBeatSubState
   /**
      * The magical function that shall tween the scroll speed.
      */
-  public function tweenScrollSpeed(?speed:Float, ?duration:Float, ?ease:Null<Float->Float>, strumlines:Array<String>):Void
+  public function tweenScrollSpeed(?speed:Float, duration:Float = 0, ?ease:Null<Float->Float>, strumlines:Array<String>):Void
   {
     // Cancel the current tween if it's active.
     cancelScrollSpeedTweens();
@@ -4959,9 +4983,11 @@ class PlayState extends MusicBeatSubState
       }
       else
       {
+        var adjustedDuration:Float = duration / playbackRate;
+
         scrollSpeedTweens.push(FlxTween.tween(strum, {
           'scrollSpeed': value
-        }, duration, {ease: ease}));
+        }, adjustedDuration, {ease: ease}));
       }
       // make sure charts dont break if the charter is dumb and stupid
       prevScrollTargets.push([value, i]);

@@ -38,6 +38,11 @@ class MemoryUtil
     #elseif js
     var result:String = 'JS-MNS:';
     result += '\n- Memory Used: ${getGCMemory()} bytes';
+    #elseif hl
+    var result:String = 'HL-MNNS:';
+    result += '\n- Memory Used: ${hl.Gc.stats().currentMemory} bytes';
+    result += '\n- Memory Allocated: ${hl.Gc.stats().totalAllocated} bytes';
+    result += '\n- Memory Allocation Count: ${hl.Gc.stats().allocationCount}';
     #else
     var result:String = 'Unknown GC';
     #end
@@ -98,6 +103,15 @@ class MemoryUtil
     return 0.0;
   }
 
+  public static function supportsGCMem():Bool
+  {
+    #if !html5
+    return true;
+    #else
+    return false;
+    #end
+  }
+
   public static function getGCMemory():Float
   {
     return openfl.system.System.totalMemoryNumber;
@@ -110,6 +124,8 @@ class MemoryUtil
   {
     #if cpp
     cpp.vm.Gc.enable(true);
+    #elseif hl
+    hl.Gc.enable(true);
     #else
     throw 'Not implemented!';
     #end
@@ -122,6 +138,8 @@ class MemoryUtil
   {
     #if cpp
     cpp.vm.Gc.enable(false);
+    #elseif hl
+    hl.Gc.enable(false);
     #else
     throw 'Not implemented!';
     #end
@@ -136,6 +154,9 @@ class MemoryUtil
   {
     #if cpp
     cpp.vm.Gc.run(major);
+    #elseif hl
+    // Doesn't seem to have just a collect function?
+    hl.Gc.major();
     #else
     throw 'Not implemented!';
     #end

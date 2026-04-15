@@ -427,7 +427,7 @@ class StageEditorState extends UIState
     // Some callbacks.
     findObjDialog = new FindObjDialog(this, selectedSprite == null ? "" : selectedSprite.name);
 
-    FlxG.stage.window.onDropFile.add(function(path:String):Void
+    FlxG.stage.window.onDropFile.add(function(path:String, state:String, x:Float, y:Float):Void
     {
       if (!allowInput || welcomeDialog != null) return;
 
@@ -797,13 +797,13 @@ class StageEditorState extends UIState
         {
           this.createAndPushAction(CHARACTER_MOVED);
 
-          moveOffset = [FlxG.mouse.getWorldPosition().x - selectedChar.cornerPosition.x, FlxG.mouse.getWorldPosition().y - selectedChar.cornerPosition.y];
+          moveOffset = [FlxG.mouse.getWorldPosition().x - selectedChar.x, FlxG.mouse.getWorldPosition().y - selectedChar.y];
         }
 
-        var posBros = new FlxPoint(FlxG.mouse.getWorldPosition().x - moveOffset[0], FlxG.mouse.getWorldPosition().y - moveOffset[1]);
+        var posBros:FlxPoint = FlxPoint.get(FlxG.mouse.getWorldPosition().x - moveOffset[0], FlxG.mouse.getWorldPosition().y - moveOffset[1]);
 
-        selectedChar.cornerPosition = new FlxPoint(Math.floor(posBros.x) - Math.floor(posBros.x) % moveStep,
-          Math.floor(posBros.y) - Math.floor(posBros.y) % moveStep);
+        selectedChar.x = Math.floor(posBros.x) - Math.floor(posBros.x) % moveStep;
+        selectedChar.y = Math.floor(posBros.y) - Math.floor(posBros.y) % moveStep;
       }
 
       arrowMovement(selectedChar);

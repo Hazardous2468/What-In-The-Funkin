@@ -2,9 +2,11 @@ package funkin.ui.freeplay;
 
 import funkin.ui.FullScreenScaleMode;
 import funkin.ui.freeplay.FreeplayState.FreeplaySongData;
+import funkin.data.story.level.LevelRegistry;
 import funkin.graphics.shaders.HSVShader;
 import funkin.graphics.shaders.GaussianBlurShader;
 import flixel.group.FlxGroup;
+import flixel.text.FlxText;
 import flixel.FlxSprite;
 import flixel.group.FlxSpriteGroup;
 import flixel.math.FlxPoint;
@@ -20,6 +22,7 @@ import flixel.tweens.FlxTween;
 import flixel.addons.effects.FlxTrail;
 import funkin.play.scoring.Scoring.ScoringRank;
 import flixel.util.FlxColor;
+import funkin.ui.story.Level;
 import funkin.ui.PixelatedIcon;
 import funkin.util.TouchUtil;
 import funkin.util.SwipeUtil;
@@ -66,13 +69,12 @@ class SongMenuItem extends FlxSpriteGroup
   // var diffRatingSprite:FlxSprite;
   public var bpmText:FlxSprite;
   public var difficultyText:FlxSprite;
-  public var weekType:FlxSprite;
+  public var weekText:FunkinSprite;
 
   public var newText:FlxSprite;
 
   var difficultyNumbers:Array<CapsuleNumber> = []; // referred to as "bignumbers" in the .fla file!
   var bpmNumbers:Array<CapsuleNumber> = []; // referred to as "smallnumbers" in the .fla file!
-  var weekNumbers:Array<CapsuleNumber> = [];
 
   var impactThing:FunkinSprite;
 
@@ -105,14 +107,11 @@ class SongMenuItem extends FlxSpriteGroup
     difficultyText.setGraphicSize(Std.int(difficultyText.width * 0.9));
     add(difficultyText);
 
-    weekType = new FlxSprite(291, 87);
-    weekType.frames = Paths.getSparrowAtlas('freeplay/freeplayCapsule/weektypes');
-
-    weekType.animation.addByPrefix('WEEK', 'WEEK text instance 1', 24, false);
-    weekType.animation.addByPrefix('WEEKEND', 'WEEKEND text instance 1', 24, false);
-
-    weekType.setGraphicSize(Std.int(weekType.width * 0.9));
-    add(weekType);
+    weekText = new FunkinSprite(291, 88);
+    weekText.scale.set(0.9, 0.9);
+    weekText.visible = false;
+    weekText.active = false;
+    add(weekText);
 
     newText = new FlxSprite(454, 9);
     newText.frames = Paths.getSparrowAtlas('freeplay/freeplayCapsule/new');
@@ -228,11 +227,6 @@ class SongMenuItem extends FlxSpriteGroup
     favIcon.blend = BlendMode.ADD;
     add(favIcon);
 
-    var weekNumber:CapsuleNumber = new CapsuleNumber(355, 88.5, false, 0);
-    add(weekNumber);
-
-    weekNumbers.push(weekNumber);
-
     setVisibleGrp(false);
 
     theActualHitbox = new FlxObject(capsule.x + 160, capsule.y - 20, Math.round(capsule.width / 1.4), Math.round(capsule.height / 1.4));
@@ -247,55 +241,66 @@ class SongMenuItem extends FlxSpriteGroup
     sparkleTimer = new FlxTimer().start(FlxG.random.float(1.2, 4.5), sparkleEffect);
   }
 
-  // no way to grab weeks rn, so this needs to be done :/
-  // negative values mean weekends
-  function checkWeek(name:String):Void
+  function checkWeek():Void
   {
-    // trace(name);
-    var weekNum:Int = 0;
-    switch (name)
+    weekText.offset.set(0, 0);
+
+    if (this.freeplayData?.levelId == null)
     {
-      case 'bopeebo' | 'fresh' | 'dadbattle':
-        weekNum = 1;
-      case 'spookeez' | 'south' | 'monster':
-        weekNum = 2;
-      case 'pico' | 'philly-nice' | 'blammed':
-        weekNum = 3;
-      case "satin-panties" | 'high' | 'milf':
-        weekNum = 4;
-      case "cocoa" | 'eggnog' | 'winter-horrorland':
-        weekNum = 5;
-      case 'senpai' | 'roses' | 'thorns':
-        weekNum = 6;
-      case 'ugh' | 'guns' | 'stress':
-        weekNum = 7;
-      case 'darnell' | 'lit-up' | '2hot' | 'blazin':
-        weekNum = -1;
-      default:
-        weekNum = 0;
+      // Make the text invisible for random levels.
+      weekText.visible = false;
+      return;
     }
 
-    weekNumbers[0].digit = Std.int(Math.abs(weekNum));
+    weekText.visible = true;
 
-    if (weekNum == 0)
+    var levelId:String = this.freeplayData.levelId;
+    var levelIdData:Level = LevelRegistry.instance.fetchEntry(levelId);
+    var levelIdClean:String = "";
+
+    if (levelIdData.getCapsuleTitle() != null)
     {
-      weekType.visible = false;
-      weekNumbers[0].visible = false;
+      // If the specified level contains a capsule title field.
+      levelIdClean = levelIdData.getCapsuleTitle();
     }
     else
     {
-      weekType.visible = true;
-      weekNumbers[0].visible = true;
+      // Otherwise, use the level id and format it to contain a space between differently capitalized letters and numbers.
+      // E.g. "bonusWeek2" -> "bonus Week 2"
+      for (i in 0...levelId.length)
+      {
+        if (i == 0)
+        {
+          levelIdClean += levelId.charAt(i);
+          continue;
+        }
+
+        var previousChar:String = levelId.charAt(i - 1);
+        var currentChar:String = levelId.charAt(i);
+
+        if (previousChar.toLowerCase() == previousChar && currentChar.toLowerCase() != currentChar) levelIdClean += " ";
+        if (Std.parseInt(previousChar) == null && Std.parseInt(currentChar) != null) levelIdClean += " ";
+        if (Std.parseInt(previousChar) != null && Std.parseInt(currentChar) == null) levelIdClean += " ";
+
+        levelIdClean += currentChar;
+      }
     }
-    if (weekNum > 0)
-    {
-      weekType.animation.play('WEEK', true);
-    }
-    else
-    {
-      weekType.animation.play('WEEKEND', true);
-      weekNumbers[0].offset.x -= 35;
-    }
+
+    createWeekTextGraphic(levelIdClean);
+    weekText.loadGraphic(FlxG.bitmap.get(levelIdClean));
+
+    var weekTextOffsets:Array<Float> = levelIdData.getCapsuleTitleOffsets();
+    weekText.offset.set(weekTextOffsets[0], weekTextOffsets[1]);
+  }
+
+  function createWeekTextGraphic(text:String)
+  {
+    if (FlxG.bitmap.checkCache(text)) return;
+
+    var weekTextBase:FlxText = new FlxText(0, 0, 0, text).setFormat("YoureGone-Regular", 20, 0xFF21242E);
+    @:privateAccess weekTextBase.regenGraphic();
+
+    FlxG.bitmap.add(weekTextBase.pixels.clone(), false, text);
   }
 
   /**
@@ -381,8 +386,30 @@ class SongMenuItem extends FlxSpriteGroup
 
   var evilTrail:FlxTrail;
 
-  public function fadeAnim():Void
+  public var hasTrail:Bool = false;
+
+  function clearUpTrail()
   {
+    if (impactThing != null)
+    {
+      FlxTween.cancelTweensOf(impactThing);
+      remove(impactThing);
+      impactThing.destroy();
+      impactThing = null;
+    }
+    if (evilTrail != null)
+    {
+      FlxTween.cancelTweensOf(evilTrail);
+      remove(evilTrail);
+      evilTrail.destroy();
+      evilTrail = null;
+    }
+  }
+
+  public function fadeAnim(?newRank:ScoringRank):Void
+  {
+    if (hasTrail) clearUpTrail();
+    hasTrail = true;
     impactThing = new FunkinSprite(0, 0);
     impactThing.frames = capsule.frames;
     impactThing.frame = capsule.frame;
@@ -396,19 +423,20 @@ class SongMenuItem extends FlxSpriteGroup
     FlxTween.tween(impactThing.scale, {x: 2.5, y: 2.5}, 0.5);
     // FlxTween.tween(impactThing, {alpha: 0}, 0.5);
 
-    evilTrail = new FlxTrail(impactThing, null, 15, 2, 0.01, 0.069);
+    evilTrail = new FlxTrail(impactThing, null, 15, 0.03, 0.01, 0.069);
     evilTrail.blend = BlendMode.ADD;
     evilTrail.zIndex = capsule.zIndex - 5;
     FlxTween.tween(evilTrail, {alpha: 0}, 0.6, {
       ease: FlxEase.quadOut,
       onComplete: function(_)
       {
-        remove(evilTrail);
+        clearUpTrail();
+        hasTrail = false;
       }
     });
     add(evilTrail);
 
-    evilTrail.color = ranking.rank.getRankingFreeplayColor();
+    evilTrail.color = (newRank ?? ranking.rank).getRankingFreeplayColor();
   }
 
   public function getTrailColor():FlxColor
@@ -430,14 +458,8 @@ class SongMenuItem extends FlxSpriteGroup
     else
     {
       songText.text = freeplayData.fullSongName;
-      if (freeplayData.songCharacter != null)
-      {
-        // UPDATE V0.7.7a, SINCE IF A CHARACTER HAS A '/' IN THE NAME CUZ OF FOLDER ORGANISATION, THEN IT'S IMPOSSIBLE FOR THAT VOICES FILE TO BE NAMED WITH THAT
-        // var c:String = StringTools.replace(freeplayData.songCharacter, "/", "%");
-        // pixelIcon.setCharacter(c);
-        pixelIcon.setCharacter(freeplayData.songCharacter);
-      }
-      pixelIcon.visible = true;
+      if (freeplayData.songCharacter != null) pixelIcon.setCharacter(freeplayData.songCharacter);
+      if (pixelIcon.char != freeplayData.songCharacter) pixelIcon.visible = false;
       updateBPM(Std.int(freeplayData.songStartingBpm) ?? 0);
       updateDifficultyRating(freeplayData.difficultyRating ?? 0);
       if (updateRank) updateScoringRank(freeplayData.scoringRank);
@@ -556,7 +578,7 @@ class SongMenuItem extends FlxSpriteGroup
 
     refreshDisplay();
 
-    checkWeek(freeplayData?.data.id);
+    checkWeek();
   }
 
   public function initRandom(?styleData:FreeplayStyle = null):Void
@@ -565,7 +587,7 @@ class SongMenuItem extends FlxSpriteGroup
     initData(null, styleData, 1);
     y = intendedY(0) + 10;
     targetPos.x = x;
-    alpha = 0.5;
+    alpha = 0;
     songText.visible = false;
     favIcon.visible = false;
     favIconBlurred.visible = false;
@@ -750,7 +772,7 @@ class SongMenuItem extends FlxSpriteGroup
     return forceHighlight;
   }
 
-  function updateSelected():Void
+  public function updateSelected():Void
   {
     final isSelected:Bool = (this.selected || this.forceHighlight);
 

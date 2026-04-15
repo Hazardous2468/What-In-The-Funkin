@@ -68,7 +68,9 @@ class TitleState extends MusicBeatState
   var titleText:FunkinSprite;
   var maskShader = new LeftMaskShader();
 
+  #if FEATURE_VIDEO_PLAYBACK
   var attractTimer:FlxTimer;
+  #end
 
   function startIntro():Void
   {
@@ -165,8 +167,10 @@ class TitleState extends MusicBeatState
     else
       initialized = true;
 
+    #if FEATURE_VIDEO_PLAYBACK
     trace('Opening Attract state in ${Constants.TITLE_ATTRACT_DELAY} seconds...');
     attractTimer = new FlxTimer().start(Constants.TITLE_ATTRACT_DELAY, (_:FlxTimer) -> moveToAttract());
+    #end
   }
 
   /**
@@ -296,11 +300,13 @@ class TitleState extends MusicBeatState
 
   function moveToMainMenu():Void
   {
+    #if FEATURE_VIDEO_PLAYBACK
     if (attractTimer != null)
     {
       attractTimer.cancel();
       attractTimer = null;
     }
+    #end
 
     funkin.FunkinMemory.purgeCache();
     FlxG.switchState(() -> new MainMenuState());
@@ -349,8 +355,10 @@ class TitleState extends MusicBeatState
     FlxG.camera.flash(FlxColor.WHITE, 1);
     FunkinSound.playOnce(Paths.sound('confirmMenu'), 0.7);
 
+    #if FEATURE_VIDEO_PLAYBACK
     // Stop the attract timer so you can listen to the whole song!
     attractTimer.cancel();
+    #end
   }
 
   function createCoolText(textArray:Array<String>):Void
