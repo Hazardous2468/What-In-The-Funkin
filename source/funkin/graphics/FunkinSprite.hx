@@ -803,17 +803,6 @@ class FunkinSprite extends FlxAnimate
     return value;
   }
 
-  override public function draw():Void
-  {
-    for (filter in filters ?? [])
-    {
-      @:privateAccess
-      if (filter.__renderDirty) _renderTextureDirty = true;
-    }
-
-    super.draw();
-  }
-
   override function drawFrameComplex(frame:FlxFrame, camera:FlxCamera):Void
   {
     final willUseRenderTexture = checkRenderTexture();
@@ -935,6 +924,11 @@ class FunkinSprite extends FlxAnimate
     }
     else
     {
+      for (filter in filters ?? [])
+      {
+        @:privateAccess
+        if (filter.__renderDirty) _renderTextureDirty = true;
+      }
       super.draw();
     }
   }
