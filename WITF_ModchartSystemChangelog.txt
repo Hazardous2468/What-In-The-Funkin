@@ -1,3 +1,10 @@
+v1.0.4:
+
+Updated to latest version of FNF (v0.8.5)
+
+
+
+
 v1.0.3:
 
 Updated to latest version of FNF (v0.8.3)
