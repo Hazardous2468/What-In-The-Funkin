@@ -38,6 +38,8 @@ Fork specific issues (V1.0.3):
 
 - AFT's act a bit strangly when pointed at themselves
 
+- AFT updates break when playback rate is set to zero
+
 - Sometimes holds / notes will be incorrectly layered when using Zsort mod
   (v0.8.0a introduces a scuffed work around by adjusting zSortMod_SustainOffset and zSortMod_StrumNoteOffset in the PlayState instance.)
 Update: v1.0 may have brought back this issue, how fun!
