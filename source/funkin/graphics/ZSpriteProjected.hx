@@ -19,7 +19,6 @@ import flixel.graphics.tile.FlxDrawTrianglesItem;
 /*
   TODO:
   textureRepeat in updateTris instead of in draw. Can also mean the edit to drawTriangles for repeating textures is no longer needed (though still need to add culling lol so might as well keep it)
-  CropRight, CropLeft, CropBottom, CropTop
  */
 class ZSpriteProjected extends ZSprite
 {
@@ -102,6 +101,43 @@ class ZSpriteProjected extends ZSprite
   {
     this.scale.y = n;
     return this.scale.y;
+  }
+
+  // 0 means no crop, 1 means fully crop, 0.5 means half cropped. The variable determines the direction of the crop (so crop right will start cropping from the right, leaving the left side).
+  // Crop the sprite starting from the left.
+  public var cropLeft(default, set):Float = 0;
+
+  function set_cropLeft(n:Float):Float
+  {
+    this.cropLeft = FlxMath.bound(n, 0.0, 1.0);
+    return this.cropLeft;
+  }
+
+  // Crop the sprite starting from the right.
+  public var cropRight(default, set):Float = 0;
+
+  function set_cropRight(n:Float):Float
+  {
+    this.cropRight = FlxMath.bound(n, 0.0, 1.0);
+    return this.cropRight;
+  }
+
+  // Crop the sprite starting from the top.
+  public var cropTop(default, set):Float = 0;
+
+  function set_cropTop(n:Float):Float
+  {
+    this.cropTop = FlxMath.bound(n, 0.0, 1.0);
+    return this.cropTop;
+  }
+
+  // Crop the sprite starting from the bottom.
+  public var cropBottom(default, set):Float = 0;
+
+  function set_cropBottom(n:Float):Float
+  {
+    this.cropBottom = FlxMath.bound(n, 0.0, 1.0);
+    return this.cropBottom;
   }
 
   var skewY(get, set):Float;
@@ -361,6 +397,8 @@ class ZSpriteProjected extends ZSprite
           point3D = applyRotZ(point3D, xPercent, yPercent, frameWidth, frameHeight, spinAngle);
         }
 
+        point3D = applyCrop(point3D, w, h);
+
         point3D = applyScale(point3D, xPercent, yPercent, w, h, false);
 
         point3D = applyFlip(point3D, xPercent, yPercent);
@@ -399,7 +437,21 @@ class ZSpriteProjected extends ZSprite
         uvX = FlxMath.remapToRange(xPercent, 0, 1, curFrame.uv.left, curFrame.uv.right);
         uvY = FlxMath.remapToRange(yPercent, 0, 1, curFrame.uv.top, curFrame.uv.bottom);
 
-        // todo: add repeat texture to here instead so that we can use frameBorderCut to determine if we repeat the entire atlas, or just the current frame
+        // todo: add repeat texture to here (using %) instead so that we can use frameBorderCut to determine if we repeat the entire atlas, or just the current frame
+        // 2026 me here, idk if this is possible cuz will need a vert for every time the texture repeats. Would have to be handled via shader instead :(
+
+        // crop
+        uvX *= (1 - cropLeft);
+
+        uvX -= 1 * (1 - cropLeft);
+        uvX *= (1.0 - cropRight / (1.0 - cropLeft));
+        uvX += 1 * (1 - cropLeft);
+
+        uvY *= (1 - cropTop);
+
+        uvY -= 1 * (1 - cropTop);
+        uvY *= (1.0 - cropBottom / (1.0 - cropTop));
+        uvY += 1 * (1 - cropTop);
 
         // uv scale
         uvX -= uvScaleOffset.x;
@@ -515,17 +567,40 @@ class ZSpriteProjected extends ZSprite
     this.scaleZ = data.scaleZ;
   }
 
+  public function applyCrop(pos:Vector3D, w:Float, h:Float):Vector3D
+  {
+    // right
+    pos.x *= (1.0 - cropRight / (1.0 - cropLeft));
+
+    // left
+    pos.x -= w;
+    pos.x *= (1.0 - cropLeft);
+    pos.x += w;
+
+    // bottom
+    pos.y *= (1.0 - cropBottom / (1.0 - cropTop));
+
+    // top
+    pos.y -= h;
+    pos.y *= (1.0 - cropTop);
+    pos.y += h;
+
+    return pos;
+  }
+
   public function applyScale(pos:Vector3D, xPercent:Float, yPercent:Float, w:Float, h:Float, isScale2:Bool = false):Vector3D
   {
     if (curRotationAmount != 0)
     {
-      var rotateModPivotPoint:Vector2 = new Vector2(0.5, 0.5); // to skew from center
-      var thing:Vector2 = ModConstants.rotateAround(rotateModPivotPoint, new Vector2(xPercent, yPercent),
-        curRotationAmount); // to fix incorrect skew when rotated
+      var rotateModPivotPoint:Vector2 = new Vector2(0.5, 0.5);
+      var thing:Vector2 = ModConstants.rotateAround(rotateModPivotPoint, new Vector2(xPercent, yPercent), curRotationAmount);
 
       xPercent = thing.x;
       yPercent = thing.y;
     }
+
+    xPercent = FlxMath.remapToRange(xPercent, 0, 1, cropLeft, 1 - cropRight);
+    yPercent = FlxMath.remapToRange(yPercent, 0, 1, cropTop, 1 - cropBottom);
 
     var newWidth:Float = ((isScale2 ? scaleX2 : scaleX) - 1) * (xPercent - 0.5);
     var newHeight:Float = ((isScale2 ? scaleY2 : scaleY) - 1) * (yPercent - 0.5);

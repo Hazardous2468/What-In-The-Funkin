@@ -85,7 +85,7 @@ class ModConstants
 {
   public static var orientTimeOffset:Float = -2.0; // in ms
 
-  public static final MODCHART_VERSION:String = "v1.0.4";
+  public static final MODCHART_VERSION:String = "v1.0.5";
 
   public static final defaultHoldGrain = 75;
   public static final defaultPathGrain = defaultHoldGrain;
@@ -95,80 +95,10 @@ class ModConstants
   // If a mod tag is in this array, it will automatically invert the mod value
   // Best to only use this for more simple modcharts.
   // TODO -> Move these to base modifiers class!
-  public static var dadInvert:Array<String> = [
-    "rotatez",
-    "rotatey",
-    "drunk",
-    "drunkangle",
-    "drunkangley",
-    "tipsy",
-    "tipsyx",
-    "beat",
-    "beatangley",
-    "beatangle",
-    "beatanglez",
-    "confusionoffset",
-    "confusion",
-    "anglez",
-    "angle",
-    "bumpyx",
-    "bumpyangle",
-    "bumpyangley",
-    "cosbumpyx",
-    "cosbumpyangle",
-    "cosbumpyangley",
-    "bouncex",
-    "bounceangley",
-    "bounceangle",
-    "cosbouncex",
-    "cosbounceangle",
-    "cosbounceangley",
-    "digital",
-    "digitalangle",
-    "digitalangley",
-    "linearx",
-    "circx",
-    "twirl",
-    "dizzy",
-    "twirl2",
-    "dizzy2",
-    "zigzag",
-    "spiralx",
-    "spiralcosx",
-    "tandrunk",
-    "square",
-    "saw",
-    "noteskewx",
-    "skewx"
-  ];
+  public static var dadInvert:Array<String> = ["rotatez", "rotatey", "drunk", "drunkangle", "drunkangley", "tipsy", "tipsyx", "beat", "beatangley", "beatangle", "beatanglez", "confusionoffset", "confusion", "anglez", "angle", "bumpyx", "bumpyangle", "bumpyangley", "cosbumpyx", "cosbumpyangle", "cosbumpyangley", "bouncex", "bounceangley", "bounceangle", "cosbouncex", "cosbounceangle", "cosbounceangley", "digital", "digitalangle", "digitalangley", "linearx", "circx", "twirl", "dizzy", "twirl2", "dizzy2", "zigzag", "spiralx", "spiralcosx", "tandrunk", "square", "saw", "noteskewx", "skewx"];
 
   // These modifiers are hidden from the debug Text by default to avoid clutter.
-  public static var hideSomeDebugBois:Array<String> = [
-    "showsubmods",
-    "showzerovalue",
-    "debugx",
-    "debugy",
-    "debugalpha",
-    "arrowpathred",
-    "arrowpathgreen",
-    "arrowpathblue",
-    "holdtype",
-    "grain",
-    "arrowpathgrain",
-    "pathgrain",
-    "arrowpathlength",
-    "arrowpathbacklength",
-    "showlanemods",
-    "showallmods",
-    "showextra",
-    "arrowpath_notitg",
-    "stealthglowred",
-    "stealthglowblue",
-    "stealthglowgreen",
-    "arrowpathwidth",
-    "noholdmathshortcut",
-    "mathcutoff"
-  ];
+  public static var hideSomeDebugBois:Array<String> = ["showsubmods", "showzerovalue", "debugx", "debugy", "debugalpha", "arrowpathred", "arrowpathgreen", "arrowpathblue", "holdtype", "grain", "arrowpathgrain", "pathgrain", "arrowpathlength", "arrowpathbacklength", "showlanemods", "showallmods", "showextra", "arrowpath_notitg", "stealthglowred", "stealthglowblue", "stealthglowgreen", "arrowpathwidth", "noholdmathshortcut", "mathcutoff"];
 
   // Sets the REAL hold note to this position - X.
   public static final holdNoteJankX:Float = 0;
@@ -563,7 +493,8 @@ class ModConstants
   // Input an ease and this function will return the same ease but flipped horizontally (meaning it'll start at 100% instead of 0%)
   public static function easeFlip(ease:Float->Float):Float->Float
   {
-    return function(t):Float {
+    return function(t):Float
+    {
       return 1.0 - ease(t);
     }
   }
@@ -571,7 +502,8 @@ class ModConstants
   // Input two eases and this function will return the result of having the first ease be the first halve, and the second ease be the second halve.
   public static function easeMerge(firstEase:Float->Float, secondEase:Float->Float):Float->Float
   {
-    return function(t):Float {
+    return function(t):Float
+    {
       return (t < 0.5 ? firstEase(t * 2) * 0.5 : secondEase(t * 2 - 1) * 0.5 + 0.5);
     }
   }
@@ -579,7 +511,8 @@ class ModConstants
   // Input two eases and this function will return the result of the two eases lerped together using t (%) as the ratio
   public static function easeLerp(firstEase:Float->Float, secondEase:Float->Float):Float->Float
   {
-    return function(t):Float {
+    return function(t):Float
+    {
       return FlxMath.lerp(firstEase(t), secondEase(t), t);
     }
   }
@@ -594,7 +527,8 @@ class ModConstants
   // Can also input a custom mixFactor method (optional)
   public static function easeBlend(firstEase:Float->Float, secondEase:Float->Float, mixFactorFunc:Null<Float->Float> = null):Float->Float
   {
-    return function(x:Float):Float {
+    return function(x:Float):Float
+    {
       var mixFactor:Float = mixFactorFunc == null ? easeBlendMixFactor(x) : mixFactorFunc(x); // if mixFactorFunc is null, use the default method
       return (1 - mixFactor) * firstEase(x) + mixFactor * secondEase(x);
     }
