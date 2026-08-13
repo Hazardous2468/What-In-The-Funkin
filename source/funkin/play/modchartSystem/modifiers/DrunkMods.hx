@@ -26,7 +26,7 @@ class DrunkModBase extends Modifier
     desync = createSubMod("desync", 0.2, ["spacing"]);
     time_add = createSubMod("time_add", 0.0, ["offset", "timeadd", "time_offset", "timeoffset"]);
     sine = createSubMod("sine", 0.0, ["usesine", "sin"]);
-    timertype = createSubMod("timertype", 0.0, ["timetype"]);
+    timertype = createSubMod("timertype", 0.0, ["timetype","timer"]);
   }
 
   function tanDrunkMath(noteDir:Int, curPos:Float):Float

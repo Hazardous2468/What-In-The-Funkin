@@ -22,7 +22,7 @@ class TipsyModBase extends Modifier
     speed = createSubMod("speed", 1.0, ["frequency"]);
     desync = createSubMod("desync", 2.0, ["spacing"]);
     time_add = createSubMod("time_add", 0.0, ["offset", "timeadd", "time_offset", "timeoffset"]);
-    timertype = createSubMod("timertype", 0.0);
+    timertype = createSubMod("timertype", 0.0, ["timer","timetype"]);
 
     unknown = false;
     strumsMod = true;

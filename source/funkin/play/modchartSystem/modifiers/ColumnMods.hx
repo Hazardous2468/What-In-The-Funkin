@@ -80,7 +80,7 @@ class BlackSphereInvertMod extends Modifier
   {
     super(name, 0);
     notPercentage = true;
-    variant = createSubMod("variant", 0.0);
+    variant = createSubMod("variant", 0.0, ["type"]);
     speedaffect = createSubMod("speedaffect", 1.0);
     modPriority = 130;
     unknown = false;
@@ -157,7 +157,7 @@ class BlackSphereFlipMod extends Modifier
   public function new(name:String)
   {
     super(name, 0);
-    variant = createSubMod("variant", 0.0);
+    variant = createSubMod("variant", 0.0, ["type"]);
     speedaffect = createSubMod("speedaffect", 1.0);
     modPriority = 130;
     notPercentage = true;

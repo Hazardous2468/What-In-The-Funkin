@@ -30,3 +30,5 @@ package-lock.json
 .aider*
 docs/repository-open-graph-template.pdn
 /TRACEY
+source/flixel/FlxCamera.hx_backup.hx
+source/funkin/play/modchartSystem/HazardAFT_testing.hx
