@@ -8,6 +8,9 @@ import funkin.save.Save;
 import funkin.util.WindowUtil;
 import funkin.util.HapticUtil.HapticsMode;
 import funkin.ui.debug.FunkinDebugDisplay.DebugDisplayMode;
+#if FEATURE_DISCORD_RPC
+import funkin.api.discord.DiscordClient;
+#end
 
 /**
  * A core class which provides a store of user-configurable, globally relevant values.
@@ -158,16 +161,6 @@ class Preferences
     #if NO_FEATURE_DEBUG_DISPLAY
     return DebugDisplayMode.Off;
     #else
-    #if hl
-    // Account for when debugDisplay used to be a boolean
-    var options:Null<SaveDataOptions> = Save.instance?.options;
-    if (options != null && Std.isOfType(options.debugDisplay, Bool))
-    {
-      var convertedDebugDisplay = cast(options.debugDisplay, Bool) ? DebugDisplayMode.Simple : DebugDisplayMode.Off;
-      options.debugDisplay = convertedDebugDisplay;
-      Save.system.flush();
-    }
-    #end
     return Save?.instance?.options?.debugDisplay ?? 'Off';
     #end
   }
@@ -215,13 +208,13 @@ class Preferences
 
   static function get_hapticsMode():HapticsMode
   {
-    var value = Save?.instance?.options?.hapticsMode ?? "All";
+    var value = Save?.instance?.options?.hapticsMode ?? 'All';
 
     return switch (value)
     {
-      case "None":
+      case 'None':
         HapticsMode.NONE;
-      case "Notes Only":
+      case 'Notes Only':
         HapticsMode.NOTES_ONLY;
       default:
         HapticsMode.ALL;
@@ -235,11 +228,11 @@ class Preferences
     switch (value)
     {
       case HapticsMode.NONE:
-        string = "None";
+        string = 'None';
       case HapticsMode.NOTES_ONLY:
-        string = "Notes Only";
+        string = 'Notes Only';
       default:
-        string = "All";
+        string = 'All';
     };
 
     var save:Save = Save.instance;
@@ -347,15 +340,15 @@ class Preferences
     #if (mobile || web)
     return lime.ui.WindowVSyncMode.OFF;
     #else
-    var value = Save?.instance?.options?.vsyncMode ?? "Off";
+    var value = Save?.instance?.options?.vsyncMode ?? 'Off';
 
     return switch (value)
     {
-      case "Off":
+      case 'Off':
         lime.ui.WindowVSyncMode.OFF;
-      case "On":
+      case 'On':
         lime.ui.WindowVSyncMode.ON;
-      case "Adaptive":
+      case 'Adaptive':
         lime.ui.WindowVSyncMode.ADAPTIVE;
       default:
         lime.ui.WindowVSyncMode.OFF;
@@ -373,13 +366,13 @@ class Preferences
     switch (value)
     {
       case lime.ui.WindowVSyncMode.OFF:
-        string = "Off";
+        string = 'Off';
       case lime.ui.WindowVSyncMode.ON:
-        string = "On";
+        string = 'On';
       case lime.ui.WindowVSyncMode.ADAPTIVE:
-        string = "Adaptive";
+        string = 'Adaptive';
       default:
-        string = "Off";
+        string = 'Off';
     };
 
     WindowUtil.setVSyncMode(value);
@@ -418,6 +411,46 @@ class Preferences
     return value;
     #end
   }
+
+  public static var enabledDiscordRPC(get, set):Bool;
+
+  static function get_enabledDiscordRPC():Bool
+  {
+    return Save?.instance?.options?.enabledDiscordRPC ?? true;
+  }
+
+  static function set_enabledDiscordRPC(value:Bool):Bool
+  {
+    #if FEATURE_DISCORD_RPC
+    toggleDiscordRPC(value);
+    #end
+
+    var save:Save = Save.instance;
+    save.options.enabledDiscordRPC = value;
+    Save.system.flush();
+    return value;
+  }
+
+  #if FEATURE_DISCORD_RPC
+  public static function toggleDiscordRPC(enable:Bool)
+  {
+    if (DiscordClient.instance == null) return;
+
+    if (enable)
+    {
+      DiscordClient.instance.init();
+
+      if (DiscordClient.presenceParamsCache != null)
+      {
+        DiscordClient.instance.setPresence(DiscordClient.presenceParamsCache);
+      }
+    }
+    else
+    {
+      DiscordClient.instance.shutdown();
+    }
+  }
+  #end
 
   /**
    * If >0, the game will display a semi-opaque background under the notes.
@@ -526,13 +559,13 @@ class Preferences
 
   public static function setDebugDisplayMode(mode:DebugDisplayMode):Void
   {
-    if (FlxG.game.parent.contains(Main.debugDisplay)) FlxG.game.parent.removeChild(Main.debugDisplay);
+    if (FlxG.game.contains(Main.debugDisplay)) FlxG.game.removeChild(Main.debugDisplay);
 
     if (mode == DebugDisplayMode.Off) return;
 
     Main.debugDisplay.isAdvanced = (mode == DebugDisplayMode.Advanced);
 
-    FlxG.game.parent.addChild(Main.debugDisplay);
+    FlxG.game.addChild(Main.debugDisplay);
   }
 
   static function setDebugDisplayBGOpacity(value:Float):Void

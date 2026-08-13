@@ -151,7 +151,7 @@ class NoteSprite extends ZSpriteProjected
   public var lowPriority:Bool = false;
 
   /**
-   * This is true if the note is later than 10 frames within the strumline,
+   * This is true if the note is later than the strumline's hitzone (`HIT_WINDOW_MS`),
    * and thus can't be hit by the player.
    * It will be destroyed after it moves offscreen.
    * Managed by PlayState.
@@ -159,14 +159,14 @@ class NoteSprite extends ZSpriteProjected
   public var hasMissed:Bool;
 
   /**
-   * This is true if the note is earlier than 10 frames within the strumline.
+   * This is true if the note is earlier than the strumline's hitzone (`HIT_WINDOW_MS`),
    * and thus can't be hit by the player.
    * Managed by PlayState.
    */
   public var tooEarly:Bool;
 
   /**
-   * This is true if the note is within 10 frames of the strumline,
+   * This is true if the note is within the strumline's hitzone (`HIT_WINDOW_MS`),
    * and thus may be hit by the player.
    * Managed by PlayState.
    */
@@ -261,7 +261,7 @@ class NoteSprite extends ZSpriteProjected
   /**
    * Call this to override how debug bounding boxes are drawn for this sprite.
    */
-  public override function drawDebugOnCamera(camera:flixel.FlxCamera):Void
+  override public function drawDebugOnCamera(camera:flixel.FlxCamera):Void
   {
     if (!camera.visible || !camera.exists || !isOnScreen(camera)) return;
 
@@ -297,7 +297,7 @@ class NoteSprite extends ZSpriteProjected
     if (hue != 1.0) this.shader = this.hsvShader;
   }
 
-  public override function revive():Void
+  override public function revive():Void
   {
     super.revive();
     this.visible = true;
@@ -342,13 +342,13 @@ class NoteSprite extends ZSpriteProjected
     this.hsvShader.stealthGlowRed = stealthGlowRed;
   }
 
-  public override function kill():Void
+  override public function kill():Void
   {
     super.kill();
     vwooshing = false;
   }
 
-  public override function destroy():Void
+  override public function destroy():Void
   {
     // This function should ONLY get called as you leave PlayState entirely.
     // Otherwise, we want the game to keep reusing note sprites to save memory.

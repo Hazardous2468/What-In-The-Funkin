@@ -16,7 +16,6 @@ class NoteHoldCover extends FlxTypedSpriteGroup<ZSprite>
   public var holdNote:SustainTrail;
 
   public var glow:ZSprite;
-  public var sparks:ZSprite;
 
   public var holdNoteDir:Int = 0;
 
@@ -134,7 +133,7 @@ class NoteHoldCover extends FlxTypedSpriteGroup<ZSprite>
     glow.shader = hsvShader;
   }
 
-  public override function kill():Void
+  override public function kill():Void
   {
     super.kill();
 
@@ -143,10 +142,9 @@ class NoteHoldCover extends FlxTypedSpriteGroup<ZSprite>
     if (holdNote != null) holdNote.cover = null;
 
     if (glow != null) glow.visible = false;
-    if (sparks != null) sparks.visible = false;
   }
 
-  public override function revive():Void
+  override public function revive():Void
   {
     super.revive();
 
@@ -154,7 +152,6 @@ class NoteHoldCover extends FlxTypedSpriteGroup<ZSprite>
     this.alpha = 1.0;
 
     if (glow != null) glow.visible = true;
-    if (sparks != null) sparks.visible = true;
   }
 
   public function onAnimationFinished(animationName:String):Void

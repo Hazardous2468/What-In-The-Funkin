@@ -92,8 +92,13 @@ class ScriptEventDispatcher
     else
     {
       // If the target doesn't support the event, stop trying to dispatch.
-      if ([ScriptEventType.DIALOGUE_START, ScriptEventType.DIALOGUE_LINE, ScriptEventType.DIALOGUE_COMPLETE_LINE, ScriptEventType.DIALOGUE_SKIP, ScriptEventType.DIALOGUE_END].contains(event.type))
-        return;
+      if ([
+        ScriptEventType.DIALOGUE_START,
+        ScriptEventType.DIALOGUE_LINE,
+        ScriptEventType.DIALOGUE_COMPLETE_LINE,
+        ScriptEventType.DIALOGUE_SKIP,
+        ScriptEventType.DIALOGUE_END
+      ].contains(event.type)) return;
     }
 
     if (Std.isOfType(target, INoteScriptedClass))
@@ -254,8 +259,16 @@ class ScriptEventDispatcher
     else
     {
       // If the target doesn't support the event, stop trying to dispatch.
-      if ([ScriptEventType.STATE_CHANGE_BEGIN, ScriptEventType.STATE_CHANGE_END, ScriptEventType.SUBSTATE_OPEN_BEGIN, ScriptEventType.SUBSTATE_OPEN_END, ScriptEventType.SUBSTATE_CLOSE_BEGIN, ScriptEventType.SUBSTATE_CLOSE_END, ScriptEventType.FOCUS_LOST, ScriptEventType.FOCUS_GAINED].contains(event.type))
-        return;
+      if ([
+        ScriptEventType.STATE_CHANGE_BEGIN,
+        ScriptEventType.STATE_CHANGE_END,
+        ScriptEventType.SUBSTATE_OPEN_BEGIN,
+        ScriptEventType.SUBSTATE_OPEN_END,
+        ScriptEventType.SUBSTATE_CLOSE_BEGIN,
+        ScriptEventType.SUBSTATE_CLOSE_END,
+        ScriptEventType.FOCUS_LOST,
+        ScriptEventType.FOCUS_GAINED
+      ].contains(event.type)) return;
     }
 
     if (Std.isOfType(target, IFreeplayScriptedClass))
@@ -287,8 +300,14 @@ class ScriptEventDispatcher
     else
     {
       // If the target doesn't support the event, stop trying to dispatch.
-      if ([ScriptEventType.CAPSULE_SELECTED, ScriptEventType.DIFFICULTY_SWITCH, ScriptEventType.SONG_SELECTED, ScriptEventType.FREEPLAY_INTRO, ScriptEventType.FREEPLAY_OUTRO, ScriptEventType.FREEPLAY_CLOSE].contains(event.type))
-        return;
+      if ([
+        ScriptEventType.CAPSULE_SELECTED,
+        ScriptEventType.DIFFICULTY_SWITCH,
+        ScriptEventType.SONG_SELECTED,
+        ScriptEventType.FREEPLAY_INTRO,
+        ScriptEventType.FREEPLAY_OUTRO,
+        ScriptEventType.FREEPLAY_CLOSE
+      ].contains(event.type)) return;
     }
 
     if (Std.isOfType(target, ICharacterSelectScriptedClass))
@@ -311,7 +330,11 @@ class ScriptEventDispatcher
     else
     {
       // If the target doesn't support the event, stop trying to dispatch.
-      if ([ScriptEventType.CHARACTER_SELECTED, ScriptEventType.CHARACTER_DESELECTED, ScriptEventType.CHARACTER_CONFIRMED].contains(event.type)) return;
+      if ([
+        ScriptEventType.CHARACTER_SELECTED,
+        ScriptEventType.CHARACTER_DESELECTED,
+        ScriptEventType.CHARACTER_CONFIRMED
+      ].contains(event.type)) return;
     }
 
     // If we reach this line, it means a script event was dispatched while not being properly handled.

@@ -14,6 +14,13 @@ package funkin.util;
 @:nullSafety
 class MemoryUtil
 {
+  static final BYTES_PER_KB:Float = 1024.0;
+
+  /**
+   * Build a log of info about the garbage collector for debugging purposes.
+   *
+   * @return The resulting log.
+   */
   public static function buildGCInfo():String
   {
     #if cpp
@@ -38,11 +45,6 @@ class MemoryUtil
     #elseif js
     var result:String = 'JS-MNS:';
     result += '\n- Memory Used: ${getGCMemory()} bytes';
-    #elseif hl
-    var result:String = 'HL-MNNS:';
-    result += '\n- Memory Used: ${hl.Gc.stats().currentMemory} bytes';
-    result += '\n- Memory Allocated: ${hl.Gc.stats().totalAllocated} bytes';
-    result += '\n- Memory Allocation Count: ${hl.Gc.stats().allocationCount}';
     #else
     var result:String = 'Unknown GC';
     #end
@@ -50,6 +52,9 @@ class MemoryUtil
     return result;
   }
 
+  /**
+   * @return Whether the current platform supports retrieving the current task memory.
+   */
   public static function supportsTaskMem():Bool
   {
     #if ((cpp && (windows || ios || macos)) || linux || android)
@@ -59,6 +64,9 @@ class MemoryUtil
     #end
   }
 
+  /**
+   * @return The current task memory for the game process.
+   */
   public static function getTaskMemory():Float
   {
     #if (windows && cpp)
@@ -92,7 +100,7 @@ class MemoryUtil
 
       if (!Math.isNaN(kb))
       {
-        return kb * 1024.0;
+        return kb * BYTES_PER_KB;
       }
     }
     catch (e:Dynamic)
@@ -103,6 +111,9 @@ class MemoryUtil
     return 0.0;
   }
 
+  /**
+   * @return Whether the current platform supports retrieving the current GC memory.
+   */
   public static function supportsGCMem():Bool
   {
     #if !html5
@@ -112,6 +123,9 @@ class MemoryUtil
     #end
   }
 
+  /**
+   * @return The current GC memory for the game process.
+   */
   public static function getGCMemory():Float
   {
     return openfl.system.System.totalMemoryNumber;
@@ -124,8 +138,6 @@ class MemoryUtil
   {
     #if cpp
     cpp.vm.Gc.enable(true);
-    #elseif hl
-    hl.Gc.enable(true);
     #else
     throw 'Not implemented!';
     #end
@@ -138,8 +150,6 @@ class MemoryUtil
   {
     #if cpp
     cpp.vm.Gc.enable(false);
-    #elseif hl
-    hl.Gc.enable(false);
     #else
     throw 'Not implemented!';
     #end
@@ -154,9 +164,6 @@ class MemoryUtil
   {
     #if cpp
     cpp.vm.Gc.run(major);
-    #elseif hl
-    // Doesn't seem to have just a collect function?
-    hl.Gc.major();
     #else
     throw 'Not implemented!';
     #end

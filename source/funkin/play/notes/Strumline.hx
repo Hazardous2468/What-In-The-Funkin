@@ -554,7 +554,7 @@ class Strumline extends FlxSpriteGroup
   // This can be changed to make the arrowpath segment into smaller chunks, making it less likely to memory leak when really long and detailed
   public var pathPieces:Int = 3;
 
-  public override function update(elapsed:Float):Void
+  override public function update(elapsed:Float):Void
   {
     super.update(elapsed);
     if (asleep) return;
@@ -1373,7 +1373,7 @@ class Strumline extends FlxSpriteGroup
 
     for (dir in DIRECTIONS)
     {
-      if (isKeyHeld(dir) && getByDirection(dir).getCurrentAnimation() == "static")
+      if (isKeyHeld(dir) && getByDirection(dir).getCurrentAnimation() == 'static')
       {
         playPress(dir);
       }
@@ -2134,12 +2134,16 @@ class Strumline extends FlxSpriteGroup
    */
   function constructNoteHoldCover():NoteHoldCover
   {
-    var result:NoteHoldCover = null;
+    var result:NoteHoldCover = this.noteHoldCovers.getFirstAvailable();
 
-    // If we haven't filled the pool yet...
-    if (noteHoldCovers.length < noteHoldCovers.maxSize)
+    if (result != null)
     {
-      // Create a new note hold cover.
+      result.revive();
+    }
+    else
+    {
+      // The note hold cover pool is full and all note hold covers are active,
+      // We have to create a new note hold cover.
       result = new NoteHoldCover(noteStyle);
       result.glow.weBelongTo = this;
       this.noteHoldCovers.add(result);
@@ -2149,22 +2153,6 @@ class Strumline extends FlxSpriteGroup
         {
           PlayState.instance.allStrumSprites.add(result.glow);
         }
-      }
-    }
-    else
-    {
-      // Else, find a note splash which is inactive so we can revive it.
-      result = this.noteHoldCovers.getFirstAvailable();
-
-      if (result != null)
-      {
-        result.revive();
-      }
-      else
-      {
-        // The note hold cover pool is full and all note hold covers are active,
-        // so we just pick one at random to destroy and restart.
-        result = FlxG.random.getObject(this.noteHoldCovers.members);
       }
     }
 
@@ -2268,14 +2256,16 @@ class Strumline extends FlxSpriteGroup
     #end
     return switch (direction)
     {
-      case NoteDirection.LEFT: -pos * 2;
+      case NoteDirection.LEFT:
+        -pos * 2;
       case NoteDirection.DOWN:
         -(pos * 2) + (1 * Strumline.NOTE_SPACING) * (noteSpacingScale * strumlineScale.x);
       case NoteDirection.UP:
         pos + (2 * Strumline.NOTE_SPACING) * (noteSpacingScale * strumlineScale.x);
       case NoteDirection.RIGHT:
         pos + (3 * Strumline.NOTE_SPACING) * (noteSpacingScale * strumlineScale.x);
-      default: -pos * 2;
+      default:
+        -pos * 2;
     }
   }
 

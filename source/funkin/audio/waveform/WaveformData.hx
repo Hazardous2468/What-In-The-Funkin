@@ -181,7 +181,7 @@ class WaveformData
   }
 
   /**
-   * Create a new WaveformData whose data represents the two waveforms overlayed.
+   * Create a new WaveformData whose data represents the two waveforms overlaid.
    */
   public function merge(that:WaveformData):WaveformData
   {
@@ -217,7 +217,7 @@ class WaveformData
   /**
    * Create a new WaveformData whose parameters match the current object.
    */
-  public function clone(?newData:Array<Int> = null):WaveformData
+  public function clone(?newData:Array<Int>):WaveformData
   {
     if (newData == null)
     {

@@ -331,7 +331,7 @@ class Stage extends FlxSpriteGroup implements IPlayStateScriptedClass implements
    * @param name (Optional) A unique name for the sprite.
    *   You can call `getNamedProp(name)` to retrieve it later.
    */
-  public function addProp(prop:StageProp, ?name:String = null):Void
+  public function addProp(prop:StageProp, ?name:String):Void
   {
     if (name != null)
     {
@@ -344,7 +344,7 @@ class Stage extends FlxSpriteGroup implements IPlayStateScriptedClass implements
   /**
    * Add a sprite to the stage which animates to the beat of the song.
    */
-  public function addBopper(bopper:Bopper, ?name:String = null):Void
+  public function addBopper(bopper:Bopper, ?name:String):Void
   {
     boppers.push(bopper);
     this.addProp(bopper, name);
@@ -810,7 +810,7 @@ class Stage extends FlxSpriteGroup implements IPlayStateScriptedClass implements
   {
   }
 
-  public override function kill()
+  override public function kill()
   {
     _skipTransformChildren = true;
     alive = false;
@@ -819,17 +819,17 @@ class Stage extends FlxSpriteGroup implements IPlayStateScriptedClass implements
     if (group != null) group.kill();
   }
 
-  public override function remove(Sprite:FlxSprite, Splice:Bool = false):FlxSprite
+  override public function remove(sprite:FlxSprite, splice:Bool = false):FlxSprite
   {
-    if (Sprite == null) return Sprite;
-    var sprite:FlxSprite = cast Sprite;
+    if (sprite == null || !(sprite is FlxSprite)) return sprite;
+
     sprite.x -= x;
     sprite.y -= y;
-    // alpha
     sprite.cameras = null;
 
-    if (group != null) group.remove(Sprite, Splice);
-    return Sprite;
+    if (group != null) group.remove(sprite, splice);
+
+    return sprite;
   }
 
   // WITF Draw Function logic
