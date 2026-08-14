@@ -15,14 +15,21 @@
       "url": "https://github.com/KarimAkra/astc-compressor"
     },
     {
+      "name": "dox",
+      "type": "haxelib",
+      "version": "1.6.0"
+    },
+    {
       "name": "extension-admob",
       "type": "git",
+      "dir": null,
       "ref": "68fc73c4090c5765709597b68fbe87389f3548c0",
       "url": "https://github.com/FunkinCrew/extension-admob"
     },
     {
       "name": "extension-agesignals",
       "type": "git",
+      "dir": null,
       "ref": "dd3f56ccbb313a43d40cba8826fca2b1ec7c7e5d",
       "url": "https://github.com/FunkinCrew/extension-agesignals"
     },
@@ -32,37 +39,37 @@
       "version": "2.2.2"
     },
     {
-      "name": "dox",
-      "type": "haxelib",
-      "version": "1.6.0"
-    },
-    {
       "name": "extension-haptics",
       "type": "git",
+      "dir": null,
       "ref": "8978b34b437f943a0d164bd6b3d8b69bd0025081",
       "url": "https://github.com/LimeExtensions/extension-haptics"
     },
     {
       "name": "extension-iapcore",
       "type": "git",
+      "dir": null,
       "ref": "5fbb4a8e56ff0f4d8ffc71b561d57a367419ead8",
       "url": "https://github.com/LimeExtensions/extension-iapcore"
     },
     {
       "name": "extension-iarcore",
       "type": "git",
+      "dir": null,
       "ref": "a78e49fe69feecef9abcdbcfd08ccc510ed00c6c",
       "url": "https://github.com/LimeExtensions/extension-iarcore"
     },
     {
       "name": "extension-webviewcore",
       "type": "git",
+      "dir": null,
       "ref": "98c059722491b182ee932ff47c5d7b564c967165",
       "url": "https://github.com/LimeExtensions/extension-webviewcore"
     },
     {
       "name": "flixel",
       "type": "git",
+      "dir": null,
       "ref": "141f23c400c0508c76d5a09a143f5ce6790f8122",
       "url": "https://github.com/FunkinCrew/flixel"
     },
@@ -86,11 +93,6 @@
       "version": "3.8.0"
     },
     {
-      "name": "svg",
-      "type": "haxelib",
-      "version": "1.1.3"
-    },
-    {
       "name": "funkin.vis",
       "type": "git",
       "dir": null,
@@ -103,11 +105,6 @@
       "dir": "src",
       "ref": "6409f3c6d1b4c52176813d3ede86c0d34e8af2c1",
       "url": "https://github.com/FunkinCrew/grig.audio"
-    },
-    {
-      "name": "tink_core",
-      "type": "haxelib",
-      "version": "1.26.0"
     },
     {
       "name": "hamcrest",
@@ -129,8 +126,14 @@
       "url": "https://github.com/haxeui/haxeui-flixel"
     },
     {
+      "name": "hscript",
+      "type": "haxelib",
+      "version": "2.7.0"
+    },
+    {
       "name": "hxcpp",
       "type": "git",
+      "dir": null,
       "ref": "0376e9b19af9a4d91f9d9afc131a358467856a10",
       "url": "https://github.com/FunkinCrew/hxcpp"
     },
@@ -147,16 +150,16 @@
       "version": "1.3.0"
     },
     {
+      "name": "hxgamemode",
+      "type": "haxelib",
+      "version": "1.0.1"
+    },
+    {
       "name": "hxjsonast",
       "type": "git",
       "dir": null,
       "ref": "20e72cc68c823496359775ac1f06500e67f189d5",
       "url": "https://github.com/nadako/hxjsonast/"
-    },
-    {
-      "name": "hxgamemode",
-      "type": "haxelib",
-      "version": "1.0.1"
     },
     {
       "name": "hxp",
@@ -188,8 +191,16 @@
     {
       "name": "lime",
       "type": "git",
+      "dir": null,
       "ref": "ad0080e7e1df97d06060ea6cf5ce8f8088c3b872",
       "url": "https://github.com/FunkinCrew/lime"
+    },
+    {
+      "name": "linc_luajit",
+      "type": "git",
+      "dir": null,
+      "ref": "1906c4a96f6bb6df66562b3f24c62f4c5bba14a7",
+      "url": "https://github.com/superpowers04/linc_luajit"
     },
     {
       "name": "newgrounds",
@@ -201,6 +212,7 @@
     {
       "name": "openfl",
       "type": "git",
+      "dir": null,
       "ref": "2e5fc2062fb07b40f81b45268085a2efdb2eb9ae",
       "url": "https://github.com/FunkinCrew/openfl"
     },
@@ -210,6 +222,11 @@
       "dir": null,
       "ref": "acfdc2e26722f20339a2bc0cc8cd7dd5fe0c6b5e",
       "url": "https://github.com/FunkinCrew/polymod"
+    },
+    {
+      "name": "svg",
+      "type": "haxelib",
+      "version": "1.1.3"
     },
     {
       "name": "thx.core",
@@ -226,11 +243,9 @@
       "url": "https://github.com/fponticelli/thx.semver"
     },
     {
-      "name": "linc_luajit",
-      "type": "git",
-      "dir": null,
-      "ref": "1906c4a96f6bb6df66562b3f24c62f4c5bba14a7",
-      "url": "https://github.com/superpowers04/linc_luajit"
+      "name": "tink_core",
+      "type": "haxelib",
+      "version": "1.26.0"
     }
   ]
 }
