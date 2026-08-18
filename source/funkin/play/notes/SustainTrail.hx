@@ -147,10 +147,8 @@ class SustainTrail extends ZSprite
 
   // if true, then this will have the arrowpath logic applied to this sustain!
   public var isArrowPath:Bool = false;
-
   // for identifying what noteStyle this notesprite is using in hxScript or even lua
   public var noteStyleName:String = "funkin";
-
   // Makes the mesh all wobbly! Taken from ZProjectSprite_Note.hx
   public var vibrateEffect:Float = 0.0;
 
@@ -292,9 +290,10 @@ class SustainTrail extends ZSprite
       }
     }
 
-    flipY = Preferences.downscroll #if mobile
-    || (Preferences.controlsScheme == FunkinHitboxControlSchemes.Arrows
-      && !funkin.mobile.input.ControlsHandler.hasExternalInputDevice) #end;
+    flipY = Preferences.downscroll #if mobile || (
+      Preferences.controlsScheme == FunkinHitboxControlSchemes.Arrows
+      && !funkin.mobile.input.ControlsHandler.hasExternalInputDevice
+    ) #end;
 
     // alpha = 0.6;
     alpha = 1.0;
@@ -442,18 +441,15 @@ class SustainTrail extends ZSprite
   public var renderEnd:Bool = true; // test
   public var piece:Int = 0; // test
   public var previousPiece:SustainTrail = null;
-
   public var cullMode = TriangleCulling.NONE;
-
   public var whichStrumNote:StrumlineNote;
 
   private var old3Dholds:Bool = false;
-
   private var holdResolution:Int = 4;
-
   private var useOldStealthGlowStyle:Bool = false;
 
   // Extra math for if you need information about the hold's TRUE curPos (not affected by being held down or not).
+
   function extraHoldRootInfo(t:Float):Void
   {
     if (this.hsvShader == null) return;
@@ -589,17 +585,22 @@ class SustainTrail extends ZSprite
   // 953.27ms with tracy. Ouch.
   // OPTIMISE ME!
   // Call this function to sample where a note would be at this strum position.
+
   function susSample(strumTimmy:Float, isRoot:Bool = false, dumbHeight:Float = 0):Void
   {
     strumTimmy = strumTimmy - whichStrumNote?.strumExtraModData?.strumPos ?? 0;
     var notePos:Float = parentStrumline.calculateNoteYPos(strumTimmy);
 
-    if (parentStrumline.mods.mathCutOffCheck(notePos, noteDirection % 4)
-      || (!isRoot
+    if (
+      parentStrumline.mods.mathCutOffCheck(notePos, noteDirection % 4)
+      || (
+        !isRoot
         && whichStrumNote.strumExtraModData.noHoldMathShortcut < 0.5
         && hitNote
         && !missedNote
-        && ((notePos < 0.5 && !flipY) || (notePos > -0.5 && flipY))))
+        && ((notePos < 0.5 && !flipY) || (notePos > -0.5 && flipY))
+      )
+    )
     {
       return;
     }
@@ -676,8 +677,10 @@ class SustainTrail extends ZSprite
     tempVec2.x = fakeNote.x;
     tempVec2.y = fakeNote.y;
 
-    if (old3Dholds || !is3D) perspectiveShift.z = ModConstants.applyPerspective_returnScale(fakeNote, graphicWidth, 8 /*dumbHeight*/,
-      noteModData.perspectiveOffset);
+    if (
+      old3Dholds
+      || !is3D
+    ) perspectiveShift.z = ModConstants.applyPerspective_returnScale(fakeNote, graphicWidth, 8 /*dumbHeight*/, noteModData.perspectiveOffset);
 
     // caluclate diff
     perspectiveShift.x = fakeNote.x - tempVec2.x;
@@ -737,8 +740,15 @@ class SustainTrail extends ZSprite
 
     if (!is3D || old3Dholds)
     {
-      ModConstants.playfieldSkew(fakeNote, noteModData.skewX_playfield, noteModData.skewY_playfield, whichStrumNote.strumExtraModData.playfieldX,
-        whichStrumNote.strumExtraModData.playfieldY, (graphicWidth / 2), 0);
+      ModConstants.playfieldSkew(
+        fakeNote,
+        noteModData.skewX_playfield,
+        noteModData.skewY_playfield,
+        whichStrumNote.strumExtraModData.playfieldX,
+        whichStrumNote.strumExtraModData.playfieldY,
+        (graphicWidth / 2),
+        0
+      );
       // undo the strum skew
       fakeNote.x -= whichStrumNote.strumExtraModData.skewMovedX;
       fakeNote.y -= whichStrumNote.strumExtraModData.skewMovedY;
@@ -755,7 +765,6 @@ class SustainTrail extends ZSprite
   }
 
   var zCutOff:Float = 835;
-
   var is3D:Bool = false;
 
   function applyPerspective(pos:Vector3D, rotatePivot:Vector2):Vector2
@@ -773,7 +782,10 @@ class SustainTrail extends ZSprite
 
       // apply skew
       // Currently doesn't work when the sustain moves on the z axis!
-      var xPercent_SkewOffset:Float = tempVec2.x - fakeNote.x - (graphicWidth / 2 * (perspectiveShift.z)); // this is dumb but at least for the time being, it makes the disconnect less bad.
+      var xPercent_SkewOffset:Float =
+        tempVec2.x
+        - fakeNote.x
+        - (graphicWidth / 2 * (perspectiveShift.z)); // this is dumb but at least for the time being, it makes the disconnect less bad.
       if (fakeNote.skew.y != 0) tempVec2.y += xPercent_SkewOffset * Math.tan(fakeNote.skew.y * FlxAngle.TO_RAD);
       return tempVec2;
     }
@@ -813,7 +825,6 @@ class SustainTrail extends ZSprite
   var spiralHoldOldMath:Bool = false;
   var tinyOffsetForSpiral:Float = 0.01;
   var lastOrientAngle:Float = 0; // same bandaid fix for orient.
-
   private var holdRootX:Float = 0.0;
   private var holdRootY:Float = 0.0;
   private var holdRootZ:Float = 0.0;
@@ -838,14 +849,11 @@ class SustainTrail extends ZSprite
 
   // If set to false, will disable the hold being hidden when being dropped
   public var hideOnMiss:Bool = true;
-
   // The angle the hold note is coming from with spiral holds! used for hold covers!
   public var baseAngle:Float = 0;
-
   // TEST
   // public var distanceFromReceptor_pos:Float = 0;
   public var distanceFromReceptor_unscaledpos:Float = 0;
-
   // The lower the number, the more hold segments are rendered and calculated!
   public var grain:Float = ModConstants.defaultHoldGrain;
 
@@ -1296,18 +1304,24 @@ class SustainTrail extends ZSprite
         };
 
         // Top right
-        uvtData[(highestNumSoFar + 1) * 2] = uvtData[highestNumSoFar * 2] +
-          (1 / 8); // 25%/50%/75%/100% of the way through the image (1/8th past the top left of cap)
+        uvtData[(
+          highestNumSoFar
+          + 1
+        ) * 2] = uvtData[highestNumSoFar * 2] + (1 / 8); // 25%/50%/75%/100% of the way through the image (1/8th past the top left of cap)
         uvtData[(highestNumSoFar + 1) * 2 + 1] = uvtData[highestNumSoFar * 2 + 1]; // top bound
 
         // Bottom left
-        uvtData[(highestNumSoFar +
-          2) * 2] = uvtData[highestNumSoFar * 2]; // 12.5%/37.5%/62.5%/87.5% of the way through the image (1/8th past the top left of hold)
+        uvtData[(
+          highestNumSoFar
+          + 2
+        ) * 2] = uvtData[highestNumSoFar * 2]; // 12.5%/37.5%/62.5%/87.5% of the way through the image (1/8th past the top left of hold)
         uvtData[(highestNumSoFar + 2) * 2 + 1] = bottomClip; // bottom bound
 
         // Bottom right
-        uvtData[(highestNumSoFar + 3) * 2] = uvtData[(highestNumSoFar +
-          1) * 2]; // 25%/50%/75%/100% of the way through the image (1/8th past the top left of cap)
+        uvtData[(
+          highestNumSoFar
+          + 3
+        ) * 2] = uvtData[(highestNumSoFar + 1) * 2]; // 25%/50%/75%/100% of the way through the image (1/8th past the top left of cap)
         uvtData[(highestNumSoFar + 3) * 2 + 1] = uvtData[(highestNumSoFar + 2) * 2 + 1]; // bottom bound
       }
     }
@@ -1571,9 +1585,25 @@ class SustainTrail extends ZSprite
 
   public override function destroy():Void
   {
+    if (fakeNote != null)
+    {
+      fakeNote.destroy();
+      fakeNote = null;
+    }
+
+    previousPiece = null;
+    whichStrumNote = null;
+    parentStrumline = null;
+    noteData = null;
+    noteModData = null;
+    hsvShader = null;
+
+    // Clear triangle data
     vertices = null;
     indices = null;
     uvtData = null;
+    colors = null;
+    vertices_array = null;
     super.destroy();
   }
 

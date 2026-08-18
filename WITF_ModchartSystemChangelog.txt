@@ -1,3 +1,14 @@
+v1.0.5:
+
+Updated to latest version of FNF (v0.8.6)
+Updated some mod scripts to now be scoped and work more consistently (metaMods now finally carry over between songs when in story).
+Updated the eventHandler to now only scan for the next event that needs to be activated instead of looping through every event every frame.
+Added cropLeft, cropRight, cropTop, and cropBottom for zSpriteProjected (Experimental as of right now).
+Added missing library to hmm (hscript).
+
+
+
+
 v1.0.4:
 
 Updated to latest version of FNF (v0.8.5)

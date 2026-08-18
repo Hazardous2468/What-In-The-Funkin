@@ -1,16 +1,10 @@
-Note: this file is old and some may be outdated.
+Note: Some reported problems are old and may have been already resolved.
 
-Fork specific issues (V1.0.3):
+Fork specific issues (V1.0.5):
 
 - Hitting a hold early will sometimes make them bug out visually
 
-- Chart editor crashes when leaving and re-entering it sometimes
-- Also sprite null crash when hot reloading with F5 sometimes
-
 - Misses may randomly occur when skipping forward / backward in a song
-
-- Playing in story mode and transitioning to another song will break the debug visual scripts.
-- Some other scripts will also break when transitioning such as metamodifiers.
 
 - Hold covers sometimes fail to disappear
 
@@ -24,7 +18,7 @@ Fork specific issues (V1.0.3):
 
 - Offsets (input / visual) aren't properly tested
 
-- If zsort is enabled earlier then beat -5, then the strums appear invisible.
+- If zSort is enabled earlier then beat -5, then the strums appear invisible.
 
 - Hurts can visually be seen being hit on some custom players while not for others. Thankfully this is just a visual bug and not anything to be worried about as the hurt logic now only works for player 1.
 
@@ -36,11 +30,11 @@ Fork specific issues (V1.0.3):
 
 - AFT's seem to cause minor but consistent lag spikes? 😔
 
-- AFT's act a bit strangly when pointed at themselves
+- AFT's act a bit strangely when pointed at themselves
 
 - AFT updates break when playback rate is set to zero
 
-- Sometimes holds / notes will be incorrectly layered when using Zsort mod
+- Sometimes holds / notes will be incorrectly layered when using zSort mod
   (v0.8.0a introduces a scuffed work around by adjusting zSortMod_SustainOffset and zSortMod_StrumNoteOffset in the PlayState instance.)
 Update: v1.0 may have brought back this issue, how fun!
 

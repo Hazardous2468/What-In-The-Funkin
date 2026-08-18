@@ -186,6 +186,7 @@ typedef PlayStateParams =
  */
 // I errr, ain't dealing with this... not yet lol -Hazard
 // @:nullSafety
+
 class PlayState extends MusicBeatSubState
 {
   /**
@@ -738,11 +739,8 @@ class PlayState extends MusicBeatSubState
   // HAZARD MODCHART VARS
   public var variables:Map<String, Dynamic> = new Map<String, Dynamic>();
   public var customLuaSprites:Map<String, FlxSprite> = new Map<String, FlxSprite>();
-
   public var perframeFunctions:Array<Float->Void> = [];
-
   public var allStrumSprites:FlxTypedSpriteGroup<ZSprite>;
-
   public var customZspritesGroup:FlxTypedSpriteGroup<ZSprite>;
 
   /**
@@ -787,7 +785,6 @@ class PlayState extends MusicBeatSubState
 
   // The event handler
   public var modchartEventHandler:ModEventHandler;
-
   // Array of lua files
   public var luaArray:Array<HazardModLuaTest> = [];
 
@@ -796,7 +793,6 @@ class PlayState extends MusicBeatSubState
 
   // basic flxSprite that can be used by lua for AFT purposes.
   public var luaAFT_sprite:HazardAFTSpriteTest;
-
   // basic AFT that can be used by lua for AFT purposes.
   public var luaAFT_Capture:HazardAFT;
 
@@ -949,8 +945,8 @@ class PlayState extends MusicBeatSubState
   public var hideNotifs:Bool = false;
 
   // Call this to display a notification in the corner of the screen!
-  public function modDebugNotif(txtToShow:String = "", ?color:FlxColor = FlxColor.WHITE, ?howManySeconds:Float = 5, ?fadeInSeconds:Float = 0.25,
-      ?fadeOutSeconds:Float = 1, criticalError:Bool = false):Void
+
+  public function modDebugNotif(txtToShow:String = "", ?color:FlxColor = FlxColor.WHITE, ?howManySeconds:Float = 5, ?fadeInSeconds:Float = 0.25, ?fadeOutSeconds:Float = 1, criticalError:Bool = false):Void
   {
     if (!criticalError && hideNotifs) return; // Don't do shit unless it's a critical error if we don't wanna show notifs!
 
@@ -997,6 +993,7 @@ class PlayState extends MusicBeatSubState
   }
 
   // Kills every active debug Notification. Does not destroy!
+
   public function clearDebugNotifications():Void
   {
     if (debugNotifs != null)
@@ -1009,6 +1006,7 @@ class PlayState extends MusicBeatSubState
   }
 
   // Kills every active debug Notification. DOES destroy!
+
   public function destroyDebugNotifications():Void
   {
     if (debugNotifs != null)
@@ -1039,12 +1037,20 @@ class PlayState extends MusicBeatSubState
       modchartEventHandler.update(elapsed);
       updateTweenList();
 
-      if (allStrumSprites.members.length > 1 && allStrumSprites.visible)
-        allStrumSprites.members.insertionSort(compareZSprites_playfields.bind(FlxSort.ASCENDING));
-
-      if (customZspritesGroup.members.length > 1 && customZspritesGroup.visible)
+      if (allStrumSprites != null)
       {
-        customZspritesGroup.members.insertionSort(compareZSprites.bind(FlxSort.ASCENDING));
+        if (
+          allStrumSprites.members.length > 1
+          && allStrumSprites.visible
+        ) allStrumSprites.members.insertionSort(compareZSprites_playfields.bind(FlxSort.ASCENDING));
+      }
+
+      if (customZspritesGroup != null)
+      {
+        if (customZspritesGroup.members.length > 1 && customZspritesGroup.visible)
+        {
+          customZspritesGroup.members.insertionSort(compareZSprites.bind(FlxSort.ASCENDING));
+        }
       }
     }
     if (luaAFT_Capture != null) luaAFT_Capture.update(elapsed);
@@ -1559,8 +1565,10 @@ class PlayState extends MusicBeatSubState
           {
             // Only do neat & smooth lerps as long as the lerp doesn't fuck up and go WAY behind the music time triggering false resyncs
             final easeRatio:Float = 1.0 - Math.exp(-(MUSIC_EASE_RATIO * playbackRate) * elapsed);
-            Conductor.instance.update(FlxMath.lerp(Conductor.instance.songPosition, FlxG.sound.music.time + Conductor.instance.combinedOffset, easeRatio),
-              false);
+            Conductor.instance.update(
+              FlxMath.lerp(Conductor.instance.songPosition, FlxG.sound.music.time + Conductor.instance.combinedOffset, easeRatio),
+              false
+            );
           }
           else
           {
@@ -1812,7 +1820,10 @@ class PlayState extends MusicBeatSubState
 
   function openPauseSubState(mode:PauseMode, cam:FlxCamera, lostFocus:Bool = false, ?onPause:Void->Void):Void
   {
-    final pauseSubState = new PauseSubState({mode: mode, lostFocus: lostFocus}, onPause);
+    final pauseSubState = new PauseSubState({
+      mode: mode,
+      lostFocus: lostFocus
+    }, onPause);
     FlxTransitionableState.skipNextTransIn = true;
     FlxTransitionableState.skipNextTransOut = true;
     pauseSubState.camera = cam;
@@ -2222,8 +2233,9 @@ class PlayState extends MusicBeatSubState
     {
       throw 'No lastParams to refer to';
     }
-    lastParams.targetSong = SongRegistry.instance.fetchEntry(currentSong.id,
-      {variation: currentVariation}) ?? throw "Could not load current song from ID. This shouldn't happen!";
+    lastParams.targetSong = SongRegistry.instance.fetchEntry(currentSong.id, {
+      variation: currentVariation
+    }) ?? throw "Could not load current song from ID. This shouldn't happen!";
     LoadingState.loadPlayState(lastParams);
   }
 
@@ -2248,10 +2260,12 @@ class PlayState extends MusicBeatSubState
     // This is an arbitrary number chosen so that the camera doesn't move insanely far in when the bop speed is fast.
     final MAX_RELATIVE_CAM_ZOOM:Float = 1.35;
 
-    if (Preferences.zoomCamera
+    if (
+      Preferences.zoomCamera
       && camHUD.zoom < (MAX_RELATIVE_CAM_ZOOM * defaultHUDCameraZoom)
       && cameraZoomRate > 0
-      && (Conductor.instance.currentStep + cameraZoomRateOffset * Constants.STEPS_PER_BEAT) % (cameraZoomRate * Constants.STEPS_PER_BEAT) == 0)
+      && (Conductor.instance.currentStep + cameraZoomRateOffset * Constants.STEPS_PER_BEAT) % (cameraZoomRate * Constants.STEPS_PER_BEAT) == 0
+    )
     {
       // Set zoom multiplier for camera bop.
       cameraBopMultiplier = cameraBopIntensity;
@@ -2307,10 +2321,14 @@ class PlayState extends MusicBeatSubState
 
       // https://github.com/FunkinCrew/Funkin/pull/3735/commits/f9b7d3fc70cccf04debe9b97ac61253f37b831a8
       // https://github.com/FunkinCrew/Funkin/pull/3955/commits/9c75961b7db36c6d46a63fd1c9b177a1ed80e559
-      if (!startingSong
-        && (Math.abs(FlxG.sound.music.time - correctSync) > RESYNC_THRESHOLD
+      if (
+        !startingSong
+        && (
+          Math.abs(FlxG.sound.music.time - correctSync) > RESYNC_THRESHOLD
           || Math.abs(playerVoicesError) > RESYNC_THRESHOLD
-          || Math.abs(opponentVoicesError) > RESYNC_THRESHOLD))
+          || Math.abs(opponentVoicesError) > RESYNC_THRESHOLD
+        )
+      )
       {
         trace('VOCALS NEED RESYNC');
         if (vocals != null)
@@ -2419,9 +2437,10 @@ class PlayState extends MusicBeatSubState
      */
   function initHealthBar():Void
   {
-    final isDownscroll:Bool = #if mobile (Preferences.controlsScheme == FunkinHitboxControlSchemes.Arrows
-      && !ControlsHandler.hasExternalInputDevice)
-      || #end Preferences.downscroll;
+    final isDownscroll:Bool = #if mobile (
+      Preferences.controlsScheme == FunkinHitboxControlSchemes.Arrows
+      && !ControlsHandler.hasExternalInputDevice
+    ) || #end Preferences.downscroll;
 
     var healthBarYPos:Float = isDownscroll ? FlxG.height * 0.1 : FlxG.height * 0.9;
 
@@ -2460,9 +2479,10 @@ class PlayState extends MusicBeatSubState
     // Create subtitles if they are enabled.
     if (Preferences.subtitles)
     {
-      final isDownscroll:Bool = #if mobile (Preferences.controlsScheme == FunkinHitboxControlSchemes.Arrows
-        && !ControlsHandler.hasExternalInputDevice)
-        || #end Preferences.downscroll;
+      final isDownscroll:Bool = #if mobile (
+        Preferences.controlsScheme == FunkinHitboxControlSchemes.Arrows
+        && !ControlsHandler.hasExternalInputDevice
+      ) || #end Preferences.downscroll;
 
       final subtitlesAlignment:SubtitlesAlignment = isDownscroll ? SubtitlesAlignment.SUBTITLES_TOP : SubtitlesAlignment.SUBTITLES_BOTTOM;
       subtitles = new Subtitles(0, 139, subtitlesAlignment);
@@ -2674,23 +2694,27 @@ class PlayState extends MusicBeatSubState
     }
   }
 
-  // Call this to clear out any custom sprites created in the lua file!
+  // Call this to clear out any custom sprites that were created from the lua file!
+
   public function clearOutCustomLuaSprites():Void
   {
     if (customLuaSprites == null) return;
-    for (key in customLuaSprites.keys())
+    var keys = [for (key in customLuaSprites.keys()) key];
+
+    for (key in keys)
     {
       var spr = customLuaSprites.get(key);
       if (spr != null)
       {
         remove(spr);
         spr.destroy();
-        customLuaSprites.remove(key);
       }
     }
+    customLuaSprites.clear();
   }
 
   // Call this to scan and reload the modchart lua file!
+
   public function scanForModchart(showNotif:Bool = true):Void
   {
     if (isMinimalMode) return; // DON'T LOAD MODCHARTS FOR MINIMAL MODE!
@@ -2858,6 +2882,7 @@ class PlayState extends MusicBeatSubState
   }
 
   // Tired of constantly changing the 'strumline.y' everywhere so it can now just be changed here. Awesome. -Haz
+
   public static function getStrumlineY(strummy:Strumline, invertDownscrollCheck:Bool = false):Float
   {
     var isDownscroll:Bool = Preferences.downscroll;
@@ -2865,9 +2890,14 @@ class PlayState extends MusicBeatSubState
     {
       isDownscroll = !Preferences.downscroll;
     }
-    return strummy.noteStyle.getInitialStrumlineOffsets()[1]
-      +
-      (isDownscroll ? FlxG.height - strummy.heightWas - Constants.STRUMLINE_Y_OFFSET - strummy.noteStyle.getStrumlineOffsets()[1] : Constants.STRUMLINE_Y_OFFSET);
+    return
+      strummy.noteStyle.getInitialStrumlineOffsets()[1]
+      + (
+        isDownscroll ? FlxG.height
+        - strummy.heightWas
+        - Constants.STRUMLINE_Y_OFFSET
+        - strummy.noteStyle.getStrumlineOffsets()[1]
+        : Constants.STRUMLINE_Y_OFFSET);
   }
 
   /**
@@ -3049,8 +3079,16 @@ class PlayState extends MusicBeatSubState
     FlxTween.cancelTweensOf(pauseButton);
     FlxTween.cancelTweensOf(pauseCircle);
 
-    FlxTween.tween(pauseButton, {alpha: 1}, 0.25, {ease: FlxEase.quartOut});
-    FlxTween.tween(pauseCircle, {alpha: 0.1}, 0.25, {ease: FlxEase.quartOut});
+    FlxTween.tween(pauseButton, {
+      alpha: 1
+    }, 0.25, {
+      ease: FlxEase.quartOut
+    });
+    FlxTween.tween(pauseCircle, {
+      alpha: 0.1
+    }, 0.25, {
+      ease: FlxEase.quartOut
+    });
   }
   #end
 
@@ -3206,7 +3244,12 @@ class PlayState extends MusicBeatSubState
     Highscore.tallies = new Tallies();
 
     @:nullSafety(Off)
-    var event:SongLoadScriptEvent = new SongLoadScriptEvent(currentChart.song.id, currentChart.difficulty, currentChart.notes.copy(), currentChart.getEvents());
+    var event:SongLoadScriptEvent = new SongLoadScriptEvent(
+      currentChart.song.id,
+      currentChart.difficulty,
+      currentChart.notes.copy(),
+      currentChart.getEvents()
+    );
 
     dispatchEvent(event);
 
@@ -3428,8 +3471,10 @@ class PlayState extends MusicBeatSubState
     // Skip this if the music is paused (GameOver, Pause menu, start-of-song offset, etc.)
     if (!(FlxG.sound.music?.playing ?? false)) return;
 
-    var timeToPlayAt:Float = Math.min(FlxG.sound.music.length - 1,
-      Math.max(Math.min(Conductor.instance.combinedOffset, 0), Conductor.instance.songPosition) - Conductor.instance.combinedOffset);
+    var timeToPlayAt:Float = Math.min(
+      FlxG.sound.music.length - 1,
+      Math.max(Math.min(Conductor.instance.combinedOffset, 0), Conductor.instance.songPosition) - Conductor.instance.combinedOffset
+    );
     trace('Resyncing vocals to ${timeToPlayAt}');
 
     FlxG.sound.music.pause();
@@ -3830,6 +3875,7 @@ class PlayState extends MusicBeatSubState
   }
 
   // same as processInputQueue but for custom strummers. Main difference is that it this version doesn't remove the inputs from the input array.
+
   function processInputQueueCustom():Void
   {
     for (customStrummer in customStrumLines)
@@ -3840,8 +3886,7 @@ class PlayState extends MusicBeatSubState
 
       var notesByDirection:Array<Array<NoteSprite>> = [[], [], [], []];
 
-      for (note in notesInRange)
-        notesByDirection[note.direction].push(note);
+      for (note in notesInRange) notesByDirection[note.direction].push(note);
 
       for (i in 0...inputPressQueue.length)
       {
@@ -4056,8 +4101,16 @@ class PlayState extends MusicBeatSubState
     }
 
     // Send the note hit event.
-    var event:HitNoteScriptEvent = new HitNoteScriptEvent(note, healthChange, score, daRating, isComboBreak,
-      note.scoreable ? Highscore.tallies.combo + 1 : Highscore.tallies.combo, noteDiff, daRating == 'sick');
+    var event:HitNoteScriptEvent = new HitNoteScriptEvent(
+      note,
+      healthChange,
+      score,
+      daRating,
+      isComboBreak,
+      note.scoreable ? Highscore.tallies.combo + 1 : Highscore.tallies.combo,
+      noteDiff,
+      daRating == 'sick'
+    );
     dispatchEvent(event);
 
     // Calling event.cancelEvent() skips all the other logic! Neat!
@@ -4222,8 +4275,10 @@ class PlayState extends MusicBeatSubState
     if (FlxG.keys.justPressed.EIGHT) scanForModchart();
 
     // 9: Toggle the old icon.
-    if ((FlxG.keys.justPressed.NINE #if FEATURE_TOUCH_CONTROLS || (TouchUtil.justPressed && TouchUtil.overlapsComplex(iconP1)) #end)
-      && iconP1 != null) iconP1.toggleOldIcon();
+    if
+      ((FlxG.keys.justPressed.NINE #if FEATURE_TOUCH_CONTROLS || (TouchUtil.justPressed && TouchUtil.overlapsComplex(iconP1)) #end)
+        && iconP1 != null
+      ) iconP1.toggleOldIcon();
 
     final isDebug:Bool = #if FEATURE_DEBUG_FUNCTIONS true #else false #end;
     if (isChartingMode || isDebug)
@@ -4383,8 +4438,10 @@ class PlayState extends MusicBeatSubState
 
     // TODO: This line of code makes me sad, but you can't really fix it without a breaking migration.
     // `easy`, `erect`, `normal-pico`, etc.
-    var suffixedDifficulty = (currentVariation != Constants.DEFAULT_VARIATION
-      && currentVariation != 'erect') ? '$currentDifficulty-${currentVariation}' : currentDifficulty;
+    var suffixedDifficulty = (
+      currentVariation != Constants.DEFAULT_VARIATION
+      && currentVariation != 'erect'
+    ) ? '$currentDifficulty-${currentVariation}' : currentDifficulty;
 
     var isNewHighscore = false;
     var prevScoreData:Null<SaveScoreData> = Save.instance.getSongScore(currentSong.id, suffixedDifficulty);
@@ -4581,8 +4638,9 @@ class PlayState extends MusicBeatSubState
         }
         else
         {
-          var targetSong:Song = SongRegistry.instance.fetchEntry(targetSongId,
-            {variation: currentVariation}) ?? throw 'Could not find a song with ID $targetSongId';
+          var targetSong:Song = SongRegistry.instance.fetchEntry(targetSongId, {
+            variation: currentVariation
+          }) ?? throw 'Could not find a song with ID $targetSongId';
           var targetVariation:String = currentVariation;
           if (!targetSong.hasDifficulty(PlayStatePlaylist.campaignDifficulty, currentVariation))
           {
@@ -4638,9 +4696,22 @@ class PlayState extends MusicBeatSubState
   function performCleanup():Void
   {
     // cleanup
+    isModchartSong = false;
+    modchartEventHandler = null;
     clearOutCustomLuaSprites();
-    if (allStrumSprites != null) allStrumSprites.clear();
-    if (customZspritesGroup != null) customZspritesGroup.clear();
+    if (allStrumSprites != null)
+    {
+      allStrumSprites.clear();
+      allStrumSprites.visible = false;
+      remove(allStrumSprites);
+    }
+
+    if (customZspritesGroup != null)
+    {
+      customZspritesGroup.clear();
+      customZspritesGroup.visible = false;
+      remove(customZspritesGroup);
+    }
 
     if (debugNotifs != null)
     {
@@ -4665,7 +4736,6 @@ class PlayState extends MusicBeatSubState
     // get rid of the hxscript!
     if (HazardModLuaTest.hscript != null)
     {
-      // HazardModLuaTest.hscript.destroy();
       HazardModLuaTest.hscript = null;
     }
 
@@ -4776,7 +4846,9 @@ class PlayState extends MusicBeatSubState
     FlxG.camera.targetOffset.x += 20;
 
     // Replace zoom animation with a fade out for now.
-    FlxTween.tween(camHUD, {alpha: 0}, 0.6);
+    FlxTween.tween(camHUD, {
+      alpha: 0
+    }, 0.6);
 
     camTransition.fade(FlxColor.BLACK, 0.6, false, function()
     {
@@ -4921,7 +4993,10 @@ class PlayState extends MusicBeatSubState
 
       // Follow tween! Caching it so we can cancel/pause it later if needed.
       var followPos:FlxPoint = cameraFollowPoint.getPosition() - FlxPoint.weak(FlxG.camera.width * 0.5, FlxG.camera.height * 0.5);
-      cameraFollowTween = FlxTween.tween(FlxG.camera.scroll, {x: followPos.x, y: followPos.y}, adjustedDuration, {
+      cameraFollowTween = FlxTween.tween(FlxG.camera.scroll, {
+        x: followPos.x,
+        y: followPos.y
+      }, adjustedDuration, {
         ease: ease,
         onComplete: function(_)
         {
@@ -4966,7 +5041,11 @@ class PlayState extends MusicBeatSubState
     {
       // Zoom tween! Caching it so we can cancel/pause it later if needed.
       var adjustedDuration:Float = duration / playbackRate;
-      cameraZoomTween = FlxTween.tween(this, {currentCameraZoom: targetZoom}, adjustedDuration, {ease: ease});
+      cameraZoomTween = FlxTween.tween(this, {
+        currentCameraZoom: targetZoom
+      }, adjustedDuration, {
+        ease: ease
+      });
 
       if (shouldSubstatePause)
       {
@@ -5029,7 +5108,9 @@ class PlayState extends MusicBeatSubState
 
         scrollSpeedTweens.push(FlxTween.tween(strum, {
           'scrollSpeed': value
-        }, adjustedDuration, {ease: ease}));
+        }, adjustedDuration, {
+          ease: ease
+        }));
       }
       // make sure charts dont break if the charter is dumb and stupid
       prevScrollTargets.push([value, i]);
