@@ -906,7 +906,18 @@ class SustainTrail extends ZSprite
     }
     longHolds += 1;
 
-    holdResolution = Math.floor(fullSustainLength * longHolds / grain);
+    final sussyLength:Float = fullSustainLength;
+
+    final endPixelSize:Float = graphic.height * endOffset * zoom;
+    final scroll:Float = parentStrumline?.scrollSpeed ?? 1.0;
+    final endCapTime:Float = endPixelSize / (Constants.PIXELS_PER_MS * scroll);
+
+    // bodyLength refers to the entire sustainLength MINUS the end cap.
+    var bodyLength:Float = fullSustainLength - endCapTime;
+    if (bodyLength < 0) bodyLength = 0;
+    final sussyLength:Float = bodyLength;
+
+    holdResolution = Math.floor(sussyLength * longHolds / grain);
 
     if (holdResolution < 1) // To ensure UV's dont break (lol???)
     {
@@ -963,7 +974,6 @@ class SustainTrail extends ZSprite
       visible = true;
     }
 
-    final sussyLength:Float = fullSustainLength;
     final holdWidth = graphicWidth;
 
     var scaleTest = fakeNote.scale.x;
@@ -1184,20 +1194,22 @@ class SustainTrail extends ZSprite
       final endvertsoftrail:Int = (holdResolution * 2);
       var highestNumSoFar:Int = endvertsoftrail + 2;
 
-      // TODO - FIX HOLD ENDS MOD SAMPLE TIME!
-      var sillyEndOffset = (graphic.height * (endOffset) * zoom);
+      // Top left
+      vertices[highestNumSoFar * 2] = vertices[endvertsoftrail * 2]; // Inline with bottom left vertex of hold
+      vertices[highestNumSoFar * 2 + 1] = vertices[endvertsoftrail * 2 + 1]; // Inline with bottom left vertex of hold
+      testCol[highestNumSoFar * 2] = testCol[endvertsoftrail * 2];
+      testCol[highestNumSoFar * 2 + 1] = testCol[endvertsoftrail * 2 + 1];
 
-      // just some random magic number for now. Don't know how to convert the pixels / height into strumTime
-      sillyEndOffset = sillyEndOffset / (0.45 * parentStrumline?.scrollSpeed ?? 1.0);
+      // Top right
+      highestNumSoFar += 1;
+      vertices[highestNumSoFar * 2] = vertices[(endvertsoftrail + 1) * 2]; // Inline with bottom right vertex of hold
+      vertices[highestNumSoFar * 2 + 1] = vertices[(endvertsoftrail + 1) * 2 + 1]; // Inline with bottom right vertex of hold
+      testCol[highestNumSoFar * 2] = testCol[(endvertsoftrail + 1) * 2]; // Inline with bottom right vertex of hold
+      testCol[highestNumSoFar * 2 + 1] = testCol[(endvertsoftrail + 1) * 2 + 1]; // Inline with bottom right vertex of hold
 
-      sillyEndOffset *= 1.9; // MAGIC NUMBER IDFK
+      // The bottom verts needs to be sampled from time!
 
-      // sillyEndOffset = sustainHeight(sustainLength, getScrollSpeed());
-
-      // pixels = (susLength * 0.45 * getScrollSpeed());
-      // sillyEndOffset = (? * 0.45)
-      // ? = sillyEndOffset / (0.45 * getScrollSpeed());
-
+      final sillyEndOffset:Float = endPixelSize / (Constants.PIXELS_PER_MS * scroll) * 1.75; // the magic number still lives
       holdPieceStrumTime = this.strumTime + (sussyLength * longHolds) + sillyEndOffset;
       var tm_end:Float = holdPieceStrumTime;
       if (spiralHolds && !spiralHoldOldMath)
@@ -1211,19 +1223,6 @@ class SustainTrail extends ZSprite
       scaleChange = widthScaled - holdWidth;
       holdLeftSide = 0 - (scaleChange / 2);
       holdRightSide = widthScaled - (scaleChange / 2);
-
-      // Top left
-      vertices[highestNumSoFar * 2] = vertices[endvertsoftrail * 2]; // Inline with bottom left vertex of hold
-      vertices[highestNumSoFar * 2 + 1] = vertices[endvertsoftrail * 2 + 1]; // Inline with bottom left vertex of hold
-      testCol[highestNumSoFar * 2] = testCol[endvertsoftrail * 2];
-      testCol[highestNumSoFar * 2 + 1] = testCol[endvertsoftrail * 2 + 1];
-
-      // Top right
-      highestNumSoFar += 1;
-      vertices[highestNumSoFar * 2] = vertices[(endvertsoftrail + 1) * 2]; // Inline with bottom right vertex of hold
-      vertices[highestNumSoFar * 2 + 1] = vertices[(endvertsoftrail + 1) * 2 + 1]; // Inline with bottom right vertex of hold
-      testCol[highestNumSoFar * 2] = testCol[(endvertsoftrail + 1) * 2]; // Inline with bottom right vertex of hold
-      testCol[highestNumSoFar * 2 + 1] = testCol[(endvertsoftrail + 1) * 2 + 1]; // Inline with bottom right vertex of hold
 
       // Bottom left
       highestNumSoFar += 1;

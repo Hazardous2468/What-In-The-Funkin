@@ -3166,7 +3166,7 @@ class PlayState extends MusicBeatSubState
 
   function buildDiscordRPCState():String
   {
-    if (currentSong.isDiscordRPCAnonymous())
+    if (currentSong != null && currentSong.isDiscordRPCAnonymous())
     {
       return '??? [???]';
     }
