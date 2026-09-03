@@ -84,38 +84,99 @@ import funkin.play.modchartSystem.modifiers.*; // if only you worked ;_;
 class ModConstants
 {
   public static var orientTimeOffset:Float = -2.0; // in ms
-
-  public static final MODCHART_VERSION:String = "v1.0.5";
-
+  public static final MODCHART_VERSION:String = "v1.0.6";
   public static final defaultHoldGrain = 75;
   public static final defaultPathGrain = defaultHoldGrain;
-
   public static var tooCloseToCameraFix:Float = 0.975; // dumb fix for preventing freak out on z math or something
-
   // If a mod tag is in this array, it will automatically invert the mod value
   // Best to only use this for more simple modcharts.
   // TODO -> Move these to base modifiers class!
-  public static var dadInvert:Array<String> = ["rotatez", "rotatey", "drunk", "drunkangle", "drunkangley", "tipsy", "tipsyx", "beat", "beatangley", "beatangle", "beatanglez", "confusionoffset", "confusion", "anglez", "angle", "bumpyx", "bumpyangle", "bumpyangley", "cosbumpyx", "cosbumpyangle", "cosbumpyangley", "bouncex", "bounceangley", "bounceangle", "cosbouncex", "cosbounceangle", "cosbounceangley", "digital", "digitalangle", "digitalangley", "linearx", "circx", "twirl", "dizzy", "twirl2", "dizzy2", "zigzag", "spiralx", "spiralcosx", "tandrunk", "square", "saw", "noteskewx", "skewx"];
-
+  public static var dadInvert:Array<String> = [
+    "rotatez",
+    "rotatey",
+    "drunk",
+    "drunkangle",
+    "drunkangley",
+    "tipsy",
+    "tipsyx",
+    "beat",
+    "beatangley",
+    "beatangle",
+    "beatanglez",
+    "confusionoffset",
+    "confusion",
+    "anglez",
+    "angle",
+    "bumpyx",
+    "bumpyangle",
+    "bumpyangley",
+    "cosbumpyx",
+    "cosbumpyangle",
+    "cosbumpyangley",
+    "bouncex",
+    "bounceangley",
+    "bounceangle",
+    "cosbouncex",
+    "cosbounceangle",
+    "cosbounceangley",
+    "digital",
+    "digitalangle",
+    "digitalangley",
+    "linearx",
+    "circx",
+    "twirl",
+    "dizzy",
+    "twirl2",
+    "dizzy2",
+    "zigzag",
+    "spiralx",
+    "spiralcosx",
+    "tandrunk",
+    "square",
+    "saw",
+    "noteskewx",
+    "skewx"
+  ];
   // These modifiers are hidden from the debug Text by default to avoid clutter.
-  public static var hideSomeDebugBois:Array<String> = ["showsubmods", "showzerovalue", "debugx", "debugy", "debugalpha", "arrowpathred", "arrowpathgreen", "arrowpathblue", "holdtype", "grain", "arrowpathgrain", "pathgrain", "arrowpathlength", "arrowpathbacklength", "showlanemods", "showallmods", "showextra", "arrowpath_notitg", "stealthglowred", "stealthglowblue", "stealthglowgreen", "arrowpathwidth", "noholdmathshortcut", "mathcutoff"];
-
+  public static var hideSomeDebugBois:Array<String> = [
+    "showsubmods",
+    "showzerovalue",
+    "debugx",
+    "debugy",
+    "debugalpha",
+    "arrowpathred",
+    "arrowpathgreen",
+    "arrowpathblue",
+    "holdtype",
+    "grain",
+    "arrowpathgrain",
+    "pathgrain",
+    "arrowpathlength",
+    "arrowpathbacklength",
+    "showlanemods",
+    "showallmods",
+    "showextra",
+    "arrowpath_notitg",
+    "stealthglowred",
+    "stealthglowblue",
+    "stealthglowgreen",
+    "arrowpathwidth",
+    "noholdmathshortcut",
+    "mathcutoff"
+  ];
   // Sets the REAL hold note to this position - X.
   public static final holdNoteJankX:Float = 0;
-
   // Sets the REAL hold note to this position - Y.
   public static final holdNoteJankY:Float = 0;
-
   // size in pixels for each note
   public static final strumSize:Float = Strumline.NOTE_SPACING;
-
   // arrowpathScale
   public static final arrowPathScale:Float = (0.696774193548387 * 0.25);
-
   // the scale of each note, idfk lol
   public static final noteScale:Float = 0.696774193548387;
 
   // Just a silly way to check if a tag is actually a submod or not lol
+
   public static function isTagSub(tag:String):Bool
   {
     return StringTools.contains(tag, "__");
@@ -412,6 +473,7 @@ class ModConstants
   }
 
   // Checks if a modifier should be inverted.
+
   public static function invertValueCheck(tag:String, invertValues:Bool):Float
   {
     return (ModConstants.dadInvert.contains(tag) && invertValues) ? -1.0 : 1.0;
@@ -491,6 +553,7 @@ class ModConstants
   }
 
   // Input an ease and this function will return the same ease but flipped horizontally (meaning it'll start at 100% instead of 0%)
+
   public static function easeFlip(ease:Float->Float):Float->Float
   {
     return function(t):Float
@@ -500,6 +563,7 @@ class ModConstants
   }
 
   // Input two eases and this function will return the result of having the first ease be the first halve, and the second ease be the second halve.
+
   public static function easeMerge(firstEase:Float->Float, secondEase:Float->Float):Float->Float
   {
     return function(t):Float
@@ -509,6 +573,7 @@ class ModConstants
   }
 
   // Input two eases and this function will return the result of the two eases lerped together using t (%) as the ratio
+
   public static function easeLerp(firstEase:Float->Float, secondEase:Float->Float):Float->Float
   {
     return function(t):Float
@@ -518,6 +583,7 @@ class ModConstants
   }
 
   // the default mixfactor math to use for the easeBlend function
+
   public static function easeBlendMixFactor(x:Float):Float
   {
     return 3 * Math.pow(x, 2) - 2 * (Math.pow(x, 3));
@@ -525,6 +591,7 @@ class ModConstants
 
   // Uses the same math Mirin Template uses for it's blendease function.
   // Can also input a custom mixFactor method (optional)
+
   public static function easeBlend(firstEase:Float->Float, secondEase:Float->Float, mixFactorFunc:Null<Float->Float> = null):Float->Float
   {
     return function(x:Float):Float
@@ -535,6 +602,7 @@ class ModConstants
   }
 
   // a function that returns [inputStr] but removes the first occurance of [whatToRemove]
+
   public static function stringRemoveFirst(inputStr:String, whatToRemove:String):String
   {
     var iStart = inputStr.indexOf(whatToRemove);
@@ -555,6 +623,7 @@ class ModConstants
   }
 
   // A function that converts a string to an ease function.
+
   public static function getEaseFromString(str:String = "linear"):Null<Float->Float>
   {
     // v0.9a
@@ -751,8 +820,7 @@ class ModConstants
     return stringReturn;
   }
 
-  public static function playfieldSkew(spr:FlxSprite, skewX:Float, skewY:Float, playfieldX:Float, playfieldY:Float, offsetX:Float = 0.0,
-      offsetY:Float = 0.0):Void
+  public static function playfieldSkew(spr:FlxSprite, skewX:Float, skewY:Float, playfieldX:Float, playfieldY:Float, offsetX:Float = 0.0, offsetY:Float = 0.0):Void
   {
     // attempt to position to playfield skew mods
     var playfieldSkewOffset_Y:Float = (spr.x + offsetX) - (playfieldX);
@@ -823,6 +891,7 @@ class ModConstants
   static var pos:Vector3D = new Vector3D();
 
   // Call this on a ZSprite to apply it's perspective! MAKE SURE IT'S SCALE AND X AND Y IS RESET BEFORE DOING THIS CUZ THIS OVERRIDES THOSE VALUES
+
   public static function applyPerspective(note:ZSprite, ?noteWidth:Float, ?noteHeight:Float, ?perspectiveOffset:Vector2):Void
   {
     if (note.getZ() == 0 || Math.isNaN(note.getZ())) return; // do fuck all if no z
@@ -840,6 +909,7 @@ class ModConstants
   }
 
   // Same as applyPerspective but returns the scale modifier thingy?
+
   public static function applyPerspective_returnScale(note:ZSprite, ?noteWidth:Float, ?noteHeight:Float, ?perspectiveOffset:Vector2):Float
   {
     var r:Float = 1;
@@ -868,6 +938,7 @@ class ModConstants
   }
 
   // Math.TAN but faster (using FlxMath fastSin and fastCos)
+
   public static function fastTan(rad:Float):Float
   {
     return FlxMath.fastSin(rad) / FlxMath.fastCos(rad);
@@ -878,6 +949,7 @@ class ModConstants
   public static var FOV:Float = 90;
 
   // https://github.com/TheZoroForce240/FNF-Modcharting-Tools/blob/main/source/modcharting/ModchartUtil.hx
+
   public static function perspectiveMath(pos:Vector3D, offsetX:Float = 0, offsetY:Float = 0, ?perspectiveOffset:Vector2):Vector3D
   {
     // Math isn't perfect (mainly with lack of FOV support), but it's good enough. -Haz
