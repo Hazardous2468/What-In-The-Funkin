@@ -746,8 +746,12 @@ class Strumline extends FlxSpriteGroup
     }
   }
 
-  // Temp fix?
-  public var doUpdateClipsInDraw:Bool = true;
+  /**
+   * Makes sustainTrails update their visuals in draw() instead of update() so that they work properly with draw funcs.
+   * However, doing so will result in a desync between them and the notes by 1 frame.
+   * This variable is automatically set to true when a drawFunc is applied, and false when it's null.
+   */
+  public var doUpdateClipsInDraw:Bool = false;
 
   /**
    * The FlxText which displays the current active mods
@@ -1327,18 +1331,21 @@ class Strumline extends FlxSpriteGroup
 
         holdNote.sustainLength = (holdNote.strumTime + holdNote.fullSustainLength) - conductorInUse.songPosition;
 
-        if (holdNote.sustainLength <= 10)
-        {
-          holdNote.visible = false;
-        }
-
         if (mods != null)
         {
+          if (holdNote.sustainLength <= 1)
+          {
+            holdNote.visible = false;
+          }
           holdNote.x = ModConstants.holdNoteJankX;
           holdNote.y = ModConstants.holdNoteJankY;
         }
         else
         {
+          if (holdNote.sustainLength <= 10)
+          {
+            holdNote.visible = false;
+          }
           if (!customPositionData)
           {
             if (Preferences.downscroll)
@@ -2533,9 +2540,11 @@ class Strumline extends FlxSpriteGroup
   {
     if (drawFunc != null && !doingDrawFunc)
     {
+      doUpdateClipsInDraw = true;
       doingDrawFunc = true;
       drawFunc();
       doingDrawFunc = false;
+      doUpdateClipsInDraw = false;
     }
     else
     {

@@ -14,16 +14,15 @@ class ZSprite extends FunkinSkewedSprite
 {
   // This sprites z position. Used for perspective math.
   public var z:Float = 0.0;
-
   // helpful additives for x,y,z
   public var z2:Float = 0.0;
   public var y2:Float = 0.0;
   public var x2:Float = 0.0;
-
   // Used for orient mod, but could be useful to use?
   public var lastKnownPosition:Vector3D;
 
   // Use this to get the current z value of this sprite!
+
   public function getZ():Float
   {
     return z + z2;
@@ -39,7 +38,6 @@ class ZSprite extends FunkinSkewedSprite
 
   // Was a test so that when Z-Sort mod gets disabled, everything can get returned to their proper strums.
   public var weBelongTo:Strumline = null;
-
   // some extra variables for stealthGlow
   public var stealthGlow:Float; // 0 = not applied. 1 = fully lit.
   // the white glow of stealth's RED color value
@@ -48,7 +46,6 @@ class ZSprite extends FunkinSkewedSprite
   public var stealthGlowGreen:Float;
   // the white glow of stealth's BLUE color value
   public var stealthGlowBlue:Float;
-
   public var hueShift:Float;
 
   public function new(?x:Float = 0, ?y:Float = 0, ?simpleGraphic:FlxGraphicAsset)
@@ -64,12 +61,10 @@ class ZSprite extends FunkinSkewedSprite
 
   // Offset the perspective math center by this amount!
   public var perspectiveCenterOffset:Vector2 = new Vector2(0, 0);
-
   // The value provided to the applyPerspective function for noteWidth parameter.
   public var perspectiveWidth:Null<Float> = null;
   // The value provided to the applyPerspective function for noteHeight parameter.
   public var perspectiveHeight:Null<Float> = null;
-
   // If set to true, will automatically calculate this sprites perspective to emulate 3D in every draw() call
   public var autoCalculatePerspective:Bool = true;
 
@@ -137,6 +132,7 @@ class ZSprite extends FunkinSkewedSprite
   }
 
   // Feed a noteData into this function to apply all of it's parameters to this sprite!
+
   public function applyNoteData(data:NoteData, applyFake3D:Bool = false):Void
   {
     this.x = data.x;
@@ -178,6 +174,7 @@ class ZSprite extends FunkinSkewedSprite
   }
 
   // Call this to update the last known position variable
+
   public function updateLastKnownPos():Void
   {
     if (lastKnownPosition == null) lastKnownPosition = new Vector3D(this.x, this.y, this.z);
@@ -191,7 +188,6 @@ class ZSprite extends FunkinSkewedSprite
 
   // Dumb silly way of identifying whether this is a holdCover or not as holdCovers don't use a special class
   public var isHoldCover:Bool = false;
-
   // ditto but for whether it's meant to be behind strums (for zsort)
   public var coverBehindStrums:Bool = false;
 }

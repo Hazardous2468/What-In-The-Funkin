@@ -953,7 +953,7 @@ class SustainTrail extends ZSprite
     noteIndices.push(highestNumSoFar_ + 2 + 2);
 
     var clipHeight:Float = FlxMath.bound(sustainHeight(sustainLength - (songTime - strumTime), parentStrumline?.scrollSpeed ?? 1.0), 0, graphicHeight);
-    if (clipHeight <= 0.1 && !isArrowPath)
+    if (clipHeight <= 0.05 && !isArrowPath)
     {
       visible = false;
       return;
@@ -966,9 +966,6 @@ class SustainTrail extends ZSprite
     final sussyLength:Float = fullSustainLength;
     final holdWidth = graphicWidth;
 
-    final bottomHeight:Float = graphic.height * zoom * endOffset;
-    final partHeight:Float = clipHeight - bottomHeight;
-
     var scaleTest = fakeNote.scale.x;
     var widthScaled = holdWidth * scaleTest;
     var scaleChange = widthScaled - holdWidth;
@@ -978,16 +975,19 @@ class SustainTrail extends ZSprite
     // ===HOLD VERTICES==
     // V0.7.4a -> Updated UV textures to not be stupid anymore. (0 -> 1 -> 2 -> 3) since we can just use the repeating texture power of drawTriangles.
 
-    // just copy it from source idgaf
+    var uvClip:Float = 0.0;
+    if (hitNote && !missedNote && (sussyLength * longHolds) > 0)
+    {
+      // Fraction of the (possibly lengthened) hold that has been clipped, in UV units
+      uvClip = (clippingTimeOffset / (sussyLength * longHolds)) * holdResolution;
+      uvClip = Math.max(0, uvClip);
+    }
     if (uvSetup)
     {
       uvtData[0 * 2] = (1 / 4) * (noteDirection % 4); // 0%/25%/50%/75% of the way through the image
-      uvtData[0 * 2 + 1] = 0; // top bound
-      // Top left
-
-      // Top right
+      uvtData[0 * 2 + 1] = uvClip;
       uvtData[1 * 2] = uvtData[0 * 2] + (1 / 8); // 12.5%/37.5%/62.5%/87.5% of the way through the image (1/8th past the top left)
-      uvtData[1 * 2 + 1] = uvtData[0 * 2 + 1]; // top bound
+      uvtData[1 * 2 + 1] = uvClip;
     }
 
     // grab left vert
@@ -1169,7 +1169,8 @@ class SustainTrail extends ZSprite
 
         // Bottom left
         uvtData[i * 2] = uvtData[0 * 2]; // 0%/25%/50%/75% of the way through the image
-        uvtData[i * 2 + 1] = 1 * (k + 1);
+        final originalV:Float = 1 * (k + 1);
+        uvtData[i * 2 + 1] = Math.max(originalV, uvClip);
 
         // Bottom right
         uvtData[(i + 1) * 2] = uvtData[1 * 2]; // 12.5%/37.5%/62.5%/87.5% of the way through the image (1/8th past the top left)
@@ -1291,24 +1292,27 @@ class SustainTrail extends ZSprite
       {
         highestNumSoFar = (holdResolution * 2) + 2;
 
+        var endClipAmount:Float = 0.0;
+        if (hitNote && !missedNote && sillyEndOffset > 0)
+        {
+          // Time that has been clipped past the end of the body
+          final timePastBody:Float = clipTimeThing(songTimmy, this.strumTime + (sussyLength * longHolds));
+          endClipAmount = FlxMath.bound(timePastBody / sillyEndOffset, 0, 1);
+        }
+
+        var capTopV:Float = endClipAmount * bottomClip;
+
         // === END CAP UVs ===
         // Top left
         uvtData[highestNumSoFar * 2] = uvtData[2 * 2] + (1 / 8); // 12.5%/37.5%/62.5%/87.5% of the way through the image (1/8th past the top left of hold)
-        uvtData[highestNumSoFar * 2 + 1] = if (partHeight > 0)
-        {
-          0;
-        }
-        else
-        {
-          (bottomHeight - clipHeight) / zoom / graphic.height;
-        };
+        uvtData[highestNumSoFar * 2 + 1] = capTopV;
 
         // Top right
         uvtData[(
           highestNumSoFar
           + 1
         ) * 2] = uvtData[highestNumSoFar * 2] + (1 / 8); // 25%/50%/75%/100% of the way through the image (1/8th past the top left of cap)
-        uvtData[(highestNumSoFar + 1) * 2 + 1] = uvtData[highestNumSoFar * 2 + 1]; // top bound
+        uvtData[(highestNumSoFar + 1) * 2 + 1] = capTopV;
 
         // Bottom left
         uvtData[(
