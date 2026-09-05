@@ -290,10 +290,10 @@ class SustainTrail extends ZSprite
       }
     }
 
-    flipY = Preferences.downscroll #if mobile || (
-      Preferences.controlsScheme == FunkinHitboxControlSchemes.Arrows
-      && !funkin.mobile.input.ControlsHandler.hasExternalInputDevice
-    ) #end;
+    flipY = Preferences.downscroll
+    #if mobile
+    || (Preferences.controlsScheme == FunkinHitboxControlSchemes.Arrows && !funkin.mobile.input.ControlsHandler.hasExternalInputDevice)
+    #end;
 
     // alpha = 0.6;
     alpha = 1.0;
@@ -913,7 +913,7 @@ class SustainTrail extends ZSprite
     final endCapTime:Float = endPixelSize / (Constants.PIXELS_PER_MS * scroll);
 
     // bodyLength refers to the entire sustainLength MINUS the end cap.
-    var bodyLength:Float = fullSustainLength - endCapTime;
+    var bodyLength:Float = renderEnd ? fullSustainLength - endCapTime : fullSustainLength;
     if (bodyLength < 0) bodyLength = 0;
     final sussyLength:Float = bodyLength;
 

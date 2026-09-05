@@ -8,11 +8,13 @@ class HSVShader extends FlxRuntimeShader
   public var hue(default, set):Float = 1;
   public var saturation(default, set):Float = 1;
   public var value(default, set):Float = 1;
+  public var path:String = "hsv";
 
-  public function new(h:Float = 1, s:Float = 1, v:Float = 1, isWITF:Bool = false)
+  public function new(h:Float = 1, s:Float = 1, v:Float = 1, shaderPath:String = "hsv")
   {
-    super(Assets.getText(Paths.frag(isWITF ? 'hsv_WITF' : 'hsv')));
-    if (!isWITF) FlxG.debugger.addTrackerProfile(new TrackerProfile(HSVShader, ['hue', 'saturation', 'value']));
+    this.path = shaderPath;
+    super(Assets.getText(Paths.frag(shaderPath)));
+    if (shaderPath == "hsv") FlxG.debugger.addTrackerProfile(new TrackerProfile(HSVShader, ['hue', 'saturation', 'value']));
     hue = h;
     saturation = s;
     value = v;

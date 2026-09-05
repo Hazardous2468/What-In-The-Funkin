@@ -206,7 +206,13 @@ class Strumline extends FlxSpriteGroup
   public var conductorInUse(get, set):Conductor;
 
   // Used in-game to control the scroll speed within a song
-  public var scrollSpeed:Float = 1.0;
+  public var scrollSpeed(default, set):Float = 1.0;
+
+  function set_scrollSpeed(value:Float):Float
+  {
+    debugNeedsUpdate = true;
+    return scrollSpeed = value;
+  }
 
   /**
    * Reset the scroll speed to the current chart's scroll speed.
@@ -702,7 +708,7 @@ class Strumline extends FlxSpriteGroup
       note.strumTime = ModConstants.getSongPosition();
       note.strumTime -= whichStrumNote?.strumExtraModData?.arrowpathBackwardsLength ?? 0;
       note.strumTime += length * note.piece;
-      if (doUpdateClipsInDraw)
+      if (!doUpdateClipsInDraw)
       {
         note.updateClipping();
 
@@ -795,7 +801,8 @@ class Strumline extends FlxSpriteGroup
       newString += "-INVERTED MOD VALUES-";
     }
     newString += "\n";
-    newString += "-ScrollSpeed: " + PlayState.instance.currentChart.scrollSpeed + "-";
+    // newString += "-ScrollSpeed: " + PlayState.instance.currentChart.scrollSpeed + "-";
+    newString += "-ScrollSpeed: " + this.scrollSpeed + "-";
 
     // for (mod in modifiers){
     for (mod in mods.mods_all)

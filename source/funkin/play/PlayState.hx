@@ -2618,7 +2618,7 @@ class PlayState extends MusicBeatSubState
       iconP2.cameras = [camHUD];
 
       #if FEATURE_DISCORD_RPC
-      if (currentSong.isDiscordRPCAnonymous())
+      if (currentSong != null && currentSong.isDiscordRPCAnonymous())
       {
         discordRPCAlbum = 'album-volume1';
         discordRPCIcon = 'icon-face';
@@ -3134,7 +3134,7 @@ class PlayState extends MusicBeatSubState
 
   function buildDiscordRPCDetails():String
   {
-    if (currentSong.isDiscordRPCAnonymous())
+    if (currentSong != null && currentSong.isDiscordRPCAnonymous())
     {
       return 'In Game';
     }
