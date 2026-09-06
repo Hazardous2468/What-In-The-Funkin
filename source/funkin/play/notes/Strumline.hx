@@ -1107,20 +1107,9 @@ class Strumline extends FlxSpriteGroup
   // This value popped up again but as 24.6 when doing (-INITIAL_OFFSET + (STRUMLINE_SIZE / 2) - (ModConstants.strumSize/2.0)) while trying to figure out some offset stuff... coincidence? no idea
   var dumbMagicNumberForX:Float = 24.6;
 
-  public var dumbTempScaleTargetThing:Null<Float> = null;
-
   public function getNoteXOffset():Float
   {
     return dumbMagicNumberForX;
-    // so errr, noteScale (0.697blahblah...) = 28?
-    // var idk:Float = dumbMagicNumberForX / ModConstants.noteScale;
-    // idk *= dumbTempScaleTargetThing ?? 1.0;
-    // return idk;
-  }
-
-  public function getNoteYOffset():Float
-  {
-    return -INITIAL_OFFSET;
   }
 
   /**

@@ -7,11 +7,14 @@ import funkin.play.modchartSystem.ModConstants;
 import lime.math.Vector2;
 
 // Contains all mods which control strumline rotation!
+
 class RotateModBase extends Modifier
 {
   var offsetX:ModifierSubValue;
   var offsetY:ModifierSubValue;
   var offsetZ:ModifierSubValue;
+  var adv_noteOffsetX:ModifierSubValue;
+  var adv_holdOffsetX:ModifierSubValue;
 
   public function new(name:String)
   {
@@ -20,6 +23,10 @@ class RotateModBase extends Modifier
     offsetX = createSubMod("offset_x", 0.0, ["offsetx", "xoffset", "x_offset"]);
     offsetY = createSubMod("offset_y", 0.0, ["offsety", "yoffset", "y_offset"]);
     offsetZ = createSubMod("offset_z", 0.0, ["offsetz", "zoffset", "z_offset"]);
+
+    adv_noteOffsetX = createSubMod("note_point_offset_x", 0.0, ["notepoint_offset_x", "notespoint_offset_x", "notes_point_offset_x"]);
+    adv_holdOffsetX = createSubMod("hold_point_offset_x", 0.0, ["holdpoint_offset_x", "holdspoint_offset_x", "holds_point_offset_x"]);
+
     unknown = false;
     notesMod = true;
     holdsMod = true;
@@ -33,21 +40,14 @@ class RotateModBase extends Modifier
 
   function noteRotateFunc_GetPivotX(data:NoteData, strumLine:Strumline):Float
   {
-    var r:Float = data.whichStrumNote.x;
+    var strumNote = data.whichStrumNote ?? strumLine.getByIndex(data.direction);
+
+    var r:Float = strumNote.x;
     if (data.noteType == "receptor")
     {
       r = data.strumPosWasHere.x;
     }
-    else if (data.noteType == "hold" || data.noteType == "path")
-    {
-      r += strumLine.mods.getHoldOffsetX(data.noteType == "path");
-      r -= data.whichStrumNote.strumExtraModData.noteStyleOffsetX;
-    }
-    else
-    {
-      r += data.whichStrumNote.weBelongTo.getNoteXOffset();
-      r -= data.whichStrumNote.strumExtraModData.noteStyleOffsetX;
-    }
+    r += strumNote.width * 0.5;
     return r;
   }
 
@@ -72,7 +72,7 @@ class RotateModBase extends Modifier
     }
     else
     {
-      r += data.whichStrumNote.weBelongTo.getNoteYOffset();
+      r -= Strumline.INITIAL_OFFSET;
       r -= data.whichStrumNote.strumExtraModData.noteStyleOffsetY;
     }
     return r;
@@ -92,19 +92,52 @@ class RotateModBase extends Modifier
       case "z":
         pivotPoint.x = noteRotateFunc_GetPivotX(data, strumLine);
         pivotPoint.y = noteRotateFunc_GetPivotY(data, strumLine);
+
         point.x = data.x;
         point.y = data.y;
+
+        var xOffset:Float = 0;
+        if (data.noteType == "hold" || data.noteType == "path")
+        {
+          xOffset += (data.width) / 2;
+          xOffset += adv_holdOffsetX.value;
+        }
+        else
+        {
+          xOffset += ((data.width * 2) - Strumline.STRUMLINE_SIZE) / 2;
+          xOffset += Strumline.NUDGE; // More accurate for groovin but makes funkin inaccurate
+          xOffset += adv_noteOffsetX.value;
+        }
+        point.x += xOffset;
+
         var output:Vector2 = ModConstants.rotateAround(pivotPoint, point, angle);
         data.x = output.x;
         data.y = output.y;
+        data.x -= xOffset;
       case "y":
         pivotPoint.x = noteRotateFunc_GetPivotX(data, strumLine);
         pivotPoint.y = noteRotateFunc_GetPivotZ(data, strumLine);
         point.x = data.x;
         point.y = data.z;
+
+        var xOffset:Float = 0;
+        if (data.noteType == "hold" || data.noteType == "path")
+        {
+          xOffset += (data.width) / 2;
+          xOffset += adv_holdOffsetX.value;
+        }
+        else
+        {
+          xOffset += ((data.width * 2) - Strumline.STRUMLINE_SIZE) / 2;
+          xOffset += Strumline.NUDGE; // More accurate for groovin but makes funkin inaccurate
+          xOffset += adv_noteOffsetX.value;
+        }
+        point.x += xOffset;
+
         var output:Vector2 = ModConstants.rotateAround(pivotPoint, point, angle);
         data.x = output.x;
         data.z = output.y;
+        data.x -= xOffset;
       case "x":
         pivotPoint.x = noteRotateFunc_GetPivotZ(data, strumLine);
         pivotPoint.y = noteRotateFunc_GetPivotY(data, strumLine);
@@ -195,6 +228,7 @@ class RotateYModifier extends RotateModBase
   {
     super(name);
     modPriority = 22;
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -214,6 +248,7 @@ class RotateZModifier extends RotateModBase
   {
     super(name);
     modPriority = 23;
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -257,6 +292,7 @@ class StrumRotateYModifier extends RotateModBase
     holdsMod = false;
     strumsMod = true;
     pathMod = false;
+    invertForDad = true;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -276,6 +312,7 @@ class StrumRotateZModifier extends RotateModBase
     holdsMod = false;
     strumsMod = true;
     pathMod = false;
+    invertForDad = true;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -314,6 +351,7 @@ class NotesRotateYModifier extends RotateModBase
     holdsMod = true;
     strumsMod = false;
     pathMod = true;
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -333,6 +371,7 @@ class NotesRotateZModifier extends RotateModBase
     holdsMod = true;
     strumsMod = false;
     pathMod = true;
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -399,6 +438,7 @@ class RotatingYModifier extends RotateModBase
       "receptors",
       "receptor"
     ]);
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -436,6 +476,7 @@ class RotatingZModifier extends RotateModBase
       "receptors",
       "receptor"
     ]);
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void

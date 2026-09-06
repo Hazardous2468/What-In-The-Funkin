@@ -7,11 +7,13 @@ import funkin.play.modchartSystem.NoteData;
 
 // Contains all the mods related to rotating the nots / strums!
 // Notes spin as they approach the receptors
+
 class DizzyMod extends Modifier
 {
   public function new(name:String)
   {
     super(name, 0);
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -22,11 +24,13 @@ class DizzyMod extends Modifier
 }
 
 // Notes spin as they approach the receptors, not being affected by speed / distance mods
+
 class Dizzy2Mod extends Modifier
 {
   public function new(name:String)
   {
     super(name, 0);
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -37,6 +41,7 @@ class Dizzy2Mod extends Modifier
 }
 
 // Notes spin as they approach the receptors
+
 class RollMod extends Modifier
 {
   public function new(name:String)
@@ -52,6 +57,7 @@ class RollMod extends Modifier
 }
 
 // Notes spin as they approach the receptors, not being affected by speed / distance mods
+
 class Roll2Mod extends Modifier
 {
   public function new(name:String)
@@ -67,11 +73,13 @@ class Roll2Mod extends Modifier
 }
 
 // Notes spin as they approach the receptors
+
 class TwirlMod extends Modifier
 {
   public function new(name:String)
   {
     super(name, 0);
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -82,11 +90,13 @@ class TwirlMod extends Modifier
 }
 
 // Notes spin as they approach the receptors, not being affected by speed / distance mods
+
 class Twirl2Mod extends Modifier
 {
   public function new(name:String)
   {
     super(name, 0);
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -97,14 +107,17 @@ class Twirl2Mod extends Modifier
 }
 
 // Notes and strums will rotate constantly
+
 class ConfusionMod extends Modifier
 {
   public function new(name:String)
   {
     super(name, 0);
+    invertForDad = true;
   }
 
   // eeeee nawh, I won't bother making this rad just to fuck with you lol
+
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
     data.angleZ += beatTime * currentValue; // lol, nobody uses this mod XD
@@ -112,11 +125,13 @@ class ConfusionMod extends Modifier
 }
 
 // Rotate the strums on the z axis
+
 class ConfusionZOffsetMod extends Modifier
 {
   public function new(name:String)
   {
     super(name, 0);
+    invertForDad = true;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -126,6 +141,7 @@ class ConfusionZOffsetMod extends Modifier
 }
 
 // Rotate the strums on the x axis
+
 class ConfusionXOffsetMod extends Modifier
 {
   public function new(name:String)
@@ -146,11 +162,13 @@ class ConfusionXOffsetMod extends Modifier
 }
 
 // Rotate the strums on the y axis
+
 class ConfusionYOffsetMod extends Modifier
 {
   public function new(name:String)
   {
     super(name, 0);
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -166,11 +184,13 @@ class ConfusionYOffsetMod extends Modifier
 }
 
 // Rotate the notes on the z axis
+
 class NotesConfusionZOffsetMod extends Modifier
 {
   public function new(name:String)
   {
     super(name, 0);
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -180,6 +200,7 @@ class NotesConfusionZOffsetMod extends Modifier
 }
 
 // Rotate the notes on the x axis
+
 class NotesConfusionXOffsetMod extends Modifier
 {
   public function new(name:String)
@@ -194,11 +215,13 @@ class NotesConfusionXOffsetMod extends Modifier
 }
 
 // Rotate the notes on the y axis
+
 class NotesConfusionYOffsetMod extends Modifier
 {
   public function new(name:String)
   {
     super(name, 0);
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void

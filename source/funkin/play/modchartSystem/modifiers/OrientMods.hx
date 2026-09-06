@@ -16,7 +16,6 @@ class OrientModBase extends Modifier
 {
   // If true, will automatically flip the angle values for when the reverse mod is active.
   var reverseFix:Bool = true;
-
   /*
    * If true, forces holds to be affected by this modifier.
    * If false, holds won't be affected by this modifier.
@@ -24,7 +23,6 @@ class OrientModBase extends Modifier
    * Doesn't really do anything as holds don't use angleZ or angleX. Use SpiralHolds instead for that.
    */
   var affectHolds:Null<Bool> = false;
-
   /*
    * the position in the array table for the orient stuff...
    * 0 = z
@@ -33,7 +31,6 @@ class OrientModBase extends Modifier
    * +3 for orient 2.
    */
   var index:Int = 0;
-
   /*
    * if enabled (above 0.5), will use the old orient math logic (will only work between -180 to 180 degrees instead of full 360 degree support)
    * if below 0.0, orientY will act the same as orientZ (easier to use / understand imo, though "intended" behaviour can be reverted via this submod)
@@ -58,7 +55,13 @@ class OrientModBase extends Modifier
     holdsMod = affectHolds;
     pathMod = false;
 
-    useAltMathSubmod = createSubMod("alt", (i % 3 == 2 ? -1.0 : 0.0), ["type", "old", "other", "variant", "varient"]);
+    useAltMathSubmod = createSubMod("alt", (i % 3 == 2 ? -1.0 : 0.0), [
+      "type",
+      "old",
+      "other",
+      "variant",
+      "varient"
+    ]);
   }
 
   var strumResult:Array<Float> = [0, 0, 0, 0];
@@ -107,6 +110,7 @@ class OrientModBase extends Modifier
   }
 
   // Returns the angle between the current position and lastKnownPosition in degrees.
+
   function getOrientAngle(data:NoteData):Float
   {
     var a:Float = 0.0; // height
@@ -180,7 +184,8 @@ class OrientModBase extends Modifier
   }
 }
 
-// Swapped the orient mods around for improved accuracy to NotITG
+// Older versions of WITF had Orient and Orient2 swapped.
+
 class OrientMod extends OrientModBase
 {
   public function new(name:String)
@@ -206,6 +211,7 @@ class OrientYMod extends OrientModBase
 }
 
 // Same as Orient but instead notes will sample based on mod math instead of last known position.
+
 class Orient2Mod extends OrientModBase
 {
   public function new(name:String)

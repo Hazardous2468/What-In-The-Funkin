@@ -160,17 +160,41 @@ class NoteStyle implements IRegistryEntry<NoteStyleData>
   function buildNoteAnimations(target:NoteSprite):Void
   {
     var leftData:Null<AnimationData> = fetchNoteAnimationData(LEFT);
-    if (leftData != null) target.animation.addByPrefix('purpleScroll', leftData.prefix ?? '', leftData.frameRate ?? 24, leftData.looped ?? false,
-      leftData.flipX, leftData.flipY);
+    if (leftData != null) target.animation.addByPrefix(
+      'purpleScroll',
+      leftData.prefix ?? '',
+      leftData.frameRate ?? 24,
+      leftData.looped ?? false,
+      leftData.flipX,
+      leftData.flipY
+    );
     var downData:Null<AnimationData> = fetchNoteAnimationData(DOWN);
-    if (downData != null) target.animation.addByPrefix('blueScroll', downData.prefix ?? '', downData.frameRate ?? 24, downData.looped ?? false,
-      downData.flipX, downData.flipY);
+    if (downData != null) target.animation.addByPrefix(
+      'blueScroll',
+      downData.prefix ?? '',
+      downData.frameRate ?? 24,
+      downData.looped ?? false,
+      downData.flipX,
+      downData.flipY
+    );
     var upData:Null<AnimationData> = fetchNoteAnimationData(UP);
-    if (upData != null) target.animation.addByPrefix('greenScroll', upData.prefix ?? '', upData.frameRate ?? 24, upData.looped ?? false, upData.flipX,
-      upData.flipY);
+    if (upData != null) target.animation.addByPrefix(
+      'greenScroll',
+      upData.prefix ?? '',
+      upData.frameRate ?? 24,
+      upData.looped ?? false,
+      upData.flipX,
+      upData.flipY
+    );
     var rightData:Null<AnimationData> = fetchNoteAnimationData(RIGHT);
-    if (rightData != null) target.animation.addByPrefix('redScroll', rightData.prefix ?? '', rightData.frameRate ?? 24, rightData.looped ?? false,
-      rightData.flipX, rightData.flipY);
+    if (rightData != null) target.animation.addByPrefix(
+      'redScroll',
+      rightData.prefix ?? '',
+      rightData.frameRate ?? 24,
+      rightData.looped ?? false,
+      rightData.flipX,
+      rightData.flipY
+    );
   }
 
   public function isNoteAnimated():Bool
@@ -324,6 +348,7 @@ class NoteStyle implements IRegistryEntry<NoteStyleData>
 
   // WITF exclusive offsets for moving the strumline around on it's initial creation.
   // Added to counter the new FNF change where strumline offsets are used in the initial creation of the strumline (strumline.y in PlayState)
+
   public function getInitialStrumlineOffsets():Array<Float>
   {
     return _data?.assets?.noteStrumline?.data?.initialOffsets ?? fallback?.getInitialStrumlineOffsets() ?? [0.0, 0.0];
@@ -1293,7 +1318,9 @@ class NoteStyle implements IRegistryEntry<NoteStyleData>
     return _data?.assets?.holdNoteCover?.data?.origin ?? fallback?.getHoldCoverOrigin() ?? [0.0, 0.0, 1.0];
   }
 
-  public function destroy():Void {}
+  public function destroy():Void
+  {
+  }
 
   /**
    * Returns a string of the library name for the given asset id

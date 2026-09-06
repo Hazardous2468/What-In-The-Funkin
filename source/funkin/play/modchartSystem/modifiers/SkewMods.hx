@@ -74,6 +74,7 @@ class PlayFieldSkewYMod extends Modifier
     strumsMod = true;
     pathMod = true;
     notPercentage = true;
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -124,6 +125,7 @@ class NotesSkewXMod extends Modifier
     strumsMod = true;
     pathMod = true;
     notPercentage = true;
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -149,6 +151,7 @@ class NotesSkewYMod extends Modifier
     strumsMod = true;
     pathMod = true;
     notPercentage = true;
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -197,6 +200,7 @@ class HoldsSkewYMod extends Modifier
     holdsMod = true;
     pathMod = true;
     notPercentage = true;
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -213,6 +217,7 @@ class StrumSkewXMod extends Modifier
     unknown = false;
     strumsMod = true;
     notPercentage = true;
+    invertForDad = true;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -229,6 +234,7 @@ class StrumSkewYMod extends Modifier
     unknown = false;
     strumsMod = true;
     notPercentage = true;
+    invertForDad = true;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -245,6 +251,7 @@ class StrumSkewZMod extends Modifier
     unknown = false;
     strumsMod = true;
     notPercentage = true;
+    invertForDad = true;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void

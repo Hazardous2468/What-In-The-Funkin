@@ -22,7 +22,6 @@ class CustomModifier extends Modifier
 {
   // public var speedMathFunc:NoteData->Float;
   public var speedMathFunc = (curPos:Float, lane:Int) -> (1.0 : Float);
-
   public var noteMathFunc:NoteData->Void;
   public var strumMathFunc:NoteData->Void;
   public var specialMathFunc:Int->Void;
@@ -33,6 +32,7 @@ class CustomModifier extends Modifier
   private var specialMathBroke:Bool = false;
 
   // Create and return a new copy of this CustomModifier
+
   public function clone():CustomModifier
   {
     var newShit:CustomModifier = new CustomModifier(tag, baseValue);
@@ -149,6 +149,7 @@ class CustomModifier extends Modifier
 
 // A lot of math came from here:
 // https://github.com/TheZoroForce240/FNF-Modcharting-Tools/blob/main/source/modcharting/Modifier.hx
+
 class ModifierSubValue
 {
   /**
@@ -224,13 +225,12 @@ class Modifier
   public var holdsMod:Bool = false;
   public var strumsMod:Bool = false;
   public var speedMod:Bool = false;
-
-  // If true, will not be treated as a % (will only use raw values)
+  // If true, then the mod value for this modifier will be multiplied by -1 for the opponent
+  public var invertForDad:Bool = false;
+  // If true, will NOT be treated as a % (will only use raw values)
   public var notPercentage:Bool = false;
-
   public var tag:String = "mod";
   public var baseValue:Float = 0;
-
   public var currentValue(default, set):Float = 0;
 
   private function set_currentValue(newValue:Float)
@@ -242,12 +242,9 @@ class Modifier
 
   public var subValues:Map<String, ModifierSubValue> = new Map<String, ModifierSubValue>();
   public var subValuesAliasMap:Map<String, String> = new Map<String, String>(); // for converting an alias to the submods real name
-
   public var targetLane:Int = -1;
   public var modPriority:Float = 100; // 100 is default. higher priority = done first
-
   public var modPriority_additive:Float = 0; // gets added onto the priority so the modchart creator can control mod priority midsong. Done this way to avoid overiding the original priority.
-
   // who owns this mod?
   public var strumOwner:Strumline = null;
 
@@ -264,8 +261,7 @@ class Modifier
   {
     currentValue = baseValue;
     modPriority_additive = 0;
-    for (subMod in subValues)
-      subMod.value = subMod.baseValue;
+    for (subMod in subValues) subMod.value = subMod.baseValue;
   }
 
   public function getSubVal(name):Float
@@ -280,6 +276,7 @@ class Modifier
   }
 
   // easy helper function for setting subValues. Kind of obsolete now.
+
   public function setSubVal(name:String, newval:Float):Void
   {
     if (name == "priority")
@@ -331,6 +328,7 @@ class Modifier
   }
 
   // Creates a new subvalue modifier and automatically adds it to the subValues map. Returns the newly created subMod.
+
   public function createSubMod(name:String, startVal:Float, ?aliases:Array<String>):ModifierSubValue
   {
     final newSubMod:ModifierSubValue = new ModifierSubValue(startVal);
@@ -350,6 +348,7 @@ class Modifier
   }
 
   // Converts a submod Name to it's real name.
+
   public function subModAliasConvert(inputName:String):String
   {
     if (subValuesAliasMap.exists(inputName))
@@ -367,9 +366,15 @@ class Modifier
     return 1.0;
   }
 
-  public dynamic function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void {}
+  public dynamic function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
+  {
+  }
 
-  public dynamic function specialMath(lane:Int, strumLine:Strumline):Void {}
+  public dynamic function specialMath(lane:Int, strumLine:Strumline):Void
+  {
+  }
 
-  public dynamic function strumMath(data:NoteData, strumLine:Strumline):Void {}
+  public dynamic function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+  }
 }

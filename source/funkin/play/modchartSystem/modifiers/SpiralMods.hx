@@ -79,6 +79,12 @@ class SpiralModBase extends Modifier
 
 class SpiralXMod extends SpiralModBase
 {
+  public function new(name:String, isCos:Bool = false)
+  {
+    super(name);
+    invertForDad = true;
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return;
@@ -88,6 +94,11 @@ class SpiralXMod extends SpiralModBase
 
 class SpiralYMod extends SpiralModBase
 {
+  public function new(name:String, isCos:Bool = false)
+  {
+    super(name);
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return;
@@ -97,6 +108,11 @@ class SpiralYMod extends SpiralModBase
 
 class SpiralZMod extends SpiralModBase
 {
+  public function new(name:String, isCos:Bool = false)
+  {
+    super(name);
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return;
@@ -111,6 +127,7 @@ class SpiralAngleZMod extends SpiralModBase
     super(name, isCos);
     holdsMod = false;
     pathMod = false;
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void

@@ -38,6 +38,7 @@ class SquareXMod extends SquareModBase
   public function new(name:String)
   {
     super(name);
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -101,6 +102,7 @@ class SquareAngleMod extends SquareModBase
   public function new(name:String)
   {
     super(name);
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -113,6 +115,47 @@ class SquareAngleMod extends SquareModBase
   {
     if (currentValue == 0) return; // skip math if mod is 0
     data.angleZ = squareMath(data.curPos) * currentValue;
+  }
+}
+
+class SquareAngleXMod extends SquareModBase
+{
+  public function new(name:String)
+  {
+    super(name);
+  }
+
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
+  {
+    if (currentValue == 0) return; // skip math if mod is 0
+    data.angleX += squareMath(data.curPos) * currentValue;
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (currentValue == 0) return; // skip math if mod is 0
+    data.angleX = squareMath(data.curPos) * currentValue;
+  }
+}
+
+class SquareAngleYMod extends SquareModBase
+{
+  public function new(name:String)
+  {
+    super(name);
+    invertForDad = true;
+  }
+
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
+  {
+    if (currentValue == 0) return; // skip math if mod is 0
+    data.angleY += squareMath(data.curPos) * currentValue;
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (currentValue == 0) return; // skip math if mod is 0
+    data.angleY = squareMath(data.curPos) * currentValue;
   }
 }
 
@@ -142,11 +185,56 @@ class SquareScaleMod extends SquareModBase
   }
 }
 
+class SquareScaleXMod extends SquareModBase
+{
+  public function new(name:String)
+  {
+    super(name);
+  }
+
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
+  {
+    if (currentValue == 0) return; // skip math if mod is 0
+    final r:Float = squareMath(data.curPos) * currentValue * 0.01;
+    data.scaleX += r;
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (currentValue == 0) return; // skip math if mod is 0
+    final r:Float = squareMath(data.curPos) * currentValue * 0.01;
+    data.scaleX += r;
+  }
+}
+
+class SquareScaleYMod extends SquareModBase
+{
+  public function new(name:String)
+  {
+    super(name);
+  }
+
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
+  {
+    if (currentValue == 0) return; // skip math if mod is 0
+    final r:Float = squareMath(data.curPos) * currentValue * 0.01;
+    data.scaleY += r;
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (currentValue == 0) return; // skip math if mod is 0
+    final r:Float = squareMath(data.curPos) * currentValue * 0.01;
+    data.scaleY += r;
+  }
+}
+
 class SquareSkewXMod extends SquareModBase
 {
   public function new(name:String)
   {
     super(name);
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -167,6 +255,7 @@ class SquareSkewYMod extends SquareModBase
   public function new(name:String)
   {
     super(name);
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void

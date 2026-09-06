@@ -17,7 +17,6 @@ class LinearModifierBase extends Modifier
   var altCurposSubmod:ModifierSubValue;
   var offset:ModifierSubValue;
   var strumResult:Array<Float> = [0, 0, 0, 0];
-
   var useUnscaledCurpos(get, never):Bool;
 
   function get_useUnscaledCurpos():Bool
@@ -34,6 +33,12 @@ class LinearModifierBase extends Modifier
 
 class LinearXMod extends LinearModifierBase
 {
+  public function new(name:String)
+  {
+    super(name);
+    invertForDad = true;
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     data.x -= strumResult[data.direction];
@@ -107,6 +112,12 @@ class LinearZMod extends LinearModifierBase
 
 class LinearAngleMod extends LinearModifierBase
 {
+  public function new(name:String)
+  {
+    super(name);
+    invertForDad = true;
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     data.angleZ -= strumResult[data.direction];
@@ -129,6 +140,12 @@ class LinearAngleMod extends LinearModifierBase
 
 class LinearAngleYMod extends LinearModifierBase
 {
+  public function new(name:String)
+  {
+    super(name);
+    invertForDad = true;
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     data.angleY += daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
@@ -239,6 +256,12 @@ class LinearScaleYMod extends LinearModifierBase
 
 class LinearSkewXMod extends LinearModifierBase
 {
+  public function new(name:String)
+  {
+    super(name);
+    invertForDad = true;
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     data.skewX += daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
@@ -260,6 +283,12 @@ class LinearSkewXMod extends LinearModifierBase
 
 class LinearSkewYMod extends LinearModifierBase
 {
+  public function new(name:String)
+  {
+    super(name);
+    invertForDad = true;
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     data.skewY += daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
@@ -298,6 +327,7 @@ class LinearSpeedMod extends Modifier
 }
 
 // for legacy support
+
 class ScaleLinearLegacyMod extends Modifier
 {
   public function new(name:String)

@@ -290,10 +290,10 @@ class SustainTrail extends ZSprite
       }
     }
 
-    flipY = Preferences.downscroll
-    #if mobile
-    || (Preferences.controlsScheme == FunkinHitboxControlSchemes.Arrows && !funkin.mobile.input.ControlsHandler.hasExternalInputDevice)
-    #end;
+    flipY = Preferences.downscroll #if mobile || (
+      Preferences.controlsScheme == FunkinHitboxControlSchemes.Arrows
+      && !funkin.mobile.input.ControlsHandler.hasExternalInputDevice
+    ) #end;
 
     // alpha = 0.6;
     alpha = 1.0;
@@ -418,22 +418,7 @@ class SustainTrail extends ZSprite
       fakeNote.alpha = 1;
       fakeNote.scale.set(ModConstants.noteScale, ModConstants.noteScale);
     }
-    return; // don't care for the rest of this, gets set to zero in noteModData default values anyway
-    /*
-      fakeNote.x = 0;
-      fakeNote.y = 0;
-      fakeNote.z = 0;
-      fakeNote.angle = 0;
-      fakeNote.color = FlxColor.WHITE;
-
-      fakeNote.stealthGlow = 0.0;
-      fakeNote.stealthGlowBlue = 1.0;
-      fakeNote.stealthGlowGreen = 1.0;
-      fakeNote.stealthGlowRed = 1.0;
-
-      fakeNote.skew.x = 0;
-      fakeNote.skew.y = 0;
-     */
+    return;
   }
 
   var noteModData:NoteData;
@@ -615,6 +600,10 @@ class SustainTrail extends ZSprite
     noteModData.curPos_unscaled = notePos;
     noteModData.whichStrumNote = whichStrumNote;
     noteModData.noteType = isArrowPath ? "path" : "hold";
+    noteModData.noteKind = isArrowPath ? "path" : (noteData?.kind ?? "default");
+    noteModData.noteStyleName = noteStyleName;
+    noteModData.width = graphicWidth;
+    noteModData.height = 0;
 
     var scrollMult:Float = 1.0;
     for (mod in parentStrumline.mods.mods_speed)
@@ -629,7 +618,20 @@ class SustainTrail extends ZSprite
     }
     noteModData.speedMod = scrollMult;
 
-    noteModData.x = whichStrumNote.x + parentStrumline.mods.getHoldOffsetX(isArrowPath, graphicWidth);
+    // Position like vanilla
+    noteModData.x = parentStrumline.x;
+    noteModData.x += parentStrumline.getXPos(Strumline.DIRECTIONS[noteModData.direction % Strumline.KEY_COUNT]);
+    noteModData.x += Strumline.STRUMLINE_SIZE / 2;
+    noteModData.x -= graphicWidth / 2;
+
+    // Then offset based on the movement from the default strum position so movement it still tied to the strum receptors.
+    final defaultPosition:Array<Float> = parentStrumline.mods.getDefaultStrumPos(noteModData.direction);
+    final xDif:Float = whichStrumNote.x - defaultPosition[0];
+    noteModData.x += xDif;
+
+    // The old method with jank
+    // noteModData.x = whichStrumNote.x + parentStrumline.mods.getHoldOffsetX(isArrowPath, graphicWidth);
+
     var sillyPos:Float = parentStrumline.calculateNoteYPos(noteModData.strumTime) * scrollMult;
     if (flipY)
     {
@@ -640,7 +642,7 @@ class SustainTrail extends ZSprite
       noteModData.y = (whichStrumNote.y - Strumline.INITIAL_OFFSET + sillyPos + Strumline.STRUMLINE_SIZE / 2);
     }
 
-    noteModData.x -= whichStrumNote.strumExtraModData.noteStyleOffsetX; // undo strum offset
+    // noteModData.x -= whichStrumNote.strumExtraModData.noteStyleOffsetX; // undo strum offset
     noteModData.y -= whichStrumNote.strumExtraModData.noteStyleOffsetY;
 
     noteModData.z = whichStrumNote.z;

@@ -1,12 +1,10 @@
 Note: Some reported problems are old and may have been already resolved.
 
-Fork specific issues (V1.0.5):
+Fork specific issues (V1.1.0):
 
-- Hitting a hold early will sometimes make them bug out visually
+- Orient modifier seems to be a bit buggy
 
-- Misses may randomly occur when skipping forward / backward in a song
-
-- Hold covers sometimes fail to disappear
+- Hold covers sometimes fail to appear and disappear
 
 - Incorrect animation speeds with zSort enabled
 
@@ -15,8 +13,6 @@ Fork specific issues (V1.0.5):
 - Chaos mode is still a WIP so there are some issues with it that will be eventually fixed
 
 - Passing nothing into a built-in lua function (like "centerPlayer()") will trigger an instant game crash.
-
-- Offsets (input / visual) aren't properly tested
 
 - If zSort is enabled earlier then beat -5, then the strums appear invisible.
 
@@ -30,7 +26,7 @@ Fork specific issues (V1.0.5):
 
 - AFT's seem to cause minor but consistent lag spikes? 😔
 
-- AFT's act a bit strangely when pointed at themselves
+- AFT's act strangely when pointed at themselves
 
 - AFT updates break when playback rate is set to zero
 

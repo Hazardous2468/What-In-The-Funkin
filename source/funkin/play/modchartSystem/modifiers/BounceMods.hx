@@ -9,6 +9,7 @@ import flixel.math.FlxMath;
 
 // Contains all the mods related bounce mods (it's like bumpy but always positive values)
 // :p
+
 class BounceModBase extends Modifier
 {
   var mult:ModifierSubValue;
@@ -62,6 +63,7 @@ class CosBounceXMod extends BounceModBase
   public function new(name:String)
   {
     super(name);
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -122,6 +124,7 @@ class CosBounceAngleMod extends BounceModBase
   public function new(name:String)
   {
     super(name);
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -161,6 +164,7 @@ class CosBounceAngleYMod extends BounceModBase
   public function new(name:String)
   {
     super(name);
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -239,6 +243,7 @@ class CosBounceSkewXMod extends BounceModBase
   public function new(name:String)
   {
     super(name);
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -257,6 +262,7 @@ class CosBounceSkewYMod extends BounceModBase
   public function new(name:String)
   {
     super(name);
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -275,6 +281,7 @@ class BounceXMod extends BounceModBase
   public function new(name:String)
   {
     super(name);
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -343,7 +350,9 @@ class BounceSpeedMod extends BounceModBase
     if (currentValue == 0) return 1; // skip math if mod is 0
     final bumpyx_Mult:Float = mult.value;
     final scrollSpeed = PlayState.instance?.currentChart?.scrollSpeed ?? 1.0;
-    final modWouldBe:Float = currentValue * 0.025 * sin(curPos / (Strumline.STRUMLINE_SIZE / 3.0) / scrollSpeed * bumpyx_Mult) * (Strumline.STRUMLINE_SIZE / 2.0);
+    final modWouldBe:Float = currentValue * 0.025 * sin(
+      curPos / (Strumline.STRUMLINE_SIZE / 3.0) / scrollSpeed * bumpyx_Mult
+    ) * (Strumline.STRUMLINE_SIZE / 2.0);
     return (modWouldBe + 1);
   }
 }
@@ -353,6 +362,7 @@ class BounceAngleMod extends BounceModBase
   public function new(name:String)
   {
     super(name);
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -392,6 +402,7 @@ class BounceAngleYMod extends BounceModBase
   public function new(name:String)
   {
     super(name);
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -470,6 +481,7 @@ class BounceSkewXMod extends BounceModBase
   public function new(name:String)
   {
     super(name);
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -489,6 +501,7 @@ class BounceSkewYMod extends BounceModBase
   public function new(name:String)
   {
     super(name);
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -508,6 +521,7 @@ class TanBounceXMod extends BounceModBase
   public function new(name:String)
   {
     super(name);
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -568,6 +582,7 @@ class TanBounceAngleMod extends BounceModBase
   public function new(name:String)
   {
     super(name);
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -609,6 +624,7 @@ class TanBounceSkewXMod extends BounceModBase
   public function new(name:String)
   {
     super(name);
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -628,6 +644,7 @@ class TanBounceSkewYMod extends BounceModBase
   public function new(name:String)
   {
     super(name);
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void

@@ -34,13 +34,18 @@ class SawtoothModBase extends Modifier
   }
 
   var strumResult:Array<Float> = [0, 0, 0, 0];
-
   var offsetSubmod:ModifierSubValue;
   var multSubmod:ModifierSubValue;
 }
 
 class SawtoothXMod extends SawtoothModBase
 {
+  public function new(name:String)
+  {
+    super(name);
+    invertForDad = true;
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
@@ -64,6 +69,11 @@ class SawtoothXMod extends SawtoothModBase
 
 class SawtoothYMod extends SawtoothModBase
 {
+  public function new(name:String)
+  {
+    super(name);
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
@@ -87,6 +97,11 @@ class SawtoothYMod extends SawtoothModBase
 
 class SawtoothZMod extends SawtoothModBase
 {
+  public function new(name:String)
+  {
+    super(name);
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
@@ -110,6 +125,17 @@ class SawtoothZMod extends SawtoothModBase
 
 class SawtoothAngleMod extends SawtoothModBase
 {
+  public function new(name:String)
+  {
+    super(name);
+    unknown = false;
+    notesMod = true;
+    holdsMod = true;
+    pathMod = false;
+    strumsMod = true;
+    invertForDad = true;
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
@@ -133,6 +159,16 @@ class SawtoothAngleMod extends SawtoothModBase
 
 class SawtoothAngleXMod extends SawtoothModBase
 {
+  public function new(name:String)
+  {
+    super(name);
+    unknown = false;
+    notesMod = true;
+    holdsMod = true;
+    pathMod = false;
+    strumsMod = true;
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
@@ -155,6 +191,17 @@ class SawtoothAngleXMod extends SawtoothModBase
 
 class SawtoothAngleYMod extends SawtoothModBase
 {
+  public function new(name:String)
+  {
+    super(name);
+    unknown = false;
+    notesMod = true;
+    holdsMod = true;
+    pathMod = false;
+    strumsMod = true;
+    invertForDad = true;
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
@@ -177,6 +224,16 @@ class SawtoothAngleYMod extends SawtoothModBase
 
 class SawtoothScaleMod extends SawtoothModBase
 {
+  public function new(name:String)
+  {
+    super(name);
+    unknown = false;
+    notesMod = true;
+    holdsMod = true;
+    pathMod = true;
+    strumsMod = true;
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
@@ -204,6 +261,16 @@ class SawtoothScaleMod extends SawtoothModBase
 
 class SawtoothScaleXMod extends SawtoothModBase
 {
+  public function new(name:String)
+  {
+    super(name);
+    unknown = false;
+    notesMod = true;
+    holdsMod = true;
+    pathMod = true;
+    strumsMod = true;
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
@@ -226,6 +293,16 @@ class SawtoothScaleXMod extends SawtoothModBase
 
 class SawtoothScaleYMod extends SawtoothModBase
 {
+  public function new(name:String)
+  {
+    super(name);
+    unknown = false;
+    notesMod = true;
+    holdsMod = true;
+    pathMod = true;
+    strumsMod = true;
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
@@ -248,6 +325,17 @@ class SawtoothScaleYMod extends SawtoothModBase
 
 class SawtoothSkewXMod extends SawtoothModBase
 {
+  public function new(name:String)
+  {
+    super(name);
+    unknown = false;
+    notesMod = true;
+    holdsMod = true;
+    pathMod = false;
+    strumsMod = true;
+    invertForDad = true;
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return;
@@ -270,6 +358,17 @@ class SawtoothSkewXMod extends SawtoothModBase
 
 class SawtoothSkewYMod extends SawtoothModBase
 {
+  public function new(name:String)
+  {
+    super(name);
+    unknown = false;
+    notesMod = true;
+    holdsMod = true;
+    pathMod = false;
+    strumsMod = true;
+    invertForDad = true;
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return;

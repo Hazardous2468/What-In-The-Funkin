@@ -12,6 +12,7 @@ import flixel.math.FlxMath;
 
 // Contains all the mods related to manual movement!
 // move based on arrowsize like NotITG (so 1.0 movex means move right by 1 arrowsize)
+
 class MoveXMod extends Modifier
 {
   public function new(name:String)
@@ -73,6 +74,7 @@ class MoveZMod extends Modifier
 }
 
 // Move in pixels as opposed to arrow size. Also applied AFTER most over mods like rotation.
+
 class MoveXMod_true extends Modifier
 {
   public function new(name:String)
@@ -218,7 +220,6 @@ class AlwaysCenterMod extends Modifier
 {
   var caluclated:Bool = false;
   var distanceToMove:Float = 0;
-
   var shouldAlwaysReCalculate:ModifierSubValue;
   var useOldMath:ModifierSubValue;
 
@@ -275,13 +276,14 @@ class CenteredNotesMod extends Modifier
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
-    final screenCenter:Float = (FlxG.height / 2) - (ModConstants.strumSize / 2) + strumLine.getNoteYOffset();
+    final screenCenter:Float = (FlxG.height / 2) - (ModConstants.strumSize / 2) - Strumline.INITIAL_OFFSET;
     final differenceBetween:Float = data.y - screenCenter;
     data.y -= currentValue * differenceBetween;
   }
 }
 
 // Ported from MT (literally made this just for meta mods lmfao)
+
 class JumpMod extends Modifier
 {
   public function new(name:String)
@@ -293,7 +295,13 @@ class JumpMod extends Modifier
 
     everyBeat = createSubMod("beat", 1.0, ["every", "frequency"]);
     offset = createSubMod("offset", 0.0, ["time_add", "timeadd", "time_offset", "timeoffset"]);
-    reverseAffect = createSubMod("reverse_affected", 1.0, ["reverse", "reversable", "reverseaffect", "reverseaffected", "reverse_affect"]);
+    reverseAffect = createSubMod("reverse_affected", 1.0, [
+      "reverse",
+      "reversable",
+      "reverseaffect",
+      "reverseaffected",
+      "reverse_affect"
+    ]);
   }
 
   var everyBeat:ModifierSubValue;

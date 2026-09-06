@@ -44,6 +44,11 @@ class DigitalModBase extends Modifier
 
 class DigitalXMod extends DigitalModBase
 {
+  public function new(name:String)
+  {
+    super(name);
+    invertForDad = true;
+  }
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
@@ -67,6 +72,10 @@ class DigitalXMod extends DigitalModBase
 
 class DigitalYMod extends DigitalModBase
 {
+  public function new(name:String)
+  {
+    super(name);
+  }
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
@@ -90,6 +99,10 @@ class DigitalYMod extends DigitalModBase
 
 class DigitalZMod extends DigitalModBase
 {
+  public function new(name:String)
+  {
+    super(name);
+  }
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
@@ -113,6 +126,11 @@ class DigitalZMod extends DigitalModBase
 
 class DigitalAngleMod extends DigitalModBase
 {
+  public function new(name:String)
+  {
+    super(name);
+    invertForDad = true;
+  }
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
@@ -136,6 +154,10 @@ class DigitalAngleMod extends DigitalModBase
 
 class DigitalAngleXMod extends DigitalModBase
 {
+  public function new(name:String)
+  {
+    super(name);
+  }
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
@@ -158,6 +180,11 @@ class DigitalAngleXMod extends DigitalModBase
 
 class DigitalAngleYMod extends DigitalModBase
 {
+  public function new(name:String)
+  {
+    super(name);
+    invertForDad = true;
+  }
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
@@ -180,6 +207,10 @@ class DigitalAngleYMod extends DigitalModBase
 
 class DigitalScaleMod extends DigitalModBase
 {
+  public function new(name:String)
+  {
+    super(name);
+  }
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
@@ -207,6 +238,10 @@ class DigitalScaleMod extends DigitalModBase
 
 class DigitalScaleXMod extends DigitalModBase
 {
+  public function new(name:String)
+  {
+    super(name);
+  }
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
@@ -229,6 +264,10 @@ class DigitalScaleXMod extends DigitalModBase
 
 class DigitalScaleYMod extends DigitalModBase
 {
+  public function new(name:String)
+  {
+    super(name);
+  }
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
@@ -251,6 +290,11 @@ class DigitalScaleYMod extends DigitalModBase
 
 class DigitalSkewXMod extends DigitalModBase
 {
+  public function new(name:String)
+  {
+    super(name);
+    invertForDad = true;
+  }
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
@@ -273,6 +317,11 @@ class DigitalSkewXMod extends DigitalModBase
 
 class DigitalSkewYMod extends DigitalModBase
 {
+  public function new(name:String)
+  {
+    super(name);
+    invertForDad = true;
+  }
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0

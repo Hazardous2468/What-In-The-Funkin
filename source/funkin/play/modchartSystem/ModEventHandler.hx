@@ -186,10 +186,8 @@ class ModEventHandler
 
       if (!timeEventTest.target.modifiers.exists(modifierName))
       {
-        timeEventTest.target.addMod(modifierName);
-
-        final invertMult:Float = ModConstants.invertValueCheck(modifierName, timeEventTest.target.invertValues);
-        timeEventTest.target.modifiers.get(modifierName).currentValue *= invertMult;
+        var mod = timeEventTest.target.addMod(modifierName);
+        mod.currentValue *= (timeEventTest.target.invertValues && mod.invertForDad ? -1 : 1);
       }
     }
 
@@ -260,9 +258,6 @@ class ModEventHandler
     // trace("-------------------------");
 
     tweenCounter++;
-
-    final mmm = ModConstants.invertValueCheck(_tag, target.invertValues);
-    newValue *= mmm;
 
     var isSub:Bool = false;
     var subModArr = null;
@@ -349,6 +344,8 @@ class ModEventHandler
     final mod:Modifier = target.modifiers.get(_tag);
     if (mod != null)
     {
+      final mmm = (target.invertValues && mod.invertForDad ? -1 : 1);
+      newValue *= mmm;
       final startPoint:Float = (type == "value" ? startingValue : mod.currentValue);
       final finishPoint:Float = startPoint + ((newValue - startPoint) * easeToUse(1.0));
       var tween:FlxTween = tweenManager.num(startPoint, newValue, time, {
@@ -387,8 +384,6 @@ class ModEventHandler
     var realTag:String = ModConstants.modTag(modName.toLowerCase(), target);
 
     tweenCounter++;
-    final mmm = ModConstants.invertValueCheck(_tag, target.invertValues);
-    addValue *= mmm;
 
     var isSub:Bool = false;
     var subModArr = null;
@@ -484,6 +479,8 @@ class ModEventHandler
     final mod:Modifier = target.modifiers.get(_tag);
     if (mod != null)
     {
+      final mmm = (target.invertValues && mod.invertForDad ? -1 : 1);
+      addValue *= mmm;
       if (time == 0)
       {
         final v:Float = addValue * easeToUse(1.0);

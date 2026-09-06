@@ -15,82 +15,59 @@ class NoteData
 {
   // Which strum receptor is this note targetting?
   public var whichStrumNote:StrumlineNote;
-
   // note direction
   public var direction:Int = 0;
-
   // The speed multiplier of the note. Higher means faster speed!
   public var speedMod:Float = 1;
-
   // Time in the song this note is to be hit at!
   public var strumTime:Float = 0;
-
   // The distance (in pixels) from receptors, taking into account speedMods.
   public var curPos:Float = 0;
-
   // The TRUE distance (in pixels) from receptors. Same as Curpos but ignores speed mods.
   public var curPos_unscaled:Float = 0;
-
   // Position of the strum in terms of curPos. Could be useful later when the strums can follow the notepath in drive2 mod or something lol
   public var strumPosition:Float = 0;
-
   // The real X position of the note.
   public var x:Float = 0.0;
-
   // The real Y position of the note.
   public var y:Float = 0.0;
-
   // The real Z position of the note.
   public var z:Float = 0.0;
-
+  // The width and height of this sprite's graphic.
+  public var width:Float = 112;
+  public var height:Float = 112;
   // The stealth glow variable. 1 means fully lit!
   public var stealth:Float = 0;
-
   // The opacity of the note. 1 is fully visible, 0 is invisible.
   public var alpha:Float = 1;
-
   // rotation on the z axis (just the default sprite.angle)
   public var angleZ:Float = 0;
-
   // rotation on the y axis (used for 3D projection thingy)
   public var angleY:Float = 0;
-
   // rotation on the x axis (used for 3D projection thingy)
   public var angleX:Float = 0;
-
   // The scale on the x axis
   public var scaleX:Float = 1;
-
   // The scale on the y axis
   public var scaleY:Float = 1;
-
   // The scale on the z axis (unused unless 3D models /noteskins are added somehow)
   public var scaleZ:Float = 1;
-
   // The scale on the x axis, unaffected by rotations
   public var scaleX2:Float = 1;
-
   // The scale on the y axis, unaffected by rotations
   public var scaleY2:Float = 1;
-
   // The amount to skew on the x axis
   public var skewX:Float = 0;
-
   // The amount to skew on the y axis
   public var skewY:Float = 0;
-
   // The amount to skew on the z axis
   public var skewZ:Float = 0;
-
   // The amount to skew on the x axis
   public var skewX_playfield:Float = 0;
-
   // The amount to skew on the y axis
   public var skewY_playfield:Float = 0;
-
   // The amount to skew on the z axis
   public var skewZ_playfield:Float = 0;
-
   // offsets for 3D rendering mode:
   public var meshOffsets_SkewX:Float = 0;
   public var meshOffsets_SkewY:Float = 0;
@@ -98,45 +75,46 @@ class NoteData
   public var meshOffsets_PivotX:Float = 0;
   public var meshOffsets_PivotY:Float = 0;
   public var meshOffsets_PivotZ:Float = 0;
-
   // Offset the perspective math center by this amount!
   public var perspectiveOffset:Vector2 = new Vector2(0, 0);
-
   // The red colour! Is a float value between 0 - 1
   public var red:Float = 1;
   // The green colour! Is a float value between 0 - 1
   public var green:Float = 1;
   // The blue colour! Is a float value between 0 - 1
   public var blue:Float = 1;
-
   // Value between -180 to 180 which allows you to hueshift the notes with the HSV shader
   public var hueShift:Float = 0;
-
   public var stealthGlowRed:Float = 1;
   public var stealthGlowGreen:Float = 1;
   public var stealthGlowBlue:Float = 1;
-
   // Used for orient mod, but could be useful to use?
   public var lastKnownPosition:Vector3D;
-
   /*
    * Sometimes orient mod just has a heart attack and dies.
    * This should make the notes spazz out less in the event that happens. just a bandaid fix for the NaN problem from orient.
    * orient, orientx, orienty, orient2, orientx2, orienty2
    */
-  public var lastKnownOrientAngle:Array<Float> = [0, 0, 0, 0, 0, 0];
-
+  public var lastKnownOrientAngle:Array<Float> = [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ];
   // Cur orient2 modifier value. Used to determine if additional math must be performed (will overwrite last known position!!)
   public var orient2:Array<Float> = [0, 0, 0];
-
   // An array of mods which should be done to this note!
   // public var noteMods:Array<String> = [];
   public var noteMods:Array<Modifier> = [];
-
-  // What kind of note is this?
-  // Examples: "note", "hurt", "hold", "path", "receptor", "path hold", "my custom note", "roll"
+  // What type of note is this?
+  // Examples: "note", "hold", "path", "receptor"
   public var noteType:String = "note";
-
+  // What notekind is this note? Can be default, hurt, noAnim, etc
+  public var noteKind:String = "default";
+  // That ID of the notestyle this note is using.
+  public var noteStyleName:String = "funkin";
   // Lower number = more detailed holds
   public var holdGrain:Float = 82;
 
@@ -149,12 +127,14 @@ class NoteData
   public var holdType:Float = 0;
 
   // Returns true if spiralPaths should be used.
+
   public function usingSpiralHolds():Bool
   {
     return (this.holdType >= 0.5);
   }
 
   // Returns true if holdType is below 0
+
   public function usingForwardHolds(isArrowPath:Bool = false):Bool
   {
     return (this.holdType < 0.0);
@@ -162,13 +142,10 @@ class NoteData
 
   // Makes holds straight. negative makes them less straight.
   public var straightHolds:Float = 0;
-
   // Makes holds look longer then what they actually are
   public var longHolds:Float = 0;
-
   // Enable this to re-enable the old 3D math for sustains! This basically just makes them scale on the x axis instead of applying true 3D math for each vert.
   public var old3Dholds:Bool = false;
-
   // I think these two were for Centered2 mod?
   public var strumPosOffsetThingy:Vector3D;
   public var strumPosWasHere:Vector3D;
@@ -182,6 +159,7 @@ class NoteData
   }
 
   // Gets the current reverse modifier amount.
+
   public function getReverse():Float
   {
     if (whichStrumNote?.strumExtraModData == null) return 0;
@@ -195,25 +173,20 @@ class NoteData
     noteMods = [];
   }
 
-  var dumbMagicNumberForX:Float = 28;
-
   public function getNoteXOffset():Float
   {
-    // return dumbMagicNumberForX;
     return whichStrumNote.weBelongTo.getNoteXOffset();
   }
 
-  public function getNoteYOffset():Float
-  {
-    return whichStrumNote.weBelongTo.getNoteYOffset();
-    // return Strumline.INITIAL_OFFSET * -1;
-  }
-
   // call this to set the values from an already existing sprite!
+
   public function setValuesFromSkewSprite(spr:FlxSkewedSprite):Void
   {
     this.x = spr.x;
     this.y = spr.y;
+
+    this.width = spr.width;
+    this.height = spr.height;
 
     this.angleZ = spr.angle;
     this.scaleX = spr.scale.x;
@@ -224,10 +197,14 @@ class NoteData
   }
 
   // call this to set the values from an already existing sprite!
+
   public function setValuesFromFunkinSkewSprite(spr:FunkinSkewedSprite):Void
   {
     this.x = spr.x;
     this.y = spr.y;
+
+    this.width = spr.width;
+    this.height = spr.height;
 
     this.angleZ = spr.angle;
     this.scaleX = spr.scale.x;
@@ -238,6 +215,7 @@ class NoteData
   }
 
   // call this to set the values from an already existing sprite! FOR ZSPRITE
+
   public function setValuesFromZSprite(spr:ZSprite):Void
   {
     this.z = spr.z;
@@ -250,15 +228,19 @@ class NoteData
   }
 
   // call this to set the values from an already existing sprite! FOR NOTES
+
   public function setValuesFromNoteSprite(noteSpr:NoteSprite):Void
   {
     setValuesFromZSprite(noteSpr);
     this.strumTime = noteSpr.strumTime;
-    this.noteType = noteSpr.kind;
+    this.noteType = "note";
+    this.noteKind = noteSpr.kind;
+    this.noteStyleName = noteSpr.noteStyleName;
     this.direction = noteSpr.direction;
   }
 
   // Call this function to reset all values back to default!
+
   public function defaultValues():Void
   {
     perspectiveOffset.setTo(0, 0);
@@ -268,6 +250,8 @@ class NoteData
     orient2 = [0, 0, 0];
 
     noteType = "note";
+    noteKind = "default";
+    noteStyleName = "funkin";
 
     x = 0;
     y = 0;
@@ -340,6 +324,7 @@ class NoteData
   }
 
   // Used in sampling a mod to figure out what it does if unknown
+
   public function didValueChange():Bool
   {
     if (x != 0) return true;

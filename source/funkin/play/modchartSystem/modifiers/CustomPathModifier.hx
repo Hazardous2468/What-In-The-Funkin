@@ -29,6 +29,7 @@ class TimeVector extends Vector4
 
 // Contains all mods which are unique or have debug purposes!
 // load a path from an external file
+
 class CustomPathMod extends Modifier
 {
   // The file this modifier looks for to load when first created
@@ -203,8 +204,12 @@ class CustomPathMod extends Modifier
                 _g++;
                 var coords = line.split(";");
                 // trace((_g - 1) + "split: " + coords);
-                var vec = new TimeVector(Std.parseFloat(coords[0]), Std.parseFloat(coords[1]) * (Preferences.downscroll ? -1 : 1), Std.parseFloat(coords[2]),
-                  Std.parseFloat(coords[3]));
+                var vec = new TimeVector(
+                  Std.parseFloat(coords[0]),
+                  Std.parseFloat(coords[1]) * (Preferences.downscroll ? -1 : 1),
+                  Std.parseFloat(coords[2]),
+                  Std.parseFloat(coords[3])
+                );
                 vec.x *= 200;
                 vec.y *= 200;
                 vec.z *= 200;
@@ -266,7 +271,7 @@ class CustomPathMod extends Modifier
     }
     else
     {
-      strumX += isHoldNote ? strumLine.mods.getHoldOffsetX(isArrowPath) : strumLine.getNoteXOffset();
+      strumX += isHoldNote ? data.width : strumLine.getNoteXOffset();
       if (isHoldNote)
       {
         if (Preferences.downscroll)
@@ -280,15 +285,20 @@ class CustomPathMod extends Modifier
       }
       else
       {
-        strumY += strumLine.getNoteYOffset();
+        strumY -= Strumline.INITIAL_OFFSET;
       }
     }
 
     var strumPosition:Vector4 = new Vector4(strumX, strumY, strumZ, 0);
     var notePosition:Vector4 = new Vector4(data.x, data.y, data.z, 0);
 
-    var newPosition1:Vector4 = executePath(beatTime, Math.abs(data.whichStrumNote?.noteModData?.curPos ?? 0.0) * -1 / 0.47, data.direction, currentValue,
-      strumPosition);
+    var newPosition1:Vector4 = executePath(
+      beatTime,
+      Math.abs(data.whichStrumNote?.noteModData?.curPos ?? 0.0) * -1 / 0.47,
+      data.direction,
+      currentValue,
+      strumPosition
+    );
     var newPosition2:Vector4 = executePath(beatTime, Math.abs(data.curPos) * -1 / 0.47, data.direction, currentValue, notePosition);
 
     var blend:Float = Math.abs(currentValue);

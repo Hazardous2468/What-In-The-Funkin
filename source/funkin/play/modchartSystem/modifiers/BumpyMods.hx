@@ -9,6 +9,7 @@ import flixel.math.FlxMath;
 
 // Contains all the mods related bumpy mods
 // :p
+
 class BumpyModBase extends Modifier
 {
   var mult:ModifierSubValue;
@@ -59,6 +60,7 @@ class CosBumpyXMod extends BumpyModBase
   public function new(name:String)
   {
     super(name);
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -119,6 +121,7 @@ class CosBumpyAngleMod extends BumpyModBase
   public function new(name:String)
   {
     super(name);
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -139,6 +142,7 @@ class CosBumpyAngleYMod extends BumpyModBase
   public function new(name:String)
   {
     super(name);
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -235,6 +239,7 @@ class CosBumpySkewXMod extends BumpyModBase
   public function new(name:String)
   {
     super(name);
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -253,6 +258,7 @@ class CosBumpySkewYMod extends BumpyModBase
   public function new(name:String)
   {
     super(name);
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -271,6 +277,7 @@ class BumpyXMod extends BumpyModBase
   public function new(name:String)
   {
     super(name);
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -361,7 +368,9 @@ class BumpySpeedMod extends BumpyModBase
     final bumpyx_Mult:Float = mult.value;
     curPos += getOffset();
     final scrollSpeed = PlayState.instance?.currentChart?.scrollSpeed ?? 1.0;
-    final modWouldBe:Float = currentValue * 0.025 * sin(curPos / (Strumline.STRUMLINE_SIZE / 3.0) / scrollSpeed * bumpyx_Mult) * (Strumline.STRUMLINE_SIZE / 2.0);
+    final modWouldBe:Float = currentValue * 0.025 * sin(
+      curPos / (Strumline.STRUMLINE_SIZE / 3.0) / scrollSpeed * bumpyx_Mult
+    ) * (Strumline.STRUMLINE_SIZE / 2.0);
     return (modWouldBe + 1);
   }
 }
@@ -371,6 +380,7 @@ class BumpyAngleMod extends BumpyModBase
   public function new(name:String)
   {
     super(name);
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -424,6 +434,7 @@ class BumpyAngleYMod extends BumpyModBase
   public function new(name:String)
   {
     super(name);
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -533,6 +544,7 @@ class BumpySkewXMod extends BumpyModBase
   public function new(name:String)
   {
     super(name);
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -559,6 +571,7 @@ class BumpySkewYMod extends BumpyModBase
   public function new(name:String)
   {
     super(name);
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -585,6 +598,7 @@ class TanBumpyXMod extends BumpyModBase
   public function new(name:String)
   {
     super(name);
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -666,6 +680,7 @@ class TanBumpyAngleMod extends BumpyModBase
   public function new(name:String)
   {
     super(name);
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -776,6 +791,7 @@ class TanBumpySkewXMod extends BumpyModBase
   public function new(name:String)
   {
     super(name);
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -802,6 +818,7 @@ class TanBumpySkewYMod extends BumpyModBase
   public function new(name:String)
   {
     super(name);
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void

@@ -26,7 +26,7 @@ class DrunkModBase extends Modifier
     desync = createSubMod("desync", 0.2, ["spacing"]);
     time_add = createSubMod("time_add", 0.0, ["offset", "timeadd", "time_offset", "timeoffset"]);
     sine = createSubMod("sine", 0.0, ["usesine", "sin"]);
-    timertype = createSubMod("timertype", 0.0, ["timetype","timer"]);
+    timertype = createSubMod("timertype", 0.0, ["timetype", "timer"]);
   }
 
   function tanDrunkMath(noteDir:Int, curPos:Float):Float
@@ -35,8 +35,9 @@ class DrunkModBase extends Modifier
     time *= speed.value;
     time += time_add.value;
 
-    final returnValue:Float = currentValue * (tan((time) + (noteDir * desync.value) +
-      (curPos * 0.45) * (10.0 / FlxG.height) * mult.value * 1.75)) * (ModConstants.strumSize * 0.5);
+    final returnValue:Float = currentValue * (tan(
+      (time) + (noteDir * desync.value) + (curPos * 0.45) * (10.0 / FlxG.height) * mult.value * 1.75
+    )) * (ModConstants.strumSize * 0.5);
 
     return returnValue;
   }
@@ -51,13 +52,15 @@ class DrunkModBase extends Modifier
 
     if (sine.value >= 0.5) // if above 50%, use sine instead of cos.
     {
-      returnValue = currentValue * (sin((time) + (noteDir * desync.value) +
-        (curPos * 0.45) * (10.0 / FlxG.height) * mult.value * 2)) * (ModConstants.strumSize * 0.5);
+      returnValue = currentValue * (sin(
+        (time) + (noteDir * desync.value) + (curPos * 0.45) * (10.0 / FlxG.height) * mult.value * 2
+      )) * (ModConstants.strumSize * 0.5);
     }
     else
     {
-      returnValue = currentValue * (cos((time) + (noteDir * desync.value) +
-        (curPos * 0.45) * (10.0 / FlxG.height) * mult.value * 1.75)) * (ModConstants.strumSize * 0.5);
+      returnValue = currentValue * (cos(
+        (time) + (noteDir * desync.value) + (curPos * 0.45) * (10.0 / FlxG.height) * mult.value * 1.75
+      )) * (ModConstants.strumSize * 0.5);
     }
 
     return returnValue;
@@ -69,6 +72,7 @@ class DrunkXMod extends DrunkModBase
   public function new(name:String)
   {
     super(name);
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -132,6 +136,7 @@ class DrunkAngleMod extends DrunkModBase
   public function new(name:String)
   {
     super(name);
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -153,6 +158,7 @@ class DrunkAngleYMod extends DrunkModBase
   public function new(name:String)
   {
     super(name);
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -258,6 +264,7 @@ class DrunkSkewXMod extends DrunkModBase
   public function new(name:String)
   {
     super(name);
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -278,6 +285,7 @@ class DrunkSkewYMod extends DrunkModBase
   public function new(name:String)
   {
     super(name);
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -314,6 +322,7 @@ class TanDrunkXMod extends DrunkModBase
   public function new(name:String)
   {
     super(name);
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -377,6 +386,7 @@ class TanDrunkAngleMod extends DrunkModBase
   public function new(name:String)
   {
     super(name);
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void

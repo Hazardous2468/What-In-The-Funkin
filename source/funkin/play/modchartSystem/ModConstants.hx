@@ -84,60 +84,11 @@ import funkin.play.modchartSystem.modifiers.*; // if only you worked ;_;
 class ModConstants
 {
   public static var orientTimeOffset:Float = -2.0; // in ms
-  public static final MODCHART_VERSION:String = "v1.0.6";
+  public static final MODCHART_VERSION:String = "v1.1.0";
   public static final defaultHoldGrain = 75;
   public static final defaultPathGrain = defaultHoldGrain;
   public static var tooCloseToCameraFix:Float = 0.975; // dumb fix for preventing freak out on z math or something
-  // If a mod tag is in this array, it will automatically invert the mod value
-  // Best to only use this for more simple modcharts.
-  // TODO -> Move these to base modifiers class!
-  public static var dadInvert:Array<String> = [
-    "rotatez",
-    "rotatey",
-    "drunk",
-    "drunkangle",
-    "drunkangley",
-    "tipsy",
-    "tipsyx",
-    "beat",
-    "beatangley",
-    "beatangle",
-    "beatanglez",
-    "confusionoffset",
-    "confusion",
-    "anglez",
-    "angle",
-    "bumpyx",
-    "bumpyangle",
-    "bumpyangley",
-    "cosbumpyx",
-    "cosbumpyangle",
-    "cosbumpyangley",
-    "bouncex",
-    "bounceangley",
-    "bounceangle",
-    "cosbouncex",
-    "cosbounceangle",
-    "cosbounceangley",
-    "digital",
-    "digitalangle",
-    "digitalangley",
-    "linearx",
-    "circx",
-    "twirl",
-    "dizzy",
-    "twirl2",
-    "dizzy2",
-    "zigzag",
-    "spiralx",
-    "spiralcosx",
-    "tandrunk",
-    "square",
-    "saw",
-    "noteskewx",
-    "skewx"
-  ];
-  // These modifiers are hidden from the debug Text by default to avoid clutter.
+  // These modifiers are hidden from the debug Text by default to avoid clutter. TODO -> Move these to base modifiers class!
   public static var hideSomeDebugBois:Array<String> = [
     "showsubmods",
     "showzerovalue",
@@ -429,6 +380,7 @@ class ModConstants
     modName = StringTools.replace(modName, "alphareceptor", "alphastrum");
     modName = StringTools.replace(modName, "alphareceptors", "alphastrum");
     modName = StringTools.replace(modName, "alphastrums", "alphastrum");
+    modName = StringTools.replace(modName, "alphaholdcovers", "alphaholdcover");
 
     modName = StringTools.replace(modName, "drawsize", "drawdistance");
     modName = StringTools.replace(modName, "renderdistance", "drawdistance");
@@ -470,13 +422,6 @@ class ModConstants
     if (Conductor.instance == null) return 0.0;
     final timeWithDelta:Float = Conductor.instance.getTimeWithDelta();
     return Conductor.instance.getTimeInSteps(timeWithDelta) / Constants.STEPS_PER_BEAT;
-  }
-
-  // Checks if a modifier should be inverted.
-
-  public static function invertValueCheck(tag:String, invertValues:Bool):Float
-  {
-    return (ModConstants.dadInvert.contains(tag) && invertValues) ? -1.0 : 1.0;
   }
 
   /**
@@ -1447,12 +1392,20 @@ class ModConstants
         newMod = new TipsyYMod(tag);
       case "tipsyz":
         newMod = new TipsyZMod(tag);
+      case "tipsyanglex":
+        newMod = new TipsyAngleXMod(tag);
+      case "tipsyangley":
+        newMod = new TipsyAngleYMod(tag);
       case "tipsyangle":
         newMod = new TipsyAngleMod(tag);
       case "tipsyskewx":
         newMod = new TipsySkewXMod(tag);
       case "tipsyscale":
         newMod = new TipsyScaleMod(tag);
+      case "tipsyscaley":
+        newMod = new TipsyScaleYMod(tag);
+      case "tipsyscalex":
+        newMod = new TipsyScaleXMod(tag);
       case "tipsyskewy":
         newMod = new TipsySkewYMod(tag);
 
@@ -1466,6 +1419,10 @@ class ModConstants
         newMod = new TanTipsyAngleMod(tag);
       case "tantipsyscale":
         newMod = new TanTipsyScaleMod(tag);
+      case "tantipsyskewx":
+        newMod = new TanTipsySkewXMod(tag);
+      case "tantipsyskewy":
+        newMod = new TanTipsySkewYMod(tag);
 
       // beat mods
       case "beat":
@@ -1660,6 +1617,14 @@ class ModConstants
         newMod = new SquareAngleMod(tag);
       case "squarespeed":
         newMod = new SquareSpeedMod(tag);
+      case "squarescalex":
+        newMod = new SquareScaleXMod(tag);
+      case "squareanglex":
+        newMod = new SquareAngleXMod(tag);
+      case "squarescaley":
+        newMod = new SquareScaleYMod(tag);
+      case "squareangley":
+        newMod = new SquareAngleYMod(tag);
 
       // digital mods
       case "digital" | "digitalx":

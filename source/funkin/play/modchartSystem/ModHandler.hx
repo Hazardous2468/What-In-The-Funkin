@@ -39,14 +39,11 @@ class ModHandler
   public var debugTxtOffsetX:Float = 0;
   // The amount in pixels to offset the debug text on the y axis
   public var debugTxtOffsetY:Float = 0;
-
   // If true, any mods in the ModConstants.dadInvert will have their values inverted.
   public var invertValues:Bool = false;
   public var isDad:Bool = false;
-
   // A map containing all the modifiers.
   public var modifiers:Map<String, Modifier> = new Map<String, Modifier>();
-
   // A series of arrays that contain all the modifiers in each catagory. This is what is used to apply the math!
   public var mods_all:Array<Modifier> = [];
   public var mods_arrowpath:Array<Modifier> = [];
@@ -54,10 +51,8 @@ class ModHandler
   public var mods_notes:Array<Modifier> = [];
   public var mods_speed:Array<Modifier> = [];
   public var mods_special:Array<Modifier> = [];
-
   // The prefix added to every tween name associated with this ModHandler.
   public var customTweenerName:String = "???";
-
   // The strumline this modHandler is tied to
   public var strum:Strumline;
 
@@ -81,18 +76,21 @@ class ModHandler
   public var cosecantOffset:Float = 0.0;
 
   // FlxMath fastSin but with sinClip applied
+
   public function sin(r:Float):Float
   {
     return FlxMath.bound(FlxMath.fastSin(r + sinOffset), -sinClip, sinClip);
   }
 
   // FlxMath fastSin but with cosClip applied
+
   public function cos(r:Float):Float
   {
     return FlxMath.bound(FlxMath.fastCos(r + cosOffset), -cosClip, cosClip);
   }
 
   // FlxMath fastSin but with cosClip applied
+
   public function tan(r:Float):Float
   {
     if (useCosecant)
@@ -181,10 +179,10 @@ class ModHandler
   }
 
   // Set a mod value instantly.
+
   public function setModVal(tag:String, val:Float):Void
   {
     var tagToUse:String = tag;
-    final mmm = ModConstants.invertValueCheck(tagToUse, invertValues);
     var isSub:Bool = false;
     var subModArr = null;
 
@@ -201,7 +199,7 @@ class ModHandler
       {
         final mod:Modifier = modifiers.get(subModArr[0]);
         final subModName:String = mod.subModAliasConvert(subModArr[1]);
-        mod.setSubVal(subModName, val * mmm);
+        mod.setSubVal(subModName, val);
       }
       else
       {
@@ -210,7 +208,7 @@ class ModHandler
 
         final mod:Modifier = modifiers.get(subModArr[0]);
         final subModName:String = mod.subModAliasConvert(subModArr[1]);
-        mod.setSubVal(subModName, val * mmm);
+        mod.setSubVal(subModName, val);
       }
       strum.debugNeedsUpdate = true;
       return;
@@ -218,23 +216,24 @@ class ModHandler
 
     if (modifiers.exists(tagToUse))
     {
-      modifiers.get(tagToUse).setVal(val * mmm);
+      var mod = modifiers.get(tagToUse);
+      mod.setVal(val * (invertValues && mod.invertForDad ? -1 : 1));
     }
     else
     {
       PlayState.instance.modDebugNotif(tagToUse + " mod doesn't exist!\nTrying to add it now!", FlxColor.ORANGE);
-      addMod(tagToUse, val); // try and add the mod lol
-      modifiers.get(tagToUse).setVal(val * mmm);
+      var _m = addMod(tagToUse, val); // try and add the mod lol
+      _m.setVal(val * (invertValues && _m.invertForDad ? -1 : 1));
       sortMods();
     }
     strum.debugNeedsUpdate = true;
   }
 
   // Set a mod value instantly.
+
   public function setDefaultModVal(tag:String, val:Float):Void
   {
     var tagToUse:String = tag;
-    final mmm = ModConstants.invertValueCheck(tagToUse, invertValues);
     var isSub:Bool = false;
     var subModArr = null;
 
@@ -251,7 +250,7 @@ class ModHandler
       {
         final mod:Modifier = modifiers.get(subModArr[0]);
         final subModName:String = mod.subModAliasConvert(subModArr[1]);
-        mod.setDefaultSubVal(subModName, val * mmm);
+        mod.setDefaultSubVal(subModName, val);
       }
       else
       {
@@ -260,7 +259,7 @@ class ModHandler
 
         final mod:Modifier = modifiers.get(subModArr[0]);
         final subModName:String = mod.subModAliasConvert(subModArr[1]);
-        mod.setDefaultSubVal(subModName, val * mmm);
+        mod.setDefaultSubVal(subModName, val);
       }
       strum.debugNeedsUpdate = true;
       return;
@@ -268,17 +267,18 @@ class ModHandler
 
     if (modifiers.exists(tagToUse))
     {
-      modifiers.get(tagToUse).setDefaultVal(val * mmm);
+      var _M = modifiers.get(tagToUse);
+      _M.setDefaultVal(val * (invertValues && _M.invertForDad ? -1 : 1));
     }
     else
     {
-      addMod(tagToUse, val * mmm); // try and add the mod lol
-      modifiers.get(tagToUse).setDefaultVal(val * mmm);
+      var _M = addMod(tagToUse, val); // try and add the mod
+      _M.setDefaultVal(val * (invertValues && _M.invertForDad ? -1 : 1));
     }
     strum.debugNeedsUpdate = true;
   }
 
-  public function addMod(nameOfMod:String, startingValue:Null<Float> = null):Void
+  public function addMod(nameOfMod:String, startingValue:Null<Float> = null):Null<Modifier>
   {
     var mod = ModConstants.createNewMod(nameOfMod);
     if (mod == null)
@@ -286,7 +286,7 @@ class ModHandler
       mod = new Modifier(nameOfMod); // to prevent everything from going to shit when an unknown mod gets used
     }
 
-    final mmm = ModConstants.invertValueCheck(nameOfMod, invertValues);
+    final mmm = (invertValues && mod.invertForDad ? -1 : 1);
 
     // mod.baseValue = baseVal == null ? startingValue : baseVal;
     if (startingValue != null)
@@ -306,9 +306,10 @@ class ModHandler
     mod.strumOwner = strum;
 
     modifiers.set(mod.tag, mod);
+    return mod;
   }
 
-  public function addCustomMod(modIn:CustomModifier, makeCopy:Bool = false):Void
+  public function addCustomMod(modIn:CustomModifier, makeCopy:Bool = false):Null<CustomModifier>
   {
     var mod:CustomModifier = makeCopy ? modIn.clone() : modIn;
 
@@ -339,10 +340,11 @@ class ModHandler
       catch (e)
       {
         PlayState.instance.modDebugNotif(e.toString(), FlxColor.RED);
-        return;
+        return null;
       }
     }
     modifiers.set(mod.tag, mod);
+    return mod;
   }
 
   function isSpecialMod(m:Modifier):Bool
@@ -352,7 +354,19 @@ class ModHandler
   }
 
   var fakeNote:NoteData;
-  var sampleModVals:Array<Float> = [-200, -144, -1, -0.5, 0, 0.5, 1, 2, 79, 133, 555];
+  var sampleModVals:Array<Float> = [
+    -200,
+    -144,
+    -1,
+    -0.5,
+    0,
+    0.5,
+    1,
+    2,
+    79,
+    133,
+    555
+  ];
 
   function propeModMath_Speed(m:Modifier):Bool
   {
@@ -495,6 +509,7 @@ class ModHandler
   }
 
   // Call this to properly sort the mod apply order!
+
   public function sortMods(skipProbe:Bool = false):Void
   {
     if (fakeNote == null) fakeNote = new NoteData();
@@ -541,42 +556,48 @@ class ModHandler
 
     // mods_arrowpath = mods_all;
 
-    mods_all.sort(function(a, b) {
+    mods_all.sort(function(a, b)
+    {
       if (a.modPriority + a.modPriority_additive < b.modPriority + b.modPriority_additive) return 1;
       else if (a.modPriority + a.modPriority_additive > b.modPriority + b.modPriority_additive) return -1;
       else
         return 0;
     });
 
-    mods_strums.sort(function(a, b) {
+    mods_strums.sort(function(a, b)
+    {
       if (a.modPriority + a.modPriority_additive < b.modPriority + b.modPriority_additive) return 1;
       else if (a.modPriority + a.modPriority_additive > b.modPriority + b.modPriority_additive) return -1;
       else
         return 0;
     });
 
-    mods_notes.sort(function(a, b) {
+    mods_notes.sort(function(a, b)
+    {
       if (a.modPriority + a.modPriority_additive < b.modPriority + b.modPriority_additive) return 1;
       else if (a.modPriority + a.modPriority_additive > b.modPriority + b.modPriority_additive) return -1;
       else
         return 0;
     });
 
-    mods_speed.sort(function(a, b) {
+    mods_speed.sort(function(a, b)
+    {
       if (a.modPriority + a.modPriority_additive < b.modPriority + b.modPriority_additive) return 1;
       else if (a.modPriority + a.modPriority_additive > b.modPriority + b.modPriority_additive) return -1;
       else
         return 0;
     });
 
-    mods_arrowpath.sort(function(a, b) {
+    mods_arrowpath.sort(function(a, b)
+    {
       if (a.modPriority + a.modPriority_additive < b.modPriority + b.modPriority_additive) return 1;
       else if (a.modPriority + a.modPriority_additive > b.modPriority + b.modPriority_additive) return -1;
       else
         return 0;
     });
 
-    mods_special.sort(function(a, b) {
+    mods_special.sort(function(a, b)
+    {
       if (a.modPriority + a.modPriority_additive < b.modPriority + b.modPriority_additive) return 1;
       else if (a.modPriority + a.modPriority_additive > b.modPriority + b.modPriority_additive) return -1;
       else
@@ -618,17 +639,20 @@ class ModHandler
   // if true, will do all the traces above ^
   final traceDebug:Bool = false;
 
+  public var holdMagicNumber:Float = 28;
+  public var pathMagicNumber:Float = 10;
+
   public function getHoldOffsetX(arrowpath:Bool = false, graphicWidth:Float = 0):Float
   {
     if (arrowpath)
     {
-      return (Strumline.STRUMLINE_SIZE / 2.0) + 10; // old math to keep paths happy until they become part of notestyle
+      return (Strumline.STRUMLINE_SIZE / 2.0) + pathMagicNumber; // old math to keep paths happy until they become part of notestyle
     }
     else
     {
       // Move the hold note left side to always be in the middle of the strum note!
       // works for default funkin noteskin which is 52.
-      var shit:Float = (Strumline.STRUMLINE_SIZE / 2.0) + 28; // JANK NUMBER SPOTTED
+      var shit:Float = (Strumline.STRUMLINE_SIZE / 2.0) + holdMagicNumber; // JANK NUMBER SPOTTED
 
       // then offset it with the correct graphicwidth in use
       if (graphicWidth == 0) graphicWidth = strum.sustainGraphicWidth;
@@ -638,8 +662,8 @@ class ModHandler
     }
   }
 
-  public function makeHoldCopyStrum_sample(note:ZSprite, strumTime:Float, direction:Int, strumLine:Strumline, notePos:Float, isArrowPath:Bool = false,
-      graphicWidth:Float = 0):Float
+  @:deprecated("this function will be removed") @:noCompletion
+  public function makeHoldCopyStrum_sample(note:ZSprite, strumTime:Float, direction:Int, strumLine:Strumline, notePos:Float, isArrowPath:Bool = false, graphicWidth:Float = 0):Float
   {
     final whichStrumNote = strumLine.getByIndex(direction % Strumline.KEY_COUNT);
     var scrollMult:Float = 1.0;
@@ -672,8 +696,7 @@ class ModHandler
     return (whichStrumNote.strumExtraModData.mathCutOff > 0 && !(whichStrumNote.strumExtraModData.mathCutOff >= Math.abs(notePos)));
   }
 
-  public function sampleModMath(susFakeNote:ZSprite, strumTime:Float, lane:Int, strumLine:Strumline, hold:Bool = false, yJank:Bool = false,
-      ?notePos:Float = -0.69, ?isArrowpath:Bool = false, ?fakeNoteWidth:Float, ?fakeNoteHeight:Float):Void
+  public function sampleModMath(susFakeNote:ZSprite, strumTime:Float, lane:Int, strumLine:Strumline, hold:Bool = false, yJank:Bool = false, ?notePos:Float = -0.69, ?isArrowpath:Bool = false, ?fakeNoteWidth:Float, ?fakeNoteHeight:Float):Void
   {
     var notePos2:Float = strumLine.calculateNoteYPos(strumTime);
     if (notePos == -0.69 || notePos == null)
@@ -716,8 +739,12 @@ class ModHandler
     }
 
     note.noteModData.defaultValues();
+    note.noteModData.width = note.width;
+    note.noteModData.height = note.height;
     note.noteModData.strumTime = note.strumTime + (orientPass ? ModConstants.orientTimeOffset : 0);
-    note.noteModData.noteType = note.kind;
+    note.noteModData.noteType = "note";
+    note.noteModData.noteKind = note.kind;
+    note.noteModData.noteStyleName = note.noteStyleName;
     note.noteModData.direction = note.direction;
     note.color = FlxColor.WHITE;
     note.noteModData.whichStrumNote = strum.getByIndex(note.noteModData.direction);
@@ -739,14 +766,12 @@ class ModHandler
 
     note.noteModData.curPos = strum.calculateNoteYPos(timmy) * note.noteModData.speedMod;
 
-    if (strum.dumbTempScaleTargetThing == null) strum.dumbTempScaleTargetThing = note.targetScale;
-
     note.scale.set(note.targetScale, note.targetScale);
     note.noteModData.scaleX = note.scale.x;
     note.noteModData.scaleY = note.scale.y;
 
     note.noteModData.angleZ = note.noteModData.whichStrumNote.angle;
-    note.noteModData.y = note.noteModData.whichStrumNote.y + note.noteModData.getNoteYOffset() + note.noteModData.curPos;
+    note.noteModData.y = note.noteModData.whichStrumNote.y + note.noteModData.curPos - Strumline.INITIAL_OFFSET;
     note.noteModData.z = note.noteModData.whichStrumNote.z; // Copy strum Z
 
     note.noteModData.x = strum.x;
@@ -784,9 +809,15 @@ class ModHandler
 
     if (!(note.noteModData?.whichStrumNote?.strumExtraModData?.threeD ?? false))
     {
-      ModConstants.playfieldSkew(note, note.noteModData.skewX_playfield, note.noteModData.skewY_playfield,
-        note.noteModData.whichStrumNote.strumExtraModData.playfieldX, note.noteModData.whichStrumNote.strumExtraModData.playfieldY, note.width / 2,
-        note.height / 2);
+      ModConstants.playfieldSkew(
+        note,
+        note.noteModData.skewX_playfield,
+        note.noteModData.skewY_playfield,
+        note.noteModData.whichStrumNote.strumExtraModData.playfieldX,
+        note.noteModData.whichStrumNote.strumExtraModData.playfieldY,
+        note.width / 2,
+        note.height / 2
+      );
       // undo the strum skew
       note.x -= note.noteModData.whichStrumNote.strumExtraModData.skewMovedX;
       note.y -= note.noteModData.whichStrumNote.strumExtraModData.skewMovedY;
@@ -887,6 +918,10 @@ class ModHandler
     note.noteModData.direction = note.direction;
     note.noteModData.whichStrumNote = note;
     note.noteModData.noteType = "receptor";
+    note.noteModData.noteKind = "";
+    note.noteModData.noteStyleName = note.noteStyleName;
+    note.noteModData.width = note.width;
+    note.noteModData.height = note.height;
 
     note.noteModData.curPos = 0;
     note.noteModData.curPos_unscaled = 0;
@@ -964,8 +999,15 @@ class ModHandler
     {
       final wasX:Float = note.x;
       final wasY:Float = note.y;
-      ModConstants.playfieldSkew(note, note.noteModData.skewX_playfield, note.noteModData.skewY_playfield, note.strumExtraModData.playfieldX,
-        note.strumExtraModData.playfieldY, note.width / 2, note.height / 2);
+      ModConstants.playfieldSkew(
+        note,
+        note.noteModData.skewX_playfield,
+        note.noteModData.skewY_playfield,
+        note.strumExtraModData.playfieldX,
+        note.strumExtraModData.playfieldY,
+        note.width / 2,
+        note.height / 2
+      );
       note.strumExtraModData.skewMovedX = note.x - wasX;
       note.strumExtraModData.skewMovedY = note.y - wasY;
       note.skew.x += note.noteModData.skewX_playfield;
@@ -985,7 +1027,8 @@ class ModHandler
    */
   public function updateStrums():Void
   {
-    strum.strumlineNotes.forEach(function(note:StrumlineNote) {
+    strum.strumlineNotes.forEach(function(note:StrumlineNote)
+    {
       setStrumPos(note);
 
       note.updateLastKnownPos();

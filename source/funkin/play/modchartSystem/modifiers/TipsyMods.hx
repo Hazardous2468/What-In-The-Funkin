@@ -22,7 +22,7 @@ class TipsyModBase extends Modifier
     speed = createSubMod("speed", 1.0, ["frequency"]);
     desync = createSubMod("desync", 2.0, ["spacing"]);
     time_add = createSubMod("time_add", 0.0, ["offset", "timeadd", "time_offset", "timeoffset"]);
-    timertype = createSubMod("timertype", 0.0, ["timer","timetype"]);
+    timertype = createSubMod("timertype", 0.0, ["timer", "timetype"]);
 
     unknown = false;
     strumsMod = true;
@@ -52,6 +52,7 @@ class TipsyXMod extends TipsyModBase
   public function new(name:String)
   {
     super(name);
+    invertForDad = true;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -66,6 +67,7 @@ class TipsyYMod extends TipsyModBase
   public function new(name:String)
   {
     super(name);
+    invertForDad = true;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -80,6 +82,7 @@ class TipsyZMod extends TipsyModBase
   public function new(name:String)
   {
     super(name);
+    invertForDad = true;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -94,12 +97,43 @@ class TipsyAngleMod extends TipsyModBase
   public function new(name:String)
   {
     super(name);
+    invertForDad = true;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
     data.angleZ += tipsyMath(data.direction, data.curPos);
+  }
+}
+
+class TipsyAngleXMod extends TipsyModBase
+{
+  public function new(name:String)
+  {
+    super(name);
+    invertForDad = true;
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (currentValue == 0) return; // skip math if mod is 0
+    data.angleX += tipsyMath(data.direction, data.curPos);
+  }
+}
+
+class TipsyAngleYMod extends TipsyModBase
+{
+  public function new(name:String)
+  {
+    super(name);
+    invertForDad = true;
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (currentValue == 0) return; // skip math if mod is 0
+    data.angleY += tipsyMath(data.direction, data.curPos);
   }
 }
 
@@ -130,6 +164,56 @@ class TipsyScaleMod extends TipsyModBase
   }
 }
 
+class TipsyScaleXMod extends TipsyModBase
+{
+  public function new(name:String)
+  {
+    super(name);
+    unknown = false;
+    notesMod = true;
+    holdsMod = true;
+    pathMod = false;
+    strumsMod = true;
+  }
+
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
+  {
+    strumMath(data, strumLine);
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (currentValue == 0) return; // skip math if mod is 0
+    final s:Float = tipsyMath(data.direction, data.curPos);
+    data.scaleX += s * 0.01;
+  }
+}
+
+class TipsyScaleYMod extends TipsyModBase
+{
+  public function new(name:String)
+  {
+    super(name);
+    unknown = false;
+    notesMod = true;
+    holdsMod = true;
+    pathMod = false;
+    strumsMod = true;
+  }
+
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
+  {
+    strumMath(data, strumLine);
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (currentValue == 0) return; // skip math if mod is 0
+    final s:Float = tipsyMath(data.direction, data.curPos);
+    data.scaleY += s * 0.01;
+  }
+}
+
 class TipsySkewXMod extends TipsyModBase
 {
   public function new(name:String)
@@ -140,6 +224,7 @@ class TipsySkewXMod extends TipsyModBase
     holdsMod = true;
     pathMod = true;
     strumsMod = true;
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -164,6 +249,7 @@ class TipsySkewYMod extends TipsyModBase
     holdsMod = true;
     pathMod = true;
     strumsMod = true;
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -183,6 +269,7 @@ class TanTipsyXMod extends TipsyModBase
   public function new(name:String)
   {
     super(name);
+    invertForDad = true;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -197,6 +284,7 @@ class TanTipsyYMod extends TipsyModBase
   public function new(name:String)
   {
     super(name);
+    invertForDad = true;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -225,6 +313,7 @@ class TanTipsyAngleMod extends TipsyModBase
   public function new(name:String)
   {
     super(name);
+    invertForDad = true;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -258,5 +347,53 @@ class TanTipsyScaleMod extends TipsyModBase
     data.scaleX += s * 0.01;
     data.scaleZ += s * 0.01;
     data.scaleY += s * 0.01;
+  }
+}
+
+class TanTipsySkewXMod extends TipsyModBase
+{
+  public function new(name:String)
+  {
+    super(name);
+    unknown = false;
+    notesMod = true;
+    holdsMod = true;
+    pathMod = false;
+    strumsMod = true;
+  }
+
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
+  {
+    strumMath(data, strumLine);
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (currentValue == 0) return; // skip math if mod is 0
+    data.skewX += tanTipsyMath(data.direction, data.curPos);
+  }
+}
+
+class TanTipsySkewYMod extends TipsyModBase
+{
+  public function new(name:String)
+  {
+    super(name);
+    unknown = false;
+    notesMod = true;
+    holdsMod = true;
+    pathMod = false;
+    strumsMod = true;
+  }
+
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
+  {
+    strumMath(data, strumLine);
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (currentValue == 0) return; // skip math if mod is 0
+    data.skewY += tanTipsyMath(data.direction, data.curPos);
   }
 }

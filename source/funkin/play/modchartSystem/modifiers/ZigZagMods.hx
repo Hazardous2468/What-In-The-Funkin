@@ -8,6 +8,7 @@ import funkin.play.modchartSystem.NoteData;
 
 // Contains all the mods related zig zagging!
 // :p
+
 class ZigZagBaseMod extends Modifier
 {
   var mult:ModifierSubValue;
@@ -53,6 +54,12 @@ class ZigZagBaseMod extends Modifier
 
 class ZigZagXMod extends ZigZagBaseMod
 {
+  public function new(name:String)
+  {
+    super(name);
+    invertForDad = true;
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
@@ -76,6 +83,11 @@ class ZigZagXMod extends ZigZagBaseMod
 
 class ZigZagYMod extends ZigZagBaseMod
 {
+  public function new(name:String)
+  {
+    super(name);
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
@@ -99,6 +111,11 @@ class ZigZagYMod extends ZigZagBaseMod
 
 class ZigZagZMod extends ZigZagBaseMod
 {
+  public function new(name:String)
+  {
+    super(name);
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
@@ -122,6 +139,12 @@ class ZigZagZMod extends ZigZagBaseMod
 
 class ZigZagAngleMod extends ZigZagBaseMod
 {
+  public function new(name:String)
+  {
+    super(name);
+    invertForDad = true;
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return;
@@ -145,6 +168,11 @@ class ZigZagAngleMod extends ZigZagBaseMod
 
 class ZigZagAngleXMod extends ZigZagBaseMod
 {
+  public function new(name:String)
+  {
+    super(name);
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return;
@@ -167,6 +195,11 @@ class ZigZagAngleXMod extends ZigZagBaseMod
 
 class ZigZagAngleYMod extends ZigZagBaseMod
 {
+  public function new(name:String)
+  {
+    super(name);
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return;
@@ -189,6 +222,11 @@ class ZigZagAngleYMod extends ZigZagBaseMod
 
 class ZigZagScaleMod extends ZigZagBaseMod
 {
+  public function new(name:String)
+  {
+    super(name);
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return;
@@ -216,6 +254,11 @@ class ZigZagScaleMod extends ZigZagBaseMod
 
 class ZigZagScaleXMod extends ZigZagBaseMod
 {
+  public function new(name:String)
+  {
+    super(name);
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
@@ -238,6 +281,11 @@ class ZigZagScaleXMod extends ZigZagBaseMod
 
 class ZigZagScaleYMod extends ZigZagBaseMod
 {
+  public function new(name:String)
+  {
+    super(name);
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return; // skip math if mod is 0
@@ -260,6 +308,12 @@ class ZigZagScaleYMod extends ZigZagBaseMod
 
 class ZigZagSkewXMod extends ZigZagBaseMod
 {
+  public function new(name:String)
+  {
+    super(name);
+    invertForDad = true;
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return;
@@ -282,6 +336,12 @@ class ZigZagSkewXMod extends ZigZagBaseMod
 
 class ZigZagSkewYMod extends ZigZagBaseMod
 {
+  public function new(name:String)
+  {
+    super(name);
+    invertForDad = true;
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0) return;

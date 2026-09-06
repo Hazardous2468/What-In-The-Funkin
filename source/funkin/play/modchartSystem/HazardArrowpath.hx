@@ -45,12 +45,9 @@ class HazardArrowpath
 
   // Just a basic rectangle which fills the entire bitmap when clearing out the old pixel data
   var rec:Rectangle;
-
   var blendMode:String = "normal";
   var colTransf:ColorTransform;
-
   var strum:Strumline;
-
   var fakeNoteData:NoteData;
 
   function setNotePos(note:ZSprite, strumTime:Float, lane:Int, whichStrumNote:StrumlineNote):Void
@@ -73,7 +70,7 @@ class HazardArrowpath
     note.x = whichStrumNote.x + strum.getNoteXOffset();
     // note.set_y(whichStrumNote.y - INITIAL_OFFSET + notePos);
 
-    note.y = whichStrumNote.y + strum.getNoteYOffset() + notePos;
+    note.y = whichStrumNote.y + notePos - Strumline.INITIAL_OFFSET;
 
     note.x += whichStrumNote.width / 2 * ModConstants.noteScale;
     note.y += whichStrumNote.height / 2 * ModConstants.noteScale;
@@ -174,6 +171,7 @@ class HazardArrowpath
   }
 
   // clear out the old bitmap data
+
   public function clearAFT():Void
   {
     bitmap.fillRect(rec, 0);

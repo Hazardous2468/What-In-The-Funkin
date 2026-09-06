@@ -37,8 +37,9 @@ class WaveyModBase extends Modifier
       final waveyX_timeMult:Float = speed.value;
       final waveyX_timeAdd:Float = offset.value;
       final waveyX_desync:Float = desync.value;
-      returnValue = currentValue * (ModConstants.fastTan((((beatTime + waveyX_timeAdd / Conductor.instance.beatLengthMs) * waveyX_timeMult)
-        + (lane * waveyX_desync)) * Math.PI) * ModConstants.strumSize / 2);
+      returnValue = currentValue * (ModConstants.fastTan(
+        (((beatTime + waveyX_timeAdd / Conductor.instance.beatLengthMs) * waveyX_timeMult) + (lane * waveyX_desync)) * Math.PI
+      ) * ModConstants.strumSize / 2);
     }
     else
     {
@@ -60,8 +61,9 @@ class WaveyModBase extends Modifier
       final waveyX_timeMult:Float = speed.value;
       final waveyX_timeAdd:Float = offset.value;
       final waveyX_desync:Float = desync.value;
-      returnValue = currentValue * (sin((((beatTime + waveyX_timeAdd / Conductor.instance.beatLengthMs) * waveyX_timeMult)
-        + (lane * waveyX_desync)) * Math.PI) * ModConstants.strumSize / 2);
+      returnValue = currentValue * (sin(
+        (((beatTime + waveyX_timeAdd / Conductor.instance.beatLengthMs) * waveyX_timeMult) + (lane * waveyX_desync)) * Math.PI
+      ) * ModConstants.strumSize / 2);
     }
     else
     {
@@ -82,6 +84,7 @@ class WaveyXMod extends WaveyModBase
     super(name);
     unknown = false;
     strumsMod = true;
+    invertForDad = true;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -130,6 +133,7 @@ class WaveyAngleMod extends WaveyModBase
     super(name);
     unknown = false;
     strumsMod = true;
+    invertForDad = true;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -173,6 +177,7 @@ class WaveyAngleYMod extends WaveyModBase
     holdsMod = true;
     pathMod = false;
     strumsMod = true;
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -224,6 +229,7 @@ class WaveySkewXMod extends WaveyModBase
     holdsMod = true;
     pathMod = false;
     strumsMod = true;
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -248,6 +254,7 @@ class WaveySkewYMod extends WaveyModBase
     holdsMod = true;
     pathMod = false;
     strumsMod = true;
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -317,6 +324,7 @@ class TanWaveyXMod extends WaveyModBase
     super(name);
     unknown = false;
     strumsMod = true;
+    invertForDad = true;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -365,6 +373,7 @@ class TanWaveyAngleMod extends WaveyModBase
     super(name);
     unknown = false;
     strumsMod = true;
+    invertForDad = true;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -411,6 +420,7 @@ class TanWaveySkewXMod extends WaveyModBase
     holdsMod = true;
     pathMod = true;
     strumsMod = true;
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -435,6 +445,7 @@ class TanWaveySkewYMod extends WaveyModBase
     holdsMod = true;
     pathMod = true;
     strumsMod = true;
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void

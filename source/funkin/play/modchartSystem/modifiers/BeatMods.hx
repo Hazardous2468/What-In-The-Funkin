@@ -21,6 +21,7 @@ class BeatModBase extends Modifier
   public function new(name:String)
   {
     super(name, 0);
+    invertForDad = true;
     speed = createSubMod("speed", 1.0, ["frequency"]);
     mult = createSubMod("mult", 1.0, ["period", "size"]);
     offset = createSubMod("offset", 0.0, ["time_add", "timeadd", "time_offset", "timeoffset"]);
@@ -261,7 +262,6 @@ class BeatScaleYMod extends BeatModBase
   }
 }
 
-// lmao why not?
 class BeatSkewXMod extends BeatModBase
 {
   public function new(name:String)

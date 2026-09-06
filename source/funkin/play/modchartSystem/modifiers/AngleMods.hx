@@ -6,12 +6,14 @@ import funkin.play.modchartSystem.NoteData;
 
 // Contains all the mods related to rotating the nots / strums!
 // Rotate the strums on the z axis
+
 class AngleZOffsetMod extends Modifier
 {
   public function new(name:String)
   {
     super(name, 0);
     notPercentage = true;
+    invertForDad = true;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -21,6 +23,7 @@ class AngleZOffsetMod extends Modifier
 }
 
 // Rotate the strums on the x axis
+
 class AngleXOffsetMod extends Modifier
 {
   public function new(name:String)
@@ -42,6 +45,7 @@ class AngleXOffsetMod extends Modifier
 }
 
 // Rotate the strums on the y axis
+
 class AngleYOffsetMod extends Modifier
 {
   public function new(name:String)
@@ -63,12 +67,14 @@ class AngleYOffsetMod extends Modifier
 }
 
 // Rotate the notes on the z axis
+
 class NotesAngleZOffsetMod extends Modifier
 {
   public function new(name:String)
   {
     super(name, 0);
     notPercentage = true;
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -79,6 +85,7 @@ class NotesAngleZOffsetMod extends Modifier
 }
 
 // Rotate the notes on the x axis
+
 class NotesAngleXOffsetMod extends Modifier
 {
   public function new(name:String)
@@ -95,6 +102,7 @@ class NotesAngleXOffsetMod extends Modifier
 }
 
 // Rotate the notes on the y axis
+
 class NotesAngleYOffsetMod extends Modifier
 {
   public function new(name:String)
@@ -111,6 +119,7 @@ class NotesAngleYOffsetMod extends Modifier
 }
 
 // Rotate the notes on the z axis
+
 class HoldsAngleZOffsetMod extends Modifier
 {
   public function new(name:String)
@@ -126,6 +135,7 @@ class HoldsAngleZOffsetMod extends Modifier
 }
 
 // Rotate the notes on the x axis
+
 class HoldsAngleXOffsetMod extends Modifier
 {
   public function new(name:String)
@@ -141,6 +151,7 @@ class HoldsAngleXOffsetMod extends Modifier
 }
 
 // Rotate the notes on the y axis
+
 class HoldsAngleYOffsetMod extends Modifier
 {
   public function new(name:String)

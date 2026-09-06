@@ -10,7 +10,6 @@ class CubicModBase extends Modifier
   var offset:ModifierSubValue;
   var altCurposSubmod:ModifierSubValue;
   var strumResult:Array<Float> = [0, 0, 0, 0];
-
   var useUnscaledCurpos(get, never):Bool;
 
   function get_useUnscaledCurpos():Bool
@@ -37,6 +36,12 @@ class CubicModBase extends Modifier
 
 class CubicXMod extends CubicModBase
 {
+  public function new(name:String)
+  {
+    super(name);
+    invertForDad = true;
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     data.x -= strumResult[data.direction];
@@ -59,6 +64,11 @@ class CubicXMod extends CubicModBase
 
 class CubicYMod extends CubicModBase
 {
+  public function new(name:String)
+  {
+    super(name);
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     data.y -= strumResult[data.direction];
@@ -81,6 +91,11 @@ class CubicYMod extends CubicModBase
 
 class CubicZMod extends CubicModBase
 {
+  public function new(name:String)
+  {
+    super(name);
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     data.z -= strumResult[data.direction];
@@ -111,6 +126,7 @@ class CubicAngleZMod extends CubicModBase
     holdsMod = true;
     pathMod = false;
     strumsMod = true;
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -166,6 +182,7 @@ class CubicAngleYMod extends CubicModBase
     holdsMod = true;
     pathMod = false;
     strumsMod = true;
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -271,6 +288,7 @@ class CubicSkewXMod extends CubicModBase
     holdsMod = true;
     pathMod = false;
     strumsMod = true;
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -294,6 +312,7 @@ class CubicSkewYMod extends CubicModBase
     holdsMod = true;
     pathMod = false;
     strumsMod = true;
+    invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void

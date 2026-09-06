@@ -1,3 +1,23 @@
+v1.1.0:
+
+New width, height, noteKind and noteStyleName properties to NoteModData. Note that this will break modifiers that target specific custom note kinds like hurts. Use noteKind for that now!
+New PopUpStuff settings for PlayState.
+Updated custom notestyles. Groovin now has a smoother animation and is properly synced to the song's BPM. Also added a new Receptor Pulse module to allow for strumNotes to pulse to the beat like NotITG.
+Updated how modifiers invert for dad.
+Sustain lengths are more accurate to vanilla.
+Sustains now have their UV's fixed when clipping.
+Tried to remove some magic number jank.
+Added TipsyScaleX, TipsyScaleY, TipsyAngleX, TipsyAngleY, TanTipsySkewX, TanTipsySkewY, SquareScaleX, SquareScaleY, SquareAngleX, SquareAngleY.
+New "note_point_offset_x" and "holdpoint_offset_x" submods for Rotate modifiers for more advanced control over how the notes / holds rotate (for fixing minor visual errors).
+Fixed IT-NEVER-ENDS.
+DebugDisplay for Modifiers now displays the strumLine's scroll speed and not the scrollSpeed set by the chart.
+HSV Shader constructor now exposes the fragPath to allow for making custom note shaders easier (i.e. the new Groovin Shader).
+Minor bug fixes.
+
+
+
+
+
 v1.0.5:
 
 Updated to latest version of FNF (v0.8.6)
