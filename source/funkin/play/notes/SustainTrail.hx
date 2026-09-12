@@ -290,10 +290,10 @@ class SustainTrail extends ZSprite
       }
     }
 
-    flipY = Preferences.downscroll #if mobile || (
-      Preferences.controlsScheme == FunkinHitboxControlSchemes.Arrows
-      && !funkin.mobile.input.ControlsHandler.hasExternalInputDevice
-    ) #end;
+    flipY = Preferences.downscroll
+    #if mobile
+    || (Preferences.controlsScheme == FunkinHitboxControlSchemes.Arrows && !funkin.mobile.input.ControlsHandler.hasExternalInputDevice)
+    #end;
 
     // alpha = 0.6;
     alpha = 1.0;
@@ -509,12 +509,9 @@ class SustainTrail extends ZSprite
 
     final holdPosFromReceptor:Float = (distanceFromReceptor_unscaledpos - (whichStrumNote?.noteModData?.curPos_unscaled ?? 0)) * (flipY ? -1 : 1);
 
-    // 1.125 works really well for 2.5 scroll speed so let's go from there
-    // 2.5 = 1.125
-    // 1 = 0.45 (WAIT I RECONGISE THAT NUMBER!!!)
     final magicNumber:Float = Constants.PIXELS_PER_MS * parentStrumline?.scrollSpeed ?? 1.0;
 
-    final spacingBetweenEachUVpiece:Float = this.fullSustainLength * magicNumber; // magic number?
+    final spacingBetweenEachUVpiece:Float = /*this.fullSustainLength*/ this.bodyLength * magicNumber;
 
     // Sudden math
     final holdPosFromSuddenStart:Float = holdPosFromReceptor - sStart;
@@ -859,6 +856,8 @@ class SustainTrail extends ZSprite
   // The lower the number, the more hold segments are rendered and calculated!
   public var grain:Float = ModConstants.defaultHoldGrain;
 
+  var bodyLength:Float = 0;
+
   /**
    * Sets up new vertex and UV data to clip the trail.
    * @param songTime	The time to clip the note at, in milliseconds.
@@ -908,14 +907,12 @@ class SustainTrail extends ZSprite
     }
     longHolds += 1;
 
-    final sussyLength:Float = fullSustainLength;
-
     final endPixelSize:Float = graphic.height * endOffset * zoom;
     final scroll:Float = parentStrumline?.scrollSpeed ?? 1.0;
     final endCapTime:Float = endPixelSize / (Constants.PIXELS_PER_MS * scroll);
 
     // bodyLength refers to the entire sustainLength MINUS the end cap.
-    var bodyLength:Float = renderEnd ? fullSustainLength - endCapTime : fullSustainLength;
+    bodyLength = renderEnd ? fullSustainLength - endCapTime : fullSustainLength;
     if (bodyLength < 0) bodyLength = 0;
     final sussyLength:Float = bodyLength;
 
