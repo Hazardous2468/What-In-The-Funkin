@@ -779,6 +779,9 @@ class PlayState extends MusicBeatSubState
     modchartTweenList.letterSpacing = -1;
     modchartTweenList.scrollFactor.set();
     modchartTweenList.zIndex = 927;
+    modchartTweenList.autoSize = false;
+    modchartTweenList.fieldWidth = Std.int(FlxG.width * 0.8);
+    // modchartTweenList.wrap = WORD(FIELD_WIDTH);
     add(modchartTweenList);
     modchartTweenList.cameras = [camHUD];
   }
