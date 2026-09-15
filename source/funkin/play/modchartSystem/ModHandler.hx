@@ -119,6 +119,9 @@ class ModHandler
   // Currently doesn't do anything though lol
   public var perspectiveCenterOffset:Vector2 = new Vector2(0, 0);
 
+  /**
+   * Goes through every modifier and resets them back to their base / starting / default values.
+   */
   public function resetModValues():Void
   {
     trace("Mod Values Reset - " + customTweenerName);
@@ -150,6 +153,9 @@ class ModHandler
     strum.debugNeedsUpdate = true;
   }
 
+  /**
+   * Clears out all the modifiers for this ModHandler.
+   */
   public function clearMods():Void
   {
     resetModValues();
@@ -157,6 +163,7 @@ class ModHandler
     {
       modifiers.remove(key);
     }
+    modifiers.clear();
 
     // https://stackoverflow.com/questions/45324169/what-is-the-correct-way-to-clear-an-array-in-haxe
     while (mods_all.length > 0)
@@ -878,6 +885,12 @@ class ModHandler
     return strum.noteStyle._data.assets.noteStrumline.offsets[1];
   }
 
+  /**
+   * Grabs where the strum notes WOULD be, given there are no modifiers / modifications made.
+   * This SHOULD be the same as where the strum notes will be in vanilla!
+   * @param direction Which lane / direction this note is.
+   * @return The point where the strum note would be by default.
+   */
   public function getDefaultStrumPos(direction):Array<Float>
   {
     var pos:Array<Float> = [0, 0, 0]; // x,y,z
@@ -886,6 +899,7 @@ class ModHandler
     pos[0] += strum.x;
     pos[0] += Strumline.INITIAL_OFFSET;
     pos[1] = strum.y;
+    pos[2] = 0;
 
     final offsets:Array<Float> = strum.noteStyle.getStrumlineOffsets();
     pos[0] += offsets[0];

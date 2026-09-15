@@ -776,28 +776,16 @@ class ModConstants
   }
 
   /**
-   * Performs a modulo operation to calculate the remainder of `a` divided by `b`.
-   *
-   * The definition of "remainder" varies by implementation;
-   * this one is similar to GLSL or Python in that it uses Euclidean division, which always returns positive,
-   * while Haxe's `%` operator uses signed truncated division.
-   *
-   * For example, `-5 % 3` returns `-2` while `FlxMath.mod(-5, 3)` returns `1`.
-   *
-   * @param a The dividend.
-   * @param b The divisor.
-   * @return `a mod b`.
-   *
-   * SOURCE: https://github.com/HaxeFlixel/flixel/pull/3341/files
+   * Used by the metaMods script to invert which character gets targetted by mods.
+   * If true, will swap bf and dad around. Custom playfields remain unaffected.
    */
-  // public static inline function mod(a:Float, b:Float):Float
-  // {
-  //  b = Math.abs(b);
-  //  return a - b * Math.floor(a / b);
-  // }
-  // Used by the metaMods script to invert which character gets targetted by mods.
   public static var invertStrumlineTarget:Bool = false;
 
+  /**
+   * Converts a string into a usable, existing ModHandler.
+   * @param playerTarget The player to try and find the modHandler for.
+   * @return The  mod handler for the provided target. If not arget is found, defaults to BF's mod handler and displays an error message.
+   */
   public static function grabStrumModTarget(playerTarget:String = "bf"):ModHandler
   {
     var modsTarget:ModHandler = PlayState.instance.playerStrumline.mods;
