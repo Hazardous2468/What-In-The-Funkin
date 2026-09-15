@@ -178,8 +178,11 @@ class ModHandler
       mods_special.pop();
   }
 
-  // Set a mod value instantly.
-
+  /**
+   * Sets a modifier's current value.
+   * @param tag The identifying tag to locate the target modifier. Supports submodifiers and lane modifiers (i.e. drunk__speed or tipsy--2)
+   * @param val The new value that the target modifier will be set to.
+   */
   public function setModVal(tag:String, val:Float):Void
   {
     var tagToUse:String = tag;
@@ -229,8 +232,12 @@ class ModHandler
     strum.debugNeedsUpdate = true;
   }
 
-  // Set a mod value instantly.
-
+  /**
+   * Sets a modifier's default value.
+   * Note that this does not automatically set the modifier's value!
+   * @param tag The identifying tag to locate the target modifier. Supports submodifiers and lane modifiers (i.e. drunk__speed or tipsy--2)
+   * @param val The new default value that the target modifier will use.
+   */
   public function setDefaultModVal(tag:String, val:Float):Void
   {
     var tagToUse:String = tag;

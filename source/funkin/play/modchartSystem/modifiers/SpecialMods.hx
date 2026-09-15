@@ -145,6 +145,7 @@ class CosecantOffset extends Modifier
 }
 
 // If enabled, *all* sprites will be sorted by their z value! Can lead to holds and arrowpath being infront of receptors / notes!
+
 class ZSortMod extends Modifier
 {
   public function new(name:String)
@@ -177,6 +178,7 @@ class ZSortMod extends Modifier
 }
 
 // If enabled,.. errr... 3D?
+
 class ThreeDProjection extends Modifier
 {
   public function new(name:String)
@@ -200,13 +202,13 @@ class MathCutOffMod extends Modifier
     unknown = false;
     specialMod = true;
     notPercentage = true;
+    utility = true;
   }
 
   override function specialMath(lane:Int, strumLine:Strumline):Void
   {
     final whichStrum:StrumlineNote = strumLine.getByIndex(lane);
     whichStrum.strumExtraModData.mathCutOff = currentValue;
-    // strumLine.mods.mathCutOff[lane] = currentValue;
   }
 }
 
@@ -251,6 +253,7 @@ class DisableHoldMathShortCutMod extends Modifier
     super(name, 0);
     unknown = false;
     specialMod = true;
+    utility = true;
   }
 
   override function specialMath(lane:Int, strumLine:Strumline):Void
@@ -267,6 +270,7 @@ class DrawDistanceBackMod extends Modifier
     super(name, 0);
     unknown = false;
     specialMod = true;
+    utility = true;
   }
 
   override function specialMath(lane:Int, strumLine:Strumline):Void
@@ -282,6 +286,7 @@ class DrawDistanceMod extends Modifier
   {
     super(name, 0);
     unknown = false;
+    utility = true;
     specialMod = true;
   }
 
@@ -299,6 +304,7 @@ class InvertModValues extends Modifier
     super(name, 0);
     unknown = false;
     specialMod = true;
+    utility = true;
   }
 
   override function specialMath(lane:Int, strumLine:Strumline):Void

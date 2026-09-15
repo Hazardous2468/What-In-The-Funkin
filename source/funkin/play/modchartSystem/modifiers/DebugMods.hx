@@ -5,6 +5,7 @@ import funkin.play.modchartSystem.NoteData;
 import funkin.play.modchartSystem.modifiers.BaseModifier;
 
 // Contains all mods which are unique or have debug purposes!
+
 class DebugXMod extends Modifier
 {
   public function new(name:String)
@@ -14,6 +15,7 @@ class DebugXMod extends Modifier
     unknown = false;
     specialMod = true;
     notPercentage = true;
+    utility = true;
   }
 
   override function specialMath(lane:Int, strumLine:Strumline):Void
@@ -31,6 +33,7 @@ class DebugYMod extends Modifier
     unknown = false;
     notPercentage = true;
     specialMod = true;
+    utility = true;
   }
 
   override function specialMath(lane:Int, strumLine:Strumline):Void
@@ -47,6 +50,7 @@ class DebugAlphaMod extends Modifier
     modPriority = -8;
     unknown = false;
     specialMod = true;
+    utility = true;
   }
 
   override function specialMath(lane:Int, strumLine:Strumline):Void
@@ -62,6 +66,7 @@ class DebugTxtExtraShow extends Modifier
     super(name, 0);
     modPriority = -14;
     unknown = false;
+    utility = true;
     specialMod = true;
   }
 
@@ -77,6 +82,7 @@ class DebugTxtZeroValueShow extends Modifier
   {
     super(name, 0);
     modPriority = -13;
+    utility = true;
     unknown = false;
     specialMod = true;
   }
@@ -94,6 +100,7 @@ class DebugTxtLaneShow extends Modifier
     super(name, 0);
     modPriority = -12;
     unknown = false;
+    utility = true;
     specialMod = true;
   }
 
@@ -109,6 +116,7 @@ class DebugTxtAllShow extends Modifier
   {
     super(name, 0);
     modPriority = -10;
+    utility = true;
     unknown = false;
     specialMod = true;
   }
@@ -125,6 +133,7 @@ class DebugTxtSubShow extends Modifier
   {
     super(name, 0);
     modPriority = -11;
+    utility = true;
     unknown = false;
     specialMod = true;
   }

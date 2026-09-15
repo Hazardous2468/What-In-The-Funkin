@@ -9,10 +9,12 @@ Sustain lengths are more accurate to vanilla.
 Sustains now have their UV's fixed when clipping.
 Tried to remove some magic number jank.
 Added TipsyScaleX, TipsyScaleY, TipsyAngleX, TipsyAngleY, TanTipsySkewX, TanTipsySkewY, SquareScaleX, SquareScaleY, SquareAngleX, SquareAngleY.
-New "note_point_offset_x" and "holdpoint_offset_x" submods for Rotate modifiers for more advanced control over how the notes / holds rotate (for fixing minor visual errors).
+New "note_point_offset_x" and "holdpoint_offset_x" submods for Rotate modifiers for more advanced control over how the notes / holds rotate (for fixing minor visual errors). By default the WITF Essentials will have a module that automatically applies fixes for most notestyles so you shouldn't have to worry about this.
 Fixed IT-NEVER-ENDS.
+Updated Cat to have it's combo popup be less intrusive.
 DebugDisplay for Modifiers now displays the strumLine's scroll speed and not the scrollSpeed set by the chart.
 Tweenlist debug display now wraps around properly (no longer goes off screen when there are too many tweens).
+Removed ModConstants.mod, use FlxMath.mod instead.
 HSV Shader constructor now exposes the fragPath to allow for making custom note shaders easier (i.e. the new Groovin Shader).
 Minor bug fixes.
 

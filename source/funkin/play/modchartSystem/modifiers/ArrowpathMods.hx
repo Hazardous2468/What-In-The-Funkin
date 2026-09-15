@@ -8,6 +8,7 @@ import flixel.math.FlxMath;
 import funkin.play.notes.StrumlineNote;
 
 // Contains all mods that control arrowpaths!
+
 class ArrowpathMod extends Modifier
 {
   public function new(name:String)
@@ -36,6 +37,7 @@ class SpiralPathsMod extends Modifier
   {
     super(name, 0);
     unknown = false;
+    utility = true;
     pathMod = true;
   }
 
@@ -52,6 +54,7 @@ class NotITG_ArrowPathMod extends Modifier
     super(name, 0);
     unknown = false;
     specialMod = true;
+    utility = true;
   }
 
   override function specialMath(lane:Int, strumLine:Strumline):Void
@@ -66,6 +69,7 @@ class ArrowpathWidthMod extends Modifier
   {
     super(name, 1);
     unknown = false;
+    utility = true;
     pathMod = true;
   }
 
@@ -86,6 +90,7 @@ class ArrowpathRedMod extends Modifier
     super(name, 0);
     unknown = false;
     pathMod = true;
+    utility = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -104,6 +109,7 @@ class ArrowpathGreenMod extends Modifier
     super(name, 0);
     unknown = false;
     pathMod = true;
+    utility = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -122,6 +128,7 @@ class ArrowpathBlueMod extends Modifier
     super(name, 0);
     unknown = false;
     pathMod = true;
+    utility = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -141,6 +148,7 @@ class ArrowpathBackLengthMod extends Modifier
     unknown = false;
     specialMod = true;
     notPercentage = true;
+    utility = true;
   }
 
   override function specialMath(lane:Int, strumLine:Strumline):Void
@@ -158,6 +166,7 @@ class ArrowpathFrontLengthMod extends Modifier
     unknown = false;
     specialMod = true;
     notPercentage = true;
+    utility = true;
   }
 
   override function specialMath(lane:Int, strumLine:Strumline):Void
@@ -190,6 +199,7 @@ class ArrowpathGrainMod extends Modifier
     unknown = false;
     notPercentage = true;
     pathMod = true;
+    utility = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void

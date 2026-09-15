@@ -6,6 +6,7 @@ import funkin.play.modchartSystem.modifiers.BaseModifier;
 import funkin.play.notes.StrumlineNote;
 
 // Contains all mods that modify holds!
+
 class Old3DHoldsMod extends Modifier
 {
   public function new(name:String)
@@ -13,6 +14,7 @@ class Old3DHoldsMod extends Modifier
     super(name, 0);
     unknown = false;
     holdsMod = true;
+    utility = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -28,6 +30,7 @@ class HoldTypeMod extends Modifier
     super(name, 0);
     unknown = false;
     holdsMod = true;
+    utility = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -44,6 +47,7 @@ class HoldGrainMod extends Modifier
     unknown = false;
     holdsMod = true;
     notPercentage = true;
+    utility = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void

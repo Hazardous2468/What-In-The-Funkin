@@ -23,6 +23,7 @@ class UseOldStealthHoldsModifier extends Modifier
     holdsMod = false;
     strumsMod = true;
     pathMod = false;
+    utility = true;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -38,6 +39,7 @@ class StealthGlowRedMod extends Modifier
   {
     super(name, 1);
     modPriority = -3;
+    utility = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -57,6 +59,7 @@ class StealthGlowGreenMod extends Modifier
   {
     super(name, 1);
     modPriority = -4;
+    utility = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -76,6 +79,7 @@ class StealthGlowBlueMod extends Modifier
   {
     super(name, 1);
     modPriority = -5;
+    utility = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -90,6 +94,7 @@ class StealthGlowBlueMod extends Modifier
 }
 
 // Fades the strums out stealth style
+
 class DarkMod extends Modifier
 {
   public function new(name:String)
@@ -107,6 +112,7 @@ class DarkMod extends Modifier
 }
 
 // Fades the strums out REAL stealth style
+
 class StrumStealthMod extends Modifier
 {
   public function new(name:String)
@@ -130,6 +136,7 @@ class StrumStealthMod extends Modifier
 }
 
 // Notes fade to white and then fade out
+
 class StealthMod extends Modifier
 {
   var noGlowSubmod:ModifierSubValue;
@@ -188,14 +195,11 @@ class StealthMod extends Modifier
 class SuddenMod extends Modifier
 {
   var noGlowSubmod:ModifierSubValue;
-
   // var stealthPastSubmod:ModifierSubValue;
   // The point where the notes start fading in
   var start:ModifierSubValue;
-
   // The point where the notes finish fading in
   var end:ModifierSubValue;
-
   // Offsets the start and end points by this amount
   var offset:ModifierSubValue;
 
@@ -264,16 +268,12 @@ class HiddenMod extends Modifier
 {
   // Disables the stealthGlow behaviour.
   var noGlowSubmod:ModifierSubValue;
-
   // If greater then 0, notes will reappear when passing the strumlineNotes
   var stealthPastSubmod:ModifierSubValue;
-
   // The point where the notes start fading out
   var start:ModifierSubValue;
-
   // The point where the notes finish fading out (fully invisible)
   var end:ModifierSubValue;
-
   // Offsets the start and end points by this amount
   var offset:ModifierSubValue;
 
@@ -342,19 +342,14 @@ class VanishMod extends Modifier
 {
   // Disables the stealthGlow behaviour.
   var noGlowSubmod:ModifierSubValue;
-
   // If greater then 0, notes will reappear when passing the strumlineNotes
   var stealthPastSubmod:ModifierSubValue;
-
   // The point where the notes start fading out (?)
   var start:ModifierSubValue;
-
   // The size of the hidden region (?)
   var size:ModifierSubValue;
-
   // The point where the notes fade back in (?)
   var end:ModifierSubValue;
-
   // Offsets the entire effect region by this amount
   var offset:ModifierSubValue;
 
@@ -442,13 +437,10 @@ class BlinkMod extends Modifier
 {
   // Disables the stealthGlow behaviour.
   var noGlowSubmod:ModifierSubValue;
-
   // If greater then 0, notes will reappear when passing the strumlineNotes
   var stealthPastSubmod:ModifierSubValue;
-
   // Offsets the blink timing
   var offset:ModifierSubValue;
-
   // How quickly the blinking is
   var speed:ModifierSubValue;
 
@@ -504,11 +496,11 @@ class BlinkMod extends Modifier
 }
 
 // Notes fade to white and then fade out
+
 class StealthHoldsMod extends Modifier
 {
   // Disables the stealthGlow behaviour.
   var noGlowSubmod:ModifierSubValue;
-
   // If greater then 0, notes will reappear when passing the strumlineNotes
   var stealthPastSubmod:ModifierSubValue;
 
@@ -563,6 +555,7 @@ class StealthHoldsMod extends Modifier
 }
 
 // Also include alpha mods!
+
 class AlphaModifier extends Modifier
 {
   public function new(name:String)

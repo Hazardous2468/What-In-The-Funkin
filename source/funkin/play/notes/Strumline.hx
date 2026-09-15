@@ -814,7 +814,7 @@ class Strumline extends FlxSpriteGroup
 
       if (usePercentage) modVal *= 100;
 
-      if (ModConstants.hideSomeDebugBois.contains(mod.tag) && debugHideUtil && !debugShowALL) continue;
+      if (mod.utility && debugHideUtil && !debugShowALL) continue;
       if (StringTools.contains(mod.tag, "--") && debugHideLane && !debugShowALL) continue;
       newString += "\n";
       newString += mod.tag + ": " + Std.string(modVal) + (usePercentage ? "%" : "");
