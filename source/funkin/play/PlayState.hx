@@ -781,7 +781,6 @@ class PlayState extends MusicBeatSubState
     modchartTweenList.zIndex = 927;
     modchartTweenList.autoSize = false;
     modchartTweenList.fieldWidth = Std.int(FlxG.width * 0.8);
-    // modchartTweenList.wrap = WORD(FIELD_WIDTH);
     add(modchartTweenList);
     modchartTweenList.cameras = [camHUD];
   }
@@ -1844,8 +1843,6 @@ class PlayState extends MusicBeatSubState
     {
       strumLine.clean();
     }
-
-    vwooshTimer.cancel();
 
     vwooshTimer.cancel();
 

@@ -218,19 +218,74 @@ class Modifier
   }
 
   // Variables for defining which array this mod should be added to for performance reasons!
-  public var unknown:Bool = true; // If true, will probe the mod to try and figure out what it does
+
+  /**
+   * If true, then the mod will get probed to try and identify what it does in order to place it into the correct modifier array.
+   */
+  public var unknown:Bool = true;
+
+  /**
+   * If true, this modifier will be placed into the 'special' modifiers array.
+   */
   public var specialMod:Bool = false;
+
+  /**
+   * If true, this modifier will be placed into the 'arrowpaths' modifiers array.
+   */
   public var pathMod:Bool = false;
+
+  /**
+   * If true, this modifier will be placed into the 'notes' modifiers array.
+   */
   public var notesMod:Bool = false;
+
+  /**
+   * If true, this modifier will be placed into the 'holds' modifiers array.
+   */
   public var holdsMod:Bool = false;
+
+  /**
+   * If true, this modifier will be placed into the 'strums' modifiers array.
+   */
   public var strumsMod:Bool = false;
+
+  /**
+   * If true, this modifier will be placed into the 'speed' modifiers array.
+   */
   public var speedMod:Bool = false;
-  // If true, then the mod value for this modifier will be multiplied by -1 for the opponent
+
+  /**
+   * If true, then the mod value for this modifier will be multiplied by -1 for the opponent IF invert mode is on for the modchart.
+   */
   public var invertForDad:Bool = false;
-  // If true, will NOT be treated as a % (will only use raw values)
+
+  /**
+   * If true, this modifier will be hidden from the modifier list by default to make it cleaner.
+   * Use 'debugShowExtra' modifier to make these modifiers appear.
+   */
+  public var utility:Bool = false;
+
+  /**
+   * If true, will display it's values always as raw values (never as %).
+   * Remember this only affects how it DISPLAYS it's values!
+   */
   public var notPercentage:Bool = false;
+
+  /**
+   * The UNIQUE tag for this modifier.
+   * Used to identify it from the modifier array when tweens want to target a modifier and such.
+   */
   public var tag:String = "mod";
+
+  /**
+   * The base / starting value of this modifier.
+   * 'currentValue' will reset back to this value when a reset is triggered.
+   */
   public var baseValue:Float = 0;
+
+  /**
+   * The current value for this modifier.
+   */
   public var currentValue(default, set):Float = 0;
 
   private function set_currentValue(newValue:Float)
@@ -240,12 +295,41 @@ class Modifier
     return currentValue;
   }
 
+  /**
+   * A map containing all the submodifiers for this modifier.
+   */
   public var subValues:Map<String, ModifierSubValue> = new Map<String, ModifierSubValue>();
-  public var subValuesAliasMap:Map<String, String> = new Map<String, String>(); // for converting an alias to the submods real name
+
+  /**
+   * For converting an alias to the submods real name
+   */
+  public var subValuesAliasMap:Map<String, String> = new Map<String, String>();
+
+  /**
+   * The lane this modifier will target.
+   * For example, 0 will target the left lane, 2 will target the up lane.
+   * -1 will target all lanes and is the default.
+   */
   public var targetLane:Int = -1;
-  public var modPriority:Float = 100; // 100 is default. higher priority = done first
-  public var modPriority_additive:Float = 0; // gets added onto the priority so the modchart creator can control mod priority midsong. Done this way to avoid overiding the original priority.
-  // who owns this mod?
+
+  /**
+   * A map containing all the submodifiers for this modifier.
+   * 100 is default. higher priority = done first.
+   * Should never really be changed mid-song.
+   */
+  public var modPriority:Float = 100;
+
+  /**
+   * A value that gets added onto the 'modPriority' value so the modchart creator can control mod priority midsong.
+   * Done this way to avoid overriding the original priority (for resets to work and what not).
+   * Primarily changed by trying to access a modifier's 'priority' submod.
+   */
+  public var modPriority_additive:Float = 0;
+
+  /**
+   * The Strumline this modifier belongs to.
+   * Is automatically set when the mod gets added.
+   */
   public var strumOwner:Strumline = null;
 
   public function new(tag:String, baseValue:Float = 0)
@@ -270,7 +354,7 @@ class Modifier
     if (sub != null) return sub.value;
     else
     {
-      PlayState.instance.modDebugNotif(name + " is not a valid subname!\nReturning 0.0...");
+      PlayState.instance.modDebugNotif(name + " is not a valid subname!\nReturning 0.0...", FlxColor.RED);
       return 0.0;
     }
   }
@@ -293,42 +377,47 @@ class Modifier
       }
       else
       {
-        PlayState.instance.modDebugNotif(name + " is not a valid subname!");
+        PlayState.instance.modDebugNotif(name + " is not a valid subname!", FlxColor.RED);
       }
     }
   }
 
-  public function setVal(newval):Void
+  public function setVal(newValue:Float):Void
   {
-    currentValue = newval;
+    currentValue = newValue;
   }
 
-  public function setDefaultSubVal(name, newval):Void
+  public function setDefaultSubVal(name:String, newValue:Float):Void
   {
     if (name == "priority")
     {
-      this.modPriority_additive = newval;
+      this.modPriority_additive = newValue;
       return;
     }
     final sub = subValues.get(name);
     if (sub != null)
     {
-      sub.baseValue = newval;
+      sub.baseValue = newValue;
       if (strumOwner != null) strumOwner.debugNeedsUpdate = true;
     }
     else
     {
-      PlayState.instance.modDebugNotif(name + " is not a valid subname!");
+      PlayState.instance.modDebugNotif(name + " is not a valid subname!", FlxColor.RED);
     }
   }
 
-  public function setDefaultVal(newval):Void
+  public function setDefaultVal(newValue:Float):Void
   {
-    baseValue = newval;
+    baseValue = newValue;
   }
 
-  // Creates a new subvalue modifier and automatically adds it to the subValues map. Returns the newly created subMod.
-
+  /**
+   * Creates a new ModifierSubValue and automatically adds it to the 'subValues' map.
+   * @param name      The name / tag for this subModifier.
+   * @param startVal  The base / starting value for this subModifier.
+   * @param aliases   An array of aliases that can be used to refer to this submodifier.
+   * @return The newly created ModifierSubValue.
+   */
   public function createSubMod(name:String, startVal:Float, ?aliases:Array<String>):ModifierSubValue
   {
     final newSubMod:ModifierSubValue = new ModifierSubValue(startVal);
@@ -341,14 +430,27 @@ class Modifier
     {
       for (alias in aliases)
       {
-        subValuesAliasMap.set(alias, name);
+        if (subValuesAliasMap.exists(alias))
+        {
+          PlayState.instance.modDebugNotif(
+            "'" + alias + "' alias for the submod '" + name + "__" + this.tag + ")' is already taken by '" + subValuesAliasMap.get(alias) + "'",
+            FlxColor.ORANGE
+          );
+        }
+        else
+        {
+          subValuesAliasMap.set(alias, name);
+        }
       }
     }
     return newSubMod;
   }
 
-  // Converts a submod Name to it's real name.
-
+  /**
+   * Converts a submod name to it's real name.
+   * @param inputName The input string to check the submod alias map with.
+   * @return The submod's proper name IF the alias exists for it. Otherwise will return the input.
+   */
   public function subModAliasConvert(inputName:String):String
   {
     if (subValuesAliasMap.exists(inputName))

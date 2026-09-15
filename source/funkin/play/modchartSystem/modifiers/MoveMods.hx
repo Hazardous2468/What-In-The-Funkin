@@ -314,7 +314,7 @@ class JumpMod extends Modifier
 
     // var time:Float = (beatTime + offset.value) % everyBeat.value;
 
-    final time:Float = ModConstants.mod((beatTime + offset.value), everyBeat.value);
+    final time:Float = FlxMath.mod((beatTime + offset.value), everyBeat.value);
 
     final val:Float = time * Conductor.instance.beatLengthMs;
 

@@ -31,6 +31,7 @@ import funkin.graphics.ZSprite;
 import openfl.display.BlendMode;
 import openfl.display.TriangleCulling;
 import funkin.data.song.SongData.SongNoteData;
+import funkin.play.notes.notestyle.NoteStyle;
 
 using StringTools;
 
@@ -41,7 +42,6 @@ class HazardModLuaTest
 
   public var lua:State = null;
   public var scriptName:String = '';
-
   public var file:String = '';
   public var folder:String = '';
 
@@ -88,11 +88,16 @@ class HazardModLuaTest
     trace('lua file loaded succesfully:' + script);
 
     set('curBpm', Conductor.instance.bpm);
+    set('startingBPM', Conductor.instance.startingBPM);
     set('songPos', Conductor.instance.songPosition);
+    set('beatPos', Conductor.instance.currentBeatTime);
 
     set('measureLength', Conductor.instance.measureLengthMs);
     set('beatLength', Conductor.instance.beatLengthMs);
     set('stepLength', Conductor.instance.stepLengthMs);
+
+    set('stepsPerBeat', Constants.STEPS_PER_BEAT);
+    set('mp3DelayMS', Constants.MP3_DELAY_MS);
 
     set('strumSize', ModConstants.strumSize);
 
@@ -101,8 +106,16 @@ class HazardModLuaTest
     set('gameVersion', Constants.VERSION);
 
     set('difficulty', PlayState.instance.currentChart.difficulty);
+    set('songDifficulty', PlayState.instance.currentChart.difficulty);
     set('songName', PlayState.instance.currentChart.songName);
     set('songVariation', PlayState.instance.currentVariation);
+    set('songInstrumental', PlayState.instance.currentInstrumental);
+
+    @:privateAccess
+    var noteStyle:NoteStyle = PlayState.instance.noteStyle;
+    set('noteStyle', noteStyle.id);
+    set('noteStyleID', noteStyle.id);
+    set('noteStyleName', noteStyle.getName());
 
     set('scriptName', scriptName);
 
@@ -116,14 +129,21 @@ class HazardModLuaTest
     set('upScroll', !Preferences.downscroll);
     set('scrollSpeed', PlayState.instance.currentChart.scrollSpeed);
 
-    set('invertStrumlineTarget', ModConstants.invertStrumlineTarget);
+    set('invertStrumlineTarget', ModConstants.invertStrumlineTarget); // For swap chart mod
 
-    Lua_helper.add_callback(lua, "targetExclude", function(who:String):Void {
+    Lua_helper.add_callback(lua, "getTypeLengthAtMS", Conductor.instance.getTypeLengthAtMs);
+    Lua_helper.add_callback(lua, "getBeatTimeInMs", Conductor.instance.getBeatTimeInMs);
+    Lua_helper.add_callback(lua, "getStepTimeInMs", Conductor.instance.getStepTimeInMs);
+    Lua_helper.add_callback(lua, "getTimeInSteps", Conductor.instance.getTimeInSteps);
+
+    Lua_helper.add_callback(lua, "targetExclude", function(who:String):Void
+    {
       var strummy:Null<Strumline> = ModConstants.grabStrumModTarget(who).strum;
       if (strummy != null) allTargetExlusions.push(strummy);
     });
 
-    Lua_helper.add_callback(lua, "notesBehindHUD", function(newVal:Bool) {
+    Lua_helper.add_callback(lua, "notesBehindHUD", function(newVal:Bool)
+    {
       if (PlayState.instance != null)
       {
         PlayState.instance.notesAboveHUD = !newVal;
@@ -141,7 +161,8 @@ class HazardModLuaTest
     // FUNCS, FUNC_TWEEN, AND PERFRAME
     // OTHER LUA EVENT STUFF LOL
 
-    Lua_helper.add_callback(lua, "setasleep", function(time:Float, playerTarget:String, newSleepState:Bool = false) {
+    Lua_helper.add_callback(lua, "setasleep", function(time:Float, playerTarget:String, newSleepState:Bool = false)
+    {
       if (playerTarget == "bf" || playerTarget == "boyfriend" || playerTarget == "0" || playerTarget == "1")
       {
         PlayState.instance.modDebugNotif("Player strumline cannot be set to sleep!", FlxColor.ORANGE);
@@ -155,7 +176,8 @@ class HazardModLuaTest
           // DO NOT ASLEEP BF!
           if (customStrummer != PlayState.instance.playerStrumline)
           {
-            PlayState.instance.modchartEventHandler.funcModEvent(customStrummer.mods, time, function() {
+            PlayState.instance.modchartEventHandler.funcModEvent(customStrummer.mods, time, function()
+            {
               customStrummer.asleep = newSleepState;
             });
           }
@@ -166,14 +188,16 @@ class HazardModLuaTest
         var modsTarget = ModConstants.grabStrumModTarget(playerTarget);
         if (modsTarget.strum != PlayState.instance.playerStrumline)
         {
-          PlayState.instance.modchartEventHandler.funcModEvent(modsTarget, time, function() {
+          PlayState.instance.modchartEventHandler.funcModEvent(modsTarget, time, function()
+          {
             modsTarget.strum.asleep = newSleepState;
           });
         }
       }
     });
 
-    Lua_helper.add_callback(lua, "setStrumControl", function(playerTarget:String, isPlayerControlled:Bool, time:Float) {
+    Lua_helper.add_callback(lua, "setStrumControl", function(playerTarget:String, isPlayerControlled:Bool, time:Float)
+    {
       if (playerTarget == "everyone" || playerTarget == "both" || playerTarget == "all")
       {
         for (customStrummer in PlayState.instance.allStrumLines)
@@ -181,7 +205,8 @@ class HazardModLuaTest
           // DO NOT ASLEEP BF!
           if (!(customStrummer == PlayState.instance.playerStrumline || customStrummer == PlayState.instance.opponentStrumline))
           {
-            PlayState.instance.modchartEventHandler.funcModEvent(customStrummer.mods, time, function() {
+            PlayState.instance.modchartEventHandler.funcModEvent(customStrummer.mods, time, function()
+            {
               customStrummer.isPlayerControlled = isPlayerControlled;
             });
           }
@@ -197,7 +222,8 @@ class HazardModLuaTest
         }
         else
         {
-          PlayState.instance.modchartEventHandler.funcModEvent(modsTarget, time, function() {
+          PlayState.instance.modchartEventHandler.funcModEvent(modsTarget, time, function()
+          {
             modsTarget.strum.isPlayerControlled = isPlayerControlled;
           });
         }
@@ -205,29 +231,37 @@ class HazardModLuaTest
     });
 
     // LMAO
-    Lua_helper.add_callback(lua, "easeFlip", function(ease1:String):String {
+    Lua_helper.add_callback(lua, "easeFlip", function(ease1:String):String
+    {
       return 'flip(${ease1})';
     });
-    Lua_helper.add_callback(lua, "easeBlend", function(ease1:String, ease2:String):String {
+    Lua_helper.add_callback(lua, "easeBlend", function(ease1:String, ease2:String):String
+    {
       return 'blend(${ease1},${ease2})';
     });
-    Lua_helper.add_callback(lua, "easeMerge", function(ease1:String, ease2:String):String {
+    Lua_helper.add_callback(lua, "easeMerge", function(ease1:String, ease2:String):String
+    {
       return 'merge(${ease1},${ease2})';
     });
-    Lua_helper.add_callback(lua, "easeLerp", function(ease1:String, ease2:String):String {
+    Lua_helper.add_callback(lua, "easeLerp", function(ease1:String, ease2:String):String
+    {
       return 'lerp(${ease1},${ease2})';
     });
 
-    Lua_helper.add_callback(lua, "flip", function(ease1:String):String {
+    Lua_helper.add_callback(lua, "flip", function(ease1:String):String
+    {
       return 'flip(${ease1})';
     });
-    Lua_helper.add_callback(lua, "blend", function(ease1:String, ease2:String):String {
+    Lua_helper.add_callback(lua, "blend", function(ease1:String, ease2:String):String
+    {
       return 'blend(${ease1},${ease2})';
     });
-    Lua_helper.add_callback(lua, "merge", function(ease1:String, ease2:String):String {
+    Lua_helper.add_callback(lua, "merge", function(ease1:String, ease2:String):String
+    {
       return 'merge(${ease1},${ease2})';
     });
-    Lua_helper.add_callback(lua, "lerp", function(ease1:String, ease2:String):String {
+    Lua_helper.add_callback(lua, "lerp", function(ease1:String, ease2:String):String
+    {
       return 'lerp(${ease1},${ease2})';
     });
 
@@ -238,7 +272,8 @@ class HazardModLuaTest
     Lua_helper.add_callback(lua, "set", setFunc_parser);
     Lua_helper.add_callback(lua, "add", addFunc_parser);
 
-    Lua_helper.add_callback(lua, "setdefaults", function(data:String) {
+    Lua_helper.add_callback(lua, "setdefaults", function(data:String)
+    {
       var input:String = StringTools.replace(data, "\n", "");
       input = StringTools.replace(input, " ", "");
       var a:Array<String> = input.split(',');
@@ -297,7 +332,8 @@ class HazardModLuaTest
 
       multiFunc([], [], [], modValues, modNames, targets, "default");
     });
-    Lua_helper.add_callback(lua, "sets", function(data:String) {
+    Lua_helper.add_callback(lua, "sets", function(data:String)
+    {
       var input:String = StringTools.replace(data, "\n", "");
       input = StringTools.replace(input, " ", "");
       var a:Array<String> = input.split(',');
@@ -359,16 +395,20 @@ class HazardModLuaTest
 
       multiFunc(startBeats, [], [], modValues, modNames, targets, "set");
     });
-    Lua_helper.add_callback(lua, "adds", function(data:String) {
+    Lua_helper.add_callback(lua, "adds", function(data:String)
+    {
       multiFuncParse(data, "add");
     });
-    Lua_helper.add_callback(lua, "eases", function(data:String) {
+    Lua_helper.add_callback(lua, "eases", function(data:String)
+    {
       multiFuncParse(data, "tween");
     });
-    Lua_helper.add_callback(lua, "tweens", function(data:String) {
+    Lua_helper.add_callback(lua, "tweens", function(data:String)
+    {
       multiFuncParse(data, "tween");
     });
-    Lua_helper.add_callback(lua, "values", function(data:String) {
+    Lua_helper.add_callback(lua, "values", function(data:String)
+    {
       trace("!!! TEST !!!");
 
       // remove all \n and spaces
@@ -531,7 +571,8 @@ class HazardModLuaTest
       }
     });
 
-    Lua_helper.add_callback(lua, "reset", function(startBeat:Float, playerTarget:String = "all") {
+    Lua_helper.add_callback(lua, "reset", function(startBeat:Float, playerTarget:String = "all")
+    {
       if (playerTarget == "everyone" || playerTarget == "both" || playerTarget == "all")
       {
         for (strummer in PlayState.instance.allStrumLines)
@@ -546,7 +587,8 @@ class HazardModLuaTest
       }
     });
 
-    Lua_helper.add_callback(lua, "resort", function(startBeat:Float, playerTarget:String = "all") {
+    Lua_helper.add_callback(lua, "resort", function(startBeat:Float, playerTarget:String = "all")
+    {
       PlayState.instance.modchartEventHandler.modChartHasResort = true;
       if (playerTarget == "everyone" || playerTarget == "both" || playerTarget == "all")
       {
@@ -562,34 +604,40 @@ class HazardModLuaTest
       }
     });
 
-    Lua_helper.add_callback(lua, "percentageMode", function(newval:Bool = false) {
+    Lua_helper.add_callback(lua, "percentageMode", function(newval:Bool = false)
+    {
       trace("set percentage mode to: " + newval);
       PlayState.instance.modchartEventHandler.percentageMods = newval;
       luaTrace("'percentageMode' is not available!", FlxColor.RED);
     });
 
-    Lua_helper.add_callback(lua, "hideNotifs", function(newval:Bool = false) {
+    Lua_helper.add_callback(lua, "hideNotifs", function(newval:Bool = false)
+    {
       PlayState.instance.hideNotifs = newval;
       trace(PlayState.instance.hideNotifs ? "Will no longer display notifs..." : "Showing notifs!");
     });
 
-    Lua_helper.add_callback(lua, "invertForDad", function(newval:Bool = false) {
+    Lua_helper.add_callback(lua, "invertForDad", function(newval:Bool = false)
+    {
       trace("set invert mode to: " + newval);
       PlayState.instance.modchartEventHandler.invertForOpponent = newval;
     });
 
-    Lua_helper.add_callback(lua, "copyZoom", function(newval:Bool = false) {
+    Lua_helper.add_callback(lua, "copyZoom", function(newval:Bool = false)
+    {
       PlayState.instance.noteCamCopyHudZoom = newval;
     });
 
-    Lua_helper.add_callback(lua, "centerPlayer", function(pointless:String = "") {
+    Lua_helper.add_callback(lua, "centerPlayer", function(pointless:String = "")
+    {
       var playerStrumline:Strumline = PlayState.instance.playerStrumline;
       if (playerStrumline != null)
       {
         playerStrumline.x = (FlxG.width / 2 - playerStrumline.width / 2);
       }
     });
-    Lua_helper.add_callback(lua, "hideOpponent", function(pointless:String = "") {
+    Lua_helper.add_callback(lua, "hideOpponent", function(pointless:String = "")
+    {
       trace("attempting to hide opponent");
       var strummer = PlayState.instance.opponentStrumline;
       if (strummer != null)
@@ -604,7 +652,8 @@ class HazardModLuaTest
       }
     });
 
-    Lua_helper.add_callback(lua, "centerStrum", function(playerTarget:String = "all") {
+    Lua_helper.add_callback(lua, "centerStrum", function(playerTarget:String = "all")
+    {
       if (playerTarget == "everyone" || playerTarget == "both" || playerTarget == "all")
       {
         for (strummer in PlayState.instance.allStrumLines)
@@ -625,7 +674,8 @@ class HazardModLuaTest
       }
     });
 
-    Lua_helper.add_callback(lua, "hideStrum", function(playerTarget:String = "opponent") {
+    Lua_helper.add_callback(lua, "hideStrum", function(playerTarget:String = "opponent")
+    {
       if (playerTarget == "everyone" || playerTarget == "both" || playerTarget == "all")
       {
         for (strummer in PlayState.instance.allStrumLines)
@@ -658,7 +708,8 @@ class HazardModLuaTest
       }
     });
 
-    Lua_helper.add_callback(lua, "centerOpponent", function(pointless:String = "") {
+    Lua_helper.add_callback(lua, "centerOpponent", function(pointless:String = "")
+    {
       var strummer:FlxSprite = PlayState.instance.opponentStrumline;
       if (strummer != null)
       {
@@ -666,7 +717,8 @@ class HazardModLuaTest
       }
     });
 
-    Lua_helper.add_callback(lua, "hidePlayer", function(pointless:String = "") {
+    Lua_helper.add_callback(lua, "hidePlayer", function(pointless:String = "")
+    {
       trace("attempting to hide player");
       var strummer:Strumline = PlayState.instance.playerStrumline;
       if (strummer != null)
@@ -682,23 +734,28 @@ class HazardModLuaTest
     });
 
     // legacy function, just use the grain mod
-    Lua_helper.add_callback(lua, "setGrain", function(newGrainValue:Float = 80, playerTarget:String = "all") {
+    Lua_helper.add_callback(lua, "setGrain", function(newGrainValue:Float = 80, playerTarget:String = "all")
+    {
       luaTrace("'setGrain' is obsolete! Use the 'grain' modifier instead!", FlxColor.RED);
     });
 
     // legacy function, use createNewPlayer
-    Lua_helper.add_callback(lua, "customStrumAmount", function(newval:Int = 0) {
+    Lua_helper.add_callback(lua, "customStrumAmount", function(newval:Int = 0)
+    {
       luaTrace("'customStrumAmount' is obsolete! Use 'createNewPlayer()' instead!", true, FlxColor.RED);
     });
 
-    Lua_helper.add_callback(lua, "createNewPlayer", function(playerControlled:Bool, ?noteStyle:String) {
+    Lua_helper.add_callback(lua, "createNewPlayer", function(playerControlled:Bool, ?noteStyle:String)
+    {
       PlayState.instance.constructNewStrumLine(playerControlled, noteStyle);
     });
 
-    Lua_helper.add_callback(lua, "trace", function(text:String, startBeat:Null<Float> = null) {
+    Lua_helper.add_callback(lua, "trace", function(text:String, startBeat:Null<Float> = null)
+    {
       if (startBeat != null)
       {
-        PlayState.instance.modchartEventHandler.funcModEvent(ModConstants.grabStrumModTarget("bf"), startBeat, function() {
+        PlayState.instance.modchartEventHandler.funcModEvent(ModConstants.grabStrumModTarget("bf"), startBeat, function()
+        {
           PlayState.instance.modDebugNotif(text);
         }, false);
       }
@@ -708,7 +765,8 @@ class HazardModLuaTest
       }
     });
 
-    Lua_helper.add_callback(lua, "aftSetup", function(startBeat:Null<Float> = null) {
+    Lua_helper.add_callback(lua, "aftSetup", function(startBeat:Null<Float> = null)
+    {
       if (PlayState.instance.luaAFT_Capture != null)
       {
         luaTrace("Only one Lua AFT sprite can exist.", FlxColor.ORANGE);
@@ -720,13 +778,15 @@ class HazardModLuaTest
       }
       else
       {
-        PlayState.instance.modchartEventHandler.funcModEvent(ModConstants.grabStrumModTarget("bf"), startBeat, function() {
+        PlayState.instance.modchartEventHandler.funcModEvent(ModConstants.grabStrumModTarget("bf"), startBeat, function()
+        {
           PlayState.instance.setUpLuaAft();
         });
       }
     });
 
-    Lua_helper.add_callback(lua, "aftCaptureAlpha", function(startBeat:Float, v:Float) {
+    Lua_helper.add_callback(lua, "aftCaptureAlpha", function(startBeat:Float, v:Float)
+    {
       luaTrace("aftTweenAlpha NOT SUPPORTED IN V0.8.0a", FlxColor.RED);
       /*
         if (PlayState.instance.luaAFT_Capture == null)
@@ -741,42 +801,49 @@ class HazardModLuaTest
        */
     });
 
-    Lua_helper.add_callback(lua, "aftSpriteAlpha", function(startBeat:Float, v:Float) {
+    Lua_helper.add_callback(lua, "aftSpriteAlpha", function(startBeat:Float, v:Float)
+    {
       if (PlayState.instance.luaAFT_Capture == null)
       {
         luaTrace("Lua AFT sprite not created!", FlxColor.RED);
         return;
       }
-      PlayState.instance.modchartEventHandler.funcModEvent(ModConstants.grabStrumModTarget("bf"), startBeat, function() {
+      PlayState.instance.modchartEventHandler.funcModEvent(ModConstants.grabStrumModTarget("bf"), startBeat, function()
+      {
         PlayState.instance.luaAFT_sprite.alpha = v;
         trace("oh hey, we alpha spr", v);
       });
     });
 
-    Lua_helper.add_callback(lua, "aftAlpha", function(startBeat:Float, v:Float) {
+    Lua_helper.add_callback(lua, "aftAlpha", function(startBeat:Float, v:Float)
+    {
       if (PlayState.instance.luaAFT_Capture == null)
       {
         luaTrace("Lua AFT sprite not created!", FlxColor.RED);
         return;
       }
-      PlayState.instance.modchartEventHandler.funcModEvent(ModConstants.grabStrumModTarget("bf"), startBeat, function() {
+      PlayState.instance.modchartEventHandler.funcModEvent(ModConstants.grabStrumModTarget("bf"), startBeat, function()
+      {
         // PlayState.instance.luaAFT_Capture.alpha = v;
         PlayState.instance.luaAFT_sprite.alpha = v;
         trace("oh hey, we alpha it", v);
       });
     });
 
-    Lua_helper.add_callback(lua, "aftRecursive", function(startBeat:Float, v:Bool) {
+    Lua_helper.add_callback(lua, "aftRecursive", function(startBeat:Float, v:Bool)
+    {
       if (PlayState.instance.luaAFT_Capture == null)
       {
         luaTrace("Lua AFT sprite not created!", FlxColor.RED);
         return;
       }
-      PlayState.instance.modchartEventHandler.funcModEvent(ModConstants.grabStrumModTarget("bf"), startBeat, function() {
+      PlayState.instance.modchartEventHandler.funcModEvent(ModConstants.grabStrumModTarget("bf"), startBeat, function()
+      {
         PlayState.instance.luaAFT_Capture.recursive = v;
       });
     });
-    Lua_helper.add_callback(lua, "aftUpdateRate", function(startBeat:Float, v:Float, trueValue:Bool = false) {
+    Lua_helper.add_callback(lua, "aftUpdateRate", function(startBeat:Float, v:Float, trueValue:Bool = false)
+    {
       if (PlayState.instance.luaAFT_Capture == null)
       {
         luaTrace("Lua AFT sprite not created!", FlxColor.RED);
@@ -784,40 +851,47 @@ class HazardModLuaTest
       }
       if (trueValue)
       {
-        PlayState.instance.modchartEventHandler.funcModEvent(ModConstants.grabStrumModTarget("bf"), startBeat, function() {
+        PlayState.instance.modchartEventHandler.funcModEvent(ModConstants.grabStrumModTarget("bf"), startBeat, function()
+        {
           PlayState.instance.luaAFT_Capture.updateRate = v;
         });
       }
       else
       {
-        PlayState.instance.modchartEventHandler.funcModEvent(ModConstants.grabStrumModTarget("bf"), startBeat, function() {
+        PlayState.instance.modchartEventHandler.funcModEvent(ModConstants.grabStrumModTarget("bf"), startBeat, function()
+        {
           PlayState.instance.luaAFT_Capture.targetFps(v);
         });
       }
     });
-    Lua_helper.add_callback(lua, "aftBlend", function(startBeat:Float, b:String) {
+    Lua_helper.add_callback(lua, "aftBlend", function(startBeat:Float, b:String)
+    {
       if (PlayState.instance.luaAFT_Capture == null)
       {
         luaTrace("Lua AFT sprite not created!", FlxColor.RED);
         return;
       }
-      PlayState.instance.modchartEventHandler.funcModEvent(ModConstants.grabStrumModTarget("bf"), startBeat, function() {
+      PlayState.instance.modchartEventHandler.funcModEvent(ModConstants.grabStrumModTarget("bf"), startBeat, function()
+      {
         PlayState.instance.luaAFT_Capture.blendMode = b;
       });
     });
-    Lua_helper.add_callback(lua, "aftSize", function(startBeat:Float, s:Float) {
+    Lua_helper.add_callback(lua, "aftSize", function(startBeat:Float, s:Float)
+    {
       if (PlayState.instance.luaAFT_Capture == null)
       {
         luaTrace("Lua AFT sprite not created!", FlxColor.RED);
         return;
       }
-      PlayState.instance.modchartEventHandler.funcModEvent(ModConstants.grabStrumModTarget("bf"), startBeat, function() {
+      PlayState.instance.modchartEventHandler.funcModEvent(ModConstants.grabStrumModTarget("bf"), startBeat, function()
+      {
         PlayState.instance.luaAFT_sprite.setGraphicSize(Std.int(PlayState.instance.luaAFT_Capture.w * s));
         trace("oh hey, we resized it");
       });
     });
 
-    Lua_helper.add_callback(lua, "aftTweenAlpha", function(startBeat:Float, lengthInBeats:Float, easeToUse:String, modValue:Float) {
+    Lua_helper.add_callback(lua, "aftTweenAlpha", function(startBeat:Float, lengthInBeats:Float, easeToUse:String, modValue:Float)
+    {
       luaTrace("aftTweenAlpha NOT SUPPORTED IN V0.8.0a", FlxColor.RED);
       /*
         if (PlayState.instance.luaAFT_Capture == null)
@@ -834,7 +908,8 @@ class HazardModLuaTest
        */
     });
 
-    Lua_helper.add_callback(lua, "aftTweenSize", function(startBeat:Float, lengthInBeats:Float, easeToUse:String, modValue:Float) {
+    Lua_helper.add_callback(lua, "aftTweenSize", function(startBeat:Float, lengthInBeats:Float, easeToUse:String, modValue:Float)
+    {
       if (PlayState.instance.luaAFT_Capture == null)
       {
         // PlayState.instance.modDebugNotif("No lua aft sprite!");
@@ -842,15 +917,25 @@ class HazardModLuaTest
         luaTrace("Lua AFT sprite not created!", FlxColor.RED);
         return;
       }
-      PlayState.instance.modchartEventHandler.funcTweenModEvent(ModConstants.grabStrumModTarget("bf"), startBeat, lengthInBeats,
-        ModConstants.getEaseFromString(easeToUse), 1, modValue, function(v) {
+      PlayState.instance.modchartEventHandler.funcTweenModEvent(
+        ModConstants.grabStrumModTarget("bf"),
+        startBeat,
+        lengthInBeats,
+        ModConstants.getEaseFromString(easeToUse),
+        1,
+        modValue,
+        function(v)
+        {
           PlayState.instance.luaAFT_sprite.setGraphicSize(Std.int(PlayState.instance.luaAFT_Capture.w * v));
           return v;
-      }, "luaAFT_scale");
+        },
+        "luaAFT_scale"
+      );
     });
 
     // Stolen from Funkin Lua
-    Lua_helper.add_callback(lua, "addHaxeLibrary", function(libName:String, ?libPackage:String = '') {
+    Lua_helper.add_callback(lua, "addHaxeLibrary", function(libName:String, ?libPackage:String = '')
+    {
       #if hscript
       initHaxeModule();
       try
@@ -869,7 +954,8 @@ class HazardModLuaTest
       #end
     });
 
-    Lua_helper.add_callback(lua, "runHaxeCode", function(codeToRun:String) {
+    Lua_helper.add_callback(lua, "runHaxeCode", function(codeToRun:String)
+    {
       var retVal:Dynamic = null;
 
       #if hscript
@@ -886,12 +972,19 @@ class HazardModLuaTest
       luaTrace("runHaxeCode: HScript isn't supported on this platform!", false, false, FlxColor.RED);
       #end
 
-      if (retVal != null && !isOfTypes(retVal, [Bool, Int, Float, String, Array])) retVal = null;
+      if (retVal != null && !isOfTypes(retVal, [
+        Bool,
+        Int,
+        Float,
+        String,
+        Array
+      ])) retVal = null;
       if (retVal == null) Lua.pushnil(lua);
       return retVal;
     });
 
-    Lua_helper.add_callback(lua, "createSprite", function(tag:String, imagePath:String) {
+    Lua_helper.add_callback(lua, "createSprite", function(tag:String, imagePath:String)
+    {
       var newSpr:FlxSprite = new FlxSprite(0, 0);
       newSpr.loadGraphic(Paths.image(imagePath));
       newSpr.scrollFactor.set();
@@ -1020,8 +1113,7 @@ class HazardModLuaTest
     multiFunc(startBeats, lengthBeats, eases, modValues, modNames, targets, type);
   }
 
-  function multiFunc(startBeats:Array<Float>, lengthBeats:Array<Float>, eases:Array<String>, modValues:Array<Float>, modNames:Array<String>,
-      targets:Array<String>, type:String):Void
+  function multiFunc(startBeats:Array<Float>, lengthBeats:Array<Float>, eases:Array<String>, modValues:Array<Float>, modNames:Array<String>, targets:Array<String>, type:String):Void
   {
     if (targets.length < 1)
     { // if empty, default to targetting all
@@ -1125,8 +1217,7 @@ class HazardModLuaTest
     }
   }
 
-  function valueFunc(startBeat:Float, lengthInBeats:Float, easeToUse:String, startingValue:Float, endingValue:Float, modName:String,
-      playerTarget:String = "all"):Void
+  function valueFunc(startBeat:Float, lengthInBeats:Float, easeToUse:String, startingValue:Float, endingValue:Float, modName:String, playerTarget:String = "all"):Void
   {
     // trace("WOW! WE NEED TWEEN: " + modName);
     modName = ModConstants.modAliasCheck(modName);
@@ -1137,16 +1228,32 @@ class HazardModLuaTest
     {
       for (strummer in PlayState.instance.allStrumLines)
       {
-        if (!allTargetExlusions.contains(strummer)) PlayState.instance.modchartEventHandler.valueTweenModEvent(strummer.mods, startBeat, lengthInBeats,
-          ModConstants.getEaseFromString(easeToUse), startingValue, endingValue, modName);
+        if (!allTargetExlusions.contains(
+          strummer
+        )) PlayState.instance.modchartEventHandler.valueTweenModEvent(
+          strummer.mods,
+          startBeat,
+          lengthInBeats,
+          ModConstants.getEaseFromString(easeToUse),
+          startingValue,
+          endingValue,
+          modName
+          );
       }
     }
     else
     {
       var modsTarget = ModConstants.grabStrumModTarget(playerTarget);
 
-      PlayState.instance.modchartEventHandler.valueTweenModEvent(modsTarget, startBeat, lengthInBeats, ModConstants.getEaseFromString(easeToUse),
-        startingValue, endingValue, modName);
+      PlayState.instance.modchartEventHandler.valueTweenModEvent(
+        modsTarget,
+        startBeat,
+        lengthInBeats,
+        ModConstants.getEaseFromString(easeToUse),
+        startingValue,
+        endingValue,
+        modName
+      );
     }
   }
 
@@ -1301,6 +1408,7 @@ class HazardModLuaTest
   // tween(0, 4, "linear", 1, "beat", "3")
   // tween(0, 4, "linear", {1, "beat", 1, "drunk"}, {3,1})
   // Work In Progress replacement to allow users to input multiple mod values into the same function without needing to convert it all to a string like for tweens func
+
   function tweenFunc_parser(startBeat:Float, lengthInBeats:Float, easeToUse:String, modValue:Any, modName:Any, _playerTarget:Any = "all"):Void
   {
     var targets_raw:Any = _playerTarget;
@@ -1356,8 +1464,14 @@ class HazardModLuaTest
       {
         if (!allTargetExlusions.contains(strummer))
         {
-          PlayState.instance.modchartEventHandler.tweenModEvent(strummer.mods, startBeat, lengthInBeats, ModConstants.getEaseFromString(easeToUse), modValue,
-            modName);
+          PlayState.instance.modchartEventHandler.tweenModEvent(
+            strummer.mods,
+            startBeat,
+            lengthInBeats,
+            ModConstants.getEaseFromString(easeToUse),
+            modValue,
+            modName
+          );
         }
       }
     }
@@ -1365,7 +1479,14 @@ class HazardModLuaTest
     {
       var modsTarget = ModConstants.grabStrumModTarget(playerTarget);
 
-      PlayState.instance.modchartEventHandler.tweenModEvent(modsTarget, startBeat, lengthInBeats, ModConstants.getEaseFromString(easeToUse), modValue, modName);
+      PlayState.instance.modchartEventHandler.tweenModEvent(
+        modsTarget,
+        startBeat,
+        lengthInBeats,
+        ModConstants.getEaseFromString(easeToUse),
+        modValue,
+        modName
+      );
     }
   }
 
@@ -1416,8 +1537,16 @@ class HazardModLuaTest
     {
       for (strummer in PlayState.instance.allStrumLines)
       {
-        if (!allTargetExlusions.contains(strummer)) PlayState.instance.modchartEventHandler.addModEvent(strummer.mods, startBeat, lengthInBeats,
-          ModConstants.getEaseFromString(easeToUse), modValue, modName);
+        if (!allTargetExlusions.contains(
+          strummer
+        )) PlayState.instance.modchartEventHandler.addModEvent(
+          strummer.mods,
+          startBeat,
+          lengthInBeats,
+          ModConstants.getEaseFromString(easeToUse),
+          modValue,
+          modName
+          );
       }
     }
     else
@@ -1497,8 +1626,7 @@ class HazardModLuaTest
         return Function_Continue;
       }
 
-      for (arg in args)
-        Convert.toLua(lua, arg);
+      for (arg in args) Convert.toLua(lua, arg);
       var status:Int = Lua.pcall(lua, args.length, 1, 0);
 
       // Checks if it's not successful, then show a error.
@@ -1555,7 +1683,6 @@ class HScript
   public static var parser:Parser = new Parser();
 
   public var interp:Interp;
-
   public var variables(get, never):Map<String, Dynamic>;
 
   function get_variables()
@@ -1599,18 +1726,21 @@ class HScript
 
     interp.variables.set("BlendMode", Type.resolveClass("openfl.display.BlendMode"));
 
-    interp.variables.set('setBlendMode', function(name:String, blendy:String = "") {
+    interp.variables.set('setBlendMode', function(name:String, blendy:String = "")
+    {
       if (PlayState.instance.customLuaSprites.exists(name))
       {
         PlayState.instance.customLuaSprites.get(name).blend = ModConstants.blendModeFromString(blendy);
       }
     });
 
-    interp.variables.set('getBlendMode', function(b:String):BlendMode {
+    interp.variables.set('getBlendMode', function(b:String):BlendMode
+    {
       return ModConstants.blendModeFromString(b);
     });
 
-    interp.variables.set('textBorderStyle', function(b:String) {
+    interp.variables.set('textBorderStyle', function(b:String)
+    {
       switch (b.toLowerCase())
       {
         case "shadow":
@@ -1627,7 +1757,8 @@ class HScript
       }
     });
 
-    interp.variables.set('culling', function(b:String) {
+    interp.variables.set('culling', function(b:String)
+    {
       switch (b.toLowerCase())
       {
         case "positive":
@@ -1641,14 +1772,16 @@ class HScript
       }
     });
 
-    interp.variables.set('createCustomEase', function(nameOfEase:String, func:Float->Float):Void {
+    interp.variables.set('createCustomEase', function(nameOfEase:String, func:Float->Float):Void
+    {
       if (PlayState.instance.modchartEventHandler != null)
       {
         PlayState.instance.modchartEventHandler.customEases.set(nameOfEase, func);
       }
     });
 
-    interp.variables.set('createSprGroup', function(variableTag:String, addToGame:Bool = true) {
+    interp.variables.set('createSprGroup', function(variableTag:String, addToGame:Bool = true)
+    {
       var grp:FlxTypedSpriteGroup<FlxSprite> = null;
 
       if (PlayState.instance.variables.exists(variableTag))
@@ -1668,7 +1801,8 @@ class HScript
       }
       return grp;
     });
-    interp.variables.set('addToSprGrp', function(variableTag_Grp:String, toAdd:FlxSprite) {
+    interp.variables.set('addToSprGrp', function(variableTag_Grp:String, toAdd:FlxSprite)
+    {
       var grp:FlxTypedSpriteGroup<FlxSprite> = null;
       if (PlayState.instance.variables.exists(variableTag_Grp)) grp = PlayState.instance.variables.get(variableTag_Grp);
       if (grp != null)
@@ -1681,13 +1815,15 @@ class HScript
     // interp.variables.set('FlxColor', FlxColor);
     // interp.variables.set('HazardAFT', HazardAFT);
 
-    interp.variables.set('getSpr', function(name:String) {
+    interp.variables.set('getSpr', function(name:String)
+    {
       var result:FlxSprite = null;
       if (PlayState.instance.customLuaSprites.exists(name)) result = PlayState.instance.customLuaSprites.get(name);
       return result;
     });
 
-    interp.variables.set('createSpr', function(tag:String, imagePath:String, addToGame:Bool = true) {
+    interp.variables.set('createSpr', function(tag:String, imagePath:String, addToGame:Bool = true)
+    {
       var newSpr:FlxSprite = new FlxSprite(0, 0);
       newSpr.loadGraphic(Paths.image(imagePath));
       newSpr.scrollFactor.set();
@@ -1699,7 +1835,8 @@ class HScript
       return newSpr;
     });
 
-    interp.variables.set('createZSpr', function(tag:String, imagePath:String, addToGame:Bool = true) {
+    interp.variables.set('createZSpr', function(tag:String, imagePath:String, addToGame:Bool = true)
+    {
       var newSpr:ZSprite = new ZSprite(0, 0);
       newSpr.loadGraphic(Paths.image(imagePath));
       newSpr.scrollFactor.set();
@@ -1711,7 +1848,8 @@ class HScript
       return newSpr;
     });
 
-    interp.variables.set('createCloneMod', function(modName:String) {
+    interp.variables.set('createCloneMod', function(modName:String)
+    {
       if (PlayState.instance.modchartEventHandler == null)
       {
         HazardModLuaTest.luaTrace("Custom Mod could not be created as this song isn't a modchart song!", false, false, FlxColor.RED);
@@ -1721,7 +1859,8 @@ class HScript
       return ModConstants.createNewMod(modName);
     });
 
-    interp.variables.set('createCustomMod', function(modName:String, defaultBaseValue:Float = 0) {
+    interp.variables.set('createCustomMod', function(modName:String, defaultBaseValue:Float = 0)
+    {
       if (PlayState.instance.modchartEventHandler == null)
       {
         HazardModLuaTest.luaTrace("Custom Mod could not be created as this song isn't a modchart song!", false, false, FlxColor.RED);
@@ -1733,50 +1872,60 @@ class HScript
 
     // createSubMod("steps", 4.0);
 
-    interp.variables.set('setResetEvent', function(func:Void->Void) {
+    interp.variables.set('setResetEvent', function(func:Void->Void)
+    {
       if (PlayState.instance.modchartEventHandler != null)
       {
         PlayState.instance.modchartEventHandler.modResetFuncs.push(func);
       }
     });
-    interp.variables.set('addResetEvent', function(func:Void->Void) {
+    interp.variables.set('addResetEvent', function(func:Void->Void)
+    {
       if (PlayState.instance.modchartEventHandler != null)
       {
         PlayState.instance.modchartEventHandler.modResetFuncs.push(func);
       }
     });
 
-    interp.variables.set('addUpdate', function(func:Float->Void) {
+    interp.variables.set('addUpdate', function(func:Float->Void)
+    {
       if (PlayState.instance.perframeFunctions != null)
       {
         PlayState.instance.perframeFunctions.push(func);
       }
     });
-    interp.variables.set('print', function(text:String, color:FlxColor = FlxColor.WHITE) {
+    interp.variables.set('print', function(text:String, color:FlxColor = FlxColor.WHITE)
+    {
       PlayState.instance.modDebugNotif(text, color);
     });
 
-    interp.variables.set('stringSplit', function(inputString:String, splitThing:String) {
+    interp.variables.set('stringSplit', function(inputString:String, splitThing:String)
+    {
       var split:Array<String> = inputString.split(splitThing);
       return split;
     });
 
-    interp.variables.set('existsFromMap', function(theMap:Dynamic, thingToGet:Dynamic) {
+    interp.variables.set('existsFromMap', function(theMap:Dynamic, thingToGet:Dynamic)
+    {
       return theMap.exists(thingToGet);
     });
-    interp.variables.set('getFromMap', function(theMap:Dynamic, thingToGet:Dynamic) {
+    interp.variables.set('getFromMap', function(theMap:Dynamic, thingToGet:Dynamic)
+    {
       return theMap.get(thingToGet);
     });
 
-    interp.variables.set('setVar', function(name:String, value:Dynamic) {
+    interp.variables.set('setVar', function(name:String, value:Dynamic)
+    {
       PlayState.instance.variables.set(name, value);
     });
-    interp.variables.set('getVar', function(name:String) {
+    interp.variables.set('getVar', function(name:String)
+    {
       var result:Dynamic = null;
       if (PlayState.instance.variables.exists(name)) result = PlayState.instance.variables.get(name);
       return result;
     });
-    interp.variables.set('removeVar', function(name:String) {
+    interp.variables.set('removeVar', function(name:String)
+    {
       if (PlayState.instance.variables.exists(name))
       {
         PlayState.instance.variables.remove(name);

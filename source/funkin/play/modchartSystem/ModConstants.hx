@@ -88,50 +88,28 @@ class ModConstants
   public static final defaultHoldGrain = 75;
   public static final defaultPathGrain = defaultHoldGrain;
   public static var tooCloseToCameraFix:Float = 0.975; // dumb fix for preventing freak out on z math or something
-  // These modifiers are hidden from the debug Text by default to avoid clutter. TODO -> Move these to base modifiers class!
-  public static var hideSomeDebugBois:Array<String> = [
-    "showsubmods",
-    "showzerovalue",
-    "debugx",
-    "debugy",
-    "debugalpha",
-    "arrowpathred",
-    "arrowpathgreen",
-    "arrowpathblue",
-    "holdtype",
-    "grain",
-    "arrowpathgrain",
-    "pathgrain",
-    "arrowpathlength",
-    "arrowpathbacklength",
-    "showlanemods",
-    "showallmods",
-    "showextra",
-    "arrowpath_notitg",
-    "stealthglowred",
-    "stealthglowblue",
-    "stealthglowgreen",
-    "arrowpathwidth",
-    "noholdmathshortcut",
-    "mathcutoff"
-  ];
   // Sets the REAL hold note to this position - X.
   public static final holdNoteJankX:Float = 0;
   // Sets the REAL hold note to this position - Y.
   public static final holdNoteJankY:Float = 0;
   // size in pixels for each note
   public static final strumSize:Float = Strumline.NOTE_SPACING;
-  // arrowpathScale
-  public static final arrowPathScale:Float = (0.696774193548387 * 0.25);
   // the scale of each note, idfk lol
   public static final noteScale:Float = 0.696774193548387;
+  // arrowpathScale
+  public static final arrowPathScale:Float = (0.696774193548387 * 0.25);
 
-  // Just a silly way to check if a tag is actually a submod or not lol
-
+  /**
+   * A helper function to determine if a tag is a submodifier.
+   * @param tag The tag to check if is a submod or not.
+   * @return Returns true if the provided tag is a submodifier, otherwise returns false.
+   */
   public static function isTagSub(tag:String):Bool
   {
     return StringTools.contains(tag, "__");
   }
+
+  // Converts a string to a BlendMode.
 
   public static function blendModeFromString(blend:String):BlendMode
   {
@@ -169,6 +147,13 @@ class ModConstants
     return NORMAL;
   }
 
+  /**
+   * Grabs where the strum notes WOULD be, given there are no modifiers / modifications made.
+   * This SHOULD be the same as where the strum notes will be in vanilla!
+   * @param strumLine The strumline of the strum note, so we can apply the proper notestyle offsets and such.
+   * @param lane Which lane / direction this note is.
+   * @return The point in 3D where the strum note would be by default.
+   */
   public static function getDefaultStrumPosition(strumLine:Strumline, lane:Float):Vector3D
   {
     var strumBaseX:Float = strumLine.x + Strumline.INITIAL_OFFSET + (lane * Strumline.NOTE_SPACING);
@@ -184,6 +169,13 @@ class ModConstants
     return wasHereOriginally;
   }
 
+  /**
+   * A helper function that rotates a Vector2 around a point.
+   * @param origin The origin point. This is where the rotation will rotate around.
+   * @param point The point that gets rotated. Will rotate around the given origin point.
+   * @param degrees How many degrees should the point rotate around the origin.
+   * @return The point, rotated around the origin, in the given degrees.
+   */
   public static function rotateAround(origin:Vector2, point:Vector2, degrees:Float):Vector2
   {
     if (degrees == 0) return point; // Do nothing if there is no rotation
@@ -199,6 +191,11 @@ class ModConstants
     return (new Vector2(qx, qy));
   }
 
+  /**
+   * Converts a modifier's name to it's real name.
+   * @param tag The raw input to check and change.
+   * @return The modifier's proper name (hopefully). Otherwise will return the input, in lowercase and removed spaces.
+   */
   public static function modAliasCheck(tag:String):String
   {
     var modName:String = tag.toLowerCase();
@@ -580,7 +577,7 @@ class ModConstants
       var ease = getEaseFromString(str);
       if (ease == null)
       {
-        PlayState.instance.modDebugNotif("'" + str + "' ease not valid! Defaulting to linear.", FlxColor.RED);
+        PlayState.instance.modDebugNotif("'" + str + "' ease not valid! Defaulting to linear.", FlxColor.ORANGE);
         return return FlxEase.linear;
       }
 
@@ -793,12 +790,11 @@ class ModConstants
    *
    * SOURCE: https://github.com/HaxeFlixel/flixel/pull/3341/files
    */
-  public static inline function mod(a:Float, b:Float):Float
-  {
-    b = Math.abs(b);
-    return a - b * Math.floor(a / b);
-  }
-
+  // public static inline function mod(a:Float, b:Float):Float
+  // {
+  //  b = Math.abs(b);
+  //  return a - b * Math.floor(a / b);
+  // }
   // Used by the metaMods script to invert which character gets targetted by mods.
   public static var invertStrumlineTarget:Bool = false;
 
