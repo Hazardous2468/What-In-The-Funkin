@@ -2,7 +2,7 @@ Note: Some reported problems are old and may have been already resolved.
 
 Fork specific issues (V1.1.0):
 
-- Orient modifier seems to be a bit buggy
+- Orient modifier seems to be a bit buggy, and breaks with rotate modifiers
 
 - Hold covers sometimes fail to appear and disappear
 
@@ -21,8 +21,6 @@ Fork specific issues (V1.1.0):
 - New hold sudden / hidden logic doesn't work if there are multiple hidden / sudden mods (can only have one of each type active at a time). 
 
 - Some mods may have slight differences between upscroll and downscroll. Be sure to check both scroll directions for your modcharts!
-
-- No good way of setting subdivisions for 3D render mod (YET!)
 
 - AFT's seem to cause minor but consistent lag spikes? 😔
 
