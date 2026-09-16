@@ -2,7 +2,7 @@ Note: Some reported problems are old and may have been already resolved.
 
 Fork specific issues (V1.1.0):
 
-- Orient modifier seems to be a bit buggy, and breaks with rotate modifiers
+- Orient modifier becomes inaccurate with drive2 modifier
 
 - Hold covers sometimes fail to appear and disappear
 
