@@ -14,6 +14,7 @@ class RedNotesColMod extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (data.inOrientPass) return;
     if (!isArrowPath)
     {
       data.red = currentValue;
@@ -31,6 +32,7 @@ class GreenNotesColMod extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (data.inOrientPass) return;
     if (!isArrowPath)
     {
       data.green = currentValue;
@@ -48,6 +50,7 @@ class BlueNotesColMod extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (data.inOrientPass) return;
     if (!isArrowPath)
     {
       data.blue = currentValue;
@@ -67,6 +70,7 @@ class RedStrumColMod extends Modifier
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
+    if (data.inOrientPass) return;
     data.red = currentValue;
   }
 }
@@ -83,6 +87,7 @@ class GreenStrumColMod extends Modifier
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
+    if (data.inOrientPass) return;
     data.green = currentValue;
   }
 }
@@ -99,6 +104,7 @@ class BlueStrumColMod extends Modifier
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
+    if (data.inOrientPass) return;
     data.blue = currentValue;
   }
 }

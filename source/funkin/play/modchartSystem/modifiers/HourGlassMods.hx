@@ -9,14 +9,13 @@ import flixel.math.FlxMath;
 
 // Contains all the mods related hourglass mods
 // Custom mod made by me (Hazard24)!
+
 class HourGlassModBase extends Modifier
 {
   // The point where the notes start moving
   var start:ModifierSubValue;
-
   // The point where the notes finish moving
   var end:ModifierSubValue;
-
   // Offsets the start and end points by this amount
   var offset:ModifierSubValue;
 
@@ -29,6 +28,7 @@ class HourGlassModBase extends Modifier
   }
 
   // Basically just a copy of Sudden math with an extra step (b and c)
+
   function hourGlassMath(data:NoteData):Float
   {
     if (currentValue == 0) return 0.0; // skip math if mod is 0
@@ -89,6 +89,36 @@ class HourGlassZ extends HourGlassModBase
   }
 }
 
+class HourGlassAngleZ extends HourGlassModBase
+{
+  public function new(name:String)
+  {
+    super(name);
+  }
+
+  var strumResult:Array<Float> = [0, 0, 0, 0];
+
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
+  {
+    if (data.inOrientPass || data.noteType == "receptor" || currentValue == 0) return;
+    data.angleZ -= strumResult[data.direction];
+    data.angleZ += hourGlassMath(data) * (currentValue * -1);
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (currentValue == 0 || data.inOrientPass || data.curPos == 0)
+    {
+      strumResult[data.direction] = 0.0;
+    }
+    else
+    {
+      strumResult[data.direction] = hourGlassMath(data) * (currentValue * -1);
+      data.angleZ += strumResult[data.direction];
+    }
+  }
+}
+
 class HourGlassAngleX extends HourGlassModBase
 {
   public function new(name:String)
@@ -98,22 +128,9 @@ class HourGlassAngleX extends HourGlassModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (data.inOrientPass || currentValue == 0) return;
     final c:Float = hourGlassMath(data);
     data.angleX += c * (currentValue * -1);
-  }
-}
-
-class HourGlassAngleZ extends HourGlassModBase
-{
-  public function new(name:String)
-  {
-    super(name);
-  }
-
-  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
-  {
-    final c:Float = hourGlassMath(data);
-    data.angleZ += c * (currentValue * -1);
   }
 }
 
@@ -126,6 +143,7 @@ class HourGlassAngleY extends HourGlassModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (data.inOrientPass || currentValue == 0) return;
     final c:Float = hourGlassMath(data);
     data.angleY += c * (currentValue * -1);
   }
@@ -140,6 +158,7 @@ class HourGlassSkewX extends HourGlassModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (data.inOrientPass || currentValue == 0) return;
     final c:Float = hourGlassMath(data);
     data.skewX += c * (currentValue * -2);
   }
@@ -154,6 +173,7 @@ class HourGlassSkewY extends HourGlassModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (data.inOrientPass || currentValue == 0) return;
     final c:Float = hourGlassMath(data);
     data.skewY += c * (currentValue * -2);
   }
@@ -168,6 +188,7 @@ class HourGlassScaleX extends HourGlassModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (data.inOrientPass || currentValue == 0) return;
     data.scaleX += hourGlassMath(data) * currentValue;
   }
 }
@@ -181,6 +202,7 @@ class HourGlassScaleY extends HourGlassModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (data.inOrientPass || currentValue == 0) return;
     data.scaleY += hourGlassMath(data) * currentValue;
   }
 }
@@ -194,6 +216,7 @@ class HourGlassScale extends HourGlassModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (data.inOrientPass || currentValue == 0) return;
     final c:Float = hourGlassMath(data);
     data.scaleX += c * currentValue;
     data.scaleY += c * currentValue;

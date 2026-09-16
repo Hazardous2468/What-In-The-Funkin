@@ -44,13 +44,14 @@ class CubicXMod extends CubicModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (currentValue == 0 || data.noteType == "receptor") return; // skip math if mod is 0
     data.x -= strumResult[data.direction];
     data.x += daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0 || offset.value == 0)
+    if (currentValue == 0)
     {
       strumResult[data.direction] = 0.0;
     }
@@ -71,13 +72,14 @@ class CubicYMod extends CubicModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (currentValue == 0 || data.noteType == "receptor") return; // skip math if mod is 0
     data.y -= strumResult[data.direction];
     data.y += daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0 || offset.value == 0)
+    if (currentValue == 0)
     {
       strumResult[data.direction] = 0.0;
     }
@@ -98,13 +100,14 @@ class CubicZMod extends CubicModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (currentValue == 0 || data.noteType == "receptor") return;
     data.z -= strumResult[data.direction];
     data.z += daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0 || offset.value == 0)
+    if (currentValue == 0)
     {
       strumResult[data.direction] = 0.0;
     }
@@ -131,13 +134,14 @@ class CubicAngleZMod extends CubicModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (data.inOrientPass || currentValue == 0 || data.noteType == "receptor") return;
     data.angleZ -= strumResult[data.direction];
     data.angleZ += daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0 || offset.value == 0)
+    if (currentValue == 0 || data.inOrientPass)
     {
       strumResult[data.direction] = 0.0;
     }
@@ -163,12 +167,21 @@ class CubicAngleXMod extends CubicModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return; // skip math if mod is 0
     data.angleX += daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    data.angleX += daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+    if (currentValue == 0 || data.inOrientPass)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+      data.angleX += strumResult[data.direction];
+    }
   }
 }
 
@@ -187,12 +200,21 @@ class CubicAngleYMod extends CubicModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return; // skip math if mod is 0
     data.angleY += daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    data.angleY += daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+    if (currentValue == 0 || data.inOrientPass)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+      data.angleY += strumResult[data.direction];
+    }
   }
 }
 
@@ -210,12 +232,21 @@ class CubicScaleXMod extends CubicModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return; // skip math if mod is 0
     data.scaleX += daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    data.scaleX += daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+    if (currentValue == 0 || data.inOrientPass)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+      data.scaleX += strumResult[data.direction];
+    }
   }
 }
 
@@ -233,12 +264,21 @@ class CubicScaleYMod extends CubicModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return; // skip math if mod is 0
     data.scaleY += daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    data.scaleY += daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+    if (currentValue == 0 || data.inOrientPass)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+      data.scaleY += strumResult[data.direction];
+    }
   }
 }
 
@@ -256,15 +296,16 @@ class CubicScaleMod extends CubicModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    final a = daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
-    data.scaleX += a;
-    data.scaleY += a;
-    data.scaleZ += a;
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return; // skip math if mod is 0
+    final s = daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+    data.scaleX += s;
+    data.scaleY += s;
+    data.scaleZ += s;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0 || offset.value == 0)
+    if (currentValue == 0 || data.inOrientPass)
     {
       strumResult[data.direction] = 0.0;
     }
@@ -293,12 +334,21 @@ class CubicSkewXMod extends CubicModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return; // skip math if mod is 0
     data.skewX += daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    data.skewX += daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+    if (currentValue == 0 || data.inOrientPass)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+      data.skewX += strumResult[data.direction];
+    }
   }
 }
 
@@ -317,11 +367,20 @@ class CubicSkewYMod extends CubicModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return; // skip math if mod is 0
     data.skewY += daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    data.skewY += daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+    if (currentValue == 0 || data.inOrientPass)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+      data.skewY += strumResult[data.direction];
+    }
   }
 }

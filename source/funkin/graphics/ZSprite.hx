@@ -177,13 +177,13 @@ class ZSprite extends FunkinSkewedSprite
 
   public function updateLastKnownPos():Void
   {
-    if (lastKnownPosition == null) lastKnownPosition = new Vector3D(this.x, this.y, this.z);
-    else
+    if (lastKnownPosition == null)
     {
-      lastKnownPosition.x = this.x + this.x2;
-      lastKnownPosition.y = this.y + this.y2;
-      lastKnownPosition.z = this.z + this.z2;
+      lastKnownPosition = new Vector3D(0, 0, 0);
     }
+    lastKnownPosition.x = this.x + this.x2;
+    lastKnownPosition.y = this.y + this.y2;
+    lastKnownPosition.z = this.z + this.z2;
   }
 
   // Dumb silly way of identifying whether this is a holdCover or not as holdCovers don't use a special class

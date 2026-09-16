@@ -41,13 +41,14 @@ class LinearXMod extends LinearModifierBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (currentValue == 0 || data.noteType == "receptor") return;
     data.x -= strumResult[data.direction];
     data.x += daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0 || offset.value == 0)
+    if (currentValue == 0)
     {
       strumResult[data.direction] = 0.0;
     }
@@ -65,7 +66,7 @@ class LinearYMod extends LinearModifierBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.noteType == "receptor") return;
 
     data.y -= strumResult[data.direction];
     final curPosToUse:Float = (useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
@@ -75,7 +76,7 @@ class LinearYMod extends LinearModifierBase
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0 || offset.value == 0)
+    if (currentValue == 0)
     {
       strumResult[data.direction] = 0.0;
     }
@@ -92,13 +93,14 @@ class LinearZMod extends LinearModifierBase
 {
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (currentValue == 0 || data.noteType == "receptor") return;
     data.z -= strumResult[data.direction];
     data.z += daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0 || offset.value == 0)
+    if (currentValue == 0)
     {
       strumResult[data.direction] = 0.0;
     }
@@ -120,13 +122,14 @@ class LinearAngleMod extends LinearModifierBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
     data.angleZ -= strumResult[data.direction];
     data.angleZ += daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0 || offset.value == 0)
+    if (currentValue == 0)
     {
       strumResult[data.direction] = 0.0;
     }
@@ -148,12 +151,13 @@ class LinearAngleYMod extends LinearModifierBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
     data.angleY += daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0 || offset.value == 0)
+    if (currentValue == 0)
     {
       strumResult[data.direction] = 0.0;
     }
@@ -169,12 +173,13 @@ class LinearAngleXMod extends LinearModifierBase
 {
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
     data.angleX += daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0 || offset.value == 0)
+    if (currentValue == 0)
     {
       strumResult[data.direction] = 0.0;
     }
@@ -190,6 +195,7 @@ class LinearScaleMod extends LinearModifierBase
 {
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
     final daResult:Float = daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos) * 0.01;
     data.scaleX += daResult;
     data.scaleY += daResult;
@@ -198,7 +204,7 @@ class LinearScaleMod extends LinearModifierBase
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0 || offset.value == 0)
+    if (currentValue == 0)
     {
       strumResult[data.direction] = 0.0;
     }
@@ -216,12 +222,13 @@ class LinearScaleXMod extends LinearModifierBase
 {
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
     data.scaleX += daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos) * 0.01;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0 || offset.value == 0)
+    if (currentValue == 0)
     {
       strumResult[data.direction] = 0.0;
     }
@@ -237,12 +244,13 @@ class LinearScaleYMod extends LinearModifierBase
 {
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
     data.scaleY += daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos) * 0.01;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0 || offset.value == 0)
+    if (currentValue == 0)
     {
       strumResult[data.direction] = 0.0;
     }
@@ -264,12 +272,13 @@ class LinearSkewXMod extends LinearModifierBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
     data.skewX += daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0 || offset.value == 0)
+    if (currentValue == 0)
     {
       strumResult[data.direction] = 0.0;
     }
@@ -291,12 +300,13 @@ class LinearSkewYMod extends LinearModifierBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
     data.skewY += daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0 || offset.value == 0)
+    if (currentValue == 0)
     {
       strumResult[data.direction] = 0.0;
     }
@@ -337,7 +347,7 @@ class ScaleLinearLegacyMod extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (isArrowPath || currentValue == 0) return;
+    if (isArrowPath || currentValue == 0 || data.inOrientPass) return;
     final curPos2:Float = data.curPos_unscaled * (Preferences.downscroll ? -1 : 1);
     final p:Float = curPos2 * -1;
     data.scaleX = FlxMath.lerp(data.scaleX, currentValue, p / 1000 * 2);

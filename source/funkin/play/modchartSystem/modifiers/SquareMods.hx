@@ -14,6 +14,8 @@ class SquareModBase extends Modifier
   var multSubmod:ModifierSubValue;
   var offsetX:ModifierSubValue;
   var offsetY:ModifierSubValue;
+  // An array which represents each arrow direction. Used to undo the strum movement for the notes for the offset submod to function
+  var strumResult:Array<Float> = [0, 0, 0, 0];
 
   public function new(name:String)
   {
@@ -39,19 +41,31 @@ class SquareXMod extends SquareModBase
   {
     super(name);
     invertForDad = true;
+    unknown = false;
+    strumsMod = true;
+    notesMod = true;
+    holdsMod = true;
+    pathMod = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
-    data.x -= squareMath(data.whichStrumNote?.strumDistance ?? 0) * currentValue * ModConstants.strumSize;
+    if (currentValue == 0 || data.noteType == "receptor") return; // skip math if mod is 0
+    data.x -= strumResult[data.direction];
     data.x += squareMath(data.curPos) * currentValue * ModConstants.strumSize;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
-    data.x += squareMath(data.curPos) * currentValue * ModConstants.strumSize;
+    if (currentValue == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = squareMath(data.curPos) * currentValue * ModConstants.strumSize;
+      data.x += strumResult[data.direction];
+    }
   }
 }
 
@@ -60,19 +74,31 @@ class SquareYMod extends SquareModBase
   public function new(name:String)
   {
     super(name);
+    unknown = false;
+    strumsMod = true;
+    notesMod = true;
+    holdsMod = true;
+    pathMod = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
-    data.y -= squareMath(data.whichStrumNote?.strumDistance ?? 0) * currentValue * ModConstants.strumSize;
+    if (currentValue == 0 || data.noteType == "receptor") return; // skip math if mod is 0
+    data.y -= strumResult[data.direction];
     data.y += squareMath(data.curPos) * currentValue * ModConstants.strumSize;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
-    data.y += squareMath(data.curPos) * currentValue * ModConstants.strumSize;
+    if (currentValue == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = squareMath(data.curPos) * currentValue * ModConstants.strumSize;
+      data.y += strumResult[data.direction];
+    }
   }
 }
 
@@ -81,19 +107,31 @@ class SquareZMod extends SquareModBase
   public function new(name:String)
   {
     super(name);
+    unknown = false;
+    strumsMod = true;
+    notesMod = true;
+    holdsMod = true;
+    pathMod = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
-    data.z -= squareMath(data.whichStrumNote?.strumDistance ?? 0) * currentValue * ModConstants.strumSize;
+    if (currentValue == 0 || data.noteType == "receptor") return; // skip math if mod is 0
+    data.z -= strumResult[data.direction];
     data.z += squareMath(data.curPos) * currentValue * ModConstants.strumSize;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
-    data.z = squareMath(data.curPos) * currentValue * ModConstants.strumSize;
+    if (currentValue == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = squareMath(data.curPos) * currentValue * ModConstants.strumSize;
+      data.z += strumResult[data.direction];
+    }
   }
 }
 
@@ -103,18 +141,31 @@ class SquareAngleMod extends SquareModBase
   {
     super(name);
     invertForDad = true;
+    unknown = false;
+    strumsMod = true;
+    notesMod = true;
+    holdsMod = true;
+    pathMod = false;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
+    data.angleZ -= strumResult[data.direction];
     data.angleZ += squareMath(data.curPos) * currentValue;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
-    data.angleZ = squareMath(data.curPos) * currentValue;
+    if (currentValue == 0 || data.inOrientPass)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = squareMath(data.curPos) * currentValue;
+      data.angleZ += strumResult[data.direction];
+    }
   }
 }
 
@@ -123,18 +174,30 @@ class SquareAngleXMod extends SquareModBase
   public function new(name:String)
   {
     super(name);
+    unknown = false;
+    strumsMod = true;
+    notesMod = true;
+    holdsMod = true;
+    pathMod = false;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
     data.angleX += squareMath(data.curPos) * currentValue;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
-    data.angleX = squareMath(data.curPos) * currentValue;
+    if (currentValue == 0 || data.inOrientPass)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = squareMath(data.curPos) * currentValue;
+      data.angleX += strumResult[data.direction];
+    }
   }
 }
 
@@ -143,19 +206,31 @@ class SquareAngleYMod extends SquareModBase
   public function new(name:String)
   {
     super(name);
+    unknown = false;
+    strumsMod = true;
+    notesMod = true;
+    holdsMod = true;
+    pathMod = false;
     invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
     data.angleY += squareMath(data.curPos) * currentValue;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
-    data.angleY = squareMath(data.curPos) * currentValue;
+    if (currentValue == 0 || data.inOrientPass)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = squareMath(data.curPos) * currentValue;
+      data.angleY += strumResult[data.direction];
+    }
   }
 }
 
@@ -168,7 +243,7 @@ class SquareScaleMod extends SquareModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
     final r:Float = squareMath(data.curPos) * currentValue * 0.01;
     data.scaleX += r;
     data.scaleY += r;
@@ -177,11 +252,17 @@ class SquareScaleMod extends SquareModBase
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
-    final r:Float = squareMath(data.curPos) * currentValue * 0.01;
-    data.scaleX += r;
-    data.scaleY += r;
-    data.scaleZ += r;
+    if (currentValue == 0 || data.inOrientPass)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = squareMath(data.curPos) * currentValue * 0.01;
+      data.scaleX += strumResult[data.direction];
+      data.scaleY += strumResult[data.direction];
+      data.scaleZ += strumResult[data.direction];
+    }
   }
 }
 
@@ -194,16 +275,21 @@ class SquareScaleXMod extends SquareModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
-    final r:Float = squareMath(data.curPos) * currentValue * 0.01;
-    data.scaleX += r;
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
+    data.scaleX += squareMath(data.curPos) * currentValue * 0.01;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
-    final r:Float = squareMath(data.curPos) * currentValue * 0.01;
-    data.scaleX += r;
+    if (currentValue == 0 || data.inOrientPass)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = squareMath(data.curPos) * currentValue * 0.01;
+      data.scaleX += strumResult[data.direction];
+    }
   }
 }
 
@@ -216,16 +302,21 @@ class SquareScaleYMod extends SquareModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
-    final r:Float = squareMath(data.curPos) * currentValue * 0.01;
-    data.scaleY += r;
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
+    data.scaleY += squareMath(data.curPos) * currentValue * 0.01;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
-    final r:Float = squareMath(data.curPos) * currentValue * 0.01;
-    data.scaleY += r;
+    if (currentValue == 0 || data.inOrientPass)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = squareMath(data.curPos) * currentValue * 0.01;
+      data.scaleY += strumResult[data.direction];
+    }
   }
 }
 
@@ -239,14 +330,21 @@ class SquareSkewXMod extends SquareModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
     data.skewX += squareMath(data.curPos) * currentValue;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
-    data.skewX = squareMath(data.curPos) * currentValue;
+    if (currentValue == 0 || data.inOrientPass)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = squareMath(data.curPos) * currentValue;
+      data.skewX += strumResult[data.direction];
+    }
   }
 }
 
@@ -260,14 +358,21 @@ class SquareSkewYMod extends SquareModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
     data.skewY += squareMath(data.curPos) * currentValue;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
-    data.skewY = squareMath(data.curPos) * currentValue;
+    if (currentValue == 0 || data.inOrientPass)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = squareMath(data.curPos) * currentValue;
+      data.skewY += strumResult[data.direction];
+    }
   }
 }
 

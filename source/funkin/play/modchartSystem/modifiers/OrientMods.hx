@@ -14,7 +14,9 @@ import flixel.math.FlxAngle;
 
 class OrientModBase extends Modifier
 {
-  // If true, will automatically flip the angle values for when the reverse mod is active.
+  /*
+   * If true, will automatically flip the angle values for when the reverse mod is active.
+   */
   var reverseFix:Bool = true;
   /*
    * If true, forces holds to be affected by this modifier.
@@ -22,7 +24,7 @@ class OrientModBase extends Modifier
    * If null, then only gets enabled for OrientY.
    * Doesn't really do anything as holds don't use angleZ or angleX. Use SpiralHolds instead for that.
    */
-  var affectHolds:Null<Bool> = false;
+  var affectHolds:Null<Bool> = null;
   /*
    * the position in the array table for the orient stuff...
    * 0 = z

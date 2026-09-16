@@ -105,11 +105,14 @@ class NoteData
   ];
   // Cur orient2 modifier value. Used to determine if additional math must be performed (will overwrite last known position!!)
   public var orient2:Array<Float> = [0, 0, 0];
+  // Is set to true when sampling for orient modifier. Used to skip unneccessary modifiers that won't impact the orient math (such as angle, dizzy, confusion, noteskewx, etc)
+  public var inOrientPass:Bool = false;
   // An array of mods which should be done to this note!
-  // public var noteMods:Array<String> = [];
   public var noteMods:Array<Modifier> = [];
-  // What type of note is this?
-  // Examples: "note", "hold", "path", "receptor"
+  /*
+   * What type of note is this?
+   * Valid types: "note", "hold", "path", "receptor"
+   */
   public var noteType:String = "note";
   // What notekind is this note? Can be default, hurt, noAnim, etc
   public var noteKind:String = "default";

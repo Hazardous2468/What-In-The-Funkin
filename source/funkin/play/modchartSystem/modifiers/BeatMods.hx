@@ -15,8 +15,9 @@ class BeatModBase extends Modifier
   var mult:ModifierSubValue; // Controls the period / size of the effect
   var offset:ModifierSubValue; // The effect time offset (in beats)
   var alternate:ModifierSubValue; // if 0.5 or higher, will alternate. otherwise, the beat will always move in one direction (never from side to side)
-
   // var cap:ModifierSubValue; // By default, the speed gets halved if the BPM is too high. However we don't have this behaviour making this obsolete
+  // An array which represents each arrow direction. Used to undo the strum movement for the notes for the offset submod to function
+  var strumResult:Array<Float> = [0, 0, 0, 0];
 
   public function new(name:String)
   {
@@ -84,14 +85,21 @@ class BeatXMod extends BeatModBase
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0 || data.noteType == "receptor") return; // skip math if mod is 0
-    data.x -= beatMath(data.whichStrumNote?.strumDistance ?? 0); // undo the strum  movement.
+    data.x -= strumResult[data.direction]; // undo the strum  movement.
     data.x += beatMath(data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
-    data.x += beatMath(data.curPos);
+    if (currentValue == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = beatMath(data.curPos);
+      data.x += strumResult[data.direction];
+    }
   }
 }
 
@@ -105,14 +113,21 @@ class BeatYMod extends BeatModBase
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0 || data.noteType == "receptor") return; // skip math if mod is 0
-    data.y -= beatMath(data.whichStrumNote?.strumDistance ?? 0); // undo the strum  movement.
+    data.y -= strumResult[data.direction]; // undo the strum  movement.
     data.y += beatMath(data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
-    data.y += beatMath(data.curPos);
+    if (currentValue == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = beatMath(data.curPos);
+      data.y += strumResult[data.direction];
+    }
   }
 }
 
@@ -126,14 +141,21 @@ class BeatZMod extends BeatModBase
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0 || data.noteType == "receptor") return; // skip math if mod is 0
-    data.z -= beatMath(data.whichStrumNote?.strumDistance ?? 0); // undo the strum  movement.
+    data.z -= strumResult[data.direction]; // undo the strum  movement.
     data.z += beatMath(data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
-    data.z += beatMath(data.curPos);
+    if (currentValue == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = beatMath(data.curPos);
+      data.z += strumResult[data.direction];
+    }
   }
 }
 
@@ -146,15 +168,22 @@ class BeatAngleMod extends BeatModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0 || data.noteType == "receptor") return; // skip math if mod is 0
-    data.angleZ -= beatMath(data.whichStrumNote?.strumDistance ?? 0); // undo the strum  movement.
+    if (data.inOrientPass || currentValue == 0 || data.noteType == "receptor") return; // skip math if mod is 0
+    data.angleZ -= strumResult[data.direction]; // undo the strum  movement.
     data.angleZ += beatMath(data.curPos); // re apply but now with notePos
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
-    data.angleZ += beatMath(data.curPos);
+    if (currentValue == 0 || data.inOrientPass)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = beatMath(data.curPos);
+      data.angleZ += strumResult[data.direction];
+    }
   }
 }
 
@@ -167,15 +196,21 @@ class BeatAngleXMod extends BeatModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0 || data.noteType == "receptor") return; // skip math if mod is 0
-    data.angleX -= beatMath(data.whichStrumNote?.strumDistance ?? 0); // undo the strum  movement.
-    data.angleX += beatMath(data.curPos); // re apply but now with notePos
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return; // skip math if mod is 0
+    data.angleX += beatMath(data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
-    data.angleX += beatMath(data.curPos);
+    if (currentValue == 0 || data.inOrientPass)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = beatMath(data.curPos);
+      data.angleX += strumResult[data.direction];
+    }
   }
 }
 
@@ -188,15 +223,21 @@ class BeatAngleYMod extends BeatModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0 || data.noteType == "receptor") return; // skip math if mod is 0
-    data.angleY -= beatMath(data.whichStrumNote?.strumDistance ?? 0); // undo the strum  movement.
-    data.angleY += beatMath(data.curPos); // re apply but now with notePos
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return; // skip math if mod is 0
+    data.angleY += beatMath(data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
-    data.angleY += beatMath(data.curPos);
+    if (currentValue == 0 || data.inOrientPass)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = beatMath(data.curPos);
+      data.angleY += strumResult[data.direction];
+    }
   }
 }
 
@@ -209,16 +250,26 @@ class BeatScaleMod extends BeatModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    strumMath(data, strumLine);
+    if (currentValue == 0 || data.inOrientPass || data.noteType == "receptor") return; // skip math if mod is 0
+    final s:Float = beatMath(data.curPos) * 0.01;
+    data.scaleX += s;
+    data.scaleY += s;
+    data.scaleZ += s;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
-    var s:Float = beatMath(data.curPos);
-    data.scaleX += s * 0.01;
-    data.scaleZ += s * 0.01;
-    data.scaleY += s * 0.01;
+    if (currentValue == 0 || data.inOrientPass)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = beatMath(data.curPos) * 0.01;
+      data.scaleX += strumResult[data.direction];
+      data.scaleY += strumResult[data.direction];
+      data.scaleZ += strumResult[data.direction];
+    }
   }
 }
 
@@ -231,14 +282,21 @@ class BeatScaleXMod extends BeatModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    strumMath(data, strumLine);
+    if (currentValue == 0 || data.inOrientPass || data.noteType == "receptor") return; // skip math if mod is 0
+    data.scaleX += beatMath(data.curPos) * 0.01;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
-    var s:Float = beatMath(data.curPos);
-    data.scaleX += s * 0.01;
+    if (currentValue == 0 || data.inOrientPass)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = beatMath(data.curPos) * 0.01;
+      data.scaleX += strumResult[data.direction];
+    }
   }
 }
 
@@ -251,14 +309,21 @@ class BeatScaleYMod extends BeatModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    strumMath(data, strumLine);
+    if (currentValue == 0 || data.inOrientPass || data.noteType == "receptor") return; // skip math if mod is 0
+    data.scaleY += beatMath(data.curPos) * 0.01;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
-    var s:Float = beatMath(data.curPos);
-    data.scaleY += s * 0.01;
+    if (currentValue == 0 || data.inOrientPass)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = beatMath(data.curPos) * 0.01;
+      data.scaleY += strumResult[data.direction];
+    }
   }
 }
 
@@ -271,13 +336,21 @@ class BeatSkewXMod extends BeatModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    strumMath(data, strumLine);
+    if (currentValue == 0 || data.inOrientPass || data.noteType == "receptor") return; // skip math if mod is 0
+    data.skewX += beatMath(data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
-    data.skewX += beatMath(data.curPos);
+    if (currentValue == 0 || data.inOrientPass)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = beatMath(data.curPos);
+      data.skewX += strumResult[data.direction];
+    }
   }
 }
 
@@ -290,13 +363,21 @@ class BeatSkewYMod extends BeatModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    strumMath(data, strumLine);
+    if (currentValue == 0 || data.inOrientPass || data.noteType == "receptor") return; // skip math if mod is 0
+    data.skewY += beatMath(data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
-    data.skewY += beatMath(data.curPos);
+    if (currentValue == 0 || data.inOrientPass)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = beatMath(data.curPos);
+      data.skewY += strumResult[data.direction];
+    }
   }
 }
 

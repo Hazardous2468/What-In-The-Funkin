@@ -137,13 +137,13 @@ class GridAngleModifier extends GridModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.inOrientPass) return; // skip math if mod is 0
     data.angleZ = toGrid(data.angleZ);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.inOrientPass) return; // skip math if mod is 0
     data.angleZ = toGrid(data.angleZ);
   }
 }

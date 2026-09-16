@@ -28,6 +28,7 @@ class UseOldStealthHoldsModifier extends Modifier
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
+    if (data.inOrientPass) return;
     final whichStrum:StrumlineNote = strumLine.getByIndex(data.direction);
     whichStrum.strumExtraModData.useOldStealthGlowStyle = currentValue >= 0.5;
   }
@@ -49,6 +50,7 @@ class StealthGlowRedMod extends Modifier
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
+    if (data.inOrientPass) return;
     data.stealthGlowRed = currentValue;
   }
 }
@@ -69,6 +71,7 @@ class StealthGlowGreenMod extends Modifier
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
+    if (data.inOrientPass) return;
     data.stealthGlowGreen = currentValue;
   }
 }
@@ -89,6 +92,7 @@ class StealthGlowBlueMod extends Modifier
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
+    if (data.inOrientPass) return;
     data.stealthGlowBlue = currentValue;
   }
 }
@@ -106,6 +110,7 @@ class DarkMod extends Modifier
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
+    if (data.inOrientPass || currentValue == 0) return;
     // will only start fading the arrow at 50%
     data.alpha -= FlxMath.bound((currentValue - 0.5) * 2, 0, 1);
   }
@@ -125,6 +130,7 @@ class StrumStealthMod extends Modifier
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
+    if (data.inOrientPass || currentValue == 0) return;
     final stealthGlow:Float = currentValue * 2; // so it reaches max at 0.5
     data.stealth += FlxMath.bound(stealthGlow, 0, 1); // clamp
 
@@ -157,6 +163,7 @@ class StealthMod extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (data.inOrientPass) return;
     if (!(data.noteType == "receptor" || data.noteType == "path"))
     {
       var curPos2:Float = data.curPos_unscaled;
@@ -221,6 +228,7 @@ class SuddenMod extends Modifier
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
+    if (data.inOrientPass) return;
     final whichStrum:StrumlineNote = strumLine.getByIndex(data.direction);
     whichStrum.strumExtraModData.suddenModAmount = currentValue;
     whichStrum.strumExtraModData.suddenStart = start.value + offset.value;
@@ -230,6 +238,7 @@ class SuddenMod extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (data.inOrientPass) return;
     var useOldStealthGlowStyle:Bool = data.whichStrumNote.strumExtraModData.useOldStealthGlowStyle;
     if (isArrowPath || data.noteType == "receptor" || (isHoldNote && !useOldStealthGlowStyle)) return;
 
@@ -295,6 +304,7 @@ class HiddenMod extends Modifier
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
+    if (data.inOrientPass) return;
     final whichStrum:StrumlineNote = strumLine.getByIndex(data.direction);
     whichStrum.strumExtraModData.hiddenModAmount = currentValue;
     whichStrum.strumExtraModData.hiddenStart = start.value + offset.value;
@@ -304,6 +314,7 @@ class HiddenMod extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (data.inOrientPass) return;
     final useOldStealthGlowStyle:Bool = data.whichStrumNote.strumExtraModData.useOldStealthGlowStyle;
     if (isArrowPath || data.noteType == "receptor" || (isHoldNote && !useOldStealthGlowStyle)) return;
 
@@ -372,6 +383,7 @@ class VanishMod extends Modifier
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
+    if (data.inOrientPass) return;
     final whichStrum:StrumlineNote = strumLine.getByIndex(data.direction);
     whichStrum.strumExtraModData.vanishModAmount = currentValue;
 
@@ -389,6 +401,7 @@ class VanishMod extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (data.inOrientPass) return;
     final useOldStealthGlowStyle:Bool = data.whichStrumNote.strumExtraModData.useOldStealthGlowStyle;
     if (isArrowPath || data.noteType == "receptor" || (isHoldNote && !useOldStealthGlowStyle)) return;
 
@@ -463,7 +476,7 @@ class BlinkMod extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (isArrowPath || data.noteType == "receptor") return;
+    if (isArrowPath || data.noteType == "receptor" || data.inOrientPass || currentValue == 0) return;
     // Don't do anything if we're past receptors!
     if (stealthPastSubmod.value <= 0)
     {
@@ -519,6 +532,7 @@ class StealthHoldsMod extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (data.inOrientPass || currentValue == 0) return;
     if (!isArrowPath && isHoldNote)
     {
       var curPos2:Float = data.curPos_unscaled;
@@ -565,11 +579,13 @@ class AlphaModifier extends Modifier
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
+    if (data.inOrientPass || currentValue == 0) return;
     data.alpha -= currentValue;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (data.inOrientPass || currentValue == 0) return;
     if (!(data.noteType == "receptor" || data.noteType == "path"))
     {
       data.alpha -= currentValue;
@@ -586,7 +602,7 @@ class AlphaNotesModifier extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (isArrowPath || isHoldNote || data.noteType == "receptor") return;
+    if (isArrowPath || isHoldNote || data.noteType == "receptor" || data.inOrientPass) return;
     data.alpha -= currentValue;
   }
 }
@@ -600,7 +616,7 @@ class AlphaHoldsModifier extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (isArrowPath || !isHoldNote || data.noteType == "receptor") return;
+    if (isArrowPath || !isHoldNote || data.noteType == "receptor" || data.inOrientPass) return;
     data.alpha -= currentValue;
   }
 }
@@ -614,6 +630,7 @@ class AlphaStrumModifier extends Modifier
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
+    if (data.inOrientPass || currentValue == 0) return;
     data.alpha -= currentValue;
   }
 }

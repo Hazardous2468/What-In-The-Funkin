@@ -48,14 +48,14 @@ class SawtoothXMod extends SawtoothModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.noteType == "receptor") return;
     data.x -= strumResult[data.direction];
     data.x += FlxMath.mod(data.curPos + offset, mult) * currentValue;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0 || offset == 0)
+    if (currentValue == 0)
     {
       strumResult[data.direction] = 0.0;
     }
@@ -76,14 +76,14 @@ class SawtoothYMod extends SawtoothModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.noteType == "receptor") return;
     data.y -= strumResult[data.direction];
     data.y += FlxMath.mod(data.curPos + offset, mult) * currentValue;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0 || offset == 0)
+    if (currentValue == 0)
     {
       strumResult[data.direction] = 0.0;
     }
@@ -104,14 +104,14 @@ class SawtoothZMod extends SawtoothModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.noteType == "receptor") return;
     data.z -= strumResult[data.direction];
     data.z += FlxMath.mod(data.curPos + offset, mult) * currentValue;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0 || offset == 0)
+    if (currentValue == 0)
     {
       strumResult[data.direction] = 0.0;
     }
@@ -138,14 +138,14 @@ class SawtoothAngleMod extends SawtoothModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
     data.angleZ -= strumResult[data.direction];
     data.angleZ += FlxMath.mod(data.curPos + offset, mult) * currentValue;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0 || offset == 0)
+    if (currentValue == 0 || data.inOrientPass)
     {
       strumResult[data.direction] = 0.0;
     }
@@ -171,13 +171,13 @@ class SawtoothAngleXMod extends SawtoothModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
     data.angleX += FlxMath.mod(data.curPos + offset, mult) * currentValue;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0 || offset == 0)
+    if (currentValue == 0 || data.inOrientPass)
     {
       strumResult[data.direction] = 0.0;
     }
@@ -204,13 +204,13 @@ class SawtoothAngleYMod extends SawtoothModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
     data.angleY += FlxMath.mod(data.curPos + offset, mult) * currentValue;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0 || offset == 0)
+    if (currentValue == 0 || data.inOrientPass)
     {
       strumResult[data.direction] = 0.0;
     }
@@ -236,8 +236,8 @@ class SawtoothScaleMod extends SawtoothModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
-    var result:Float = FlxMath.mod(data.curPos + offset, mult) * currentValue * -1 * 0.01;
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
+    final result:Float = FlxMath.mod(data.curPos + offset, mult) * currentValue * -1 * 0.01;
     data.scaleX += result;
     data.scaleY += result;
     data.scaleZ += result;
@@ -245,7 +245,7 @@ class SawtoothScaleMod extends SawtoothModBase
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0 || offset == 0)
+    if (currentValue == 0 || data.inOrientPass)
     {
       strumResult[data.direction] = 0.0;
     }
@@ -273,13 +273,13 @@ class SawtoothScaleXMod extends SawtoothModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
     data.scaleX += FlxMath.mod(data.curPos + offset, mult) * currentValue * -1 * 0.01;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0 || offset == 0)
+    if (currentValue == 0 || data.inOrientPass)
     {
       strumResult[data.direction] = 0.0;
     }
@@ -305,13 +305,13 @@ class SawtoothScaleYMod extends SawtoothModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
     data.scaleY += FlxMath.mod(data.curPos + offset, mult) * currentValue * -1 * 0.01;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0 || offset == 0)
+    if (currentValue == 0 || data.inOrientPass)
     {
       strumResult[data.direction] = 0.0;
     }
@@ -338,13 +338,13 @@ class SawtoothSkewXMod extends SawtoothModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return;
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
     data.skewX += FlxMath.mod(data.curPos + offset, mult) * currentValue;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0 || offset == 0)
+    if (currentValue == 0 || data.inOrientPass)
     {
       strumResult[data.direction] = 0.0;
     }
@@ -371,14 +371,14 @@ class SawtoothSkewYMod extends SawtoothModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return;
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
     var result:Float = FlxMath.mod(data.curPos + offset, mult) * currentValue * -1;
     data.skewY += (result);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0 || offset == 0)
+    if (currentValue == 0 || data.inOrientPass)
     {
       strumResult[data.direction] = 0.0;
     }

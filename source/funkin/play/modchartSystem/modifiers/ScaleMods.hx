@@ -7,6 +7,7 @@ import flixel.math.FlxMath;
 import funkin.play.modchartSystem.modifiers.RotateMods; // for scaleFrom modifier
 
 // Contains all the mods related to scale!
+
 class ScaleModifier extends Modifier
 {
   public function new(name:String)
@@ -17,7 +18,7 @@ class ScaleModifier extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0 || data.noteType == "receptor") return;
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
     data.scaleX += currentValue;
     data.scaleY += currentValue;
     data.scaleZ += currentValue;
@@ -25,7 +26,7 @@ class ScaleModifier extends Modifier
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return;
+    if (currentValue == 0 || data.inOrientPass) return;
     data.scaleX += currentValue;
     data.scaleY += currentValue;
     data.scaleZ += currentValue;
@@ -42,13 +43,13 @@ class ScaleXModifier extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0 || data.noteType == "receptor") return;
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
     data.scaleX += currentValue;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return;
+    if (currentValue == 0 || data.inOrientPass) return;
     data.scaleX += currentValue;
   }
 }
@@ -63,13 +64,13 @@ class ScaleYModifier extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0 || data.noteType == "receptor") return;
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
     data.scaleY += currentValue;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return;
+    if (currentValue == 0 || data.inOrientPass) return;
     data.scaleY += currentValue;
   }
 }
@@ -105,7 +106,7 @@ class ScaleStrumsModifier extends Modifier
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return;
+    if (currentValue == 0 || data.inOrientPass) return;
     data.scaleX += currentValue;
     data.scaleY += currentValue;
     data.scaleZ += currentValue;
@@ -122,7 +123,7 @@ class ScaleXStrumsModifier extends Modifier
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return;
+    if (currentValue == 0 || data.inOrientPass) return;
     data.scaleX += currentValue;
   }
 }
@@ -137,7 +138,7 @@ class ScaleYStrumsModifier extends Modifier
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return;
+    if (currentValue == 0 || data.inOrientPass) return;
     data.scaleY += currentValue;
   }
 }
@@ -152,7 +153,7 @@ class ScaleNotesModifier extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0 || data.noteType == "receptor") return;
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
     data.scaleX += currentValue;
     data.scaleY += currentValue;
     data.scaleZ += currentValue;
@@ -169,7 +170,7 @@ class ScaleXNotesModifier extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0 || data.noteType == "receptor") return;
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
     data.scaleX += currentValue;
   }
 }
@@ -184,7 +185,7 @@ class ScaleYNotesModifier extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0 || data.noteType == "receptor") return;
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
     data.scaleY += currentValue;
   }
 }
@@ -199,7 +200,7 @@ class ScaleHoldsModifier extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (isArrowPath || currentValue == 0 || data.noteType == "receptor") return;
+    if (isArrowPath || currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
     if (isHoldNote)
     {
       data.scaleX += currentValue;
@@ -210,6 +211,7 @@ class ScaleHoldsModifier extends Modifier
 }
 
 // Not perfect but close enough
+
 class MiniModifier extends Modifier
 {
   public function new(name:String)
@@ -246,6 +248,7 @@ class MiniModifier extends Modifier
 }
 
 // Contains all the mods related to scale!
+
 class TinyModifier extends Modifier
 {
   public function new(name:String)
@@ -256,7 +259,7 @@ class TinyModifier extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (isArrowPath || currentValue == 0 || data.noteType == "receptor") return;
+    if (isArrowPath || currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
     data.scaleX = FlxMath.lerp(data.scaleX, 0.0, currentValue / 2);
     data.scaleY = FlxMath.lerp(data.scaleY, 0.0, currentValue / 2);
     data.scaleZ = FlxMath.lerp(data.scaleZ, 0.0, currentValue / 2);
@@ -264,7 +267,7 @@ class TinyModifier extends Modifier
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return;
+    if (currentValue == 0 || data.inOrientPass) return;
     data.scaleX = FlxMath.lerp(data.scaleX, 0.0, currentValue / 2);
     data.scaleY = FlxMath.lerp(data.scaleY, 0.0, currentValue / 2);
     data.scaleZ = FlxMath.lerp(data.scaleZ, 0.0, currentValue / 2);
@@ -280,13 +283,13 @@ class TinyXModifier extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (isArrowPath || currentValue == 0 || data.noteType == "receptor") return;
+    if (isArrowPath || currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
     data.scaleX = FlxMath.lerp(data.scaleX, 0.0, currentValue / 2);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return;
+    if (currentValue == 0 || data.inOrientPass) return;
     data.scaleX = FlxMath.lerp(data.scaleX, 0.0, currentValue / 2);
   }
 }
@@ -300,13 +303,13 @@ class TinyYModifier extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (isArrowPath || currentValue == 0 || data.noteType == "receptor") return;
+    if (isArrowPath || currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
     data.scaleY = FlxMath.lerp(data.scaleY, 0.0, currentValue / 2);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return;
+    if (currentValue == 0 || data.inOrientPass) return;
     data.scaleY = FlxMath.lerp(data.scaleY, 0.0, currentValue / 2);
   }
 }
@@ -320,13 +323,13 @@ class TinyZModifier extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (isArrowPath || currentValue == 0 || data.noteType == "receptor") return;
+    if (isArrowPath || currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
     data.scaleZ = FlxMath.lerp(data.scaleZ, 0.0, currentValue / 2);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return;
+    if (currentValue == 0 || data.inOrientPass) return;
     data.scaleZ = FlxMath.lerp(data.scaleZ, 0.0, currentValue / 2);
   }
 }
@@ -340,7 +343,7 @@ class TinyHoldsModifier extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (isArrowPath || currentValue == 0 || data.noteType == "receptor") return;
+    if (isArrowPath || currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
     if (isHoldNote)
     {
       data.scaleX = FlxMath.lerp(data.scaleX, 0.0, currentValue / 2);
@@ -359,7 +362,7 @@ class TinyStrumModifier extends Modifier
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return;
+    if (currentValue == 0 || data.inOrientPass) return;
     data.scaleX = FlxMath.lerp(data.scaleX, 0.0, currentValue / 2);
     data.scaleY = FlxMath.lerp(data.scaleY, 0.0, currentValue / 2);
     data.scaleZ = FlxMath.lerp(data.scaleZ, 0.0, currentValue / 2);
@@ -375,7 +378,7 @@ class TinyStrumXModifier extends Modifier
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return;
+    if (currentValue == 0 || data.inOrientPass) return;
     data.scaleX = FlxMath.lerp(data.scaleX, 0.0, currentValue / 2);
   }
 }
@@ -389,7 +392,7 @@ class TinyStrumYModifier extends Modifier
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return;
+    if (currentValue == 0 || data.inOrientPass) return;
     data.scaleY = FlxMath.lerp(data.scaleY, 0.0, currentValue / 2);
   }
 }
@@ -403,7 +406,7 @@ class TinyStrumZModifier extends Modifier
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return;
+    if (currentValue == 0 || data.inOrientPass) return;
     data.scaleZ = FlxMath.lerp(data.scaleZ, 0.0, currentValue / 2);
   }
 }
@@ -417,7 +420,7 @@ class TinyNotesModifier extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (isArrowPath || currentValue == 0 || data.noteType == "receptor") return;
+    if (isArrowPath || currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
     data.scaleX = FlxMath.lerp(data.scaleX, 0.0, currentValue / 2);
     data.scaleY = FlxMath.lerp(data.scaleY, 0.0, currentValue / 2);
     data.scaleZ = FlxMath.lerp(data.scaleZ, 0.0, currentValue / 2);
@@ -433,7 +436,7 @@ class TinyNotesXModifier extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (isArrowPath || currentValue == 0 || data.noteType == "receptor") return;
+    if (isArrowPath || currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
     data.scaleX = FlxMath.lerp(data.scaleX, 0.0, currentValue / 2);
   }
 }
@@ -447,7 +450,7 @@ class TinyNotesYModifier extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (isArrowPath || currentValue == 0 || data.noteType == "receptor") return;
+    if (isArrowPath || currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
     data.scaleY = FlxMath.lerp(data.scaleY, 0.0, currentValue / 2);
   }
 }
@@ -461,17 +464,17 @@ class TinyNotesZModifier extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (isArrowPath || currentValue == 0 || data.noteType == "receptor") return;
+    if (isArrowPath || currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
     data.scaleZ = FlxMath.lerp(data.scaleZ, 0.0, currentValue / 2);
   }
 }
 
 // Has the additional functionality of allowing you to move the scale point around (works the same as rotate mods!)
+
 class ZoomModifier extends RotateModBase
 {
   var doX:Bool = true;
   var doY:Bool = true;
-
   // If set to 0.5 or higher, will use scale2 instead. Otherwise use normal scale.
   var typeSubmod:ModifierSubValue;
 

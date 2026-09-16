@@ -943,6 +943,7 @@ class ModHandler
     note.noteModData.noteStyleName = note.noteStyleName;
     note.noteModData.width = note.width;
     note.noteModData.height = note.height;
+    note.noteModData.inOrientPass = false;
 
     note.noteModData.curPos = 0;
     note.noteModData.curPos_unscaled = 0;
@@ -959,10 +960,12 @@ class ModHandler
 
   /**
    * This function applies the modifier math onto the strumline note!
+   * Assumes the strumline note is already at the base default position.
    */
   function applyStrumModifierMath(note:StrumlineNote, timeOffset:Float = 0):Void
   {
-    if (note.strumDistance != 0 || timeOffset != 0)
+    // Move the strum notes like regular notes.
+    if (note.strumDistance != 0 || timeOffset != 0 || note.noteModData.inOrientPass)
     {
       note.noteModData.strumTime = ModConstants.getSongPosition();
       note.noteModData.strumTime += note.noteModData.strumPosition + timeOffset;
@@ -1067,8 +1070,10 @@ class ModHandler
 
       if (doOrientPass)
       {
+        note.noteModData.inOrientPass = true;
         applyStrumModifierMath(note, ModConstants.orientTimeOffset);
         setStrumPos(note);
+        note.noteModData.inOrientPass = false;
       }
       applyStrumModifierMath(note);
     });

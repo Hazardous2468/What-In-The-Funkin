@@ -205,6 +205,8 @@ class ModConstants
 
     // trace("in goes: " + modName);
 
+    modName = StringTools.replace(modName, "anglez", "angle");
+
     modName = StringTools.replace(modName, "spiralholds", "holdtype");
     modName = StringTools.replace(modName, "spiralpaths", "arrowpathtype");
     modName = StringTools.replace(modName, "pathstype", "arrowpathtype");
@@ -223,7 +225,7 @@ class ModConstants
 
     modName = StringTools.replace(modName, "holdsanglex", "holdanglex");
     modName = StringTools.replace(modName, "holdsangley", "holdangley");
-    modName = StringTools.replace(modName, "holdsanglez", "holdanglez");
+    modName = StringTools.replace(modName, "holdsangle", "holdangle");
 
     modName = StringTools.replace(modName, "cosspiral", "spiralcos");
 
@@ -350,8 +352,6 @@ class ModConstants
     modName = StringTools.replace(modName, "centered", "center");
     modName = StringTools.replace(modName, "centere", "center");
     modName = StringTools.replace(modName, "alwayscenter", "center2");
-
-    modName = StringTools.replace(modName, "circanglez", "circangle");
 
     modName = StringTools.replace(modName, "bumpyz", "bumpy");
 
@@ -1248,7 +1248,7 @@ class ModConstants
         newMod = new HoldsAngleXOffsetMod(tag);
       case "holdangley":
         newMod = new HoldsAngleYOffsetMod(tag);
-      case "holdanglez":
+      case "holdangle":
         newMod = new HoldsAngleZOffsetMod(tag);
 
       case "dizzy":
@@ -1449,6 +1449,10 @@ class ModConstants
         newMod = new CosecantScaleYMod(tag);
       case "cosecantscalex":
         newMod = new CosecantScaleXMod(tag);
+      case "cosecantskewx":
+        newMod = new CosecantSkewXMod(tag);
+      case "cosecantskewy":
+        newMod = new CosecantSkewYMod(tag);
 
       // spiral mods
 
@@ -1460,10 +1464,22 @@ class ModConstants
         newMod = new SpiralZMod(tag, true);
       case "spiralcosangle":
         newMod = new SpiralAngleZMod(tag, true);
+      case "spiralcosanglex":
+        newMod = new SpiralAngleXMod(tag, true);
+      case "spiralcosangley":
+        newMod = new SpiralAngleYMod(tag, true);
       case "spiralcosspeed":
         newMod = new SpiralSpeedMod(tag, true);
       case "spiralcosscale":
         newMod = new SpiralScaleMod(tag, true);
+      case "spiralcosscalex":
+        newMod = new SpiralScaleXMod(tag, true);
+      case "spiralcosscaley":
+        newMod = new SpiralScaleYMod(tag, true);
+      case "spiralcosskewx":
+        newMod = new SpiralSkewXMod(tag, true);
+      case "spiralcosskewy":
+        newMod = new SpiralSkewYMod(tag, true);
 
       case "spiralx":
         newMod = new SpiralXMod(tag);
@@ -1473,10 +1489,22 @@ class ModConstants
         newMod = new SpiralZMod(tag);
       case "spiralangle":
         newMod = new SpiralAngleZMod(tag);
+      case "spiralanglex":
+        newMod = new SpiralAngleXMod(tag);
+      case "spiralangley":
+        newMod = new SpiralAngleYMod(tag);
       case "spiralspeed":
         newMod = new SpiralSpeedMod(tag);
       case "spiralscale":
         newMod = new SpiralScaleMod(tag);
+      case "spiralscalex":
+        newMod = new SpiralScaleXMod(tag);
+      case "spiralscaley":
+        newMod = new SpiralScaleYMod(tag);
+      case "spiralskewx":
+        newMod = new SpiralSkewXMod(tag);
+      case "spiralskewy":
+        newMod = new SpiralSkewXMod(tag);
 
       // tornado mods
       case "tornado":
@@ -1519,7 +1547,7 @@ class ModConstants
         newMod = new HourGlassAngleX(tag);
       case "hourglassangley":
         newMod = new HourGlassAngleY(tag);
-      case "hourglassanglez":
+      case "hourglassangle":
         newMod = new HourGlassAngleZ(tag);
       case "hourglassskewx":
         newMod = new HourGlassSkewX(tag);
@@ -1693,6 +1721,10 @@ class ModConstants
         newMod = new TanBounceZMod(tag);
       case "tanbounceangle":
         newMod = new TanBounceAngleMod(tag);
+      case "tanbounceangley":
+        newMod = new TanBounceAngleYMod(tag);
+      case "tanbounceanglex":
+        newMod = new TanBounceAngleXMod(tag);
       case "tanbouncescale":
         newMod = new TanBounceScaleMod(tag);
       case "tanbounceskewx":
@@ -1854,7 +1886,7 @@ class ModConstants
         newMod = new AsymptoteYMod(tag);
       case "asymptotez":
         newMod = new AsymptoteZMod(tag);
-      case "asymptoteanglez":
+      case "asymptoteangle":
         newMod = new AsymptoteAngleZMod(tag);
       case "asymptoteanglex":
         newMod = new AsymptoteAngleXMod(tag);

@@ -132,8 +132,73 @@ class SpiralAngleZMod extends SpiralModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return;
+    if (currentValue == 0 || data.inOrientPass) return;
     data.angleZ += spiralMath((useUnscaledCurpos ? data.curPos_unscaled : data.curPos));
+  }
+}
+
+class SpiralAngleYMod extends SpiralModBase
+{
+  public function new(name:String, isCos:Bool = false)
+  {
+    super(name, isCos);
+    holdsMod = false;
+    pathMod = false;
+    invertForDad = true;
+  }
+
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
+  {
+    if (currentValue == 0 || data.inOrientPass) return;
+    data.angleY += spiralMath((useUnscaledCurpos ? data.curPos_unscaled : data.curPos));
+  }
+}
+
+class SpiralAngleXMod extends SpiralModBase
+{
+  public function new(name:String, isCos:Bool = false)
+  {
+    super(name, isCos);
+    holdsMod = false;
+    pathMod = false;
+  }
+
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
+  {
+    if (currentValue == 0 || data.inOrientPass) return;
+    data.angleX += spiralMath((useUnscaledCurpos ? data.curPos_unscaled : data.curPos));
+  }
+}
+
+class SpiralSkewXMod extends SpiralModBase
+{
+  public function new(name:String, isCos:Bool = false)
+  {
+    super(name, isCos);
+    holdsMod = false;
+    pathMod = false;
+  }
+
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
+  {
+    if (currentValue == 0 || data.inOrientPass) return;
+    data.skewX += spiralMath((useUnscaledCurpos ? data.curPos_unscaled : data.curPos));
+  }
+}
+
+class SpiralSkewYMod extends SpiralModBase
+{
+  public function new(name:String, isCos:Bool = false)
+  {
+    super(name, isCos);
+    holdsMod = false;
+    pathMod = false;
+  }
+
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
+  {
+    if (currentValue == 0 || data.inOrientPass) return;
+    data.skewY += spiralMath((useUnscaledCurpos ? data.curPos_unscaled : data.curPos));
   }
 }
 
@@ -147,11 +212,43 @@ class SpiralScaleMod extends SpiralModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return;
+    if (currentValue == 0 || data.inOrientPass) return;
     final modMathResult:Float = spiralMath((useUnscaledCurpos ? data.curPos_unscaled : data.curPos)) * 0.01;
     data.scaleX += modMathResult;
     data.scaleY += modMathResult;
     data.scaleZ += modMathResult;
+  }
+}
+
+class SpiralScaleXMod extends SpiralModBase
+{
+  public function new(name:String, isCos:Bool = false)
+  {
+    super(name, isCos);
+    pathMod = false;
+  }
+
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
+  {
+    if (currentValue == 0 || data.inOrientPass) return;
+    final modMathResult:Float = spiralMath((useUnscaledCurpos ? data.curPos_unscaled : data.curPos)) * 0.01;
+    data.scaleX += modMathResult;
+  }
+}
+
+class SpiralScaleYMod extends SpiralModBase
+{
+  public function new(name:String, isCos:Bool = false)
+  {
+    super(name, isCos);
+    pathMod = false;
+  }
+
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
+  {
+    if (currentValue == 0 || data.inOrientPass) return;
+    final modMathResult:Float = spiralMath((useUnscaledCurpos ? data.curPos_unscaled : data.curPos)) * 0.01;
+    data.scaleY += modMathResult;
   }
 }
 

@@ -117,7 +117,7 @@ class TipsyAngleXMod extends TipsyModBase
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.inOrientPass) return;
     data.angleX += tipsyMath(data.direction, data.curPos);
   }
 }
@@ -132,7 +132,7 @@ class TipsyAngleYMod extends TipsyModBase
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.inOrientPass) return;
     data.angleY += tipsyMath(data.direction, data.curPos);
   }
 }
@@ -156,7 +156,7 @@ class TipsyScaleMod extends TipsyModBase
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.inOrientPass) return;
     final s:Float = tipsyMath(data.direction, data.curPos);
     data.scaleX += s * 0.01;
     data.scaleZ += s * 0.01;
@@ -183,7 +183,7 @@ class TipsyScaleXMod extends TipsyModBase
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.inOrientPass) return;
     final s:Float = tipsyMath(data.direction, data.curPos);
     data.scaleX += s * 0.01;
   }
@@ -208,7 +208,7 @@ class TipsyScaleYMod extends TipsyModBase
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.inOrientPass) return;
     final s:Float = tipsyMath(data.direction, data.curPos);
     data.scaleY += s * 0.01;
   }
@@ -234,7 +234,7 @@ class TipsySkewXMod extends TipsyModBase
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.inOrientPass) return;
     data.skewX += tipsyMath(data.direction, data.curPos);
   }
 }
@@ -259,7 +259,7 @@ class TipsySkewYMod extends TipsyModBase
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.inOrientPass) return;
     data.skewY += tipsyMath(data.direction, data.curPos);
   }
 }
@@ -318,7 +318,7 @@ class TanTipsyAngleMod extends TipsyModBase
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.inOrientPass) return;
     data.angleZ += tanTipsyMath(data.direction, data.curPos);
   }
 }
@@ -342,7 +342,7 @@ class TanTipsyScaleMod extends TipsyModBase
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.inOrientPass) return;
     final s:Float = tanTipsyMath(data.direction, data.curPos);
     data.scaleX += s * 0.01;
     data.scaleZ += s * 0.01;
@@ -369,7 +369,7 @@ class TanTipsySkewXMod extends TipsyModBase
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.inOrientPass) return;
     data.skewX += tanTipsyMath(data.direction, data.curPos);
   }
 }
@@ -393,7 +393,7 @@ class TanTipsySkewYMod extends TipsyModBase
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.inOrientPass) return;
     data.skewY += tanTipsyMath(data.direction, data.curPos);
   }
 }

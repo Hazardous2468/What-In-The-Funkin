@@ -130,12 +130,13 @@ class NotesSkewXMod extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0 || data.noteType == "receptor") return;
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
     data.skewX += currentValue;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
+    if (data.inOrientPass || currentValue == 0) return;
     data.skewX += currentValue;
   }
 }
@@ -156,12 +157,13 @@ class NotesSkewYMod extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0 || data.noteType == "receptor") return;
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
     data.skewY += currentValue;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
+    if (data.inOrientPass || currentValue == 0) return;
     data.skewY += currentValue;
   }
 }
@@ -181,12 +183,13 @@ class NotesSkewZMod extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0 || data.noteType == "receptor") return;
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
     data.skewZ += currentValue;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
+    if (data.inOrientPass || currentValue == 0) return;
     data.skewZ += currentValue;
   }
 }
@@ -222,6 +225,7 @@ class StrumSkewXMod extends Modifier
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
+    if (data.inOrientPass || currentValue == 0) return;
     data.skewX += currentValue;
   }
 }
@@ -239,6 +243,7 @@ class StrumSkewYMod extends Modifier
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
+    if (data.inOrientPass || currentValue == 0) return;
     data.skewY += currentValue;
   }
 }
@@ -256,6 +261,7 @@ class StrumSkewZMod extends Modifier
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
+    if (data.inOrientPass || currentValue == 0) return;
     data.skewZ += currentValue;
   }
 }

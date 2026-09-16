@@ -102,6 +102,11 @@ class RotateModBase extends Modifier
           xOffset += (data.width) / 2;
           xOffset += adv_holdOffsetX.value;
         }
+        else if (data.noteType == "receptor")
+        {
+          xOffset += (data.width) / 2;
+          // xOffset += adv_holdOffsetX.value;
+        }
         else
         {
           xOffset += ((data.width * 2) - Strumline.STRUMLINE_SIZE) / 2;
@@ -126,10 +131,15 @@ class RotateModBase extends Modifier
           xOffset += (data.width) / 2;
           xOffset += adv_holdOffsetX.value;
         }
+        else if (data.noteType == "receptor")
+        {
+          xOffset += (data.width) / 2;
+          // xOffset += adv_holdOffsetX.value;
+        }
         else
         {
           xOffset += ((data.width * 2) - Strumline.STRUMLINE_SIZE) / 2;
-          xOffset += Strumline.NUDGE; // More accurate for groovin but makes funkin inaccurate
+          xOffset += Strumline.NUDGE; // More accurate for groovin but makes funkin inaccurate? tbh I dunno what I'm doing.
           xOffset += adv_noteOffsetX.value;
         }
         point.x += xOffset;
@@ -151,13 +161,10 @@ class RotateModBase extends Modifier
 
   function strumRotateFunc_GetPivotX(data:NoteData, strumLine:Strumline):Float
   {
-    if (strumLine == null)
-    {
-      strumLine = data.whichStrumNote.weBelongTo;
-    }
     var r:Float = 0;
     r += strumLine.x + Strumline.INITIAL_OFFSET + (Strumline.NOTE_SPACING * 1.5);
-    r += strumLine.getByIndex(data.direction % Strumline.KEY_COUNT).strumExtraModData.noteStyleOffsetX;
+    // r += strumLine.getByIndex(data.direction % Strumline.KEY_COUNT).strumExtraModData.noteStyleOffsetX;
+    r += data.whichStrumNote.strumExtraModData.noteStyleOffsetX;
     r += this.offsetX.value;
     return r;
   };

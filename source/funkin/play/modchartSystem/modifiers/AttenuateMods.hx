@@ -87,12 +87,14 @@ class AttenuateAngleMod extends AttenuateModBase
 {
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (data.inOrientPass) return;
     data.angleZ -= strumResult[data.direction];
     data.angleZ += daMath(data);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
+    if (data.inOrientPass) return;
     strumResult[data.direction] = daMath(data);
     data.angleZ += strumResult[data.direction];
   }
@@ -102,11 +104,13 @@ class AttenuateAngleXMod extends AttenuateModBase
 {
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (data.inOrientPass) return;
     data.angleX += daMath(data);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
+    if (data.inOrientPass) return;
     strumResult[data.direction] = daMath(data);
     data.angleX += strumResult[data.direction];
   }
@@ -116,11 +120,13 @@ class AttenuateAngleYMod extends AttenuateModBase
 {
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (data.inOrientPass) return;
     data.angleY += daMath(data);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
+    if (data.inOrientPass) return;
     strumResult[data.direction] = daMath(data);
     data.angleY += strumResult[data.direction];
   }
@@ -130,11 +136,13 @@ class AttenuateSkewXMod extends AttenuateModBase
 {
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (data.inOrientPass) return;
     data.skewX += daMath(data);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
+    if (data.inOrientPass) return;
     strumResult[data.direction] = daMath(data);
     data.skewX += strumResult[data.direction];
   }
@@ -144,11 +152,13 @@ class AttenuateSkewYMod extends AttenuateModBase
 {
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (data.inOrientPass) return;
     data.skewY += daMath(data);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
+    if (data.inOrientPass) return;
     strumResult[data.direction] = daMath(data);
     data.skewY += strumResult[data.direction];
   }
@@ -158,6 +168,7 @@ class AttenuateScaleMod extends AttenuateModBase
 {
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (data.inOrientPass) return;
     final daResult:Float = daMath(data) * 0.01;
     data.scaleX += daResult;
     data.scaleY += daResult;
@@ -166,6 +177,7 @@ class AttenuateScaleMod extends AttenuateModBase
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
+    if (data.inOrientPass) return;
     strumResult[data.direction] = daMath(data) * 0.01;
     data.scaleX += strumResult[data.direction];
     data.scaleY += strumResult[data.direction];
@@ -177,11 +189,13 @@ class AttenuateScaleXMod extends AttenuateModBase
 {
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (data.inOrientPass) return;
     data.scaleX += daMath(data) * 0.01;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
+    if (data.inOrientPass) return;
     strumResult[data.direction] = daMath(data) * 0.01;
     data.scaleX += strumResult[data.direction];
   }
@@ -191,11 +205,13 @@ class AttenuateScaleYMod extends AttenuateModBase
 {
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (data.inOrientPass) return;
     data.scaleY += daMath(data) * 0.01;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
+    if (data.inOrientPass) return;
     strumResult[data.direction] = daMath(data) * 0.01;
     data.scaleY += strumResult[data.direction];
   }

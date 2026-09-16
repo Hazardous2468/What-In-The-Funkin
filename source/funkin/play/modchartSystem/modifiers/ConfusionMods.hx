@@ -18,7 +18,7 @@ class DizzyMod extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0 || isArrowPath) return; // skip math if mod is 0
+    if (currentValue == 0 || isArrowPath || data.inOrientPass) return; // skip math if mod is 0
     data.angleZ += data.curPos_unscaled / 2.0 * currentValue;
   }
 }
@@ -35,7 +35,7 @@ class Dizzy2Mod extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0 || isArrowPath) return; // skip math if mod is 0
+    if (currentValue == 0 || isArrowPath || data.inOrientPass) return; // skip math if mod is 0
     data.angleZ += data.curPos / 2.0 * currentValue;
   }
 }
@@ -51,7 +51,7 @@ class RollMod extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0 || isArrowPath) return; // skip math if mod is 0
+    if (currentValue == 0 || isArrowPath || data.inOrientPass) return; // skip math if mod is 0
     data.angleX += data.curPos_unscaled / 2.0 * currentValue;
   }
 }
@@ -67,7 +67,7 @@ class Roll2Mod extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0 || isArrowPath) return; // skip math if mod is 0
+    if (currentValue == 0 || isArrowPath || data.inOrientPass) return; // skip math if mod is 0
     data.angleX += data.curPos / 2.0 * currentValue;
   }
 }
@@ -84,7 +84,7 @@ class TwirlMod extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0 || isArrowPath) return; // skip math if mod is 0
+    if (currentValue == 0 || isArrowPath || data.inOrientPass) return; // skip math if mod is 0
     data.angleY += data.curPos_unscaled / 2.0 * currentValue;
   }
 }
@@ -101,7 +101,7 @@ class Twirl2Mod extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0 || isArrowPath) return; // skip math if mod is 0
+    if (currentValue == 0 || isArrowPath || data.inOrientPass) return; // skip math if mod is 0
     data.angleY += data.curPos / 2.0 * currentValue;
   }
 }
@@ -120,7 +120,8 @@ class ConfusionMod extends Modifier
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    data.angleZ += beatTime * currentValue; // lol, nobody uses this mod XD
+    if (data.inOrientPass || currentValue == 0) return;
+    data.angleZ += beatTime * currentValue;
   }
 }
 
@@ -136,6 +137,7 @@ class ConfusionZOffsetMod extends Modifier
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
+    if (data.inOrientPass || currentValue == 0) return;
     data.angleZ += currentValue * FlxAngle.TO_DEG;
   }
 }
@@ -151,12 +153,14 @@ class ConfusionXOffsetMod extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (data.inOrientPass || currentValue == 0) return;
     if (isArrowPath || data.noteType == "receptor") return;
     data.angleX += currentValue * FlxAngle.TO_DEG;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
+    if (data.inOrientPass || currentValue == 0) return;
     data.angleX += currentValue * FlxAngle.TO_DEG;
   }
 }
@@ -173,12 +177,14 @@ class ConfusionYOffsetMod extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (data.inOrientPass || currentValue == 0) return;
     if (isArrowPath || data.noteType == "receptor") return;
     data.angleY += currentValue * FlxAngle.TO_DEG;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
+    if (data.inOrientPass || currentValue == 0) return;
     data.angleY += currentValue * FlxAngle.TO_DEG;
   }
 }
@@ -195,6 +201,7 @@ class NotesConfusionZOffsetMod extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (data.inOrientPass || currentValue == 0) return;
     data.angleZ += currentValue * FlxAngle.TO_DEG;
   }
 }
@@ -210,6 +217,7 @@ class NotesConfusionXOffsetMod extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (data.inOrientPass || currentValue == 0) return;
     data.angleX += currentValue * FlxAngle.TO_DEG;
   }
 }
@@ -226,6 +234,7 @@ class NotesConfusionYOffsetMod extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (data.inOrientPass || currentValue == 0) return;
     data.angleY += currentValue * FlxAngle.TO_DEG;
   }
 }

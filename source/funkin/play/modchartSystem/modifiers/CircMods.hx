@@ -8,7 +8,6 @@ class CircModBase extends Modifier
 {
   var offset:ModifierSubValue;
   var strumResult:Array<Float> = [0, 0, 0, 0];
-
   var altCurposSubmod:ModifierSubValue;
 
   public function new(name:String)
@@ -37,14 +36,14 @@ class CircXMod extends CircModBase
 {
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.noteType == "receptor") return;
     data.x -= strumResult[data.direction];
     data.x += daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0 || offset.value == 0)
+    if (currentValue == 0)
     {
       strumResult[data.direction] = 0.0;
     }
@@ -62,14 +61,14 @@ class CircYMod extends CircModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.noteType == "receptor") return;
     data.y -= strumResult[data.direction];
     data.y += daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos) * (Preferences.downscroll && flipForDownscroll ? -1 : 1);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0 || offset.value == 0)
+    if (currentValue == 0)
     {
       strumResult[data.direction] = 0.0;
     }
@@ -85,14 +84,14 @@ class CircZMod extends CircModBase
 {
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.noteType == "receptor") return;
     data.z -= strumResult[data.direction];
     data.z += daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0 || offset.value == 0)
+    if (currentValue == 0)
     {
       strumResult[data.direction] = 0.0;
     }
@@ -108,14 +107,14 @@ class CircAngleMod extends CircModBase
 {
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
     data.angleZ -= strumResult[data.direction];
     data.angleZ += daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0 || offset.value == 0)
+    if (currentValue == 0)
     {
       strumResult[data.direction] = 0.0;
     }
@@ -131,13 +130,13 @@ class CircAngleYMod extends CircModBase
 {
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
     data.angleY += daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0 || offset.value == 0)
+    if (currentValue == 0)
     {
       strumResult[data.direction] = 0.0;
     }
@@ -153,13 +152,13 @@ class CircAngleXMod extends CircModBase
 {
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
     data.angleX += daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0 || offset.value == 0)
+    if (currentValue == 0)
     {
       strumResult[data.direction] = 0.0;
     }
@@ -175,7 +174,7 @@ class CircScaleMod extends CircModBase
 {
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
     final r:Float = daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos) * -0.01;
     data.scaleY += r;
     data.scaleX += r;
@@ -184,7 +183,7 @@ class CircScaleMod extends CircModBase
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0 || offset.value == 0)
+    if (currentValue == 0)
     {
       strumResult[data.direction] = 0.0;
     }
@@ -202,13 +201,13 @@ class CircScaleXMod extends CircModBase
 {
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
     data.scaleX += daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos) * -0.01;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0 || offset.value == 0)
+    if (currentValue == 0)
     {
       strumResult[data.direction] = 0.0;
     }
@@ -224,13 +223,13 @@ class CircScaleYMod extends CircModBase
 {
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
     data.scaleY += daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos) * -0.01;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0 || offset.value == 0)
+    if (currentValue == 0)
     {
       strumResult[data.direction] = 0.0;
     }
@@ -246,13 +245,13 @@ class CircSkewXMod extends CircModBase
 {
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
     data.skewX += daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0 || offset.value == 0)
+    if (currentValue == 0)
     {
       strumResult[data.direction] = 0.0;
     }
@@ -268,13 +267,13 @@ class CircSkewYMod extends CircModBase
 {
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
     data.skewY += daMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0 || offset.value == 0)
+    if (currentValue == 0)
     {
       strumResult[data.direction] = 0.0;
     }

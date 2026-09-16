@@ -34,7 +34,7 @@ class AngleXOffsetMod extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (isArrowPath || data.noteType == "receptor") return;
+    if (isArrowPath || data.noteType == "receptor" || data.inOrientPass) return;
     data.angleX += currentValue;
   }
 
@@ -56,7 +56,7 @@ class AngleYOffsetMod extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (isArrowPath || data.noteType == "receptor") return;
+    if (isArrowPath || data.noteType == "receptor" || data.inOrientPass) return;
     data.angleY += currentValue;
   }
 
@@ -79,7 +79,7 @@ class NotesAngleZOffsetMod extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (isArrowPath || data.noteType == "receptor") return;
+    if (isArrowPath || data.noteType == "receptor" || data.inOrientPass) return;
     data.angleZ += currentValue;
   }
 }
@@ -96,7 +96,7 @@ class NotesAngleXOffsetMod extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (isArrowPath || data.noteType == "receptor") return;
+    if (isArrowPath || data.noteType == "receptor" || data.inOrientPass) return;
     data.angleX += currentValue;
   }
 }
@@ -113,7 +113,7 @@ class NotesAngleYOffsetMod extends Modifier
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (isArrowPath || data.noteType == "receptor") return;
+    if (isArrowPath || data.noteType == "receptor" || data.inOrientPass) return;
     data.angleY += currentValue;
   }
 }

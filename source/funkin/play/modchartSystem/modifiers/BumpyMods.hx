@@ -391,6 +391,7 @@ class BumpyAngleMod extends BumpyModBase
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
+    if (data.inOrientPass) return;
     if (getOffset() == 0)
     {
       strumResult[data.direction] = 0;
@@ -417,6 +418,7 @@ class BumpyAngleXMod extends BumpyModBase
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
+    if (data.inOrientPass) return;
     if (getOffset() == 0)
     {
       strumResult[data.direction] = 0;
@@ -444,6 +446,7 @@ class BumpyAngleYMod extends BumpyModBase
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
+    if (data.inOrientPass) return;
     if (getOffset() == 0)
     {
       strumResult[data.direction] = 0;
@@ -473,6 +476,7 @@ class BumpyScaleMod extends BumpyModBase
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
+    if (data.inOrientPass) return;
     if (getOffset() == 0)
     {
       strumResult[data.direction] = 0;
@@ -501,6 +505,7 @@ class BumpyScaleXMod extends BumpyModBase
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
+    if (data.inOrientPass) return;
     if (getOffset() == 0)
     {
       strumResult[data.direction] = 0;
@@ -527,6 +532,7 @@ class BumpyScaleYMod extends BumpyModBase
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
+    if (data.inOrientPass) return;
     if (getOffset() == 0)
     {
       strumResult[data.direction] = 0;
@@ -554,6 +560,7 @@ class BumpySkewXMod extends BumpyModBase
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
+    if (data.inOrientPass) return;
     if (getOffset() == 0)
     {
       strumResult[data.direction] = 0;
@@ -581,6 +588,7 @@ class BumpySkewYMod extends BumpyModBase
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
+    if (data.inOrientPass) return;
     if (getOffset() == 0)
     {
       strumResult[data.direction] = 0;
@@ -691,6 +699,7 @@ class TanBumpyAngleMod extends BumpyModBase
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
+    if (data.inOrientPass) return;
     if (getOffset() == 0)
     {
       strumResult[data.direction] = 0;
@@ -720,6 +729,7 @@ class TanBumpyScaleMod extends BumpyModBase
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
+    if (data.inOrientPass) return;
     if (getOffset() == 0)
     {
       strumResult[data.direction] = 0;
@@ -748,6 +758,7 @@ class TanBumpyScaleXMod extends BumpyModBase
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
+    if (data.inOrientPass) return;
     if (getOffset() == 0)
     {
       strumResult[data.direction] = 0;
@@ -774,6 +785,7 @@ class TanBumpyScaleYMod extends BumpyModBase
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
+    if (data.inOrientPass) return;
     if (getOffset() == 0)
     {
       strumResult[data.direction] = 0;
@@ -801,6 +813,7 @@ class TanBumpySkewXMod extends BumpyModBase
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
+    if (data.inOrientPass) return;
     if (getOffset() == 0)
     {
       strumResult[data.direction] = 0;
@@ -823,11 +836,13 @@ class TanBumpySkewYMod extends BumpyModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (data.inOrientPass || currentValue == 0) return;
     data.skewY += tanBumpyMath(data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
+    if (data.inOrientPass) return;
     if (getOffset() == 0)
     {
       strumResult[data.direction] = 0;
