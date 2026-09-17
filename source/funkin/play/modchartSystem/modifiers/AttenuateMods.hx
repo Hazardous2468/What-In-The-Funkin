@@ -7,13 +7,21 @@ import flixel.math.FlxMath;
 
 class AttenuateModBase extends Modifier
 {
-  var offset:ModifierSubValue;
   var strumResult:Array<Float> = [0, 0, 0, 0];
+  var offset:ModifierSubValue;
+  var altCurposSubmod:ModifierSubValue;
+  var useUnscaledCurpos(get, never):Bool;
+
+  function get_useUnscaledCurpos():Bool
+  {
+    return altCurposSubmod.value >= 0.5;
+  }
 
   public function new(name:String)
   {
     super(name);
     offset = createSubMod("offset", 0.0);
+    altCurposSubmod = createSubMod("altcurpos", 1.0, ["use_unscaled", "alt_curpos", "type"]);
   }
 
   function daMath(data:NoteData):Float
@@ -25,7 +33,7 @@ class AttenuateModBase extends Modifier
     var nd = data.direction % Strumline.KEY_COUNT;
     var newPos = FlxMath.remapToRange(nd, 0, Strumline.KEY_COUNT, Strumline.KEY_COUNT * -1 * 0.5, Strumline.KEY_COUNT * 0.5);
 
-    var p:Float = data.curPos * (Preferences.downscroll ? -1 : 1);
+    var p:Float = (useUnscaledCurpos ? data.curPos_unscaled : data.curPos) * (Preferences.downscroll ? -1 : 1);
     p += offset.value;
     p = (p * p) * 0.1;
 

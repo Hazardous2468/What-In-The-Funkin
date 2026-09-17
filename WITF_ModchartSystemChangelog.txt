@@ -9,8 +9,9 @@ Fixed IT-NEVER-ENDS.
 Updated Cat and 19zz to have it's combo popup be less intrusive.
 Sustain lengths are more accurate to vanilla.
 Sustains now have their UV's fixed when clipping.
-New Lua variables and functions: stepsPerBeat, mp3DelaysMS, songDifficulty, songInstrumental, noteStyle, noteStyleID, noteStyleName, getTypeLengthAtMS(), getBeatTimeInMS(), getStepTimeInMS(), getTimeInSteps()
+New Lua variables and functions: stepsPerBeat, mp3DelaysMS, songDifficulty, songInstrumental, noteStyle, noteStyleID, noteStyleName, getTypeLengthAtMS(), getBeatTimeInMS(), getStepTimeInMS(), getTimeInSteps().
 Added TipsyScaleX, TipsyScaleY, TipsyAngleX, TipsyAngleY, TanTipsySkewX, TanTipsySkewY, SquareScaleX, SquareScaleY, SquareAngleX, SquareAngleY, TanBounceAngleX, TanBounceAngleY, CosecantSkewX, CosecantSkewY, SpiralSkewX, SpiralSkewY, SpiralScaleX, SpiralScaleY, SpiralAngleX, SpiralAngleY, SpiralCosAngleX, SpiralCosAngleY, SpiralCosScaleX, SpiralCosScaleY, SpiralCosSkewX, SpiralCosSkewY.
+Added altCurPos submodifier to Bounce, Bumpy and Attenuate.
 Fixed some modifiers breaking with Drive2 modifier.
 DebugDisplay for Modifiers now displays the strumLine's scroll speed and not the scrollSpeed set by the chart.
 Tweenlist debug display now wraps around properly (no longer goes off screen when there are too many tweens).

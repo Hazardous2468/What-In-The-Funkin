@@ -14,21 +14,29 @@ class BounceModBase extends Modifier
 {
   var mult:ModifierSubValue;
   var offset:ModifierSubValue;
+  var altCurposSubmod:ModifierSubValue;
+  var useUnscaledCurpos(get, never):Bool;
+
+  function get_useUnscaledCurpos():Bool
+  {
+    return altCurposSubmod.value >= 0.5;
+  }
 
   public function new(name:String)
   {
     super(name, 0);
     mult = createSubMod("mult", 1.0, ["period", "size"]);
     offset = createSubMod("offset", 0.0);
+    altCurposSubmod = createSubMod("altcurpos", 1.0, ["use_unscaled", "alt_curpos", "type"]);
   }
-
-  // An array which represents each arrow direction. Used to undo the strum movement for the notes for the offset submod to function
-  var strumResult:Array<Float> = [0, 0, 0, 0];
 
   function getOffset():Float
   {
     return offset.value * (Preferences.downscroll ? -1 : 1);
   }
+
+  // An array which represents each arrow direction. Used to undo the strum movement for the notes for the offset submod to function
+  var strumResult:Array<Float> = [0, 0, 0, 0];
 
   function bumpyMath(curPos:Float):Float
   {
@@ -68,14 +76,22 @@ class CosBounceXMod extends BounceModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (currentValue == 0 || data.noteType == "receptor") return;
     data.x -= strumResult[data.direction];
-    data.x += cosBumpyMath(data.curPos);
+    data.x += cosBumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    strumResult[data.direction] = cosBumpyMath(data.curPos);
-    data.x += strumResult[data.direction];
+    if (currentValue == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = cosBumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+      data.x += strumResult[data.direction];
+    }
   }
 }
 
@@ -88,14 +104,22 @@ class CosBounceYMod extends BounceModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (currentValue == 0 || data.noteType == "receptor") return;
     data.y -= strumResult[data.direction];
-    data.y += cosBumpyMath(data.curPos);
+    data.y += cosBumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    strumResult[data.direction] = cosBumpyMath(data.curPos);
-    data.y += strumResult[data.direction];
+    if (currentValue == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = cosBumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+      data.y += strumResult[data.direction];
+    }
   }
 }
 
@@ -108,14 +132,22 @@ class CosBounceZMod extends BounceModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (currentValue == 0 || data.noteType == "receptor") return;
     data.z -= strumResult[data.direction];
-    data.z += cosBumpyMath(data.curPos);
+    data.z += cosBumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    strumResult[data.direction] = cosBumpyMath(data.curPos);
-    data.z += strumResult[data.direction];
+    if (currentValue == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = cosBumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+      data.z += strumResult[data.direction];
+    }
   }
 }
 
@@ -129,14 +161,22 @@ class CosBounceAngleMod extends BounceModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
     data.angleZ -= strumResult[data.direction];
-    data.angleZ += cosBumpyMath(data.curPos);
+    data.angleZ += cosBumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    strumResult[data.direction] = cosBumpyMath(data.curPos);
-    data.angleZ += strumResult[data.direction];
+    if (currentValue == 0 || data.inOrientPass)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = cosBumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+      data.angleZ += strumResult[data.direction];
+    }
   }
 }
 
@@ -149,13 +189,21 @@ class CosBounceAngleXMod extends BounceModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    data.angleX -= cosBumpyMath(data.whichStrumNote?.strumDistance ?? 0);
-    data.angleX += cosBumpyMath(data.curPos);
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
+    data.angleX += cosBumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    data.angleX += cosBumpyMath(data.curPos);
+    if (data.inOrientPass || currentValue == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = cosBumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+      data.angleX += strumResult[data.direction];
+    }
   }
 }
 
@@ -169,13 +217,21 @@ class CosBounceAngleYMod extends BounceModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    data.angleY -= cosBumpyMath(data.whichStrumNote?.strumDistance ?? 0);
-    data.angleY += cosBumpyMath(data.curPos);
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
+    data.angleY += cosBumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    data.angleY += cosBumpyMath(data.curPos);
+    if (data.inOrientPass || currentValue == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = cosBumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+      data.angleY += strumResult[data.direction];
+    }
   }
 }
 
@@ -188,15 +244,26 @@ class CosBounceScaleMod extends BounceModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    data.scaleX += cosBumpyMath(data.curPos) * 0.01;
-    data.scaleY += cosBumpyMath(data.curPos) * 0.01;
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
+    final s:Float = cosBumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos) * 0.01;
+    data.scaleX += s;
+    data.scaleY += s;
+    data.scaleZ += s;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    strumResult[data.direction] = cosBumpyMath(data.curPos) * 0.01;
-    data.scaleX += strumResult[data.direction];
-    data.scaleY += strumResult[data.direction];
+    if (data.inOrientPass || currentValue == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = cosBumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos) * 0.01;
+      data.scaleX += strumResult[data.direction];
+      data.scaleY += strumResult[data.direction];
+      data.scaleZ += strumResult[data.direction];
+    }
   }
 }
 
@@ -209,13 +276,21 @@ class CosBounceScaleXMod extends BounceModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    data.scaleX += cosBumpyMath(data.curPos) * 0.01;
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
+    data.scaleX += cosBumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos) * 0.01;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    strumResult[data.direction] = cosBumpyMath(data.curPos) * 0.01;
-    data.scaleX += strumResult[data.direction];
+    if (data.inOrientPass || currentValue == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = cosBumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos) * 0.01;
+      data.scaleX += strumResult[data.direction];
+    }
   }
 }
 
@@ -228,13 +303,21 @@ class CosBounceScaleYMod extends BounceModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    data.scaleY += cosBumpyMath(data.curPos) * 0.01;
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
+    data.scaleY += cosBumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos) * 0.01;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    strumResult[data.direction] = cosBumpyMath(data.curPos) * 0.01;
-    data.scaleY += strumResult[data.direction];
+    if (data.inOrientPass || currentValue == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = cosBumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos) * 0.01;
+      data.scaleY += strumResult[data.direction];
+    }
   }
 }
 
@@ -248,12 +331,21 @@ class CosBounceSkewXMod extends BounceModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    data.skewX += cosBumpyMath(data.curPos);
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
+    data.skewX += cosBumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    data.skewX += cosBumpyMath(data.curPos);
+    if (data.inOrientPass || currentValue == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = cosBumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+      data.skewX += strumResult[data.direction];
+    }
   }
 }
 
@@ -267,12 +359,21 @@ class CosBounceSkewYMod extends BounceModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    data.skewY += cosBumpyMath(data.curPos);
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
+    data.skewY += cosBumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    data.skewY += cosBumpyMath(data.curPos);
+    if (data.inOrientPass || currentValue == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = cosBumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+      data.skewY += strumResult[data.direction];
+    }
   }
 }
 
@@ -286,14 +387,22 @@ class BounceXMod extends BounceModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (currentValue == 0 || data.noteType == "receptor") return;
     data.x -= strumResult[data.direction];
-    data.x += bumpyMath(data.curPos);
+    data.x += bumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    strumResult[data.direction] = bumpyMath(data.curPos);
-    data.x += strumResult[data.direction];
+    if (currentValue == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = bumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+      data.x += strumResult[data.direction];
+    }
   }
 }
 
@@ -306,14 +415,22 @@ class BounceYMod extends BounceModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (currentValue == 0 || data.noteType == "receptor") return;
     data.y -= strumResult[data.direction];
-    data.y += bumpyMath(data.curPos);
+    data.y += bumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    strumResult[data.direction] = bumpyMath(data.curPos);
-    data.y += strumResult[data.direction];
+    if (currentValue == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = bumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+      data.y += strumResult[data.direction];
+    }
   }
 }
 
@@ -326,14 +443,22 @@ class BounceZMod extends BounceModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (currentValue == 0 || data.noteType == "receptor") return;
     data.z -= strumResult[data.direction];
-    data.z += bumpyMath(data.curPos);
+    data.z += bumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    strumResult[data.direction] = bumpyMath(data.curPos);
-    data.z += strumResult[data.direction];
+    if (currentValue == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = bumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+      data.z += strumResult[data.direction];
+    }
   }
 }
 
@@ -367,16 +492,22 @@ class BounceAngleMod extends BounceModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (data.inOrientPass) return;
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
     data.angleZ -= strumResult[data.direction];
-    data.angleZ += bumpyMath(data.curPos);
+    data.angleZ += bumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (data.inOrientPass) return;
-    strumResult[data.direction] = bumpyMath(data.curPos);
-    data.angleZ += strumResult[data.direction];
+    if (data.inOrientPass || currentValue == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = bumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+      data.angleZ += strumResult[data.direction];
+    }
   }
 }
 
@@ -389,15 +520,21 @@ class BounceAngleXMod extends BounceModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (data.inOrientPass) return;
-    data.angleX += bumpyMath(data.curPos);
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
+    data.angleX += bumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (data.inOrientPass) return;
-    strumResult[data.direction] = bumpyMath(data.curPos);
-    data.angleX += strumResult[data.direction];
+    if (data.inOrientPass || currentValue == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = bumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+      data.angleX += strumResult[data.direction];
+    }
   }
 }
 
@@ -411,15 +548,21 @@ class BounceAngleYMod extends BounceModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (data.inOrientPass) return;
-    data.angleY += bumpyMath(data.curPos);
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
+    data.angleY += bumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (data.inOrientPass) return;
-    strumResult[data.direction] = bumpyMath(data.curPos);
-    data.angleY += strumResult[data.direction];
+    if (data.inOrientPass || currentValue == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = bumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+      data.angleY += strumResult[data.direction];
+    }
   }
 }
 
@@ -432,17 +575,26 @@ class BounceScaleMod extends BounceModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (data.inOrientPass) return;
-    data.scaleX += bumpyMath(data.curPos) * 0.01;
-    data.scaleY += bumpyMath(data.curPos) * 0.01;
+    if (data.inOrientPass || currentValue == 0 || data.noteType == "receptor") return;
+    final s:Float = bumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos) * 0.01;
+    data.scaleX += s;
+    data.scaleY += s;
+    data.scaleZ += s;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (data.inOrientPass) return;
-    strumResult[data.direction] = bumpyMath(data.curPos) * 0.01;
-    data.scaleX += strumResult[data.direction];
-    data.scaleY += strumResult[data.direction];
+    if (data.inOrientPass || currentValue == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = bumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos) * 0.01;
+      data.scaleX += strumResult[data.direction];
+      data.scaleY += strumResult[data.direction];
+      data.scaleZ += strumResult[data.direction];
+    }
   }
 }
 
@@ -455,15 +607,21 @@ class BounceScaleXMod extends BounceModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (data.inOrientPass) return;
-    data.scaleX += bumpyMath(data.curPos) * 0.01;
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
+    data.scaleX += bumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos) * 0.01;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (data.inOrientPass) return;
-    strumResult[data.direction] = bumpyMath(data.curPos) * 0.01;
-    data.scaleX += strumResult[data.direction];
+    if (data.inOrientPass || currentValue == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = bumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos) * 0.01;
+      data.scaleX += strumResult[data.direction];
+    }
   }
 }
 
@@ -476,15 +634,21 @@ class BounceScaleYMod extends BounceModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (data.inOrientPass) return;
-    data.scaleY += bumpyMath(data.curPos) * 0.01;
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
+    data.scaleY += bumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos) * 0.01;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (data.inOrientPass) return;
-    strumResult[data.direction] = bumpyMath(data.curPos) * 0.01;
-    data.scaleY += strumResult[data.direction];
+    if (data.inOrientPass || currentValue == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = bumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos) * 0.01;
+      data.scaleY += strumResult[data.direction];
+    }
   }
 }
 
@@ -498,15 +662,21 @@ class BounceSkewXMod extends BounceModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (data.inOrientPass) return;
-    data.skewX += bumpyMath(data.curPos);
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
+    data.skewX += bumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (data.inOrientPass) return;
-    strumResult[data.direction] = bumpyMath(data.curPos);
-    data.skewX += strumResult[data.direction];
+    if (data.inOrientPass || currentValue == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = bumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+      data.skewX += strumResult[data.direction];
+    }
   }
 }
 
@@ -520,15 +690,21 @@ class BounceSkewYMod extends BounceModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (data.inOrientPass) return;
-    data.skewY += bumpyMath(data.curPos);
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
+    data.skewY += bumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (data.inOrientPass) return;
-    strumResult[data.direction] = bumpyMath(data.curPos);
-    data.skewY += strumResult[data.direction];
+    if (data.inOrientPass || currentValue == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = bumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+      data.skewY += strumResult[data.direction];
+    }
   }
 }
 
@@ -542,14 +718,22 @@ class TanBounceXMod extends BounceModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (currentValue == 0 || data.noteType == "receptor") return;
     data.x -= strumResult[data.direction];
-    data.x += tanBumpyMath(data.curPos);
+    data.x += tanBumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    strumResult[data.direction] = tanBumpyMath(data.curPos);
-    data.x += strumResult[data.direction];
+    if (currentValue == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = tanBumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+      data.x += strumResult[data.direction];
+    }
   }
 }
 
@@ -562,14 +746,22 @@ class TanBounceYMod extends BounceModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (currentValue == 0 || data.noteType == "receptor") return;
     data.y -= strumResult[data.direction];
-    data.y += tanBumpyMath(data.curPos);
+    data.y += tanBumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    strumResult[data.direction] = tanBumpyMath(data.curPos);
-    data.y += strumResult[data.direction];
+    if (currentValue == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = tanBumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+      data.y += strumResult[data.direction];
+    }
   }
 }
 
@@ -582,14 +774,22 @@ class TanBounceZMod extends BounceModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
+    if (currentValue == 0 || data.noteType == "receptor") return;
     data.z -= strumResult[data.direction];
-    data.z += tanBumpyMath(data.curPos);
+    data.z += tanBumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    strumResult[data.direction] = tanBumpyMath(data.curPos);
-    data.z += strumResult[data.direction];
+    if (currentValue == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = tanBumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+      data.z += strumResult[data.direction];
+    }
   }
 }
 
@@ -603,16 +803,22 @@ class TanBounceAngleMod extends BounceModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (data.inOrientPass) return;
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
     data.angleZ -= strumResult[data.direction];
-    data.angleZ += tanBumpyMath(data.curPos);
+    data.angleZ += tanBumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (data.inOrientPass) return;
-    strumResult[data.direction] = tanBumpyMath(data.curPos);
-    data.angleZ += strumResult[data.direction];
+    if (data.inOrientPass || currentValue == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = tanBumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+      data.angleZ += strumResult[data.direction];
+    }
   }
 }
 
@@ -626,15 +832,21 @@ class TanBounceAngleXMod extends BounceModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (data.inOrientPass) return;
-    data.angleX += tanBumpyMath(data.curPos);
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
+    data.angleX += tanBumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (data.inOrientPass) return;
-    strumResult[data.direction] = tanBumpyMath(data.curPos);
-    data.angleX += strumResult[data.direction];
+    if (data.inOrientPass || currentValue == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = tanBumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+      data.angleX += strumResult[data.direction];
+    }
   }
 }
 
@@ -648,15 +860,21 @@ class TanBounceAngleYMod extends BounceModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (data.inOrientPass) return;
-    data.angleY += tanBumpyMath(data.curPos);
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
+    data.angleY += tanBumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (data.inOrientPass) return;
-    strumResult[data.direction] = tanBumpyMath(data.curPos);
-    data.angleY += strumResult[data.direction];
+    if (data.inOrientPass || currentValue == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = tanBumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+      data.angleY += strumResult[data.direction];
+    }
   }
 }
 
@@ -669,17 +887,26 @@ class TanBounceScaleMod extends BounceModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (data.inOrientPass) return;
-    data.scaleX += tanBumpyMath(data.curPos) * 0.01;
-    data.scaleY += tanBumpyMath(data.curPos) * 0.01;
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
+    final s:Float = tanBumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos) * 0.01;
+    data.scaleX += s;
+    data.scaleY += s;
+    data.scaleZ += s;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (data.inOrientPass) return;
-    strumResult[data.direction] = tanBumpyMath(data.curPos) * 0.01;
-    data.scaleX += strumResult[data.direction];
-    data.scaleY += strumResult[data.direction];
+    if (data.inOrientPass || currentValue == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = tanBumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos) * 0.01;
+      data.scaleX += strumResult[data.direction];
+      data.scaleY += strumResult[data.direction];
+      data.scaleZ += strumResult[data.direction];
+    }
   }
 }
 
@@ -693,15 +920,21 @@ class TanBounceSkewXMod extends BounceModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (data.inOrientPass) return;
-    data.skewX += tanBumpyMath(data.curPos);
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
+    data.skewX += tanBumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (data.inOrientPass) return;
-    strumResult[data.direction] = tanBumpyMath(data.curPos);
-    data.skewX += strumResult[data.direction];
+    if (data.inOrientPass || currentValue == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = tanBumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+      data.skewX += strumResult[data.direction];
+    }
   }
 }
 
@@ -715,14 +948,20 @@ class TanBounceSkewYMod extends BounceModBase
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (data.inOrientPass) return;
-    data.skewY += tanBumpyMath(data.curPos);
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
+    data.skewY += tanBumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (data.inOrientPass) return;
-    strumResult[data.direction] = tanBumpyMath(data.curPos);
-    data.skewY += strumResult[data.direction];
+    if (data.inOrientPass || currentValue == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = tanBumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+      data.skewY += strumResult[data.direction];
+    }
   }
 }
