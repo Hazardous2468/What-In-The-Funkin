@@ -216,6 +216,8 @@ class ModConstants
     modName = StringTools.replace(modName, "autodriven", "jump");
     modName = StringTools.replace(modName, "autodrive", "jump");
 
+    modName = StringTools.replace(modName, "speedmod", "speed");
+
     modName = StringTools.replace(modName, "rotx", "rotatex");
     modName = StringTools.replace(modName, "roty", "rotatey");
     modName = StringTools.replace(modName, "rotz", "rotatez");
@@ -1063,7 +1065,7 @@ class ModConstants
         newMod = new HoldGrainMod(tag);
 
       // speed mods
-      case "speed" | "speedmod": // forgot the name lol
+      case "speed":
         newMod = new SpeedMod(tag);
       case "slowdown":
         newMod = new SlowDownMod(tag);
