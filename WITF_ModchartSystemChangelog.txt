@@ -7,6 +7,8 @@ Updated custom notestyles. Groovin now has a smoother animation and is properly 
 Updated how modifiers invert for dad, as well as how some modifiers are hidden from the debug list (whether a mod should invert or be hidden is now inside the BaseModifier instead of an array in ModConstants).
 Fixed IT-NEVER-ENDS.
 Updated Cat and 19zz to have it's combo popup be less intrusive.
+Replaced 'nobody' with 'modcharts' for the player ID. This will cause compatibility issues with every older version so make sure everything is updated to use the new ID!
+ZSprites are now scriptable.
 Sustain lengths are more accurate to vanilla.
 Sustains now have their UV's fixed when clipping.
 New Lua variables and functions: stepsPerBeat, mp3DelaysMS, songDifficulty, songInstrumental, noteStyle, noteStyleID, noteStyleName, getTypeLengthAtMS(), getBeatTimeInMS(), getStepTimeInMS(), getTimeInSteps().
