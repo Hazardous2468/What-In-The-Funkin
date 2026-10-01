@@ -109,6 +109,7 @@ class HazardModLuaTest
     set('songDifficulty', PlayState.instance.currentChart.difficulty);
     set('songName', PlayState.instance.currentChart.songName);
     set('songVariation', PlayState.instance.currentVariation);
+    set('variation', PlayState.instance.currentVariation);
     set('songInstrumental', PlayState.instance.currentInstrumental);
 
     @:privateAccess
