@@ -84,7 +84,7 @@ import funkin.play.modchartSystem.modifiers.*; // if only you worked ;_;
 class ModConstants
 {
   public static var orientTimeOffset:Float = -2.0; // in ms
-  public static final MODCHART_VERSION:String = "v1.1.0";
+  public static final MODCHART_VERSION:String = "v1.1.1";
   public static final defaultHoldGrain = 75;
   public static final defaultPathGrain = defaultHoldGrain;
   public static var tooCloseToCameraFix:Float = 0.975; // dumb fix for preventing freak out on z math or something

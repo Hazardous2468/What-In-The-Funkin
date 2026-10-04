@@ -1707,18 +1707,18 @@ class HScript
     interp.variables.set('Conductor', Conductor);
     interp.variables.set('StringTools', StringTools);
     interp.variables.set('Std', Std);
-    interp.variables.set('eh', PlayState.instance.modchartEventHandler);
+    // interp.variables.set('eh', PlayState.instance.modchartEventHandler);
 
     interp.variables.set('FlxMath', FlxMath);
     interp.variables.set('Math', Math);
 
+    interp.variables.set("Constants", Type.resolveClass("funkin.util.Constants"));
     interp.variables.set("ModConstants", Type.resolveClass("funkin.play.modchartSystem.ModConstants"));
     interp.variables.set("BaseModifier", Type.resolveClass("funkin.play.modchartSystem.modifiers.BaseModifier"));
     interp.variables.set("CustomModifier", Type.resolveClass("funkin.play.modchartSystem.modifiers.CustomModifier"));
     interp.variables.set("NoteData", Type.resolveClass("funkin.play.modchartSystem.NoteData"));
     interp.variables.set('ModHandler', ModHandler);
     interp.variables.set('ModEventHandler', ModEventHandler);
-
     interp.variables.set('Preferences', Preferences);
     interp.variables.set('downScroll', Preferences.downscroll);
     interp.variables.set('upScroll', !Preferences.downscroll);
