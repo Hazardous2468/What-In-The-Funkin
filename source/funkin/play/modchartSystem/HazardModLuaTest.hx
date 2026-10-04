@@ -941,10 +941,15 @@ class HazardModLuaTest
       initHaxeModule();
       try
       {
-        var str:String = '';
-        if (libPackage.length > 0) str = libPackage + '.';
+        var full:String = (libPackage.length > 0 ? libPackage + '.' : '') + libName;
 
-        hscript.variables.set(libName, Type.resolveClass(str + libName));
+        if (isBlacklisted(full))
+        {
+          luaTrace("Cannot use '" + full + "' as it is blacklisted.", false, false, FlxColor.RED);
+          return;
+        }
+
+        hscript.variables.set(libName, Type.resolveClass(full));
       }
       catch (e:Dynamic)
       {
@@ -1001,6 +1006,46 @@ class HazardModLuaTest
     for (type in types)
     {
       if (Std.isOfType(value, type)) return true;
+    }
+    return false;
+  }
+
+  // An array that copies the
+  static final BLACKLISTED:Array<String> = [
+    'Sys',
+    'sys',
+    'cpp.Lib',
+    'haxe.Unserializer',
+    'haxe.Http',
+    'lime.utils.AssetLibrary',
+    'lime.utils.Assets',
+    'lime.system.System',
+    'lime.system.CFFI',
+    'lime.system.JNI',
+    'openfl.utils.Assets', // Even though it's blacklisted in polyModHandler, it still works in scripts for my shaders?
+    'openfl.Lib',
+    'openfl.system.ApplicationDomain',
+    'openfl.net.SharedObject',
+    'openfl.desktop.NativeProcess',
+    'funkin.mobile.util',
+    'Reflect',
+    'Type',
+    'extension',
+    'funkin.api',
+    'polymod',
+    'hscript',
+    'io.newgrounds',
+    'funkin.util.macro',
+    'funkin.external.android.CallbackUtil',
+    'funkin.external.android.DataFolderUtil',
+    'funkin.external.android.JNIUtil'
+  ];
+
+  static function isBlacklisted(fullName:String):Bool
+  {
+    for (b in BLACKLISTED)
+    {
+      if (fullName == b || StringTools.startsWith(fullName, b + '.')) return true;
     }
     return false;
   }
@@ -1707,7 +1752,7 @@ class HScript
     interp.variables.set('Conductor', Conductor);
     interp.variables.set('StringTools', StringTools);
     interp.variables.set('Std', Std);
-    // interp.variables.set('eh', PlayState.instance.modchartEventHandler);
+    interp.variables.set('eh', PlayState.instance.modchartEventHandler);
 
     interp.variables.set('FlxMath', FlxMath);
     interp.variables.set('Math', Math);

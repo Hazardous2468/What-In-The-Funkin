@@ -11,6 +11,7 @@ import funkin.play.Countdown.CountdownStep;
 import funkin.play.notes.NoteDirection;
 import funkin.ui.freeplay.SongMenuItem;
 import openfl.events.KeyboardEvent;
+import flixel.util.FlxColor;
 
 /**
  * This is a base class for all events that are issued to scripted classes.
@@ -656,5 +657,23 @@ class PauseScriptEvent extends ScriptEvent
   {
     super(PAUSE, true);
     this.gitaroo = gitaroo;
+  }
+}
+
+/**
+ * An event which is called whenever the 'modDebugNotif' function gets used.
+ */
+class DebugNotificationScriptEvent extends ScriptEvent
+{
+  public var text(default, default):String;
+  public var color(default, default):FlxColor;
+  public var critical(default, default):Bool;
+
+  public function new(text:String, color:FlxColor = FlxColor.WHITE, critical:Bool = false):Void
+  {
+    super(MODCHART_NOTIFICATION, true);
+    this.text = text;
+    this.color = color;
+    this.critical = critical;
   }
 }

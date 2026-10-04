@@ -1,6 +1,7 @@
 package funkin.util;
 
 import flixel.util.FlxSignal.FlxTypedSignal;
+import openfl.Lib;
 
 using StringTools;
 
@@ -199,5 +200,10 @@ class WindowUtil
       trace('Failed to set VSync mode to ' + value);
       FlxG.stage.application.window.setVSyncMode(lime.ui.WindowVSyncMode.OFF);
     }
+  }
+
+  public static function getLibApplicationWindow()
+  {
+    return Lib.application.window;
   }
 }

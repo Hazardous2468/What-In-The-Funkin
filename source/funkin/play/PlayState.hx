@@ -950,6 +950,11 @@ class PlayState extends MusicBeatSubState
 
   public function modDebugNotif(txtToShow:String = "", ?color:FlxColor = FlxColor.WHITE, ?howManySeconds:Float = 5, ?fadeInSeconds:Float = 0.25, ?fadeOutSeconds:Float = 1, criticalError:Bool = false):Void
   {
+    var event:DebugNotificationScriptEvent = new DebugNotificationScriptEvent(txtToShow, color, criticalError);
+    dispatchEvent(event);
+
+    if (event.eventCanceled) return;
+
     if (!criticalError && hideNotifs) return; // Don't do shit unless it's a critical error if we don't wanna show notifs!
 
     if (debugNotifs == null)

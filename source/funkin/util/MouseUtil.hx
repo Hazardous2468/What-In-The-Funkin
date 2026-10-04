@@ -1,6 +1,7 @@
 package funkin.util;
 
 import flixel.math.FlxPoint;
+import openfl.Lib;
 
 /**
  * Utility functions related to the mouse.
@@ -50,5 +51,15 @@ class MouseUtil
   public static function mouseWheelZoom():Void
   {
     if (FlxG.mouse.wheel != 0) FlxG.camera.zoom += FlxG.mouse.deltaWheel.y * (0.1 * FlxG.camera.zoom);
+  }
+
+  public static function warpMouse(x:Int, y:Int)
+  {
+    Lib.application.window.warpMouse(x, y);
+  }
+
+  public static function setMouseLock(mouseLock:Bool)
+  {
+    Lib.application.window.mouseLock = mouseLock;
   }
 }

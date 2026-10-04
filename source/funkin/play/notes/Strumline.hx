@@ -354,9 +354,9 @@ class Strumline extends FlxSpriteGroup
 
   function arrowPathSetup():Void
   {
-    arrowPaths = new FlxTypedSpriteGroup<SustainTrail>();
-    arrowPaths.zIndex = 6;
-    this.add(arrowPaths);
+    this.arrowPaths = new FlxTypedSpriteGroup<SustainTrail>();
+    this.arrowPaths.zIndex = 6;
+    this.add(this.arrowPaths);
 
     notitgPathSprite = new ZSprite();
     notitgPathSprite.x = 0;
@@ -673,11 +673,15 @@ class Strumline extends FlxSpriteGroup
     if (!generatedArrowPaths) return;
     if (!drawArrowPaths)
     {
-      arrowPaths.visible = false;
+      arrowPaths.forEach(function(note:SustainTrail)
+      {
+        note.visible = false;
+      });
+      // arrowPaths.visible = false;
       notitgPathSprite.visible = false;
       return;
     }
-    arrowPaths.visible = this.visible;
+    // arrowPaths.visible = this.visible;
 
     notitgPathSprite.visible = notitgStyledPath && this.visible;
     if (notitgStyledPath)

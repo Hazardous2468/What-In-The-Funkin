@@ -23,8 +23,7 @@ typedef ModuleParams =
  * You may have the module active at all times, or only when another script enables it.
  */
 @:nullSafety
-class Module implements IPlayStateScriptedClass implements IStateChangingScriptedClass implements IFreeplayScriptedClass
-    implements ICharacterSelectScriptedClass
+class Module implements IPlayStateScriptedClass implements IStateChangingScriptedClass implements IFreeplayScriptedClass implements ICharacterSelectScriptedClass
 {
   /**
    * Whether the module is currently active.
@@ -299,19 +298,32 @@ class Module implements IPlayStateScriptedClass implements IStateChangingScripte
   }
 
   /**
+   * Called from playstate whenever the 'modDebugNotif' function gets used.
+   */
+  public function onModchartNotification(event:ScriptEvent)
+  {
+  }
+
+  /**
    * Called first thing during the creation of PlayState if a modchart is present. Will only be called ONCE, even if reloading midsong!
    */
-  public function onModchartSetup(event:ScriptEvent) {}
+  public function onModchartSetup(event:ScriptEvent)
+  {
+  }
 
   /**
    * Called when the modchart timeline is being constructed (once during song load, and again if hot reloading midsong)
    */
-  public function onModchartTimeline(event:ScriptEvent) {}
+  public function onModchartTimeline(event:ScriptEvent)
+  {
+  }
 
   /**
    * Called when the modchart requests a reset (whether restarting a song, going backwards, or hot reloading midsong)
    */
-  public function onModchartReset(event:ScriptEvent) {}
+  public function onModchartReset(event:ScriptEvent)
+  {
+  }
 
   /**
    * Called when any state is created.

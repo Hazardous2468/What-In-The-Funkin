@@ -331,7 +331,7 @@ class PolymodHandler
     // `haxe.Http`
     // An alias for `sys.Http`, which is also a blacklisted package.
     Polymod.blacklistImport('haxe.Http');
-    
+
     // `haxe.Unserializer`
     // Unserializer.DEFAULT_RESOLVER.resolveClass() can access blacklisted packages
     Polymod.blacklistImport('haxe.Unserializer');
@@ -472,6 +472,10 @@ class PolymodHandler
 
     // Blacklists accessing the interp for polymod hscript
     Polymod.blacklistInstanceFields(polymod.hscript._internal.PolymodScriptClass.PolymodScriptClass, ['_interp']);
+
+    // `funkin.play.modchartSystem.HazardModLuaTest`
+    // If left out, can be edited by polymod hxScripts to change the blacklist array.
+    Polymod.blacklistImport('funkin.play.modchartSystem.HazardModLuaTest');
   }
 
   /**
@@ -561,9 +565,7 @@ class PolymodHandler
    */
   public static function getAllModDirs():Array<String>
   {
-    var modDirs:Array<String> = [
-      for (i in getAllMods()) i.dirName
-    ];
+    var modDirs:Array<String> = [for (i in getAllMods()) i.dirName];
     return modDirs;
   }
 

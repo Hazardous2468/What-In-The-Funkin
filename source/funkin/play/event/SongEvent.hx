@@ -201,4 +201,8 @@ class SongEvent implements IPlayStateScriptedClass
   public function onModchartReset(event:ScriptEvent)
   {
   }
+
+  public function onModchartNotification(event:ScriptEvent)
+  {
+  }
 }

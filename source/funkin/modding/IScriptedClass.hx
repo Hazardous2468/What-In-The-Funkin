@@ -110,6 +110,11 @@ interface IBPMSyncedScriptedClass extends IScriptedClass
 interface IPlayStateScriptedClass extends INoteScriptedClass extends IBPMSyncedScriptedClass
 {
   /**
+   * Called from playstate whenever the 'modDebugNotif' function gets used.
+   */
+  public function onModchartNotification(event:ScriptEvent):Void;
+
+  /**
    * Called during the setup process of Modcharts.
    * Use this to mutate the modchart system before it gets applied / set!
    * THIS IS BEFORE CUSTOM STRUMS ARE CREATED!

@@ -196,15 +196,18 @@ class Song implements IPlayStateScriptedClass implements IRegistryEntry<SongMeta
    * @param validScore Whether the song is elegible for highscores.
    * @return The constructed song object.
    */
-  public static function buildRaw(songId:String, metadata:Array<SongMetadata>, variation:String, charts:Map<String, SongChartData>, includeScript:Bool = true,
-      validScore:Bool = false):Song
+  public static function buildRaw(songId:String, metadata:Array<SongMetadata>, variation:String, charts:Map<String, SongChartData>, includeScript:Bool = true, validScore:Bool = false):Song
   {
     @:privateAccess
     var result:Null<Song> = null;
 
-    if (includeScript && SongRegistry.instance.isScriptedEntry(songId, {variation: variation}))
+    if (includeScript && SongRegistry.instance.isScriptedEntry(songId, {
+      variation: variation
+    }))
     {
-      var songClassName:Null<String> = SongRegistry.instance.getScriptedEntryClassName(songId, {variation: variation});
+      var songClassName:Null<String> = SongRegistry.instance.getScriptedEntryClassName(songId, {
+        variation: variation
+      });
       @:privateAccess
       if (songClassName != null) result = SongRegistry.instance.createScriptedEntry(songClassName);
     }
@@ -527,10 +530,7 @@ class Song implements IPlayStateScriptedClass implements IRegistryEntry<SongMeta
     {
       var metadata = _metadata.get(variationId);
       return metadata?.playData?.difficulties ?? [];
-    })
-      .flatten()
-      .filterNull()
-      .distinct();
+    }).flatten().filterNull().distinct();
 
     diffFiltered = diffFiltered.filter(function(diffId:String):Bool
     {
@@ -561,8 +561,7 @@ class Song implements IPlayStateScriptedClass implements IRegistryEntry<SongMeta
       var difficulties = listDifficulties(variation, null, showLocked, showHidden);
       for (difficulty in difficulties)
       {
-        var suffixedDifficulty = (variation != Constants.DEFAULT_VARIATION
-          && variation != 'erect') ? '$difficulty-${variation}' : difficulty;
+        var suffixedDifficulty = (variation != Constants.DEFAULT_VARIATION && variation != 'erect') ? '$difficulty-${variation}' : difficulty;
         result.push(suffixedDifficulty);
       }
     }
@@ -720,11 +719,21 @@ class Song implements IPlayStateScriptedClass implements IRegistryEntry<SongMeta
   {
   };
 
-  public function onModchartSetup(event:ScriptEvent):Void {};
+  public function onModchartNotification(event:ScriptEvent):Void
+  {
+  }
 
-  public function onModchartReset(event:ScriptEvent):Void {};
+  public function onModchartSetup(event:ScriptEvent):Void
+  {
+  };
 
-  public function onModchartTimeline(event:ScriptEvent):Void {};
+  public function onModchartReset(event:ScriptEvent):Void
+  {
+  };
+
+  public function onModchartTimeline(event:ScriptEvent):Void
+  {
+  };
 
   static function _fetchData(id:String):Null<SongMetadata>
   {

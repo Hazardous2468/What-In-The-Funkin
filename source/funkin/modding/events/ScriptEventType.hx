@@ -4,6 +4,12 @@ package funkin.modding.events;
 enum abstract ScriptEventType(String) from String to String
 {
   /**
+   * Called in playstate whenever the 'modDebugNotif' function gets used.
+   * This event is cancelable.
+   */
+  var MODCHART_NOTIFICATION = "MODCHART_NOTIFICATION";
+
+  /**
    * Called in playstate song creation, right after the modchart event handler is first created.
    * This function is only called once.
    * This event is not cancelable.
