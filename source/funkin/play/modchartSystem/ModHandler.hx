@@ -323,9 +323,9 @@ class ModHandler
     return mod;
   }
 
-  public function addCustomMod(modIn:CustomModifier, makeCopy:Bool = false):Null<CustomModifier>
+  public function addCustomMod(modIn:Modifier, makeCopy:Bool = false):Null<Modifier>
   {
-    var mod:CustomModifier = makeCopy ? modIn.clone() : modIn;
+    var mod:Modifier = makeCopy ? modIn.clone() : modIn;
 
     /*
       // we already have this!

@@ -33,7 +33,7 @@ class CustomModifier extends Modifier
 
   // Create and return a new copy of this CustomModifier
 
-  public function clone():CustomModifier
+  public override function clone():CustomModifier
   {
     var newShit:CustomModifier = new CustomModifier(tag, baseValue);
 
@@ -478,5 +478,27 @@ class Modifier
 
   public dynamic function strumMath(data:NoteData, strumLine:Strumline):Void
   {
+  }
+
+  public function clone():Modifier
+  {
+    var newShit:Modifier = new Modifier(tag, baseValue);
+
+    newShit.modPriority = this.modPriority;
+    newShit.targetLane = this.targetLane;
+
+    newShit.unknown = this.unknown;
+    newShit.strumsMod = this.strumsMod;
+    newShit.notesMod = this.notesMod;
+    newShit.holdsMod = this.holdsMod;
+    newShit.pathMod = this.pathMod;
+    newShit.specialMod = this.specialMod;
+    newShit.speedMod = this.speedMod;
+
+    newShit.notPercentage = this.notPercentage;
+    newShit.invertForDad = this.invertForDad;
+    newShit.utility = this.utility;
+
+    return newShit;
   }
 }

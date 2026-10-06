@@ -991,6 +991,8 @@ class ModConstants
     switch (tag_)
     {
       // special mods
+      case "oldcustompath":
+        newMod = new OldCustomPathMod(tag);
       case "custompath":
         newMod = new CustomPathMod(tag);
       case "orient":

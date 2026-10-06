@@ -1,3 +1,13 @@
+v1.1.1:
+
+Overhauled the customPath logic. For the old behaviour, use 'oldCustomPath' modifier.
+The 'addCustomMod' function for ModHandlers now accept any Modifier, not just CustomModifier. This means you can create your own Drunk Modifier, edit the noteMath, and then add it using the addCustomMod function.
+Added aliases for some stealth submods.
+Tiffy now appears in the character select.
+
+
+
+
 v1.1.0:
 
 Updated to latest version of FNF (v0.8.7)
