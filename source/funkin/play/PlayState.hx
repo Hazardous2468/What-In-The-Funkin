@@ -886,6 +886,7 @@ class PlayState extends MusicBeatSubState
 
     if (allStrumSprites != null)
     {
+      allStrumSprites.active = false;
       for (strumLine in allStrumLines)
       {
         if (strumLine.asleep) continue; // Skip this strumline if it's asleep lol
@@ -2842,6 +2843,7 @@ class PlayState extends MusicBeatSubState
       allStrumSprites.cameras = [camNotes];
       add(allStrumSprites);
       allStrumSprites.visible = false;
+      allStrumSprites.active = false;
     }
   }
 

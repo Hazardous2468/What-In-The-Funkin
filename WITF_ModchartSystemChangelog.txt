@@ -1,8 +1,11 @@
 v1.1.1:
 
 Overhauled the customPath logic. For the old behaviour, use 'oldCustomPath' modifier.
+Blacklisted some classes when trying to use them in runHaxeCode in modcharts to match base game.
+New 'onModchartNotification' script event for polymod hxScripts.
 The 'addCustomMod' function for ModHandlers now accept any Modifier, not just CustomModifier. This means you can create your own Drunk Modifier, edit the noteMath, and then add it using the addCustomMod function.
 Added aliases for some stealth submods.
+Fixed zSort animation speeds (mostly affects Notesplashes and HoldCovers)
 Tiffy now appears in the character select.
 
 

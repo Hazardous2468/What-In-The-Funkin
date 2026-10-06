@@ -15,12 +15,10 @@ class NoteSplash extends ZSprite
   static var frameCollection:FlxFramesCollection;
 
   public var DIRECTION:Int = 0;
-
   // If set to true, will copy the HSV values from the note that triggered this notesplash. Unique to v0.8.0 (WITF)
   public var copyHSV:Bool = false;
 
   var hsvShader:HSVNotesShader;
-
   var noteStyle:NoteStyle = null;
 
   public function new(noteStyle:NoteStyle)
@@ -78,7 +76,8 @@ class NoteSplash extends ZSprite
     this.DIRECTION = direction;
     if (variant == null)
     {
-      var animationAmount:Int = this.animation.getAnimationList().filter(function(anim) return anim.name.startsWith('splash${direction.nameUpper}')).length
+      var animationAmount:Int =
+        this.animation.getAnimationList().filter(function(anim) return anim.name.startsWith('splash${direction.nameUpper}')).length
         - 1;
       variant = FlxG.random.int(0, animationAmount);
     }
@@ -89,17 +88,7 @@ class NoteSplash extends ZSprite
 
     if (animation.curAnim == null) return;
 
-    // Dumb fix for animation playing at 2x speed when zSort is enabled. To future me, please find a better fix for this.
-    var splashFramerateEdit:Int = splashFramerate;
-    if (PlayState.instance != null)
-    {
-      if (PlayState.instance.allStrumSprites != null && PlayState.instance.noteRenderMode)
-      {
-        splashFramerateEdit = Math.round(splashFramerate * 0.5);
-      }
-    }
-
-    animation.curAnim.frameRate = splashFramerateEdit + FlxG.random.int(-splashFramerateVariance, splashFramerateVariance);
+    animation.curAnim.frameRate = splashFramerate + FlxG.random.int(-splashFramerateVariance, splashFramerateVariance);
 
     // Center the animation on the note splash.
     offset.set(width * 0.3, height * 0.3);

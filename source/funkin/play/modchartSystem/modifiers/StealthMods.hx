@@ -153,7 +153,7 @@ class StealthMod extends Modifier
     super(name, 0);
     modPriority = 120;
     noGlowSubmod = createSubMod("noglow", 0.0, ["nostealthglow", "alphaonly", "alpha"]);
-    stealthPastSubmod = createSubMod("stealthpastreceptors", 1.0);
+    stealthPastSubmod = createSubMod("stealthpastreceptors", 1.0, ["pastreceptors", "persist"]);
     unknown = false;
     notesMod = true;
     holdsMod = true;
@@ -218,7 +218,7 @@ class SuddenMod extends Modifier
     start = createSubMod("start", 500.0, ["begin"]);
     end = createSubMod("end", 300.0, ["finish"]);
     offset = createSubMod("offset", 0.0, ["shift"]);
-    // stealthPastSubmod = createSubMod("stealthpastreceptors", 1.0); // is pretty much unused for sudden
+    // stealthPastSubmod = createSubMod("stealthpastreceptors", 1.0, ["pastreceptors", "persist"]); // is pretty much unused for sudden
     unknown = false;
     notesMod = true;
     holdsMod = true;
@@ -295,7 +295,7 @@ class HiddenMod extends Modifier
     end = createSubMod("end", 300.0, ["finish"]);
     offset = createSubMod("offset", 0.0, ["shift"]);
 
-    stealthPastSubmod = createSubMod("stealthpastreceptors", 1.0);
+    stealthPastSubmod = createSubMod("stealthpastreceptors", 1.0, ["pastreceptors", "persist"]);
     unknown = false;
     notesMod = true;
     holdsMod = true;
@@ -374,7 +374,7 @@ class VanishMod extends Modifier
     size = createSubMod("size", 195.0, ["region", "middle"]);
     end = createSubMod("end", 125.0, ["finish"]);
     offset = createSubMod("offset", 0.0, ["shift"]);
-    stealthPastSubmod = createSubMod("stealthpastreceptors", 1.0);
+    stealthPastSubmod = createSubMod("stealthpastreceptors", 1.0, ["pastreceptors", "persist"]);
     unknown = false;
     notesMod = true;
     holdsMod = true;
@@ -464,7 +464,7 @@ class BlinkMod extends Modifier
     modPriority = 116;
 
     noGlowSubmod = createSubMod("noglow", 0.0, ["nostealthglow", "alphaonly", "alpha"]);
-    stealthPastSubmod = createSubMod("stealthpastreceptors", 1.0);
+    stealthPastSubmod = createSubMod("stealthpastreceptors", 1.0, ["pastreceptors", "persist"]);
     offset = createSubMod("offset", 0.0, ["shift"]);
     speed = createSubMod("speed", 1.0);
 
@@ -523,7 +523,7 @@ class StealthHoldsMod extends Modifier
     super(name, 0);
     modPriority = 120;
     noGlowSubmod = createSubMod("noglow", 0.0, ["nostealthglow", "alphaonly", "alpha"]);
-    stealthPastSubmod = createSubMod("stealthpastreceptors", 1.0);
+    stealthPastSubmod = createSubMod("stealthpastreceptors", 1.0, ["pastreceptors", "persist"]);
     unknown = false;
     notesMod = false;
     holdsMod = true;
