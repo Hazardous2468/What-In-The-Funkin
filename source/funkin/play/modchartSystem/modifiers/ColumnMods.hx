@@ -9,6 +9,7 @@ import funkin.play.modchartSystem.NoteData;
 
 // Contains all the mods related to column swapping!
 // LDUR becomes RUDL
+
 class FlipMod extends Modifier
 {
   public function new(name:String)
@@ -29,6 +30,7 @@ class FlipMod extends Modifier
 }
 
 // LDUR becomes DLRU
+
 class InvertMod extends Modifier
 {
   public function new(name:String)
@@ -46,6 +48,7 @@ class InvertMod extends Modifier
 }
 
 // LDUR becomes LUDR
+
 class VideoGamesMod extends Modifier
 {
   public function new(name:String)
@@ -81,7 +84,7 @@ class BlackSphereInvertMod extends Modifier
     super(name, 0);
     notPercentage = true;
     variant = createSubMod("variant", 0.0, ["type"]);
-    speedaffect = createSubMod("speedaffect", 1.0);
+    speedaffect = createSubMod("speedaffect", 1.0, ["reverse", "speedeffect"]);
     modPriority = 130;
     unknown = false;
     strumsMod = true;
@@ -158,7 +161,7 @@ class BlackSphereFlipMod extends Modifier
   {
     super(name, 0);
     variant = createSubMod("variant", 0.0, ["type"]);
-    speedaffect = createSubMod("speedaffect", 1.0);
+    speedaffect = createSubMod("speedaffect", 1.0, ["reverse", "speedeffect"]);
     modPriority = 130;
     notPercentage = true;
 

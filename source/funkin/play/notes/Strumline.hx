@@ -2134,6 +2134,9 @@ class Strumline extends FlxSpriteGroup
 
       holdNoteSprite.cullMode = holdNoteSprite.whichStrumNote?.strumExtraModData?.cullModeSustain ?? "none";
       if (noteKind != null) holdNoteSprite.scoreable = noteKind.scoreable;
+
+      // holdNoteSprite.waitTillModUpdate = true;
+      holdNoteSprite.updateClipping_mods();
     }
 
     return holdNoteSprite;

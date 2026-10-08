@@ -114,32 +114,6 @@ class CustomPathMod extends Modifier
     return _path.first();
   }
 
-  function executePath(curPos:Float, column:Int):Vector4
-  {
-    if (_path == null)
-    {
-      return new Vector4(0, 0, 0, 0);
-    }
-
-    if (posTypeSubmod.value <= -0.5) // classic / old style
-    {
-      curPos = Math.abs(curPos) * -1 / 0.47;
-      curPos = curPos / -1500.0 * _pathDistance;
-    }
-    else
-    {
-      curPos *= -1;
-    }
-
-    var pathAtDist = getPointAlongPath(curPos);
-
-    var pathAtZero = getPointAlongPath(0.0);
-
-    var offset = new Vector4(pathAtDist.x - pathAtZero.x, pathAtDist.y - pathAtZero.y, pathAtDist.z - pathAtZero.z, 0);
-
-    return offset;
-  }
-
   var _path:List<TimeVector> = null;
   var _pathDistance:Float = 0;
 
@@ -230,52 +204,155 @@ class CustomPathMod extends Modifier
     }
   }
 
-  var posTypeSubmod:ModifierSubValue;
+  function executePath(curPos:Float, column:Int, isReceptor:Bool = false):Vector4
+  {
+    if (_path == null)
+    {
+      return new Vector4(0, 0, 0, 0);
+    }
+
+    if (posTypeSubMod.value <= -0.5) // classic / old style
+    {
+      curPos = Math.abs(curPos) * -1 / 0.47;
+      curPos = curPos / -1500.0 * _pathDistance;
+    }
+    else
+    {
+      curPos *= -1;
+    }
+
+    var offset:Float = offsetSubMod.value;
+    if (!isReceptor)
+    {
+      offset += driveSubMod.value;
+    }
+
+    var pathAtDist = getPointAlongPath(curPos + offset);
+
+    var pathAtZero = getPointAlongPath(0.0 + offset);
+
+    var offset = new Vector4(pathAtDist.x - pathAtZero.x, pathAtDist.y - pathAtZero.y, pathAtDist.z - pathAtZero.z, 0);
+
+    return offset;
+  }
+
+  /**
+   * Determines what curPos value to use.
+   * 1.0 = unscaled pos
+   * 0.0 = normal
+   * -1.0 = normal multiplied by path length (classic style)
+   * -2.0 = unscaled pos multiplied by path length (classic style)
+   */
+  public var posTypeSubMod:ModifierSubValue;
+
+  /**
+   * Multiplies the size of the customPath by this amount.
+   */
+  public var sizeSubMod:ModifierSubValue;
+
+  public var sizeXSubMod:ModifierSubValue;
+  public var sizeYSubMod:ModifierSubValue;
+  public var sizeZSubMod:ModifierSubValue;
+
+  /**
+   * By default, the customPath modifier will try and cancel out the default note scroll movement.
+   * Same logic as linearY modifier
+   */
+  public var linearYsubMod:ModifierSubValue;
+
+  /**
+   * While Drive2 allows you to have the strums follow the path,
+   * the offset submod allows you 'scrub' through the path without the strums moving along it.
+   * Very useful if you're making an effect like 'line' from NotITG and want to keep the strums anchored (to avoid having to figure out camera movement)
+   */
+  public var offsetSubMod:ModifierSubValue;
+
+  /**
+   * Basically just a built-in drive2 modifier.
+   */
+  public var driveSubMod:ModifierSubValue;
 
   public function new(name:String)
   {
     super(name, 0);
-    // modPriority = 119;
-    // modPriority = 119;
     unknown = false;
     notesMod = true;
     holdsMod = true;
-    strumsMod = false;
+    strumsMod = true;
     pathMod = true;
-    // 1.0 = unscaled pos
-    // 0.0 = normal
-    // -1.0 = normal multiplied by path length (classic style)
-    // -2.0 = unscaled pos multiplied by path length (classic style)
 
-    posTypeSubmod = createSubMod("postype", 0.0, [
+    posTypeSubMod = createSubMod("postype", 0.0, [
       "pos",
       "type",
       "mode",
       "curpos",
       "curpostype"
     ]);
+    driveSubMod = createSubMod("drive", 0.0);
+    offsetSubMod = createSubMod("offset", 0.0, ["scrub", "shift"]);
+    sizeXSubMod = createSubMod("scalex", 1.0, ["sizex"]);
+    sizeYSubMod = createSubMod("scaley", 1.0, ["sizey"]);
+    sizeZSubMod = createSubMod("scalez", 1.0, ["sizez"]);
+    sizeSubMod = createSubMod("size", 1.0, ["scale"]);
+
+    linearYsubMod = createSubMod("scroll", 1.0, [
+      "cancely",
+      "ytype",
+      "ymove",
+      "lineary",
+      "linearyblend",
+      "yblend",
+      "antiscroll",
+      "cancelscroll"
+    ]);
+
     loadPath();
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    var path = customArrowPathModTest;
-    if (path == null || currentValue == 0) return;
+    if (customArrowPathModTest == null || currentValue == 0) return;
 
     var curPos:Float = data.curPos;
-    if (posTypeSubmod.value > 0.5 || posTypeSubmod.value < -1.5)
+    if (posTypeSubMod.value > 0.5 || posTypeSubMod.value < -1.5)
     {
       curPos = data.curPos_unscaled;
     }
+    if (!Preferences.downscroll)
+    {
+      curPos *= -1;
+    }
 
-    var newPosition:Vector4 = executePath(curPos, data.direction);
-    data.x += newPosition.x;
-    data.y += newPosition.y;
-    data.z += newPosition.z;
+    var newPosition:Vector4 = executePath(curPos, data.direction, false);
+    final scaleAmount:Float = sizeSubMod.value;
+    newPosition.x *= scaleAmount * sizeXSubMod.value;
+    newPosition.y *= scaleAmount * sizeYSubMod.value;
+    newPosition.z *= scaleAmount * sizeZSubMod.value;
+    data.x += newPosition.x * currentValue;
+    data.y += newPosition.y * currentValue;
+    data.z += newPosition.z * currentValue;
 
+    if (linearYsubMod.value == 0.0) return;
     // automatically apply linearY mod to cancel the default y movement
-    var curVal:Float = currentValue * -1;
-    data.y += data.curPos * curVal;
+    var linearYValue:Float = Math.abs(currentValue);
+    if (linearYValue > 1.0) linearYValue = 1.0;
+    linearYValue *= -1.0;
+    data.y += data.curPos * linearYValue * linearYsubMod.value;
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (driveSubMod.value == 0) return;
+    if (customArrowPathModTest == null || currentValue == 0) return;
+
+    var newPosition:Vector4 = executePath(driveSubMod.value * -1, data.direction, true);
+    final scaleAmount:Float = sizeSubMod.value;
+    newPosition.x *= scaleAmount * sizeXSubMod.value;
+    newPosition.y *= scaleAmount * sizeYSubMod.value;
+    newPosition.z *= scaleAmount * sizeZSubMod.value;
+    data.x += newPosition.x * currentValue;
+    data.y += newPosition.y * currentValue;
+    data.z += newPosition.z * currentValue;
   }
 }
 

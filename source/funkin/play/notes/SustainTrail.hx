@@ -290,10 +290,10 @@ class SustainTrail extends ZSprite
       }
     }
 
-    flipY = Preferences.downscroll
-    #if mobile
-    || (Preferences.controlsScheme == FunkinHitboxControlSchemes.Arrows && !funkin.mobile.input.ControlsHandler.hasExternalInputDevice)
-    #end;
+    flipY = Preferences.downscroll #if mobile || (
+      Preferences.controlsScheme == FunkinHitboxControlSchemes.Arrows
+      && !funkin.mobile.input.ControlsHandler.hasExternalInputDevice
+    ) #end;
 
     // alpha = 0.6;
     alpha = 1.0;
@@ -1381,6 +1381,7 @@ class SustainTrail extends ZSprite
     testCol = null;
     noteIndices = null;
     vertices = null;
+    waitTillModUpdate = false;
   }
 
   function setVerts(vertices):Void
@@ -1500,12 +1501,19 @@ class SustainTrail extends ZSprite
     // Bottom right
     uvtData[7 * 2] = uvtData[5 * 2]; // 25%/50%/75%/100% of the way through the image (1/8th past the top left of cap)
     uvtData[7 * 2 + 1] = uvtData[6 * 2 + 1]; // bottom bound
+    waitTillModUpdate = false;
   }
+
+  /**
+   * If set to true, will refuse to draw() this sustain. Is always set to false after every modUpdate pass.
+   * This is to help prevent holds from flickering for a frame when they get created.
+   */
+  public var waitTillModUpdate:Bool = false;
 
   @:access(flixel.FlxCamera)
   override public function draw():Void
   {
-    if (graphic == null || !this.alive) return;
+    if (graphic == null || !this.alive || (waitTillModUpdate && usingHazModHolds)) return;
 
     // Update tris if modchart system
     if (usingHazModHolds && parentStrumline.doUpdateClipsInDraw)
