@@ -218,6 +218,7 @@ class SuddenMod extends Modifier
     start = createSubMod("start", 500.0, ["begin"]);
     end = createSubMod("end", 300.0, ["finish"]);
     offset = createSubMod("offset", 0.0, ["shift"]);
+
     // stealthPastSubmod = createSubMod("stealthpastreceptors", 1.0, ["pastreceptors", "persist"]); // is pretty much unused for sudden
     unknown = false;
     notesMod = true;
