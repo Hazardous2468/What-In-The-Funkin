@@ -21,6 +21,7 @@ import flixel.math.FlxMath;
 import lime.math.Vector2;
 import openfl.geom.Vector3D;
 import flixel.math.FlxAngle;
+import funkin.modding.PolymodHandler;
 import funkin.util.SortUtil;
 import flixel.util.FlxSort;
 // tween
@@ -107,6 +108,24 @@ class ModConstants
   public static function isTagSub(tag:String):Bool
   {
     return StringTools.contains(tag, "__");
+  }
+
+  public static function getFoldersToCheckForModchartStuff(songID:String):Array<String>
+  {
+    var foldersToCheck:Array<String> = [];
+
+    var checkHere:String = 'assets/data/modchart/' + songID + "/";
+    foldersToCheck.push(checkHere);
+
+    // fuck it, we just check every mod lmfao
+    for (modDir in PolymodHandler.loadedModDirs)
+    {
+      @:privateAccess
+      checkHere = PolymodHandler.MOD_FOLDER + '/' + modDir + '/data/modchart/' + songID + "/";
+      foldersToCheck.push(checkHere);
+    }
+
+    return foldersToCheck;
   }
 
   // Converts a string to a BlendMode.
@@ -380,6 +399,8 @@ class ModConstants
     modName = StringTools.replace(modName, "alphareceptors", "alphastrum");
     modName = StringTools.replace(modName, "alphastrums", "alphastrum");
     modName = StringTools.replace(modName, "alphaholdcovers", "alphaholdcover");
+    modName = StringTools.replace(modName, "alphanotesplashes", "alphasplash");
+    modName = StringTools.replace(modName, "alphanotesplash", "alphasplash");
 
     modName = StringTools.replace(modName, "drawsize", "drawdistance");
     modName = StringTools.replace(modName, "renderdistance", "drawdistance");

@@ -30,6 +30,18 @@ import polymod.Polymod;
 class PolymodHandler
 {
   /**
+   * WITF API version (independent of the API_VERSION below) for polymods to use.
+   * Currently not implemented cuz I'm big stupid and don't know how to do it.
+   */
+  public static final WITF_VERSION:String = "1.1.1";
+
+  /**
+   * The Semantic Versioning rule
+   * Basically a copy of the 'API_VERSION_RULE' below, but for WITF
+   */
+  public static final WITF_VERSION_RULE:String = ">=1.1.1 <1.2.0";
+
+  /**
    * The API version for the current version of the game. Since 0.5.0, we've just made this the game version!
    * Minor updates rarely impact mods but major versions sometimes do.
    */

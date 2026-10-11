@@ -71,6 +71,7 @@ import funkin.play.notes.NoteSplash;
 import funkin.play.notes.notekind.NoteKindManager;
 import funkin.play.notes.notestyle.NoteStyle;
 import funkin.play.notes.NoteVibrationsHandler;
+import funkin.play.modchartSystem.ModConstants;
 import funkin.play.scoring.Scoring;
 import funkin.play.song.Song;
 import funkin.play.stage.Stage;
@@ -2745,29 +2746,8 @@ class PlayState extends MusicBeatSubState
     var filesPushed:Array<String> = [];
 
     var vari:String = (currentVariation == Constants.DEFAULT_VARIATION ? "" : '-${currentVariation.toLowerCase()}');
-    var songna:String = (currentSong?.id ?? '').toLowerCase() + vari;
-    var foldersToCheck:Array<String> = [];
-
-    var checkHere:String = 'assets/data/modchart/' + songna + "/";
-    foldersToCheck.push(checkHere);
-    if (currentChart != null && false)
-    {
-      checkHere = 'assets/data/modchart/' + currentChart.songName.toLowerCase() + vari + "/";
-      foldersToCheck.push(checkHere);
-    }
-
-    // fuck it, we just check every mod lmfao
-    for (modID in PolymodHandler.loadedModDirs)
-    {
-      checkHere = 'mods/' + modID + '/data/modchart/' + songna + "/";
-      foldersToCheck.push(checkHere);
-
-      if (currentChart != null && false)
-      {
-        checkHere = 'mods/${modID}/data/modchart/${currentChart.songName.toLowerCase() + vari}/';
-        foldersToCheck.push(checkHere);
-      }
-    }
+    var songID:String = (currentSong?.id ?? '').toLowerCase() + vari;
+    var foldersToCheck:Array<String> = ModConstants.getFoldersToCheckForModchartStuff(songID);
 
     for (folder in foldersToCheck)
     {

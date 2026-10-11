@@ -119,22 +119,12 @@ class CustomPathMod extends Modifier
 
   public function loadPath()
   {
-    // scan for the path.txt file
-    var songna:String = (PlayState.instance?.currentSong?.id ?? '').toLowerCase();
-    var firstCheckTest:String = 'assets/data/modchart/' + PlayState.instance?.currentChart.songName.toLowerCase() + "/";
-    var secondCheckTest:String = 'assets/data/modchart/' + songna + "/";
-    var foldersToCheck:Array<String> = [firstCheckTest, secondCheckTest];
-
     customArrowPathModTest = null;
 
-    // fuck it, we just check every mod lmfao
-    for (modid in PolymodHandler.loadedModIds)
-    {
-      var lmfao:String = 'mods/' + modid + '/data/modchart/' + songna + "/";
-      foldersToCheck.insert(0, lmfao);
-      lmfao = 'mods/' + modid + '/data/modchart/' + PlayState.instance?.currentChart.songName.toLowerCase() + "/";
-      foldersToCheck.insert(0, lmfao);
-    }
+    // scan for the path.txt file
+    var vari:String = (PlayState.instance?.currentVariation == Constants.DEFAULT_VARIATION ? "" : '-${PlayState.instance?.currentVariation.toLowerCase()}');
+    var songID:String = (PlayState.instance?.currentSong?.id ?? '').toLowerCase() + vari;
+    var foldersToCheck:Array<String> = ModConstants.getFoldersToCheckForModchartStuff(songID);
 
     for (folder in foldersToCheck)
     {
