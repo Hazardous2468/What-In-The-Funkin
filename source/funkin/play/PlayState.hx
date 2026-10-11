@@ -2757,7 +2757,7 @@ class PlayState extends MusicBeatSubState
     }
 
     // fuck it, we just check every mod lmfao
-    for (modID in PolymodHandler.loadedModIds)
+    for (modID in PolymodHandler.loadedModDirs)
     {
       checkHere = 'mods/' + modID + '/data/modchart/' + songna + "/";
       foldersToCheck.push(checkHere);
