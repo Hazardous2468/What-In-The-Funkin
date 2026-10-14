@@ -7,7 +7,9 @@ The 'addCustomMod' function for ModHandlers now accept any Modifier, not just Cu
 Added aliases for some stealth submods.
 Fixed zSort animation speeds (mostly affects Notesplashes and HoldCovers)
 Tiffy now appears in the character select.
-
+Added 200memestep and sing sing red indigo.
+Fixed modcharts looking into the wrong folder for mods with a proper ID set.
+Changed the Window Title.
 
 
 

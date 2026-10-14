@@ -43,17 +43,17 @@ class Project extends HXProject
   /**
    * The game's name. Used as the default window title.
    */
-  static final TITLE:String = "Friday Night Funkin'";
+  static final TITLE:String = "What in the Funkin'";
 
   /**
    * The game's name on mobile. Used as the title for the game on the home screen.
    */
-  static final TITLE_MOBILE:String = "FNF";
+  static final TITLE_MOBILE:String = "WITF";
 
   /**
    * A package name used for identifying the app on various app stores.
    */
-  static final PACKAGE_NAME:String = "me.funkin.fnf";
+  static final PACKAGE_NAME:String = "hazard24.funkin.witf";
 
   /**
    * The name of the generated executable file.

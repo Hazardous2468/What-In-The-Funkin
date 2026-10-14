@@ -105,6 +105,10 @@ class HazardModLuaTest
     set('witfVersion', ModConstants.MODCHART_VERSION);
     set('gameVersion', Constants.VERSION);
 
+    set('mobile', FlxG.onMobile);
+    set('isMobile', FlxG.onMobile);
+    set('onMobile', FlxG.onMobile);
+
     set('difficulty', PlayState.instance.currentChart.difficulty);
     set('songDifficulty', PlayState.instance.currentChart.difficulty);
     set('songName', PlayState.instance.currentChart.songName);

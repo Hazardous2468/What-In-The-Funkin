@@ -453,7 +453,7 @@ class Strumline extends FlxSpriteGroup
     { // Fuckin, background won't work when the notes go all over the screen!!! Wasn't expecting this to be a feature, but it won't be supported.
       var backgroundWidth:Float = KEY_COUNT * Strumline.NOTE_SPACING + BACKGROUND_PAD * 2;
       #if mobile
-      if (inArrowContorlSchemeMode && isPlayer)
+      if (inArrowControlSchemeMode && isPlayer)
       {
         backgroundWidth = backgroundWidth * 1.84;
       }
@@ -464,7 +464,7 @@ class Strumline extends FlxSpriteGroup
       this.background.scrollFactor.set(0, 0);
       this.background.x = -BACKGROUND_PAD;
       #if mobile
-      if (inArrowContorlSchemeMode && isPlayer) this.background.x -= 100;
+      if (inArrowControlSchemeMode && isPlayer) this.background.x -= 100;
       #end
       this.add(this.background);
     }

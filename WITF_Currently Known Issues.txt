@@ -1,6 +1,8 @@
 Note: Some reported problems are old and may have been already resolved.
 
-Fork specific issues (V1.1.0):
+Fork specific issues (V1.1.1):
+
+- No mobile support for modcharts
 
 - Orient modifier becomes inaccurate with drive2 modifier
 
