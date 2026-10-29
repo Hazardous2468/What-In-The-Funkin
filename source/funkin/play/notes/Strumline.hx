@@ -300,7 +300,7 @@ class Strumline extends FlxSpriteGroup
    */
   public var noteVibrations:NoteVibrationsHandler = new NoteVibrationsHandler();
 
-  final inArrowControlSchemeMode:Bool = #if mobile (
+  var inArrowControlSchemeMode:Bool = #if mobile (
     Preferences.controlsScheme == FunkinHitboxControlSchemes.Arrows
     && !ControlsHandler.hasExternalInputDevice
   ) #else false #end;
@@ -402,6 +402,12 @@ class Strumline extends FlxSpriteGroup
 
   public function new(noteStyle:NoteStyle, isPlayer:Bool, ?scrollSpeed:Float, ?modchartSong:Bool = false)
   {
+    if (modchartSong && (PlayState.instance?.allowMobileUI ?? false))
+    {
+      inArrowControlSchemeMode = false;
+      isDownscroll = Preferences.downscroll;
+    }
+
     super();
 
     this.isPlayer = isPlayer;

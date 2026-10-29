@@ -194,13 +194,15 @@
       "ref": "268dacfb2609766e14bef9ea5b669e91501852d2",
       "url": "https://github.com/FunkinCrew/lime"
     },
+
     {
       "name": "linc_luajit",
       "type": "git",
       "dir": null,
-      "ref": "1906c4a96f6bb6df66562b3f24c62f4c5bba14a7",
-      "url": "https://github.com/superpowers04/linc_luajit"
+      "ref": null,
+      "url": "https://github.com/Psych-Slice/linc_luajit-mobile"
     },
+
     {
       "name": "newgrounds",
       "type": "git",

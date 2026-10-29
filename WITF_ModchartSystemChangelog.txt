@@ -1,6 +1,7 @@
 v1.1.2:
 
 Fixed modchart files not loading when mods are in a .zip file.
+Fixed Metamods speedmodifier.
 
 
 

@@ -2444,10 +2444,16 @@ class PlayState extends MusicBeatSubState
      */
   function initHealthBar():Void
   {
-    final isDownscroll:Bool = #if mobile (
+    var isDownscroll:Bool = #if mobile (
       Preferences.controlsScheme == FunkinHitboxControlSchemes.Arrows
       && !ControlsHandler.hasExternalInputDevice
     ) || #end Preferences.downscroll;
+    #if mobile
+    if (!allowMobileUI && isModchartSong)
+    {
+      isDownscroll = Preferences.downscroll;
+    }
+    #end
 
     var healthBarYPos:Float = isDownscroll ? FlxG.height * 0.1 : FlxG.height * 0.9;
 
@@ -2486,10 +2492,16 @@ class PlayState extends MusicBeatSubState
     // Create subtitles if they are enabled.
     if (Preferences.subtitles)
     {
-      final isDownscroll:Bool = #if mobile (
+      var isDownscroll:Bool = #if mobile (
         Preferences.controlsScheme == FunkinHitboxControlSchemes.Arrows
         && !ControlsHandler.hasExternalInputDevice
       ) || #end Preferences.downscroll;
+      #if mobile
+      if (!allowMobileUI && isModchartSong)
+      {
+        isDownscroll = Preferences.downscroll;
+      }
+      #end
 
       final subtitlesAlignment:SubtitlesAlignment = isDownscroll ? SubtitlesAlignment.SUBTITLES_TOP : SubtitlesAlignment.SUBTITLES_BOTTOM;
       subtitles = new Subtitles(0, 139, subtitlesAlignment);
@@ -2719,6 +2731,8 @@ class PlayState extends MusicBeatSubState
     }
     customLuaSprites.clear();
   }
+
+  public var allowMobileUI:Bool = false;
 
   // Call this to scan and reload the modchart lua file!
 
@@ -2961,7 +2975,10 @@ class PlayState extends MusicBeatSubState
     #if mobile
     if (Preferences.controlsScheme == FunkinHitboxControlSchemes.Arrows && !ControlsHandler.hasExternalInputDevice)
     {
-      initNoteHitbox();
+      if (!isModchartSong || (isModchartSong && allowMobileUI))
+      {
+        initNoteHitbox();
+      }
     }
     #end
 
@@ -4261,7 +4278,7 @@ class PlayState extends MusicBeatSubState
     if (FlxG.keys.justPressed.THREE) health -= 0.05 * Constants.HEALTH_MAX;
     #end
 
-    // 8: Toggle the old icon.
+    // 8: Quickly reloads all the modchart stuff for quick iterations
     if (FlxG.keys.justPressed.EIGHT) scanForModchart();
 
     // 9: Toggle the old icon.

@@ -185,6 +185,14 @@ class HazardModLuaTest
       }
     });
 
+    Lua_helper.add_callback(lua, "allowMobileUI", function(newVal:Bool)
+    {
+      if (PlayState.instance != null)
+      {
+        PlayState.instance.allowMobileUI = newVal;
+      }
+    });
+
     // v0.8.1a -> New function that allows you to get the beats of notes between two points in a song, similar to using GetNoteData() for NotITG mirin
     // v[1] == the beats that the charted notes are on
     // v[2] == the column that the charted notes are on, starting from 0
