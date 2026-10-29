@@ -1,3 +1,10 @@
+v1.1.2:
+
+Fixed modchart files not loading when mods are in a .zip file.
+
+
+
+
 v1.1.1:
 
 Overhauled the customPath logic. For the old behaviour, use 'oldCustomPath' modifier.
@@ -10,6 +17,7 @@ Tiffy now appears in the character select.
 Added 200memestep and sing sing red indigo.
 Fixed modcharts looking into the wrong folder for mods with a proper ID set.
 Changed the Window Title.
+
 
 
 
@@ -38,7 +46,6 @@ HSV Shader constructor now exposes the fragPath to allow for making custom note 
 Tried to remove some magic number jank.
 New "note_point_offset_x" and "holdpoint_offset_x" submods for Rotate modifiers for more advanced control over how the notes / holds rotate (for fixing minor visual errors). By default the WITF Essentials will have a module that automatically applies fixes for most notestyles so you shouldn't have to worry about this.
 Minor bug fixes and script tweaks.
-
 
 
 

@@ -117,80 +117,126 @@ class CustomPathMod extends Modifier
   var _path:List<TimeVector> = null;
   var _pathDistance:Float = 0;
 
-  public function loadPath()
+  public function loadPath():Bool
   {
-    customArrowPathModTest = null;
+    var currentVariation:String = PlayState.instance?.currentVariation ?? Constants.DEFAULT_VARIATION;
+    var currentSongID:String = PlayState.instance?.currentSong?.id ?? '';
 
-    // scan for the path.txt file
-    var vari:String = (PlayState.instance?.currentVariation == Constants.DEFAULT_VARIATION ? "" : '-${PlayState.instance?.currentVariation.toLowerCase()}');
-    var songID:String = (PlayState.instance?.currentSong?.id ?? '').toLowerCase() + vari;
+    // scan for lua file for modchart!
+    var filesPushed:Array<String> = [];
+    var vari:String = (currentVariation == Constants.DEFAULT_VARIATION ? "" : '-${currentVariation.toLowerCase()}');
+    var songID:String = (currentSongID).toLowerCase() + vari;
     var foldersToCheck:Array<String> = ModConstants.getFoldersToCheckForModchartStuff(songID);
-
     for (folder in foldersToCheck)
     {
-      trace("Looking into - " + folder);
-      if (FileSystem.exists(folder))
+      final isModPath = StringTools.startsWith(folder, PolymodHandler.MOD_FOLDER + "/") || StringTools.startsWith(folder, PolymodHandler.MOD_FOLDER + "\\");
+      final exists = isModPath ? PolymodHandler.modExists(folder) : FileSystem.exists(folder);
+      trace("trying: " + folder);
+      if (!exists) continue;
+      trace("it exists, looking inside folder...");
+      final files = isModPath ? PolymodHandler.modReadDirectory(folder) : FileSystem.readDirectory(folder);
+      for (file in files)
       {
-        trace("Folder exists...");
-        for (file in FileSystem.readDirectory(folder))
+        trace("file: " + file);
+        if (file == pathToLoad && customArrowPathModTest == null)
         {
-          trace("file : " + file);
-          if (file == pathToLoad && customArrowPathModTest == null)
+          trace("found custom path file, attempting to load...");
+          customArrowPathModTest = folder + "/" + file;
+
+          // var fileData:String = funkin.util.FileUtil.readStringFromPath(customArrowPathModTest);
+          var fileData:Null<String> = null;
+          final assetId = ModConstants.normalizeToAssetId(file); // see helper below
+
+          if (assetId != null && funkin.Assets.exists(assetId, openfl.utils.AssetType.TEXT))
           {
-            customArrowPathModTest = folder + file;
-            trace("Oh shit, we found somethin? " + customArrowPathModTest);
-            // var file = sys.io.File.getContent(customArrowPathModTest);
-            var file_part1 = funkin.util.FileUtil.readStringFromPath(customArrowPathModTest);
-
-            var filePath:Array<String> = [];
-            filePath = file_part1.trim().split('\n');
-
-            for (i in 0...filePath.length)
+            fileData = funkin.Assets.getText(assetId);
+          }
+          else if (PolymodHandler.modExists(customArrowPathModTest)) // or your modGetContent path
+          {
+            fileData = PolymodHandler.modGetContent(customArrowPathModTest);
+          }
+          #if sys
+          else if (sys.FileSystem.exists(customArrowPathModTest))
+          {
+            fileData = sys.io.File.getContent(customArrowPathModTest);
+          }
+          #end
+        else
+        {
+          fileData = funkin.util.FileUtil.readStringFromPath(customArrowPathModTest);
+        }
+          if (fileData != null)
+          {
+            if (loadPathData(fileData))
             {
-              filePath[i] = filePath[i].trim();
-            }
-            filePath.reverse(); // lmao, the points are reversed when used in my system
-
-            if (filePath != null)
-            {
-              var path = new List<TimeVector>();
-              var _g = 0;
-              while (_g < filePath.length)
-              {
-                var line = filePath[_g];
-                // trace("line: " + line);
-                _g++;
-                var coords = line.split(";");
-                // trace((_g - 1) + "split: " + coords);
-                var vec = new TimeVector(
-                  Std.parseFloat(coords[0]),
-                  Std.parseFloat(coords[1]) * (Preferences.downscroll ? -1 : 1),
-                  Std.parseFloat(coords[2]),
-                  Std.parseFloat(coords[3])
-                );
-                vec.x *= 200;
-                vec.y *= 200;
-                vec.z *= 200;
-                path.add(vec);
-
-                //  trace("x: " + vec.x);
-                // trace("y: " + vec.y);
-                // trace("z: " + vec.z);
-                // trace("-------");
-              }
-
-              _pathDistance = calculatePathDistances(path);
-              _path = path;
-              return; // We done here
+              trace("custom path file loaded successfully!");
+              return true;
             }
             else
             {
-              trace("nvm, file is fucked");
-              customArrowPathModTest == null;
+              trace("custom path file failed to load.");
+              customArrowPathModTest = null;
             }
+          }
+          else
+          {
+            trace("custom path file failed to load. File content was null?");
+            customArrowPathModTest = null;
           }
         }
       }
+    }
+    customArrowPathModTest = null;
+    return false;
+  }
+
+  public function loadPathData(pathData:String):Bool
+  {
+    var filePath:Array<String> = [];
+    filePath = pathData.trim().split('\n');
+
+    for (i in 0...filePath.length)
+    {
+      filePath[i] = filePath[i].trim();
+    }
+    filePath.reverse();
+
+    if (filePath != null)
+    {
+      var path = new List<TimeVector>();
+      var _g = 0;
+      while (_g < filePath.length)
+      {
+        var line = filePath[_g];
+        // trace("line: " + line);
+        _g++;
+        var coords = line.split(";");
+        // trace((_g - 1) + "split: " + coords);
+        var vec = new TimeVector(
+          Std.parseFloat(coords[0]),
+          Std.parseFloat(coords[1]) * (Preferences.downscroll ? -1 : 1),
+          Std.parseFloat(coords[2]),
+          Std.parseFloat(coords[3])
+        );
+        vec.x *= 200;
+        vec.y *= 200;
+        vec.z *= 200;
+        path.add(vec);
+
+        //  trace("x: " + vec.x);
+        // trace("y: " + vec.y);
+        // trace("z: " + vec.z);
+        // trace("-------");
+      }
+
+      _pathDistance = calculatePathDistances(path);
+      _path = path;
+      return true;
+    }
+    else
+    {
+      // trace("nvm, file is fucked");
+      return false;
     }
   }
 

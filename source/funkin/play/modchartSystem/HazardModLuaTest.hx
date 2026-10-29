@@ -32,6 +32,7 @@ import openfl.display.BlendMode;
 import openfl.display.TriangleCulling;
 import funkin.data.song.SongData.SongNoteData;
 import funkin.play.notes.notestyle.NoteStyle;
+import funkin.modding.PolymodHandler;
 
 using StringTools;
 
@@ -63,7 +64,36 @@ class HazardModLuaTest
     Lua.init_callbacks(lua);
     try
     {
-      var result:Dynamic = LuaL.dofile(lua, script);
+      var luaCode:Null<String> = null;
+      final assetId = ModConstants.normalizeToAssetId(script); // see helper below
+      if (assetId != null && funkin.Assets.exists(assetId, openfl.utils.AssetType.TEXT))
+      {
+        luaCode = funkin.Assets.getText(assetId);
+      }
+      else if (PolymodHandler.modExists(script)) // or your modGetContent path
+      {
+        luaCode = PolymodHandler.modGetContent(script);
+      }
+      #if sys
+      else if (sys.FileSystem.exists(script))
+      {
+        luaCode = sys.io.File.getContent(script);
+      }
+      #end
+
+      if (luaCode == null || luaCode.length == 0)
+      {
+        trace('Error on lua script! cannot open $script: No such file or directory');
+        #if windows
+        lime.app.Application.current.window.alert('cannot open $script: No such file or directory', 'Error on lua script!');
+        #else
+        luaTrace('Error loading lua script: "$script"\n No such file or directory', true, false, FlxColor.RED);
+        #end
+        lua = null;
+        return;
+      }
+
+      var result:Dynamic = LuaL.dostring(lua, luaCode);
       var resultStr:String = Lua.tostring(lua, result);
       if (resultStr != null && result != 0)
       {

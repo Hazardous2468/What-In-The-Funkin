@@ -2751,19 +2751,22 @@ class PlayState extends MusicBeatSubState
 
     for (folder in foldersToCheck)
     {
-      trace("Looking into - " + folder);
-      if (FileSystem.exists(folder))
+      final isModPath = StringTools.startsWith(folder, PolymodHandler.MOD_FOLDER + "/") || StringTools.startsWith(folder, PolymodHandler.MOD_FOLDER + "\\");
+
+      final exists = isModPath ? PolymodHandler.modExists(folder) : FileSystem.exists(folder);
+      trace("trying: " + folder);
+      if (!exists) continue;
+
+      trace("it exists, looking inside folder...");
+      final files = isModPath ? PolymodHandler.modReadDirectory(folder) : FileSystem.readDirectory(folder);
+      for (file in files)
       {
-        trace("Folder exists...");
-        for (file in FileSystem.readDirectory(folder))
+        trace("file: " + file);
+        if (file.endsWith('.lua') && !filesPushed.contains(file))
         {
-          trace("file : " + file);
-          if (file.endsWith('.lua') && !filesPushed.contains(file))
-          {
-            trace("New Lua spotted, adding!!");
-            luaArray.push(new HazardModLuaTest(folder + file, folder, file));
-            filesPushed.push(file);
-          }
+          trace("New Lua spotted, adding!!");
+          luaArray.push(new HazardModLuaTest(folder + "/" + file, folder, file));
+          filesPushed.push(file);
         }
       }
     }

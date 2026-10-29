@@ -63,7 +63,7 @@ class PolymodHandler
   /**
    * Where relative to the executable that mods are located.
    */
-  static final MOD_FOLDER:String =
+  public static final MOD_FOLDER:String =
     #if (REDIRECT_ASSETS_FOLDER && mac)
     '../../../../../../../example_mods'
     #elseif REDIRECT_ASSETS_FOLDER
@@ -100,6 +100,21 @@ class PolymodHandler
   public static function createModRoot():Void
   {
     FileUtil.createDirIfNotExists(MOD_FOLDER);
+  }
+
+  public static function modExists(path:String):Bool
+  {
+    return modFileSystem != null && modFileSystem.exists(path);
+  }
+
+  public static function modReadDirectory(path:String):Array<String>
+  {
+    return (modFileSystem != null) ? modFileSystem.readDirectory(path) : [];
+  }
+
+  public static function modGetContent(path:String):Null<String>
+  {
+    return (modFileSystem != null) ? modFileSystem.getFileContent(path) : null;
   }
 
   /**

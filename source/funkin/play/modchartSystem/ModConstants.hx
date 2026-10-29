@@ -10,6 +10,7 @@ import funkin.Preferences;
 import funkin.util.Constants;
 import funkin.play.notes.Strumline;
 import funkin.Paths;
+import funkin.Assets;
 import funkin.play.notes.NoteSprite;
 import funkin.play.notes.StrumlineNote;
 import funkin.data.song.SongData.SongTimeChange;
@@ -38,6 +39,9 @@ import funkin.play.modchartSystem.HazardEase;
 import lime.math.Vector4;
 //
 import openfl.display.BlendMode;
+import flixel.text.FlxText;
+// import flixel.text.FlxTextBorderStyle;
+// import flixel.text.FlxTextAlign;
 // I want to kill myself:
 import funkin.play.modchartSystem.modifiers.BaseModifier;
 import funkin.play.modchartSystem.modifiers.ColumnMods;
@@ -85,7 +89,7 @@ import funkin.play.modchartSystem.modifiers.*; // if only you worked ;_;
 class ModConstants
 {
   public static var orientTimeOffset:Float = -2.0; // in ms
-  public static final MODCHART_VERSION:String = "v1.1.1";
+  public static final MODCHART_VERSION:String = "v1.1.2";
   public static final defaultHoldGrain = 75;
   public static final defaultPathGrain = defaultHoldGrain;
   public static var tooCloseToCameraFix:Float = 0.975; // dumb fix for preventing freak out on z math or something
@@ -120,16 +124,18 @@ class ModConstants
     // fuck it, we just check every mod lmfao
     for (modDir in PolymodHandler.loadedModDirs)
     {
-      @:privateAccess
-      checkHere = PolymodHandler.MOD_FOLDER + '/' + modDir + '/data/modchart/' + songID + "/";
+      checkHere = PolymodHandler.MOD_FOLDER + '/' + modDir + '/data/modchart/' + songID;
       foldersToCheck.push(checkHere);
     }
 
     return foldersToCheck;
   }
 
-  // Converts a string to a BlendMode.
-
+  /**
+   * Converts a string to a BlendMode.
+   * @param blend The string input.
+   * @return The BlendMode.
+   */
   public static function blendModeFromString(blend:String):BlendMode
   {
     switch (blend.toLowerCase().trim())
@@ -164,6 +170,51 @@ class ModConstants
         return SUBTRACT;
     }
     return NORMAL;
+  }
+
+  public static function normalizeToAssetId(path:String):Null<String>
+  {
+    // Already an asset-style path?
+    if (path.startsWith("data/") || path.startsWith("assets/data/"))
+    {
+      return StringTools.replace(path, "assets/", "");
+    }
+
+    // mods/ModName/data/modchart/... → data/modchart/...
+    final modsPrefix = PolymodHandler.MOD_FOLDER + "/";
+    if (path.startsWith(modsPrefix))
+    {
+      var rest = path.substr(modsPrefix.length);
+      // strip "ModName/"
+      final slash = rest.indexOf("/");
+      if (slash != -1) rest = rest.substr(slash + 1);
+      return rest;
+    }
+
+    return null;
+  }
+
+  /**
+   * Converts a string to a FlxTextBorderStyle.
+   * @param t The string input.
+   * @return The FlxTextBorderStyle.
+   */
+  public static function textBorderStyleFromString(t:String):FlxTextBorderStyle
+  {
+    switch (t.toLowerCase().trim())
+    {
+      case 'outline_fast':
+        return FlxTextBorderStyle.OUTLINE_FAST;
+      case 'outlinefast':
+        return FlxTextBorderStyle.OUTLINE_FAST;
+      case 'outline fast':
+        return FlxTextBorderStyle.OUTLINE_FAST;
+      case 'outline':
+        return FlxTextBorderStyle.OUTLINE;
+      case 'shadow':
+        return FlxTextBorderStyle.SHADOW;
+    }
+    return FlxTextBorderStyle.NONE;
   }
 
   /**
