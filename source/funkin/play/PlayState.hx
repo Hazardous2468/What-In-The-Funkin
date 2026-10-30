@@ -1290,12 +1290,12 @@ class PlayState extends MusicBeatSubState
     if (!ControlsHandler.hasExternalInputDevice)
     {
       // Initialize the hitbox for mobile controls
-      addHitbox(false);
+      addHitbox(Preferences.showHitbox);
       if (hitbox != null)
       {
         hitbox.isPixel = currentChart.noteStyle == 'pixel';
 
-        if (Preferences.controlsScheme == FunkinHitboxControlSchemes.Arrows)
+        if (Preferences.controlsScheme == FunkinHitboxControlSchemes.Arrows && !isModchartSong)
         {
           for (direction in Strumline.DIRECTIONS)
           {

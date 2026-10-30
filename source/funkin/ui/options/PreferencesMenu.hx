@@ -122,6 +122,13 @@ class PreferencesMenu extends Page<OptionsState.OptionsMenuPageName>
     {
       Preferences.strumlineBackgroundOpacity = value;
     }, Preferences.strumlineBackgroundOpacity);
+    #if mobile
+    createPrefItemCheckbox('Show Hitbox', 'When enabled, will show the hitboxes for each note.', function(value:Bool):Void
+    {
+      Preferences.showHitbox = value;
+    }, Preferences.showHitbox);
+    #end
+
     #if FEATURE_HAPTICS
     createPrefItemEnum('Haptics', 'When enabled, the game plays haptic feedback effects.', [
       "All" => HapticsMode.ALL,

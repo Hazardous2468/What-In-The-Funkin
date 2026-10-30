@@ -21,7 +21,8 @@ import funkin.api.newgrounds.Medals;
 import funkin.api.newgrounds.Leaderboards;
 #end
 
-@:nullSafety @:build(funkin.util.macro.SaveMacro.buildSaveProperties())
+@:nullSafety
+@:build(funkin.util.macro.SaveMacro.buildSaveProperties())
 class Save implements ConsoleClass
 {
   public static final SAVE_DATA_VERSION:thx.semver.Version = "2.1.1";
@@ -139,6 +140,7 @@ class Save implements ConsoleClass
       #if mobile
       mobileOptions: {
         // Reasonable defaults.
+        showHitbox: false,
         screenTimeout: false,
         controlsScheme: FunkinHitboxControlSchemes.Arrows,
         noAds: false
@@ -316,8 +318,10 @@ class Save implements ConsoleClass
 
   function get_stageBoyfriendChar():String
   {
-    if (data.optionsStageEditor.bfChar == null
-      || CharacterDataParser.fetchCharacterData(data.optionsStageEditor.bfChar) == null) data.optionsStageEditor.bfChar = "bf";
+    if (
+      data.optionsStageEditor.bfChar == null
+      || CharacterDataParser.fetchCharacterData(data.optionsStageEditor.bfChar) == null
+    ) data.optionsStageEditor.bfChar = "bf";
     return data.optionsStageEditor.bfChar;
   }
 
@@ -333,8 +337,10 @@ class Save implements ConsoleClass
 
   function get_stageGirlfriendChar():String
   {
-    if (data.optionsStageEditor.gfChar == null
-      || CharacterDataParser.fetchCharacterData(data.optionsStageEditor.gfChar ?? "") == null) data.optionsStageEditor.gfChar = "gf";
+    if (
+      data.optionsStageEditor.gfChar == null
+      || CharacterDataParser.fetchCharacterData(data.optionsStageEditor.gfChar ?? "") == null
+    ) data.optionsStageEditor.gfChar = "gf";
     return data.optionsStageEditor.gfChar;
   }
 
@@ -350,8 +356,10 @@ class Save implements ConsoleClass
 
   function get_stageDadChar():String
   {
-    if (data.optionsStageEditor.dadChar == null
-      || CharacterDataParser.fetchCharacterData(data.optionsStageEditor.dadChar ?? "") == null) data.optionsStageEditor.dadChar = "dad";
+    if (
+      data.optionsStageEditor.dadChar == null
+      || CharacterDataParser.fetchCharacterData(data.optionsStageEditor.dadChar ?? "") == null
+    ) data.optionsStageEditor.dadChar = "dad";
     return data.optionsStageEditor.dadChar;
   }
 
@@ -551,8 +559,10 @@ class Save implements ConsoleClass
     // Set the high score and the high rank separately.
     var newScore:SaveScoreData = {
       score: (previousScoreData.score > newScoreData.score) ? previousScoreData.score : newScoreData.score,
-      tallies: (previousRank > newRank
-        || Scoring.tallyCompletion(previousScoreData.tallies) > Scoring.tallyCompletion(newScoreData.tallies)) ? previousScoreData.tallies : newScoreData.tallies
+      tallies: (
+        previousRank > newRank
+        || Scoring.tallyCompletion(previousScoreData.tallies) > Scoring.tallyCompletion(newScoreData.tallies)
+      ) ? previousScoreData.tallies : newScoreData.tallies
     };
     song.set(difficultyId, newScore);
     Save.system.flush();
@@ -1242,6 +1252,12 @@ typedef PlayerControlData =
 #if mobile
 typedef SaveDataMobileOptions =
 {
+  /**
+   * If enabled, device will be able to sleep on its own.
+   * @default `false`
+   */
+  var showHitbox:Bool;
+
   /**
    * If enabled, device will be able to sleep on its own.
    * @default `false`

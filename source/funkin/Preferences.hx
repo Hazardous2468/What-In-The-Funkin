@@ -599,6 +599,25 @@ class Preferences
    * If enabled, device will be able to sleep on its own.
    * @default `false`
    */
+  public static var showHitbox(get, set):Bool;
+
+  static function get_showHitbox():Bool
+  {
+    return Save?.instance?.mobileOptions?.showHitbox ?? false;
+  }
+
+  static function set_showHitbox(value:Bool):Bool
+  {
+    var save:Save = Save.instance;
+    save.mobileOptions.showHitbox = value;
+    Save.system.flush();
+    return value;
+  }
+
+  /**
+   * If enabled, device will be able to sleep on its own.
+   * @default `false`
+   */
   public static var screenTimeout(get, set):Bool;
 
   static function get_screenTimeout():Bool
