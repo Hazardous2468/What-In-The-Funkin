@@ -1,14 +1,12 @@
 Note: Some reported problems are old and may have been already resolved.
 
-Fork specific issues (V1.1.1):
+Fork specific issues (V1.1.2):
 
-- No mobile support for modcharts
+- Inputs are broken / very inconsistent on Mobile with modcharts.
 
 - Orient modifier becomes inaccurate with drive2 modifier
 
 - Hold covers sometimes fail to appear and disappear
-
-- Incorrect animation speeds with zSort enabled
 
 - Metamods will not apply turn/chart modifiers unless you enter and exit the menu
 - The 'random' chart shuffle may take ages to load. Will be overhauled in a later fix
@@ -33,7 +31,5 @@ Fork specific issues (V1.1.1):
 - Sometimes holds / notes will be incorrectly layered when using zSort mod
   (v0.8.0a introduces a scuffed work around by adjusting zSortMod_SustainOffset and zSortMod_StrumNoteOffset in the PlayState instance.)
 Update: v1.0 may have brought back this issue, how fun!
-
-- Custom path mod jank (just try to stick to values between '0 - 1')
 
 - Note Splashes will have a visual flicker / stutter when being hitting on the first frame sometimes.

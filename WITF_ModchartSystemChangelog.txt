@@ -2,6 +2,7 @@ v1.1.2:
 
 Fixed modchart files not loading when mods are in a .zip file.
 Fixed Metamods speedmodifier.
+Added 'altCurPos' submodifier to BeatModifier.
 
 
 
@@ -13,7 +14,7 @@ Blacklisted some classes when trying to use them in runHaxeCode in modcharts to 
 New 'onModchartNotification' script event for polymod hxScripts.
 The 'addCustomMod' function for ModHandlers now accept any Modifier, not just CustomModifier. This means you can create your own Drunk Modifier, edit the noteMath, and then add it using the addCustomMod function.
 Added aliases for some stealth submods.
-Fixed zSort animation speeds (mostly affects Notesplashes and HoldCovers)
+Fixed zSort animation speeds (mostly affects Notesplashes and HoldCovers).
 Tiffy now appears in the character select.
 Added 200memestep and sing sing red indigo.
 Fixed modcharts looking into the wrong folder for mods with a proper ID set.

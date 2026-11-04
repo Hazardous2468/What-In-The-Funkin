@@ -18,6 +18,13 @@ class BeatModBase extends Modifier
   // var cap:ModifierSubValue; // By default, the speed gets halved if the BPM is too high. However we don't have this behaviour making this obsolete
   // An array which represents each arrow direction. Used to undo the strum movement for the notes for the offset submod to function
   var strumResult:Array<Float> = [0, 0, 0, 0];
+  var altCurposSubmod:ModifierSubValue;
+  var useUnscaledCurpos(get, never):Bool;
+
+  function get_useUnscaledCurpos():Bool
+  {
+    return altCurposSubmod.value >= 0.5;
+  }
 
   public function new(name:String)
   {
@@ -29,6 +36,7 @@ class BeatModBase extends Modifier
     alternate = createSubMod("alternate", 1.0);
     fAccelTimeSubmod = createSubMod("accel", 0.2);
     fTotalTimeSubmod = createSubMod("total", 0.5);
+    altCurposSubmod = createSubMod("altcurpos", 0.0, ["use_unscaled", "alt_curpos", "type"]);
   }
 
   // Control the acceleration and modifier timings:
@@ -86,7 +94,7 @@ class BeatXMod extends BeatModBase
   {
     if (currentValue == 0 || data.noteType == "receptor") return; // skip math if mod is 0
     data.x -= strumResult[data.direction]; // undo the strum  movement.
-    data.x += beatMath(data.curPos);
+    data.x += beatMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -97,7 +105,7 @@ class BeatXMod extends BeatModBase
     }
     else
     {
-      strumResult[data.direction] = beatMath(data.curPos);
+      strumResult[data.direction] = beatMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
       data.x += strumResult[data.direction];
     }
   }
@@ -114,7 +122,7 @@ class BeatYMod extends BeatModBase
   {
     if (currentValue == 0 || data.noteType == "receptor") return; // skip math if mod is 0
     data.y -= strumResult[data.direction]; // undo the strum  movement.
-    data.y += beatMath(data.curPos);
+    data.y += beatMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -125,7 +133,7 @@ class BeatYMod extends BeatModBase
     }
     else
     {
-      strumResult[data.direction] = beatMath(data.curPos);
+      strumResult[data.direction] = beatMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
       data.y += strumResult[data.direction];
     }
   }
@@ -142,7 +150,7 @@ class BeatZMod extends BeatModBase
   {
     if (currentValue == 0 || data.noteType == "receptor") return; // skip math if mod is 0
     data.z -= strumResult[data.direction]; // undo the strum  movement.
-    data.z += beatMath(data.curPos);
+    data.z += beatMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -153,7 +161,7 @@ class BeatZMod extends BeatModBase
     }
     else
     {
-      strumResult[data.direction] = beatMath(data.curPos);
+      strumResult[data.direction] = beatMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
       data.z += strumResult[data.direction];
     }
   }
@@ -170,7 +178,7 @@ class BeatAngleMod extends BeatModBase
   {
     if (data.inOrientPass || currentValue == 0 || data.noteType == "receptor") return; // skip math if mod is 0
     data.angleZ -= strumResult[data.direction]; // undo the strum  movement.
-    data.angleZ += beatMath(data.curPos); // re apply but now with notePos
+    data.angleZ += beatMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos); // re apply but now with notePos
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -181,7 +189,7 @@ class BeatAngleMod extends BeatModBase
     }
     else
     {
-      strumResult[data.direction] = beatMath(data.curPos);
+      strumResult[data.direction] = beatMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
       data.angleZ += strumResult[data.direction];
     }
   }
@@ -197,7 +205,7 @@ class BeatAngleXMod extends BeatModBase
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return; // skip math if mod is 0
-    data.angleX += beatMath(data.curPos);
+    data.angleX += beatMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -208,7 +216,7 @@ class BeatAngleXMod extends BeatModBase
     }
     else
     {
-      strumResult[data.direction] = beatMath(data.curPos);
+      strumResult[data.direction] = beatMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
       data.angleX += strumResult[data.direction];
     }
   }
@@ -224,7 +232,7 @@ class BeatAngleYMod extends BeatModBase
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return; // skip math if mod is 0
-    data.angleY += beatMath(data.curPos);
+    data.angleY += beatMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -235,7 +243,7 @@ class BeatAngleYMod extends BeatModBase
     }
     else
     {
-      strumResult[data.direction] = beatMath(data.curPos);
+      strumResult[data.direction] = beatMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
       data.angleY += strumResult[data.direction];
     }
   }
@@ -251,7 +259,7 @@ class BeatScaleMod extends BeatModBase
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0 || data.inOrientPass || data.noteType == "receptor") return; // skip math if mod is 0
-    final s:Float = beatMath(data.curPos) * 0.01;
+    final s:Float = beatMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos) * 0.01;
     data.scaleX += s;
     data.scaleY += s;
     data.scaleZ += s;
@@ -265,7 +273,7 @@ class BeatScaleMod extends BeatModBase
     }
     else
     {
-      strumResult[data.direction] = beatMath(data.curPos) * 0.01;
+      strumResult[data.direction] = beatMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos) * 0.01;
       data.scaleX += strumResult[data.direction];
       data.scaleY += strumResult[data.direction];
       data.scaleZ += strumResult[data.direction];
@@ -283,7 +291,7 @@ class BeatScaleXMod extends BeatModBase
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0 || data.inOrientPass || data.noteType == "receptor") return; // skip math if mod is 0
-    data.scaleX += beatMath(data.curPos) * 0.01;
+    data.scaleX += beatMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos) * 0.01;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -294,7 +302,7 @@ class BeatScaleXMod extends BeatModBase
     }
     else
     {
-      strumResult[data.direction] = beatMath(data.curPos) * 0.01;
+      strumResult[data.direction] = beatMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos) * 0.01;
       data.scaleX += strumResult[data.direction];
     }
   }
@@ -310,7 +318,7 @@ class BeatScaleYMod extends BeatModBase
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0 || data.inOrientPass || data.noteType == "receptor") return; // skip math if mod is 0
-    data.scaleY += beatMath(data.curPos) * 0.01;
+    data.scaleY += beatMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos) * 0.01;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -321,7 +329,7 @@ class BeatScaleYMod extends BeatModBase
     }
     else
     {
-      strumResult[data.direction] = beatMath(data.curPos) * 0.01;
+      strumResult[data.direction] = beatMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos) * 0.01;
       data.scaleY += strumResult[data.direction];
     }
   }
@@ -337,7 +345,7 @@ class BeatSkewXMod extends BeatModBase
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0 || data.inOrientPass || data.noteType == "receptor") return; // skip math if mod is 0
-    data.skewX += beatMath(data.curPos);
+    data.skewX += beatMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -348,7 +356,7 @@ class BeatSkewXMod extends BeatModBase
     }
     else
     {
-      strumResult[data.direction] = beatMath(data.curPos);
+      strumResult[data.direction] = beatMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
       data.skewX += strumResult[data.direction];
     }
   }
@@ -364,7 +372,7 @@ class BeatSkewYMod extends BeatModBase
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0 || data.inOrientPass || data.noteType == "receptor") return; // skip math if mod is 0
-    data.skewY += beatMath(data.curPos);
+    data.skewY += beatMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -375,7 +383,7 @@ class BeatSkewYMod extends BeatModBase
     }
     else
     {
-      strumResult[data.direction] = beatMath(data.curPos);
+      strumResult[data.direction] = beatMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
       data.skewY += strumResult[data.direction];
     }
   }
