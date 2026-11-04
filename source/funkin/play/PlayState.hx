@@ -4279,7 +4279,7 @@ class PlayState extends MusicBeatSubState
     #end
 
     // 8: Quickly reloads all the modchart stuff for quick iterations
-    if (FlxG.keys.justPressed.EIGHT) scanForModchart();
+    if (controls.RELOAD_MODCHART) scanForModchart();
 
     // 9: Toggle the old icon.
     if

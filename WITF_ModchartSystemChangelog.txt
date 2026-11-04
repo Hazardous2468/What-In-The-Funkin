@@ -3,7 +3,8 @@ v1.1.2:
 Fixed modchart files not loading when mods are in a .zip file.
 Fixed Metamods speedmodifier.
 Added 'altCurPos' submodifier to BeatModifier.
-
+Fixed Discord RPC.
+Can now rebind the 'reload modchart lua' button. (Still defaults to '8')
 
 
 

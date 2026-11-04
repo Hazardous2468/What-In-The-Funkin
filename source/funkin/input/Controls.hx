@@ -50,6 +50,7 @@ class Controls extends FlxActionSet
   #if FEATURE_STAGE_EDITOR
   var _debug_stage:FunkinAction = new FunkinAction(Action.DEBUG_STAGE);
   #end
+  var _reload_modchart:FunkinAction = new FunkinAction(Action.RELOAD_MODCHART);
   var _debug_display:FunkinAction = new FunkinAction(Action.DEBUG_DISPLAY);
   var _volume_up:FunkinAction = new FunkinAction(Action.VOLUME_UP);
   var _volume_down:FunkinAction = new FunkinAction(Action.VOLUME_DOWN);
@@ -402,6 +403,13 @@ class Controls extends FlxActionSet
   }
   #end
 
+  public var RELOAD_MODCHART(get, never):Bool;
+
+  inline function get_RELOAD_MODCHART():Bool
+  {
+    return _reload_modchart.check();
+  }
+
   public var DEBUG_DISPLAY(get, never):Bool;
 
   inline function get_DEBUG_DISPLAY():Bool
@@ -458,6 +466,7 @@ class Controls extends FlxActionSet
     #if FEATURE_DEBUG_MENU add(_debug_menu); #end
     #if FEATURE_CHART_EDITOR add(_debug_chart); #end
     #if FEATURE_STAGE_EDITOR add(_debug_stage); #end
+    add(_reload_modchart);
     add(_debug_display);
     add(_volume_up);
     add(_volume_down);
@@ -493,12 +502,12 @@ class Controls extends FlxActionSet
     var action = byName[name];
     if (gamepadOnly)
     {
-      if(action.checkFiltered(trigger, GAMEPAD)) action.updateLastDeviceUsed();
+      if (action.checkFiltered(trigger, GAMEPAD)) action.updateLastDeviceUsed();
       return action.checkFiltered(trigger, GAMEPAD);
     }
     else
     {
-      if(action.checkFiltered(trigger)) action.updateLastDeviceUsed();
+      if (action.checkFiltered(trigger)) action.updateLastDeviceUsed();
       return action.checkFiltered(trigger);
     }
   }
@@ -632,6 +641,8 @@ class Controls extends FlxActionSet
       case DEBUG_STAGE:
         _debug_stage;
       #end
+      case RELOAD_MODCHART:
+        _reload_modchart;
       case DEBUG_DISPLAY:
         _debug_display;
       case VOLUME_UP:
@@ -734,6 +745,8 @@ class Controls extends FlxActionSet
       #end
       case DEBUG_DISPLAY:
         func(_debug_display, JUST_PRESSED);
+      case RELOAD_MODCHART:
+        func(_reload_modchart, JUST_PRESSED);
       case VOLUME_UP:
         func(_volume_up, JUST_PRESSED);
       case VOLUME_DOWN:
@@ -957,6 +970,7 @@ class Controls extends FlxActionSet
     bindKeys(Control.DEBUG_STAGE, getDefaultKeybinds(scheme, Control.DEBUG_STAGE));
     #end
     bindKeys(Control.DEBUG_DISPLAY, getDefaultKeybinds(scheme, Control.DEBUG_DISPLAY));
+    bindKeys(Control.RELOAD_MODCHART, getDefaultKeybinds(scheme, Control.RELOAD_MODCHART));
     bindKeys(Control.VOLUME_UP, getDefaultKeybinds(scheme, Control.VOLUME_UP));
     bindKeys(Control.VOLUME_DOWN, getDefaultKeybinds(scheme, Control.VOLUME_DOWN));
     bindKeys(Control.VOLUME_MUTE, getDefaultKeybinds(scheme, Control.VOLUME_MUTE));
@@ -1027,6 +1041,8 @@ class Controls extends FlxActionSet
           #end
           case Control.DEBUG_DISPLAY:
             return [F6];
+          case Control.RELOAD_MODCHART:
+            return [EIGHT];
           case Control.VOLUME_UP:
             return [PLUS, NUMPADPLUS];
           case Control.VOLUME_DOWN:
@@ -1095,6 +1111,8 @@ class Controls extends FlxActionSet
           #end
           case Control.DEBUG_DISPLAY:
             return [F6];
+          case Control.RELOAD_MODCHART:
+            return [EIGHT];
           case Control.VOLUME_UP:
             return [PLUS];
           case Control.VOLUME_DOWN:
@@ -1162,6 +1180,8 @@ class Controls extends FlxActionSet
             return [];
           #end
           case Control.DEBUG_DISPLAY:
+            return [];
+          case Control.RELOAD_MODCHART:
             return [];
           case Control.VOLUME_UP:
             return [NUMPADPLUS];
@@ -1250,6 +1270,7 @@ class Controls extends FlxActionSet
       #if FEATURE_CHART_EDITOR Control.DEBUG_CHART => getDefaultGamepadBinds(Control.DEBUG_CHART), #end
       #if FEATURE_STAGE_EDITOR Control.DEBUG_STAGE => getDefaultGamepadBinds(Control.DEBUG_STAGE), #end
       Control.DEBUG_DISPLAY => getDefaultGamepadBinds(Control.DEBUG_DISPLAY),
+      Control.RELOAD_MODCHART => getDefaultGamepadBinds(Control.RELOAD_MODCHART),
     ]);
   }
 
@@ -1320,6 +1341,8 @@ class Controls extends FlxActionSet
         [];
       #end
       case Control.DEBUG_DISPLAY:
+        [];
+      case Control.RELOAD_MODCHART:
         [];
       default:
         [];
@@ -1681,7 +1704,10 @@ class FunkinAction extends FlxActionDigital
       }
     }
 
-    cache.set(key, {timestamp: FlxG.game.ticks, value: triggered});
+    cache.set(key, {
+      timestamp: FlxG.game.ticks,
+      value: triggered
+    });
 
     return triggered;
   }
@@ -1752,6 +1778,7 @@ enum Control
   #if FEATURE_CHART_EDITOR DEBUG_CHART; #end
   #if FEATURE_STAGE_EDITOR DEBUG_STAGE; #end
   DEBUG_DISPLAY;
+  RELOAD_MODCHART;
 }
 
 enum abstract Action(String) to String from String
@@ -1799,6 +1826,7 @@ enum abstract Action(String) to String from String
   var DEBUG_STAGE = 'debug_stage';
   #end
   public var DEBUG_DISPLAY = 'debug_display';
+  public var RELOAD_MODCHART = 'reload_modchart';
 }
 
 enum Device
