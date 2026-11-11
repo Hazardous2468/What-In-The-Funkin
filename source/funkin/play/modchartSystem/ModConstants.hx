@@ -275,19 +275,29 @@ class ModConstants
 
     // trace("in goes: " + modName);
 
+    // All references of AngleZ becomes just Angle.
     modName = StringTools.replace(modName, "anglez", "angle");
 
+    // Spiral alias'
     modName = StringTools.replace(modName, "spiralholds", "holdtype");
     modName = StringTools.replace(modName, "spiralpaths", "arrowpathtype");
     modName = StringTools.replace(modName, "pathstype", "arrowpathtype");
 
+    // antiNegativeScale
     modName = StringTools.replace(modName, "nonegativescale", "antinegativescale");
 
+    // Jump
     modName = StringTools.replace(modName, "autodriven", "jump");
     modName = StringTools.replace(modName, "autodrive", "jump");
 
+    // Speed
+    modName = StringTools.replace(modName, "scrollspeedmultiplier", "speed");
+    modName = StringTools.replace(modName, "speedmultiplier", "speed");
+    modName = StringTools.replace(modName, "scrollspeedmult", "speed");
+    modName = StringTools.replace(modName, "speedmult", "speed");
     modName = StringTools.replace(modName, "speedmod", "speed");
 
+    // Rotate
     modName = StringTools.replace(modName, "rotx", "rotatex");
     modName = StringTools.replace(modName, "roty", "rotatey");
     modName = StringTools.replace(modName, "rotz", "rotatez");
@@ -295,15 +305,18 @@ class ModConstants
     modName = StringTools.replace(modName, "rotationy", "rotatey");
     modName = StringTools.replace(modName, "rotationz", "rotatez");
 
+    // HoldAngle
     modName = StringTools.replace(modName, "holdsanglex", "holdanglex");
     modName = StringTools.replace(modName, "holdsangley", "holdangley");
     modName = StringTools.replace(modName, "holdsangle", "holdangle");
 
+    // CosSpiral
     modName = StringTools.replace(modName, "cosspiral", "spiralcos");
 
+    // Confusion
     modName = StringTools.replace(modName, "confusionzoffset", "confusionoffset");
 
-    // this is stupid
+    // Alias checking Directly (without the '--')
     var noLaneName:String = modName;
     var noLaneName_2:String = "";
     var subModArr = null;
@@ -340,50 +353,54 @@ class ModConstants
     }
     modName = noLaneName + noLaneName_2;
 
+    // NoteSplashCopy
     modName = StringTools.replace(modName, "notesplashsscalecopy", "notesplashscalecopy");
     modName = StringTools.replace(modName, "notesplashesscalecopy", "notesplashscalecopy");
     modName = StringTools.replace(modName, "holdcoversscalecopy", "holdcoverscalecopy");
+    modName = StringTools.replace(modName, "coversscalecopy", "holdcoverscalecopy");
+    modName = StringTools.replace(modName, "coverscalecopy", "holdcoverscalecopy");
 
+    // Scale
     modName = StringTools.replace(modName, "scaleholds", "scalehold");
     modName = StringTools.replace(modName, "scalestrums", "scalestrum");
     modName = StringTools.replace(modName, "scalenotes", "scalenote");
 
+    modName = StringTools.replace(modName, "small", "tiny");
     modName = StringTools.replace(modName, "tinyholds", "tinyhold");
 
-    modName = StringTools.replace(modName, "sawx", "saw");
+    // Sawtooth
     modName = StringTools.replace(modName, "sawtooth", "saw");
-    modName = StringTools.replace(modName, "sawtoothx", "saw");
-    modName = StringTools.replace(modName, "sawtoothy", "sawy");
-    modName = StringTools.replace(modName, "sawtoothz", "sawz");
-    modName = StringTools.replace(modName, "sawtoothscale", "sawscale");
-    modName = StringTools.replace(modName, "sawtoothangle", "sawangle");
+    modName = StringTools.replace(modName, "sawx", "saw");
 
-    modName = StringTools.replace(modName, "zigzagx", "zigzag");
+    // Zigzag
     modName = StringTools.replace(modName, "tri", "zigzag");
-    modName = StringTools.replace(modName, "trix", "zigzag");
-    modName = StringTools.replace(modName, "triy", "zigzagy");
-    modName = StringTools.replace(modName, "triz", "zigzagz");
+    modName = StringTools.replace(modName, "zigzagx", "zigzag");
 
+    // Grain
+    modName = StringTools.replace(modName, "holdsgrain", "grain");
     modName = StringTools.replace(modName, "holdgrain", "grain");
+    modName = StringTools.replace(modName, "arrowpathsgrain", "pathgrain");
     modName = StringTools.replace(modName, "arrowpathgrain", "pathgrain");
 
+    // Cull
     modName = StringTools.replace(modName, "cullholds", "cullsustain");
     modName = StringTools.replace(modName, "cullhold", "cullsustain");
+    modName = StringTools.replace(modName, "cullnotes", "cullnote");
+    modName = StringTools.replace(modName, "cullstrums", "cullstrum");
     modName = StringTools.replace(modName, "cullarrowpaths", "cullpath");
     modName = StringTools.replace(modName, "cullarrowpath", "cullpath");
 
+    // Stealth Glow
     modName = StringTools.replace(modName, "stealthred", "stealthglowred");
     modName = StringTools.replace(modName, "stealthgreen", "stealthglowgreen");
     modName = StringTools.replace(modName, "stealthblue", "stealthglowblue");
 
+    // Stealth
     modName = StringTools.replace(modName, "stealthstrum", "strumstealth");
     modName = StringTools.replace(modName, "stealthreceptor", "strumstealth");
     modName = StringTools.replace(modName, "receptorstealth", "strumstealth");
 
-    modName = StringTools.replace(modName, "small", "tiny");
-
-    modName = StringTools.replace(modName, "scrollspeedmult", "speedmod");
-
+    // Debug
     modName = StringTools.replace(modName, "showzerovaluemods", "showzerovalue");
     modName = StringTools.replace(modName, "debugshowzeromods", "showzerovalue");
     modName = StringTools.replace(modName, "debugshowzerovaluemods", "showzerovalue");
@@ -408,8 +425,14 @@ class ModConstants
     modName = StringTools.replace(modName, "debugoffsetx", "debugx");
     modName = StringTools.replace(modName, "debugoffsety", "debugy");
 
+    // noholdmathshortcut
+    modName = StringTools.replace(modName, "disableholdsmathshortcut", "noholdmathshortcut");
+    modName = StringTools.replace(modName, "disablesustainmathshortcut", "noholdmathshortcut");
+    modName = StringTools.replace(modName, "disablesustaintrailmathshortcut", "noholdmathshortcut");
+    modName = StringTools.replace(modName, "disablesustaintrailshortcut", "noholdmathshortcut");
     modName = StringTools.replace(modName, "disableholdmathshortcut", "noholdmathshortcut");
 
+    // Arrowpath
     modName = StringTools.replace(modName, "notepath", "arrowpath");
     modName = StringTools.replace(modName, "arrowpath_notitgstyled", "arrowpath_notitg");
     modName = StringTools.replace(modName, "arrowpath_line", "arrowpath_notitg");
@@ -421,38 +444,50 @@ class ModConstants
     modName = StringTools.replace(modName, "arrowpathstraightholds", "arrowpathstraighthold");
     modName = StringTools.replace(modName, "arrowpathfrontlength", "arrowpathlength");
 
+    // Center
     modName = StringTools.replace(modName, "centered", "center");
     modName = StringTools.replace(modName, "centere", "center");
     modName = StringTools.replace(modName, "alwayscenter", "center2");
 
+    // Bumpy
     modName = StringTools.replace(modName, "bumpyz", "bumpy");
 
+    // Tornado
     modName = StringTools.replace(modName, "tornadox", "tornado");
+
+    // Hour Glass
     modName = StringTools.replace(modName, "hourglassx", "hourglass");
 
+    // Beat
     modName = StringTools.replace(modName, "beatx", "beat");
 
+    // Square
     modName = StringTools.replace(modName, "squarex", "square");
 
+    // Drunk
     modName = StringTools.replace(modName, "drunkx", "drunk");
-    modName = StringTools.replace(modName, "tandrunkx", "tandrunk");
 
+    // Tipsy
     modName = StringTools.replace(modName, "tipsyy", "tipsy");
-    modName = StringTools.replace(modName, "tantipsyy", "tantipsy");
 
+    // Wavey
     modName = StringTools.replace(modName, "waveystrum", "wavey");
 
+    // Blacksphere
     modName = StringTools.replace(modName, "blacksphere_flip", "blacksphereflip");
 
+    // Alpha
     modName = StringTools.replace(modName, "alphanotes", "alphanote");
     modName = StringTools.replace(modName, "alphaholds", "alphahold");
     modName = StringTools.replace(modName, "alphareceptor", "alphastrum");
     modName = StringTools.replace(modName, "alphareceptors", "alphastrum");
     modName = StringTools.replace(modName, "alphastrums", "alphastrum");
     modName = StringTools.replace(modName, "alphaholdcovers", "alphaholdcover");
+    modName = StringTools.replace(modName, "alphacovers", "alphaholdcover");
     modName = StringTools.replace(modName, "alphanotesplashes", "alphasplash");
     modName = StringTools.replace(modName, "alphanotesplash", "alphasplash");
 
+    // Draw distance
     modName = StringTools.replace(modName, "drawsize", "drawdistance");
     modName = StringTools.replace(modName, "renderdistance", "drawdistance");
 
@@ -466,13 +501,19 @@ class ModConstants
     modName = StringTools.replace(modName, "renderdistancebackwards", "drawdistanceback");
     modName = StringTools.replace(modName, "renderdistanceback", "drawdistanceback");
 
-    modName = StringTools.replace(modName, "tinyholds", "tinyhold");
-
+    // AttenuateX
     modName = StringTools.replace(modName, "attenuatex", "attenuate");
 
+    // 3D
     modName = StringTools.replace(modName, "threed", "3d");
     modName = StringTools.replace(modName, "3drenderer", "3d");
     modName = StringTools.replace(modName, "3dprojection", "3d");
+
+    // Old Modifiers
+    modName = StringTools.replace(modName, "old3dholds", "old3dhold");
+    modName = StringTools.replace(modName, "legacy3dholds", "old3dhold");
+    modName = StringTools.replace(modName, "legacy3dhold", "old3dhold");
+    modName = StringTools.replace(modName, "legacycustompath", "oldcustompath");
 
     // trace("out goes: " + modName);
 
@@ -1127,7 +1168,7 @@ class ModConstants
         newMod = new DrawDistanceMod(tag);
 
       // hold mods
-      case "old3dholds":
+      case "old3dhold":
         newMod = new Old3DHoldsMod(tag);
       case "holdtype":
         newMod = new HoldTypeMod(tag);
