@@ -5,6 +5,7 @@ Removed Mirin Template song.
 Added TornadoAngleX, TornadoAngleY, TanBumpyAngleY, TanBumpyAngleX, TanDrunkScaleX, TanDrunkScaleY, TanDrunkAngleX, TanDrunkAngleY, TanTipsyAngleX, TanTipsyAngleY.
 Added 'displayName' variable and 'hideIfBaseValue' variable to all modifiers. This also means some modifiers will now be properly hidden when at their default values such as Speed or Zoom modifiers.
 Fixed TipsyAngleY and TipsyAngleX.
+'3D' modifier now made a utility mod (no longer shows up by default in debug).
 Minor modifier tweaks (Asymptote, Zigzag, Wavey).
 Circ modifier now uses 'invertForDad' correctly.
 

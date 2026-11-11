@@ -195,6 +195,7 @@ class ThreeDProjection extends Modifier
     super(name, 0);
     unknown = false;
     strumsMod = true;
+    utility = true;
     displayName = "3D";
   }
 
