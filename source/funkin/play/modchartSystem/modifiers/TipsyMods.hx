@@ -106,7 +106,7 @@ class TipsyAngleMod extends TipsyModBase
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.inOrientPass) return; // skip math if mod is 0
     data.angleZ += tipsyMath(data.direction, data.curPos);
   }
 }

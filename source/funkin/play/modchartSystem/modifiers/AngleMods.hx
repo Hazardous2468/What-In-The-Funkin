@@ -19,6 +19,7 @@ class AngleZOffsetMod extends Modifier
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
+    if (data.inOrientPass) return;
     data.angleZ += currentValue;
   }
 }

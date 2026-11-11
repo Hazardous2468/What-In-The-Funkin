@@ -389,8 +389,15 @@ class TanDrunkXMod extends DrunkModBase
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
-    data.x += tanDrunkMath(data.direction, data.curPos);
+    if (currentValue == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = tanDrunkMath(data.direction, data.curPos);
+      data.x += strumResult[data.direction];
+    }
   }
 }
 
@@ -411,8 +418,15 @@ class TanDrunkYMod extends DrunkModBase
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
-    data.y += tanDrunkMath(data.direction, data.curPos);
+    if (currentValue == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = tanDrunkMath(data.direction, data.curPos);
+      data.y += strumResult[data.direction];
+    }
   }
 }
 
@@ -433,8 +447,15 @@ class TanDrunkZMod extends DrunkModBase
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
-    data.z += tanDrunkMath(data.direction, data.curPos);
+    if (currentValue == 0)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = tanDrunkMath(data.direction, data.curPos);
+      data.z += strumResult[data.direction];
+    }
   }
 }
 
@@ -456,8 +477,15 @@ class TanDrunkAngleMod extends DrunkModBase
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0 || data.inOrientPass) return; // skip math if mod is 0
-    data.angleZ += tanDrunkMath(data.direction, data.curPos);
+    if (currentValue == 0 || data.inOrientPass)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = tanDrunkMath(data.direction, data.curPos);
+      data.angleZ += strumResult[data.direction];
+    }
   }
 }
 
@@ -478,8 +506,15 @@ class TanDrunkAngleXMod extends DrunkModBase
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0 || data.inOrientPass) return; // skip math if mod is 0
-    data.angleX += tanDrunkMath(data.direction, data.curPos);
+    if (currentValue == 0 || data.inOrientPass)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = tanDrunkMath(data.direction, data.curPos);
+      data.angleX += strumResult[data.direction];
+    }
   }
 }
 
@@ -500,8 +535,15 @@ class TanDrunkAngleYMod extends DrunkModBase
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0 || data.inOrientPass) return; // skip math if mod is 0
-    data.angleY += tanDrunkMath(data.direction, data.curPos);
+    if (currentValue == 0 || data.inOrientPass)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = tanDrunkMath(data.direction, data.curPos);
+      data.angleY += strumResult[data.direction];
+    }
   }
 }
 
@@ -516,16 +558,26 @@ class TanDrunkScaleMod extends DrunkModBase
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return; // skip math if mod is 0
-    strumMath(data, strumLine);
-  }
-
-  override function strumMath(data:NoteData, strumLine:Strumline):Void
-  {
-    if (currentValue == 0 || data.inOrientPass) return; // skip math if mod is 0
     final s:Float = tanDrunkMath(data.direction, data.curPos);
     data.scaleX += s * 0.01;
     data.scaleZ += s * 0.01;
     data.scaleY += s * 0.01;
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (currentValue == 0 || data.inOrientPass)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      final s:Float = tanDrunkMath(data.direction, data.curPos) * 0.01;
+      strumResult[data.direction] = s;
+      data.scaleX += s;
+      data.scaleZ += s;
+      data.scaleY += s;
+    }
   }
 }
 
@@ -540,13 +592,20 @@ class TanDrunkScaleYMod extends DrunkModBase
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return; // skip math if mod is 0
-    strumMath(data, strumLine);
+    data.scaleY += tanDrunkMath(data.direction, data.curPos) * 0.01;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0 || data.inOrientPass) return; // skip math if mod is 0
-    data.scaleY += tanDrunkMath(data.direction, data.curPos) * 0.01;
+    if (currentValue == 0 || data.inOrientPass)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = tanDrunkMath(data.direction, data.curPos) * 0.01;
+      data.scaleY += strumResult[data.direction];
+    }
   }
 }
 
@@ -561,12 +620,19 @@ class TanDrunkScaleXMod extends DrunkModBase
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return; // skip math if mod is 0
-    strumMath(data, strumLine);
+    data.scaleX += tanDrunkMath(data.direction, data.curPos) * 0.01;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0 || data.inOrientPass) return; // skip math if mod is 0
-    data.scaleX += tanDrunkMath(data.direction, data.curPos) * 0.01;
+    if (currentValue == 0 || data.inOrientPass)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = tanDrunkMath(data.direction, data.curPos) * 0.01;
+      data.scaleX += strumResult[data.direction];
+    }
   }
 }
