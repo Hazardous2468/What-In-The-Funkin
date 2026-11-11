@@ -34,6 +34,13 @@ class CircModBase extends Modifier
 
 class CircXMod extends CircModBase
 {
+  public function new(name:String)
+  {
+    super(name);
+    displayName = "CircX";
+    invertForDad = true;
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0 || data.noteType == "receptor") return;
@@ -57,6 +64,12 @@ class CircXMod extends CircModBase
 
 class CircYMod extends CircModBase
 {
+  public function new(name:String)
+  {
+    super(name);
+    displayName = "CircY";
+  }
+
   public var flipForDownscroll:Bool = true;
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -82,6 +95,12 @@ class CircYMod extends CircModBase
 
 class CircZMod extends CircModBase
 {
+  public function new(name:String)
+  {
+    super(name);
+    displayName = "CircZ";
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0 || data.noteType == "receptor") return;
@@ -105,6 +124,13 @@ class CircZMod extends CircModBase
 
 class CircAngleMod extends CircModBase
 {
+  public function new(name:String)
+  {
+    super(name);
+    displayName = "CircAngle";
+    invertForDad = true;
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
@@ -128,6 +154,13 @@ class CircAngleMod extends CircModBase
 
 class CircAngleYMod extends CircModBase
 {
+  public function new(name:String)
+  {
+    super(name);
+    displayName = "CircAngleY";
+    invertForDad = true;
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
@@ -150,6 +183,12 @@ class CircAngleYMod extends CircModBase
 
 class CircAngleXMod extends CircModBase
 {
+  public function new(name:String)
+  {
+    super(name);
+    displayName = "CircAngleX";
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
@@ -172,6 +211,12 @@ class CircAngleXMod extends CircModBase
 
 class CircScaleMod extends CircModBase
 {
+  public function new(name:String)
+  {
+    super(name);
+    displayName = "CircScale";
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
@@ -199,6 +244,12 @@ class CircScaleMod extends CircModBase
 
 class CircScaleXMod extends CircModBase
 {
+  public function new(name:String)
+  {
+    super(name);
+    displayName = "CircScaleX";
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
@@ -221,6 +272,12 @@ class CircScaleXMod extends CircModBase
 
 class CircScaleYMod extends CircModBase
 {
+  public function new(name:String)
+  {
+    super(name);
+    displayName = "CircScaleY";
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
@@ -243,6 +300,13 @@ class CircScaleYMod extends CircModBase
 
 class CircSkewXMod extends CircModBase
 {
+  public function new(name:String)
+  {
+    super(name);
+    invertForDad = true;
+    displayName = "CircSkewX";
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
@@ -265,6 +329,13 @@ class CircSkewXMod extends CircModBase
 
 class CircSkewYMod extends CircModBase
 {
+  public function new(name:String)
+  {
+    super(name);
+    displayName = "CircSkewY";
+    invertForDad = true;
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
@@ -292,6 +363,7 @@ class CircSpeedMod extends Modifier
     super(name);
     modPriority = 396;
     offset = createSubMod("offset", 0.0);
+    displayName = "CircSpeed";
   }
 
   var offset:ModifierSubValue;

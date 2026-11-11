@@ -85,6 +85,7 @@ class WaveyXMod extends WaveyModBase
     unknown = false;
     strumsMod = true;
     invertForDad = true;
+    displayName = "WaveyX";
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -101,6 +102,7 @@ class WaveyYMod extends WaveyModBase
     super(name);
     unknown = false;
     strumsMod = true;
+    displayName = "WaveyY";
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -117,6 +119,7 @@ class WaveyZMod extends WaveyModBase
     super(name);
     unknown = false;
     strumsMod = true;
+    displayName = "WaveyZ";
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -134,6 +137,7 @@ class WaveyAngleMod extends WaveyModBase
     unknown = false;
     strumsMod = true;
     invertForDad = true;
+    displayName = "WaveyAngle";
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -153,6 +157,7 @@ class WaveyAngleXMod extends WaveyModBase
     holdsMod = true;
     pathMod = false;
     strumsMod = true;
+    displayName = "WaveyAngleX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -178,6 +183,7 @@ class WaveyAngleYMod extends WaveyModBase
     pathMod = false;
     strumsMod = true;
     invertForDad = true;
+    displayName = "WaveyAngleY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -202,6 +208,7 @@ class WaveyScaleMod extends WaveyModBase
     holdsMod = true;
     pathMod = false;
     strumsMod = true;
+    displayName = "WaveyScale";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -230,6 +237,7 @@ class WaveySkewXMod extends WaveyModBase
     pathMod = false;
     strumsMod = true;
     invertForDad = true;
+    displayName = "WaveySkewX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -255,6 +263,7 @@ class WaveySkewYMod extends WaveyModBase
     pathMod = false;
     strumsMod = true;
     invertForDad = true;
+    displayName = "WaveySkewY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -279,6 +288,7 @@ class WaveyScaleXMod extends WaveyModBase
     holdsMod = true;
     pathMod = true;
     strumsMod = true;
+    displayName = "WaveyScaleX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -303,6 +313,7 @@ class WaveyScaleYMod extends WaveyModBase
     holdsMod = true;
     pathMod = true;
     strumsMod = true;
+    displayName = "WaveyScaleY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -325,11 +336,12 @@ class TanWaveyXMod extends WaveyModBase
     unknown = false;
     strumsMod = true;
     invertForDad = true;
+    displayName = "TanWaveyX";
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0) return;
     data.x += tanWaveyMath(data.direction, data.curPos);
   }
 }
@@ -340,12 +352,13 @@ class TanWaveyYMod extends WaveyModBase
   {
     super(name);
     unknown = false;
+    displayName = "TanWaveyY";
     strumsMod = true;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0) return;
     data.y += tanWaveyMath(data.direction, data.curPos);
   }
 }
@@ -357,11 +370,12 @@ class TanWaveyZMod extends WaveyModBase
     super(name);
     unknown = false;
     strumsMod = true;
+    displayName = "TanWaveyZ";
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0) return;
     data.z += tanWaveyMath(data.direction, data.curPos);
   }
 }
@@ -374,12 +388,67 @@ class TanWaveyAngleMod extends WaveyModBase
     unknown = false;
     strumsMod = true;
     invertForDad = true;
+    displayName = "TanWaveyAngle";
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (data.inOrientPass || currentValue == 0) return;
     data.angleZ += tanWaveyMath(data.direction, data.curPos);
+  }
+}
+
+class TanWaveyAngleXMod extends WaveyModBase
+{
+  public function new(name:String)
+  {
+    super(name);
+    unknown = false;
+    notesMod = true;
+    holdsMod = true;
+    pathMod = false;
+    strumsMod = true;
+    invertForDad = true;
+    displayName = "TanWaveyAngleX";
+  }
+
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
+  {
+    if (data.inOrientPass || currentValue == 0 || data.noteType == "receptor") return;
+    data.angleX += tanWaveyMath(data.direction, data.curPos);
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (data.inOrientPass || currentValue == 0) return;
+    data.angleX += tanWaveyMath(data.direction, data.curPos);
+  }
+}
+
+class TanWaveyAngleYMod extends WaveyModBase
+{
+  public function new(name:String)
+  {
+    super(name);
+    unknown = false;
+    notesMod = true;
+    holdsMod = true;
+    pathMod = false;
+    strumsMod = true;
+    invertForDad = true;
+    displayName = "TanWaveyAngleY";
+  }
+
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
+  {
+    if (data.inOrientPass || currentValue == 0 || data.noteType == "receptor") return;
+    data.angleY += tanWaveyMath(data.direction, data.curPos);
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (data.inOrientPass || currentValue == 0) return;
+    data.angleY += tanWaveyMath(data.direction, data.curPos);
   }
 }
 
@@ -393,20 +462,77 @@ class TanWaveyScaleMod extends WaveyModBase
     holdsMod = true;
     pathMod = false;
     strumsMod = true;
+    displayName = "TanWaveyScale";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    strumMath(data, strumLine);
-  }
-
-  override function strumMath(data:NoteData, strumLine:Strumline):Void
-  {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (data.inOrientPass || currentValue == 0 || data.noteType == "receptor") return;
     final s:Float = tanWaveyMath(data.direction, data.curPos);
     data.scaleX += s * 0.01;
     data.scaleZ += s * 0.01;
     data.scaleY += s * 0.01;
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (data.inOrientPass || currentValue == 0) return;
+    final s:Float = tanWaveyMath(data.direction, data.curPos);
+    data.scaleX += s * 0.01;
+    data.scaleZ += s * 0.01;
+    data.scaleY += s * 0.01;
+  }
+}
+
+class TanWaveyScaleXMod extends WaveyModBase
+{
+  public function new(name:String)
+  {
+    super(name);
+    unknown = false;
+    notesMod = true;
+    holdsMod = true;
+    pathMod = false;
+    strumsMod = true;
+    displayName = "TanWaveyScaleX";
+  }
+
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
+  {
+    if (data.inOrientPass || currentValue == 0 || data.noteType == "receptor") return;
+    data.scaleX += tanWaveyMath(data.direction, data.curPos) * 0.01;
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (data.inOrientPass || currentValue == 0) return;
+    data.scaleX += tanWaveyMath(data.direction, data.curPos) * 0.01;
+  }
+}
+
+class TanWaveyScaleYMod extends WaveyModBase
+{
+  public function new(name:String)
+  {
+    super(name);
+    unknown = false;
+    notesMod = true;
+    holdsMod = true;
+    pathMod = false;
+    strumsMod = true;
+    displayName = "TanWaveyScaleY";
+  }
+
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
+  {
+    if (data.inOrientPass || currentValue == 0 || data.noteType == "receptor") return;
+    data.scaleY += tanWaveyMath(data.direction, data.curPos) * 0.01;
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (data.inOrientPass || currentValue == 0) return;
+    data.scaleY += tanWaveyMath(data.direction, data.curPos) * 0.01;
   }
 }
 
@@ -420,17 +546,19 @@ class TanWaveySkewXMod extends WaveyModBase
     holdsMod = true;
     pathMod = true;
     strumsMod = true;
+    displayName = "TanWaveySkewX";
     invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    strumMath(data, strumLine);
+    if (data.inOrientPass || currentValue == 0 || data.noteType == "receptor") return;
+    data.skewX += tanWaveyMath(data.direction, data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (data.inOrientPass || currentValue == 0) return;
     data.skewX += tanWaveyMath(data.direction, data.curPos);
   }
 }
@@ -444,18 +572,20 @@ class TanWaveySkewYMod extends WaveyModBase
     notesMod = true;
     holdsMod = true;
     pathMod = true;
+    displayName = "TanWaveySkewY";
     strumsMod = true;
     invertForDad = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    strumMath(data, strumLine);
+    if (data.inOrientPass || currentValue == 0 || data.noteType == "receptor") return;
+    data.skewY += tanWaveyMath(data.direction, data.curPos);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (data.inOrientPass || currentValue == 0) return;
     data.skewY += tanWaveyMath(data.direction, data.curPos);
   }
 }

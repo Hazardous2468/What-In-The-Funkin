@@ -56,6 +56,7 @@ class CosecantXMod extends CosecantModifierBase
   public function new(name:String)
   {
     super(name);
+    displayName = "CosecantX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -84,6 +85,7 @@ class CosecantYMod extends CosecantModifierBase
   public function new(name:String)
   {
     super(name);
+    displayName = "CosecantY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -112,6 +114,7 @@ class CosecantZMod extends CosecantModifierBase
   public function new(name:String)
   {
     super(name);
+    displayName = "CosecantZ";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -140,6 +143,7 @@ class CosecantAngleMod extends CosecantModifierBase
   public function new(name:String)
   {
     super(name);
+    displayName = "CosecantAngle";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -168,6 +172,7 @@ class CosecantScaleMod extends CosecantModifierBase
   public function new(name:String)
   {
     super(name);
+    displayName = "CosecantScale";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -200,6 +205,7 @@ class CosecantScaleXMod extends CosecantModifierBase
   public function new(name:String)
   {
     super(name);
+    displayName = "CosecantScaleX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -227,6 +233,7 @@ class CosecantScaleYMod extends CosecantModifierBase
   public function new(name:String)
   {
     super(name);
+    displayName = "CosecantScaleY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -254,6 +261,7 @@ class CosecantSkewXMod extends CosecantModifierBase
   public function new(name:String)
   {
     super(name);
+    displayName = "CosecantSkewX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -281,6 +289,7 @@ class CosecantSkewYMod extends CosecantModifierBase
   public function new(name:String)
   {
     super(name);
+    displayName = "CosecantSkewY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void

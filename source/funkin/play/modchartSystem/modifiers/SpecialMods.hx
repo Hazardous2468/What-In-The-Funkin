@@ -18,6 +18,7 @@ class SinClip extends Modifier
     specialMod = true;
     modPriority = 500;
     baseValue = 1;
+    displayName = "SinClip";
   }
 
   override function specialMath(lane:Int, strumLine:Strumline):Void
@@ -35,6 +36,7 @@ class CosClip extends Modifier
     specialMod = true;
     modPriority = 500;
     baseValue = 1;
+    displayName = "CosClip";
   }
 
   override function specialMath(lane:Int, strumLine:Strumline):Void
@@ -50,6 +52,7 @@ class Cosecant extends Modifier
     super(name, 0);
     unknown = false;
     specialMod = true;
+    displayName = "Cosecant";
     modPriority = 500;
   }
 
@@ -68,6 +71,7 @@ class TanClip extends Modifier
     unknown = false;
     specialMod = true;
     modPriority = 500;
+    displayName = "TanClip";
   }
 
   override function specialMath(lane:Int, strumLine:Strumline):Void
@@ -85,6 +89,7 @@ class SinOffset extends Modifier
     specialMod = true;
     modPriority = 500;
     notPercentage = true;
+    displayName = "SinOffset";
   }
 
   override function specialMath(lane:Int, strumLine:Strumline):Void
@@ -101,6 +106,7 @@ class CosOffset extends Modifier
     unknown = false;
     specialMod = true;
     modPriority = 500;
+    displayName = "CosOffset";
     notPercentage = true;
   }
 
@@ -119,6 +125,7 @@ class TanOffset extends Modifier
     specialMod = true;
     modPriority = 500;
     notPercentage = true;
+    displayName = "TanOffset";
   }
 
   override function specialMath(lane:Int, strumLine:Strumline):Void
@@ -136,6 +143,7 @@ class CosecantOffset extends Modifier
     specialMod = true;
     modPriority = 500;
     notPercentage = true;
+    displayName = "CosecantOffset";
   }
 
   override function specialMath(lane:Int, strumLine:Strumline):Void
@@ -153,6 +161,7 @@ class ZSortMod extends Modifier
     super(name, 0);
     unknown = false;
     specialMod = true;
+    displayName = "ZSort";
   }
 
   override function specialMath(lane:Int, strumLine:Strumline):Void
@@ -186,6 +195,7 @@ class ThreeDProjection extends Modifier
     super(name, 0);
     unknown = false;
     strumsMod = true;
+    displayName = "3D";
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -203,6 +213,7 @@ class MathCutOffMod extends Modifier
     specialMod = true;
     notPercentage = true;
     utility = true;
+    displayName = "MathCutoff";
   }
 
   override function specialMath(lane:Int, strumLine:Strumline):Void
@@ -220,6 +231,7 @@ class NoteSplashCopyStrumScaleMod extends Modifier
     modPriority = 400;
     unknown = false;
     specialMod = true;
+    displayName = "NoteSplashCopiesStrumScale";
   }
 
   override function specialMath(lane:Int, strumLine:Strumline):Void
@@ -237,6 +249,7 @@ class HoldCoverCopyStrumScaleMod extends Modifier
     modPriority = 400;
     unknown = false;
     specialMod = true;
+    displayName = "HoldCoverCopiesStrumScale";
   }
 
   override function specialMath(lane:Int, strumLine:Strumline):Void
@@ -254,6 +267,7 @@ class DisableHoldMathShortCutMod extends Modifier
     unknown = false;
     specialMod = true;
     utility = true;
+    displayName = "DisableHoldMathShortcut";
   }
 
   override function specialMath(lane:Int, strumLine:Strumline):Void
@@ -271,6 +285,7 @@ class DrawDistanceBackMod extends Modifier
     unknown = false;
     specialMod = true;
     utility = true;
+    displayName = "DrawDistanceBack";
   }
 
   override function specialMath(lane:Int, strumLine:Strumline):Void
@@ -288,6 +303,7 @@ class DrawDistanceMod extends Modifier
     unknown = false;
     utility = true;
     specialMod = true;
+    displayName = "DrawDistance";
   }
 
   override function specialMath(lane:Int, strumLine:Strumline):Void
@@ -305,6 +321,7 @@ class InvertModValues extends Modifier
     unknown = false;
     specialMod = true;
     utility = true;
+    displayName = "InvertModValues";
   }
 
   override function specialMath(lane:Int, strumLine:Strumline):Void

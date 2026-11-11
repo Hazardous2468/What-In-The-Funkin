@@ -788,6 +788,8 @@ class Strumline extends FlxSpriteGroup
   public var debugShowALL:Bool = false;
   public var debugNeedsUpdate:Bool = true; // V0.7a -> Now no longer updates every frame! Only updates when needed. Will be further optimised later!
 
+  final modDebugDecimals:Int = 2;
+
   function updateModDebug():Void
   {
     if (PlayState.instance == null) return;
@@ -825,16 +827,25 @@ class Strumline extends FlxSpriteGroup
     for (mod in mods.mods_all)
     {
       var usePercentage:Bool = PlayState.instance.modchartEventHandler.percentageMods && !mod.notPercentage;
-      var modVal = FlxMath.roundDecimal(mod.currentValue, 2);
-      if (modVal == 0 && hideZeroValueMods && !debugShowALL) continue;
+      var modVal = FlxMath.roundDecimal(mod.currentValue, modDebugDecimals);
+      // if (modVal == 0 && hideZeroValueMods && !debugShowALL) continue;
       // if (mod.currentValue == mod.baseValue && hideZeroValueMods && !debugShowALL) continue;
+
+      if (mod.hideIfBaseValue && modVal == mod.baseValue && hideZeroValueMods && !debugShowALL) continue;
 
       if (usePercentage) modVal *= 100;
 
       if (mod.utility && debugHideUtil && !debugShowALL) continue;
       if (StringTools.contains(mod.tag, "--") && debugHideLane && !debugShowALL) continue;
+
+      var displayName:String = mod.displayName;
+      if (displayName == "")
+      {
+        displayName = mod.tag;
+      }
+
       newString += "\n";
-      newString += mod.tag + ": " + Std.string(modVal) + (usePercentage ? "%" : "");
+      newString += displayName + ": " + Std.string(modVal) + (usePercentage ? "%" : "");
       if (!hideSubMods || debugShowALL)
       {
         if (mod.modPriority_additive != 0)

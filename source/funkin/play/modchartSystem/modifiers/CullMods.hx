@@ -9,6 +9,7 @@ import flixel.math.FlxMath;
 import lime.math.Vector4;
 
 // Culling mods. 0 is no cull (normal), 1 for cull backside, -1 for cull frontside
+
 class CullAllModifier extends Modifier
 {
   public function new(name:String)
@@ -16,6 +17,7 @@ class CullAllModifier extends Modifier
     super(name, 0);
     unknown = false;
     strumsMod = true;
+    displayName = "Cull";
     modPriority = 0;
   }
 
@@ -67,6 +69,7 @@ class CullNotesModifier extends Modifier
     unknown = false;
     strumsMod = true;
     modPriority = -1;
+    displayName = "CullNotes";
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -107,6 +110,7 @@ class CullSustainModifier extends Modifier
     unknown = false;
     strumsMod = true;
     modPriority = -1;
+    displayName = "CullHolds";
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -147,6 +151,7 @@ class CullArrowPathModifier extends Modifier
     unknown = false;
     strumsMod = true;
     modPriority = -1;
+    displayName = "CullPaths";
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -187,6 +192,7 @@ class CullStrumModifier extends Modifier
     unknown = false;
     strumsMod = true;
     modPriority = -1;
+    displayName = "CullStrums";
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void

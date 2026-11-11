@@ -69,6 +69,7 @@ class CosBumpyXMod extends BumpyModBase
   {
     super(name);
     invertForDad = true;
+    displayName = "CosBumpyX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -97,6 +98,7 @@ class CosBumpyYMod extends BumpyModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "CosBumpyY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -125,6 +127,7 @@ class CosBumpyZMod extends BumpyModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "CosBumpy";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -154,6 +157,7 @@ class CosBumpyAngleMod extends BumpyModBase
   {
     super(name);
     invertForDad = true;
+    displayName = "CosBumpyAngle";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -183,6 +187,7 @@ class CosBumpyAngleYMod extends BumpyModBase
   {
     super(name);
     invertForDad = true;
+    displayName = "CosBumpyAngleY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -210,6 +215,7 @@ class CosBumpyAngleXMod extends BumpyModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "CosBumpyAngleX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -237,6 +243,7 @@ class CosBumpyScaleMod extends BumpyModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "CosBumpyScale";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -269,6 +276,7 @@ class CosBumpyScaleXMod extends BumpyModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "CosBumpyScaleX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -296,6 +304,7 @@ class CosBumpyScaleYMod extends BumpyModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "CosBumpyScaleY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -323,6 +332,7 @@ class CosBumpySkewXMod extends BumpyModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "CosBumpySkewX";
     invertForDad = true;
   }
 
@@ -352,6 +362,7 @@ class CosBumpySkewYMod extends BumpyModBase
   {
     super(name);
     invertForDad = true;
+    displayName = "CosBumpySkewY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -380,6 +391,7 @@ class BumpyXMod extends BumpyModBase
   {
     super(name);
     invertForDad = true;
+    displayName = "BumpyX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -408,6 +420,7 @@ class BumpyYMod extends BumpyModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "BumpyY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -436,6 +449,7 @@ class BumpyZMod extends BumpyModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "Bumpy";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -465,6 +479,7 @@ class BumpySpeedMod extends BumpyModBase
   {
     super(name);
     modPriority = 397;
+    displayName = "BumpySpeed";
   }
 
   override function speedMath(lane:Int, curPos:Float, strumLine, isHoldNote = false):Float
@@ -486,6 +501,7 @@ class BumpyAngleMod extends BumpyModBase
   {
     super(name);
     invertForDad = true;
+    displayName = "BumpyAngle";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -514,6 +530,7 @@ class BumpyAngleXMod extends BumpyModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "BumpyAngleX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -541,6 +558,7 @@ class BumpyAngleYMod extends BumpyModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "BumpyAngleY";
     invertForDad = true;
   }
 
@@ -569,6 +587,7 @@ class BumpyScaleMod extends BumpyModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "BumpyScale";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -601,6 +620,7 @@ class BumpyScaleXMod extends BumpyModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "BumpyScaleX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -628,6 +648,7 @@ class BumpyScaleYMod extends BumpyModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "BumpyScaleY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -656,6 +677,7 @@ class BumpySkewXMod extends BumpyModBase
   {
     super(name);
     invertForDad = true;
+    displayName = "BumpySkewX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -684,6 +706,7 @@ class BumpySkewYMod extends BumpyModBase
   {
     super(name);
     invertForDad = true;
+    displayName = "BumpySkewY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -712,6 +735,7 @@ class TanBumpyXMod extends BumpyModBase
   {
     super(name);
     invertForDad = true;
+    displayName = "TanBumpyX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -740,6 +764,7 @@ class TanBumpyYMod extends BumpyModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "TanBumpyY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -768,6 +793,7 @@ class TanBumpyZMod extends BumpyModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "TanBumpy";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -797,6 +823,7 @@ class TanBumpyAngleMod extends BumpyModBase
   {
     super(name);
     invertForDad = true;
+    displayName = "TanBumpyAngle";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -820,11 +847,70 @@ class TanBumpyAngleMod extends BumpyModBase
   }
 }
 
+class TanBumpyAngleXMod extends BumpyModBase
+{
+  public function new(name:String)
+  {
+    super(name);
+    invertForDad = true;
+    displayName = "TanBumpyAngleX";
+  }
+
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
+  {
+    if (data.inOrientPass || currentValue == 0 || data.noteType == "receptor") return;
+    data.angleX += tanBumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (currentValue == 0 || data.inOrientPass)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = tanBumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+      data.angleX += strumResult[data.direction];
+    }
+  }
+}
+
+class TanBumpyAngleYMod extends BumpyModBase
+{
+  public function new(name:String)
+  {
+    super(name);
+    invertForDad = true;
+    displayName = "TanBumpyAngleY";
+  }
+
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
+  {
+    if (data.inOrientPass || currentValue == 0 || data.noteType == "receptor") return;
+    data.angleY += tanBumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (currentValue == 0 || data.inOrientPass)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = tanBumpyMath(useUnscaledCurpos ? data.curPos_unscaled : data.curPos);
+      data.angleY += strumResult[data.direction];
+    }
+  }
+}
+
 class TanBumpyScaleMod extends BumpyModBase
 {
   public function new(name:String)
   {
     super(name);
+    displayName = "TanBumpyScale";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -857,6 +943,7 @@ class TanBumpyScaleXMod extends BumpyModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "TanBumpyScaleX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -885,6 +972,7 @@ class TanBumpyScaleYMod extends BumpyModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "TanBumpyScaleY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -913,6 +1001,7 @@ class TanBumpySkewXMod extends BumpyModBase
   {
     super(name);
     invertForDad = true;
+    displayName = "TanBumpySkewX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -941,6 +1030,7 @@ class TanBumpySkewYMod extends BumpyModBase
   {
     super(name);
     invertForDad = true;
+    displayName = "TanBumpySkewY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void

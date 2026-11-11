@@ -9,6 +9,7 @@ import flixel.FlxG;
 
 // Contains all the mods related to speed!
 // Controls how fast the note approaches the receptor
+
 class SpeedMod extends Modifier
 {
   public function new(name:String)
@@ -20,6 +21,7 @@ class SpeedMod extends Modifier
 
     this.baseValue = 1;
     this.currentValue = 1;
+    displayName = "SpeedMultiplier";
   }
 
   override function speedMath(lane:Int, curPos:Float, strumLine:Strumline, isHoldNote:Bool = false):Float
@@ -29,6 +31,7 @@ class SpeedMod extends Modifier
 }
 
 // Invert scroll direction!
+
 class ReverseMod extends Modifier
 {
   public function new(name:String)
@@ -39,6 +42,7 @@ class ReverseMod extends Modifier
     speedMod = true;
     strumsMod = true;
     typeSubmod = createSubMod("type", 1.0, ["style", "variant"]);
+    displayName = "Reverse";
   }
 
   var typeSubmod:ModifierSubValue;
@@ -97,6 +101,7 @@ class ReverseMod extends Modifier
 }
 
 // Notes slow down as they approach the receptors. Kind of outdated.
+
 class SlowDownMod extends Modifier
 {
   public function new(name:String)
@@ -104,6 +109,7 @@ class SlowDownMod extends Modifier
     super(name, 0);
     unknown = false;
     speedMod = true;
+    displayName = "Slowdown";
   }
 
   override function speedMath(lane:Int, curPos:Float, strumLine:Strumline, isHoldNote:Bool = false):Float
@@ -116,6 +122,7 @@ class SlowDownMod extends Modifier
 }
 
 // Notes slow down as they approach the receptors
+
 class BrakeMod extends Modifier
 {
   public function new(name:String)
@@ -123,6 +130,7 @@ class BrakeMod extends Modifier
     super(name, 0);
     unknown = false;
     speedMod = true;
+    displayName = "Brake";
   }
 
   override function speedMath(lane:Int, curPos:Float, strumLine:Strumline, isHoldNote:Bool = false):Float
@@ -141,6 +149,7 @@ class BrakeMod extends Modifier
 }
 
 // Notes speed up as they approach the receptors
+
 class BoostMod extends Modifier
 {
   var startSubmod:ModifierSubValue;
@@ -150,6 +159,7 @@ class BoostMod extends Modifier
     super(name, 0);
     unknown = false;
     speedMod = true;
+    displayName = "Boost";
     startSubmod = createSubMod("start", 900, ["begin", "trigger", "threshold"]);
   }
 
@@ -190,6 +200,7 @@ class OldBoostMod extends Modifier
     super(name, 0);
     unknown = false;
     speedMod = true;
+    displayName = "OldBoost";
   }
 
   override function speedMath(lane:Int, curPos:Float, strumLine:Strumline, isHoldNote:Bool = false):Float
@@ -207,6 +218,7 @@ class OldBoostMod extends Modifier
 }
 
 // notes slow down and speed up before reaching receptor. Fixed version where the effect doesn't intensify the further notes are.
+
 class WaveMod extends Modifier
 {
   var multSubmod:ModifierSubValue;
@@ -217,6 +229,7 @@ class WaveMod extends Modifier
     super(name, 0);
     unknown = false;
     speedMod = true;
+    displayName = "Wave";
     multSubmod = createSubMod("mult", 1, ["period", "size"]);
     offsetSubmod = createSubMod("offset", 0);
   }
@@ -235,6 +248,7 @@ class WaveMod extends Modifier
 }
 
 // notes slow down and speed up before reaching receptor
+
 class OldWaveMod extends Modifier
 {
   var multSubmod:ModifierSubValue;
@@ -244,6 +258,7 @@ class OldWaveMod extends Modifier
     super(name, 0);
     unknown = false;
     speedMod = true;
+    displayName = "OldWave";
 
     multSubmod = createSubMod("mult", 1.0, ["period", "size"]);
   }
@@ -260,6 +275,7 @@ class OldWaveMod extends Modifier
 }
 
 // Scroll speed slows down and speeds back up and slows down then speeds back up again.
+
 class Expand extends Modifier
 {
   var speedSubmod:ModifierSubValue;
@@ -267,6 +283,7 @@ class Expand extends Modifier
   public function new(name:String)
   {
     super(name, 0);
+    displayName = "Expand";
     unknown = false;
     speedMod = true;
     speedSubmod = createSubMod("speed", 1.0, ["period", "size", "mult"]);

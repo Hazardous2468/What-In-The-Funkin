@@ -48,6 +48,7 @@ class DigitalXMod extends DigitalModBase
   {
     super(name);
     invertForDad = true;
+    displayName = "Digital";
   }
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
@@ -75,6 +76,7 @@ class DigitalYMod extends DigitalModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "DigitalY";
   }
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
@@ -102,6 +104,7 @@ class DigitalZMod extends DigitalModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "DigitalZ";
   }
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
@@ -130,6 +133,7 @@ class DigitalAngleMod extends DigitalModBase
   {
     super(name);
     invertForDad = true;
+    displayName = "DigitalAngle";
   }
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
@@ -157,6 +161,7 @@ class DigitalAngleXMod extends DigitalModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "DigitalAngleX";
   }
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
@@ -184,6 +189,7 @@ class DigitalAngleYMod extends DigitalModBase
   {
     super(name);
     invertForDad = true;
+    displayName = "DigitalAngleY";
   }
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
@@ -210,6 +216,7 @@ class DigitalScaleMod extends DigitalModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "DigitalScale";
   }
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
@@ -241,6 +248,7 @@ class DigitalScaleXMod extends DigitalModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "DigitalScaleX";
   }
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
@@ -267,6 +275,7 @@ class DigitalScaleYMod extends DigitalModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "DigitalScaleY";
   }
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
@@ -294,6 +303,7 @@ class DigitalSkewXMod extends DigitalModBase
   {
     super(name);
     invertForDad = true;
+    displayName = "DigitalSkewX";
   }
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
@@ -321,6 +331,7 @@ class DigitalSkewYMod extends DigitalModBase
   {
     super(name);
     invertForDad = true;
+    displayName = "DigitalSkewY";
   }
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
@@ -345,6 +356,12 @@ class DigitalSkewYMod extends DigitalModBase
 
 class DigitalSpeedMod extends DigitalModBase
 {
+  public function new(name:String)
+  {
+    super(name);
+    invertForDad = false;
+    displayName = "DigitalSpeed";
+  }
   override function speedMath(lane:Int, curPos:Float, strumLine, isHoldNote = false):Float
   {
     if (currentValue == 0) return 1; // skip math if mod is 0

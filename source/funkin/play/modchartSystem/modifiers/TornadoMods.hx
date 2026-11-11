@@ -9,6 +9,7 @@ import flixel.math.FlxMath;
 
 // Contains all the mods related tornado
 // :p
+
 class TornadoModBase extends Modifier
 {
   var speed:ModifierSubValue;
@@ -64,6 +65,7 @@ class TornadoXMod extends TornadoModBase
     holdsMod = true;
     strumsMod = true;
     speedMod = false;
+    displayName = "Tornado";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -100,6 +102,7 @@ class TornadoYMod extends TornadoModBase
     holdsMod = true;
     strumsMod = true;
     speedMod = false;
+    displayName = "TornadoY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -136,6 +139,7 @@ class TornadoZMod extends TornadoModBase
     holdsMod = true;
     strumsMod = true;
     speedMod = false;
+    displayName = "TornadoZ";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -172,11 +176,12 @@ class TornadoAngleMod extends TornadoModBase
     holdsMod = false;
     strumsMod = true;
     speedMod = false;
+    displayName = "TornadoAngle";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (data.inOrientPass || currentValue == 0 || data.noteType == "receptor") return;
     data.angleZ -= strumResult[data.direction];
     data.angleZ += tornadoMath(data.direction, data.curPos) * currentValue;
   }
@@ -195,6 +200,78 @@ class TornadoAngleMod extends TornadoModBase
   }
 }
 
+class TornadoAngleXMod extends TornadoModBase
+{
+  public function new(name:String)
+  {
+    super(name);
+    unknown = false;
+
+    specialMod = false;
+    pathMod = false;
+    notesMod = true;
+    holdsMod = false;
+    strumsMod = true;
+    speedMod = false;
+    displayName = "TornadoAngleX";
+  }
+
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
+  {
+    if (data.inOrientPass || currentValue == 0 || data.noteType == "receptor") return;
+    data.angleX += tornadoMath(data.direction, data.curPos) * currentValue;
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (currentValue == 0 || offset.value == 0)
+    {
+      strumResult[data.direction] = 0.0;
+    }
+    else
+    {
+      strumResult[data.direction] = tornadoMath(data.direction, data.curPos) * currentValue;
+      data.angleX += strumResult[data.direction];
+    }
+  }
+}
+
+class TornadoAngleYMod extends TornadoModBase
+{
+  public function new(name:String)
+  {
+    super(name);
+    unknown = false;
+
+    specialMod = false;
+    pathMod = false;
+    notesMod = true;
+    holdsMod = false;
+    strumsMod = true;
+    speedMod = false;
+    displayName = "TornadoAngleY";
+  }
+
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
+  {
+    if (data.inOrientPass || currentValue == 0 || data.noteType == "receptor") return;
+    data.angleY += tornadoMath(data.direction, data.curPos) * currentValue;
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (currentValue == 0 || offset.value == 0)
+    {
+      strumResult[data.direction] = 0.0;
+    }
+    else
+    {
+      strumResult[data.direction] = tornadoMath(data.direction, data.curPos) * currentValue;
+      data.angleY += strumResult[data.direction];
+    }
+  }
+}
+
 class TornadoScaleMod extends TornadoModBase
 {
   public function new(name:String)
@@ -208,6 +285,7 @@ class TornadoScaleMod extends TornadoModBase
     holdsMod = true;
     strumsMod = true;
     speedMod = false;
+    displayName = "TornadoScale";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -248,6 +326,7 @@ class TornadoScaleXMod extends TornadoModBase
     holdsMod = true;
     strumsMod = true;
     speedMod = false;
+    displayName = "TornadoScaleX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -284,6 +363,7 @@ class TornadoScaleYMod extends TornadoModBase
     holdsMod = true;
     strumsMod = true;
     speedMod = false;
+    displayName = "TornadoScaleY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -320,6 +400,7 @@ class TornadoSkewXMod extends TornadoModBase
     holdsMod = true;
     strumsMod = true;
     speedMod = false;
+    displayName = "TornadoSkewX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -348,6 +429,7 @@ class TornadoSkewYMod extends TornadoModBase
   {
     super(name);
     unknown = false;
+    displayName = "TornadoSkewY";
 
     specialMod = false;
     pathMod = false;
@@ -390,6 +472,7 @@ class TanTornadoXMod extends TornadoModBase
     holdsMod = true;
     strumsMod = true;
     speedMod = false;
+    displayName = "TanTornado";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -426,6 +509,7 @@ class TanTornadoYMod extends TornadoModBase
     holdsMod = true;
     strumsMod = true;
     speedMod = false;
+    displayName = "TanTornadoY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -462,6 +546,7 @@ class TanTornadoZMod extends TornadoModBase
     holdsMod = true;
     strumsMod = true;
     speedMod = false;
+    displayName = "TanTornadoZ";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -498,6 +583,7 @@ class TanTornadoAngleMod extends TornadoModBase
     holdsMod = false;
     strumsMod = true;
     speedMod = false;
+    displayName = "TanTornadoAngle";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -527,6 +613,7 @@ class TanTornadoScaleMod extends TornadoModBase
   {
     super(name);
     unknown = false;
+    displayName = "TanTornadoScale";
 
     specialMod = false;
     pathMod = false;

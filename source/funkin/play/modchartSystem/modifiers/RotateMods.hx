@@ -216,6 +216,7 @@ class RotateXModifier extends RotateModBase
   {
     super(name);
     modPriority = 21;
+    displayName = "RotateX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -235,6 +236,7 @@ class RotateYModifier extends RotateModBase
   {
     super(name);
     modPriority = 22;
+    displayName = "RotateY";
     invertForDad = true;
   }
 
@@ -254,6 +256,7 @@ class RotateZModifier extends RotateModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "RotateZ";
     modPriority = 23;
     invertForDad = true;
   }
@@ -280,6 +283,7 @@ class StrumRotateXModifier extends RotateModBase
     holdsMod = false;
     strumsMod = true;
     pathMod = false;
+    displayName = "StrumRotateX";
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -300,6 +304,7 @@ class StrumRotateYModifier extends RotateModBase
     strumsMod = true;
     pathMod = false;
     invertForDad = true;
+    displayName = "StrumRotateY";
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -320,6 +325,7 @@ class StrumRotateZModifier extends RotateModBase
     strumsMod = true;
     pathMod = false;
     invertForDad = true;
+    displayName = "StrumRotateZ";
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -339,6 +345,7 @@ class NotesRotateXModifier extends RotateModBase
     holdsMod = true;
     strumsMod = false;
     pathMod = true;
+    displayName = "NotesRotateX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -359,6 +366,7 @@ class NotesRotateYModifier extends RotateModBase
     strumsMod = false;
     pathMod = true;
     invertForDad = true;
+    displayName = "NotesRotateY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -379,6 +387,7 @@ class NotesRotateZModifier extends RotateModBase
     strumsMod = false;
     pathMod = true;
     invertForDad = true;
+    displayName = "NotesRotateZ";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -408,6 +417,7 @@ class RotatingXModifier extends RotateModBase
       "receptors",
       "receptor"
     ]);
+    displayName = "RotatingX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -446,6 +456,7 @@ class RotatingYModifier extends RotateModBase
       "receptor"
     ]);
     invertForDad = true;
+    displayName = "RotatingY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -484,6 +495,7 @@ class RotatingZModifier extends RotateModBase
       "receptor"
     ]);
     invertForDad = true;
+    displayName = "RotatingZ";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void

@@ -88,6 +88,7 @@ class BeatXMod extends BeatModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "Beat";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -116,6 +117,7 @@ class BeatYMod extends BeatModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "BeatY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -144,6 +146,7 @@ class BeatZMod extends BeatModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "BeatZ";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -172,6 +175,7 @@ class BeatAngleMod extends BeatModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "BeatAngle";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -200,6 +204,7 @@ class BeatAngleXMod extends BeatModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "BeatAngleX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -227,6 +232,7 @@ class BeatAngleYMod extends BeatModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "BeatAngleY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -254,6 +260,7 @@ class BeatScaleMod extends BeatModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "BeatScale";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -286,6 +293,7 @@ class BeatScaleXMod extends BeatModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "BeatScaleX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -313,6 +321,7 @@ class BeatScaleYMod extends BeatModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "BeatScaleY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -340,6 +349,7 @@ class BeatSkewXMod extends BeatModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "BeatSkewX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -367,6 +377,7 @@ class BeatSkewYMod extends BeatModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "BeatSkewY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -395,6 +406,7 @@ class BeatSpeedMod extends BeatModBase
   {
     super(name);
     modPriority = 399;
+    displayName = "BeatSpeed";
   }
 
   override function speedMath(lane:Int, curPos:Float, strumLine, isHoldNote = false):Float

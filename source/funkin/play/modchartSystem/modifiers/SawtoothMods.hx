@@ -44,6 +44,7 @@ class SawtoothXMod extends SawtoothModBase
   {
     super(name);
     invertForDad = true;
+    displayName = "Sawtooth";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -72,6 +73,7 @@ class SawtoothYMod extends SawtoothModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "SawtoothY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -100,6 +102,7 @@ class SawtoothZMod extends SawtoothModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "SawtoothZ";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -133,6 +136,7 @@ class SawtoothAngleMod extends SawtoothModBase
     holdsMod = true;
     pathMod = false;
     strumsMod = true;
+    displayName = "SawtoothAngle";
     invertForDad = true;
   }
 
@@ -167,6 +171,7 @@ class SawtoothAngleXMod extends SawtoothModBase
     holdsMod = true;
     pathMod = false;
     strumsMod = true;
+    displayName = "SawtoothAngleX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -200,6 +205,7 @@ class SawtoothAngleYMod extends SawtoothModBase
     pathMod = false;
     strumsMod = true;
     invertForDad = true;
+    displayName = "SawtoothAngleY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -232,6 +238,7 @@ class SawtoothScaleMod extends SawtoothModBase
     holdsMod = true;
     pathMod = true;
     strumsMod = true;
+    displayName = "SawtoothScale";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -269,6 +276,7 @@ class SawtoothScaleXMod extends SawtoothModBase
     holdsMod = true;
     pathMod = true;
     strumsMod = true;
+    displayName = "SawtoothScaleX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -300,6 +308,7 @@ class SawtoothScaleYMod extends SawtoothModBase
     notesMod = true;
     holdsMod = true;
     pathMod = true;
+    displayName = "SawtoothScaleY";
     strumsMod = true;
   }
 
@@ -333,6 +342,7 @@ class SawtoothSkewXMod extends SawtoothModBase
     holdsMod = true;
     pathMod = false;
     strumsMod = true;
+    displayName = "SawtoothSkewX";
     invertForDad = true;
   }
 
@@ -367,6 +377,7 @@ class SawtoothSkewYMod extends SawtoothModBase
     pathMod = false;
     strumsMod = true;
     invertForDad = true;
+    displayName = "SawtoothSkewY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -396,6 +407,7 @@ class SawtoothSpeedMod extends SawtoothModBase
   {
     super(name);
     modPriority = 400;
+    displayName = "SawtoothSpeed";
   }
 
   override function speedMath(lane:Int, curPos:Float, strumLine, isHoldNote = false):Float

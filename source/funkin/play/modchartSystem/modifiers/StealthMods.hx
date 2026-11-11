@@ -24,6 +24,7 @@ class UseOldStealthHoldsModifier extends Modifier
     strumsMod = true;
     pathMod = false;
     utility = true;
+    displayName = "OldStealthHolds";
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -41,6 +42,7 @@ class StealthGlowRedMod extends Modifier
     super(name, 1);
     modPriority = -3;
     utility = true;
+    displayName = "StealthGlowRed";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -62,6 +64,7 @@ class StealthGlowGreenMod extends Modifier
     super(name, 1);
     modPriority = -4;
     utility = true;
+    displayName = "StealthGlowGreen";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -83,6 +86,7 @@ class StealthGlowBlueMod extends Modifier
     super(name, 1);
     modPriority = -5;
     utility = true;
+    displayName = "StealthGlowBlue";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -106,6 +110,7 @@ class DarkMod extends Modifier
     super(name, 0);
     strumsMod = true;
     unknown = false;
+    displayName = "Dark";
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -126,6 +131,7 @@ class StrumStealthMod extends Modifier
     modPriority = 120;
     strumsMod = true;
     unknown = false;
+    displayName = "StrumStealth";
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -159,6 +165,7 @@ class StealthMod extends Modifier
     holdsMod = true;
     strumsMod = false;
     pathMod = false;
+    displayName = "Stealth";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -225,6 +232,7 @@ class SuddenMod extends Modifier
     holdsMod = true;
     strumsMod = true;
     pathMod = false;
+    displayName = "Sudden";
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -302,6 +310,7 @@ class HiddenMod extends Modifier
     holdsMod = true;
     strumsMod = true;
     pathMod = false;
+    displayName = "Hidden";
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -381,6 +390,7 @@ class VanishMod extends Modifier
     holdsMod = true;
     strumsMod = true;
     pathMod = false;
+    displayName = "Vanish";
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -474,6 +484,7 @@ class BlinkMod extends Modifier
     holdsMod = true;
     strumsMod = false;
     pathMod = false;
+    displayName = "Blink";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -530,6 +541,7 @@ class StealthHoldsMod extends Modifier
     holdsMod = true;
     strumsMod = false;
     pathMod = false;
+    displayName = "StealthHolds";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -577,6 +589,7 @@ class AlphaModifier extends Modifier
   public function new(name:String)
   {
     super(name, 0);
+    displayName = "Alpha";
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -600,6 +613,7 @@ class AlphaNotesModifier extends Modifier
   public function new(name:String)
   {
     super(name, 0);
+    displayName = "AlphaNotes";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -614,6 +628,7 @@ class AlphaHoldsModifier extends Modifier
   public function new(name:String)
   {
     super(name, 0);
+    displayName = "AlphaHolds";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -628,6 +643,7 @@ class AlphaStrumModifier extends Modifier
   public function new(name:String)
   {
     super(name, 0);
+    displayName = "AlphaStrums";
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -644,6 +660,7 @@ class AlphaNoteSplashModifier extends Modifier
     super(name, 0);
     unknown = false;
     specialMod = true;
+    displayName = "AlphaNoteSplashes";
   }
 
   override function specialMath(lane:Int, strumLine:Strumline):Void
@@ -661,6 +678,7 @@ class AlphaHoldCoverModifier extends Modifier
     super(name, 0);
     unknown = false;
     specialMod = true;
+    displayName = "AlphaHoldCovers";
   }
 
   override function specialMath(lane:Int, strumLine:Strumline):Void

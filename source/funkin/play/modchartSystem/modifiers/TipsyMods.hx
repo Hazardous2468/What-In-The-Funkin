@@ -53,6 +53,7 @@ class TipsyXMod extends TipsyModBase
   {
     super(name);
     invertForDad = true;
+    displayName = "TipsyX";
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -68,6 +69,7 @@ class TipsyYMod extends TipsyModBase
   {
     super(name);
     invertForDad = true;
+    displayName = "Tipsy";
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -83,6 +85,7 @@ class TipsyZMod extends TipsyModBase
   {
     super(name);
     invertForDad = true;
+    displayName = "TipsyZ";
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -98,6 +101,7 @@ class TipsyAngleMod extends TipsyModBase
   {
     super(name);
     invertForDad = true;
+    displayName = "TipsyAngle";
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -113,6 +117,17 @@ class TipsyAngleXMod extends TipsyModBase
   {
     super(name);
     invertForDad = true;
+    displayName = "TipsyAngleX";
+    unknown = false;
+    notesMod = true;
+    holdsMod = true;
+    pathMod = true;
+    strumsMod = true;
+  }
+
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
+  {
+    strumMath(data, strumLine);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -128,6 +143,17 @@ class TipsyAngleYMod extends TipsyModBase
   {
     super(name);
     invertForDad = true;
+    displayName = "TipsyAngleY";
+    unknown = false;
+    notesMod = true;
+    holdsMod = true;
+    pathMod = true;
+    strumsMod = true;
+  }
+
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
+  {
+    strumMath(data, strumLine);
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -147,6 +173,7 @@ class TipsyScaleMod extends TipsyModBase
     holdsMod = true;
     pathMod = false;
     strumsMod = true;
+    displayName = "TipsyScale";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -174,6 +201,7 @@ class TipsyScaleXMod extends TipsyModBase
     holdsMod = true;
     pathMod = false;
     strumsMod = true;
+    displayName = "TipsyScaleX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -199,6 +227,7 @@ class TipsyScaleYMod extends TipsyModBase
     holdsMod = true;
     pathMod = false;
     strumsMod = true;
+    displayName = "TipsyScaleY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -225,6 +254,7 @@ class TipsySkewXMod extends TipsyModBase
     pathMod = true;
     strumsMod = true;
     invertForDad = true;
+    displayName = "TipsySkewX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -250,6 +280,7 @@ class TipsySkewYMod extends TipsyModBase
     pathMod = true;
     strumsMod = true;
     invertForDad = true;
+    displayName = "TipsySkewY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -270,6 +301,7 @@ class TanTipsyXMod extends TipsyModBase
   {
     super(name);
     invertForDad = true;
+    displayName = "TanTipsyX";
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -285,6 +317,7 @@ class TanTipsyYMod extends TipsyModBase
   {
     super(name);
     invertForDad = true;
+    displayName = "TanTipsy";
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -299,6 +332,7 @@ class TanTipsyZMod extends TipsyModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "TanTipsyZ";
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -314,12 +348,65 @@ class TanTipsyAngleMod extends TipsyModBase
   {
     super(name);
     invertForDad = true;
+    displayName = "TanTipsyAngle";
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
   {
     if (currentValue == 0 || data.inOrientPass) return;
     data.angleZ += tanTipsyMath(data.direction, data.curPos);
+  }
+}
+
+class TanTipsyAngleXMod extends TipsyModBase
+{
+  public function new(name:String)
+  {
+    super(name);
+    invertForDad = true;
+    unknown = false;
+    notesMod = true;
+    holdsMod = true;
+    pathMod = true;
+    strumsMod = true;
+    displayName = "TanTipsyAngleX";
+  }
+
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
+  {
+    strumMath(data, strumLine);
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (currentValue == 0 || data.inOrientPass) return;
+    data.angleX += tanTipsyMath(data.direction, data.curPos);
+  }
+}
+
+class TanTipsyAngleYMod extends TipsyModBase
+{
+  public function new(name:String)
+  {
+    super(name);
+    invertForDad = true;
+    unknown = false;
+    notesMod = true;
+    holdsMod = true;
+    pathMod = true;
+    strumsMod = true;
+    displayName = "TanTipsyAngleY";
+  }
+
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
+  {
+    strumMath(data, strumLine);
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (currentValue == 0 || data.inOrientPass) return;
+    data.angleY += tanTipsyMath(data.direction, data.curPos);
   }
 }
 
@@ -333,6 +420,7 @@ class TanTipsyScaleMod extends TipsyModBase
     holdsMod = true;
     pathMod = false;
     strumsMod = true;
+    displayName = "TanTipsyScale";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -360,6 +448,7 @@ class TanTipsySkewXMod extends TipsyModBase
     holdsMod = true;
     pathMod = false;
     strumsMod = true;
+    displayName = "TanTipsySkewX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -384,6 +473,7 @@ class TanTipsySkewYMod extends TipsyModBase
     holdsMod = true;
     pathMod = false;
     strumsMod = true;
+    displayName = "TanTipsySkewY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void

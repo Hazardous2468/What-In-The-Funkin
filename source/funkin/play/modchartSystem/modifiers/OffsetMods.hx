@@ -18,6 +18,7 @@ class PerspectiveCenterOffsetXModifier extends Modifier
     notesMod = true;
     holdsMod = true;
     strumsMod = true;
+    displayName = "OffsetPerspectiveCenterX";
   }
 
   function applyThing(data:NoteData):Void
@@ -48,6 +49,7 @@ class PerspectiveCenterOffsetYModifier extends Modifier
     notesMod = true;
     holdsMod = true;
     strumsMod = true;
+    displayName = "OffsetPerspectiveCenterY";
   }
 
   function applyThing(data:NoteData):Void
@@ -73,6 +75,7 @@ class NoteOffsetXMod extends Modifier
     super(name, 0);
     modPriority = -670;
     notPercentage = true;
+    displayName = "OffsetNotesX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -88,6 +91,7 @@ class NoteOffsetYMod extends Modifier
     super(name, 0);
     modPriority = -670;
     notPercentage = true;
+    displayName = "OffsetNotesY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -102,6 +106,7 @@ class NoteOffsetZMod extends Modifier
   {
     super(name, 0);
     modPriority = -670;
+    displayName = "OffsetNotesZ";
     notPercentage = true;
   }
 
@@ -118,6 +123,7 @@ class HoldOffsetXMod extends Modifier
     super(name, 0);
     modPriority = -670;
     notPercentage = true;
+    displayName = "OffsetHoldsX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -133,6 +139,7 @@ class HoldOffsetYMod extends Modifier
     super(name, 0);
     modPriority = -670;
     notPercentage = true;
+    displayName = "OffsetHoldsY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -148,6 +155,7 @@ class HoldOffsetZMod extends Modifier
     super(name, 0);
     modPriority = -670;
     notPercentage = true;
+    displayName = "OffsetHoldsZ";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -163,6 +171,7 @@ class StrumOffsetXMod extends Modifier
     super(name, 0);
     modPriority = -670;
     notPercentage = true;
+    displayName = "OffsetStrumsX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -183,6 +192,7 @@ class StrumOffsetYMod extends Modifier
     super(name, 0);
     modPriority = -670;
     notPercentage = true;
+    displayName = "OffsetStrumsY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -203,6 +213,7 @@ class StrumOffsetZMod extends Modifier
     super(name, 0);
     modPriority = -670;
     notPercentage = true;
+    displayName = "OffsetStrumsZ";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -223,6 +234,7 @@ class ArrowPathOffsetXMod extends Modifier
     super(name, 0);
     modPriority = -670;
     notPercentage = true;
+    displayName = "OffsetPathX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -238,6 +250,7 @@ class ArrowPathOffsetYMod extends Modifier
     super(name, 0);
     modPriority = -670;
     notPercentage = true;
+    displayName = "OffsetPathY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -253,6 +266,7 @@ class ArrowPathOffsetZMod extends Modifier
     super(name, 0);
     modPriority = -670;
     notPercentage = true;
+    displayName = "OffsetPathZ";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -274,6 +288,7 @@ class MeshSkewOffsetX extends Modifier
     specialMod = false;
     speedMod = false;
     notPercentage = true;
+    displayName = "MeshSkewOffsetX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -300,6 +315,7 @@ class MeshSkewOffsetY extends Modifier
     pathMod = true;
     specialMod = false;
     speedMod = false;
+    displayName = "MeshSkewOffsetY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -326,6 +342,7 @@ class MeshSkewOffsetZ extends Modifier
     pathMod = true;
     specialMod = false;
     speedMod = false;
+    displayName = "MeshSkewOffsetZ";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -352,6 +369,7 @@ class MeshPivotOffsetX extends Modifier
     pathMod = true;
     specialMod = false;
     speedMod = false;
+    displayName = "MeshPivotOffsetX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -378,6 +396,7 @@ class MeshPivotOffsetY extends Modifier
     pathMod = true;
     specialMod = false;
     speedMod = false;
+    displayName = "MeshPivotOffsetY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -404,6 +423,7 @@ class MeshPivotOffsetZ extends Modifier
     pathMod = true;
     specialMod = false;
     speedMod = false;
+    displayName = "MeshPivotOffsetZ";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void

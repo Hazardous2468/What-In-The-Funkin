@@ -9,16 +9,12 @@ class AsymptoteModBase extends Modifier
 {
   // If above 0.0, will have an effect similar to attenuate. Othewise disable the effect
   var doLaneOffset:ModifierSubValue;
-
   // The size / magnitude of the effect
   var magnitude:ModifierSubValue;
-
   // Offset the entire effect by this amount in MS
   var offset:ModifierSubValue;
-
   // Which curPos to use?
   var altCurposSubmod:ModifierSubValue;
-
   var useUnscaledCurpos(get, never):Bool;
 
   function get_useUnscaledCurpos():Bool
@@ -68,6 +64,12 @@ class AsymptoteModBase extends Modifier
 
 class AsymptoteXMod extends AsymptoteModBase
 {
+  public function new(name:String)
+  {
+    super(name);
+    displayName = "Asymptote";
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     data.x -= strumResult[data.direction];
@@ -93,7 +95,8 @@ class AsymptoteYMod extends AsymptoteModBase
   public function new(name:String)
   {
     super(name);
-    doLaneOffset.baseValue = doLaneOffset.baseValue = 0;
+    displayName = "AsymptoteY";
+    doLaneOffset.baseValue = 0;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -118,6 +121,12 @@ class AsymptoteYMod extends AsymptoteModBase
 
 class AsymptoteZMod extends AsymptoteModBase
 {
+  public function new(name:String)
+  {
+    super(name);
+    displayName = "AsymptoteZ";
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     data.z -= strumResult[data.direction];
@@ -143,7 +152,7 @@ class AsymptoteAngleXMod extends AsymptoteModBase
   public function new(name:String)
   {
     super(name);
-    doLaneOffset.baseValue = doLaneOffset.baseValue = 0;
+    displayName = "AsymptoteAngleX";
     unknown = false;
     notesMod = true;
     holdsMod = true;
@@ -167,6 +176,7 @@ class AsymptoteAngleYMod extends AsymptoteModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "AsymptoteAngleY";
     unknown = false;
     notesMod = true;
     holdsMod = true;
@@ -190,6 +200,7 @@ class AsymptoteAngleZMod extends AsymptoteModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "AsymptoteAngle";
     unknown = false;
     notesMod = true;
     holdsMod = true;
@@ -222,7 +233,7 @@ class AsymptoteScaleMod extends AsymptoteModBase
   public function new(name:String)
   {
     super(name);
-    doLaneOffset.baseValue = doLaneOffset.baseValue = 0;
+    displayName = "AsymptoteScale";
     unknown = false;
     notesMod = true;
     holdsMod = true;
@@ -249,12 +260,12 @@ class AsymptoteScaleXMod extends AsymptoteModBase
   public function new(name:String)
   {
     super(name);
-    doLaneOffset.baseValue = doLaneOffset.baseValue = 0;
     unknown = false;
     notesMod = true;
     holdsMod = true;
     pathMod = false;
     strumsMod = true;
+    displayName = "AsymptoteScaleX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -273,12 +284,12 @@ class AsymptoteScaleYMod extends AsymptoteModBase
   public function new(name:String)
   {
     super(name);
-    doLaneOffset.baseValue = doLaneOffset.baseValue = 0;
     unknown = false;
     notesMod = true;
     holdsMod = true;
     pathMod = false;
     strumsMod = true;
+    displayName = "AsymptoteScaleY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -297,12 +308,12 @@ class AsymptoteSkewYMod extends AsymptoteModBase
   public function new(name:String)
   {
     super(name);
-    doLaneOffset.baseValue = doLaneOffset.baseValue = 0;
     unknown = false;
     notesMod = true;
     holdsMod = true;
     pathMod = false;
     strumsMod = true;
+    displayName = "AsymptoteSkewY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -326,6 +337,7 @@ class AsymptoteSkewXMod extends AsymptoteModBase
     holdsMod = true;
     pathMod = false;
     strumsMod = true;
+    displayName = "AsymptoteSkewX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void

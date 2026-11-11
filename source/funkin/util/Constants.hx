@@ -73,9 +73,9 @@ class Constants
   public static final URL_MERCH_FALLBACK:String = 'https://needlejuicerecords.com/en-ca/pages/friday-night-funkin';
 
   /**
-   * Link to download the game on Itch.io.
+   * Link to download the game on Itch.io (Github for WITF).
    */
-  public static final URL_ITCH:String = 'https://ninja-muffin24.itch.io/funkin';
+  public static final URL_ITCH:String = 'https://github.com/Hazardous2468/What-In-The-Funkin';
 
   /**
    * Link to play the game on Newgrounds.

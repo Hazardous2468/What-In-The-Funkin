@@ -46,6 +46,7 @@ class SquareXMod extends SquareModBase
     notesMod = true;
     holdsMod = true;
     pathMod = true;
+    displayName = "Square";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -78,6 +79,7 @@ class SquareYMod extends SquareModBase
     strumsMod = true;
     notesMod = true;
     holdsMod = true;
+    displayName = "SquareY";
     pathMod = true;
   }
 
@@ -112,6 +114,7 @@ class SquareZMod extends SquareModBase
     notesMod = true;
     holdsMod = true;
     pathMod = true;
+    displayName = "SquareZ";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -143,6 +146,7 @@ class SquareAngleMod extends SquareModBase
     invertForDad = true;
     unknown = false;
     strumsMod = true;
+    displayName = "SquareAngle";
     notesMod = true;
     holdsMod = true;
     pathMod = false;
@@ -179,6 +183,7 @@ class SquareAngleXMod extends SquareModBase
     notesMod = true;
     holdsMod = true;
     pathMod = false;
+    displayName = "SquareAngleX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -212,6 +217,7 @@ class SquareAngleYMod extends SquareModBase
     holdsMod = true;
     pathMod = false;
     invertForDad = true;
+    displayName = "SquareAngleY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -239,6 +245,8 @@ class SquareScaleMod extends SquareModBase
   public function new(name:String)
   {
     super(name);
+    pathMod = false;
+    displayName = "SquareScale";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -271,6 +279,8 @@ class SquareScaleXMod extends SquareModBase
   public function new(name:String)
   {
     super(name);
+    pathMod = false;
+    displayName = "SquareScaleX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -298,6 +308,8 @@ class SquareScaleYMod extends SquareModBase
   public function new(name:String)
   {
     super(name);
+    pathMod = false;
+    displayName = "SquareScaleY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -326,6 +338,7 @@ class SquareSkewXMod extends SquareModBase
   {
     super(name);
     invertForDad = true;
+    displayName = "SquareSkewX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -354,6 +367,7 @@ class SquareSkewYMod extends SquareModBase
   {
     super(name);
     invertForDad = true;
+    displayName = "SquareSkewY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -382,6 +396,7 @@ class SquareSpeedMod extends SquareModBase
   {
     super(name);
     modPriority = 401;
+    displayName = "SquareSpeed";
   }
 
   override function speedMath(lane:Int, curPos:Float, strumLine, isHoldNote = false):Float

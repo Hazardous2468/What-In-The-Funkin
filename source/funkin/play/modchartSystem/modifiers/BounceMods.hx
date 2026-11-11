@@ -72,6 +72,7 @@ class CosBounceXMod extends BounceModBase
   {
     super(name);
     invertForDad = true;
+    displayName = "CosBounceX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -100,6 +101,7 @@ class CosBounceYMod extends BounceModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "CosBounceY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -128,6 +130,7 @@ class CosBounceZMod extends BounceModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "CosBounceZ";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -157,6 +160,7 @@ class CosBounceAngleMod extends BounceModBase
   {
     super(name);
     invertForDad = true;
+    displayName = "CosBounceAngle";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -185,6 +189,7 @@ class CosBounceAngleXMod extends BounceModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "CosBounceAngleX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -213,6 +218,7 @@ class CosBounceAngleYMod extends BounceModBase
   {
     super(name);
     invertForDad = true;
+    displayName = "CosBounceAngleY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -240,6 +246,7 @@ class CosBounceScaleMod extends BounceModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "CosBounceScale";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -272,6 +279,7 @@ class CosBounceScaleXMod extends BounceModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "CosBounceScaleX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -299,6 +307,7 @@ class CosBounceScaleYMod extends BounceModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "CosBounceScaleY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -327,6 +336,7 @@ class CosBounceSkewXMod extends BounceModBase
   {
     super(name);
     invertForDad = true;
+    displayName = "CosBounceSkewX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -355,6 +365,7 @@ class CosBounceSkewYMod extends BounceModBase
   {
     super(name);
     invertForDad = true;
+    displayName = "CosBounceSkewY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -383,6 +394,7 @@ class BounceXMod extends BounceModBase
   {
     super(name);
     invertForDad = true;
+    displayName = "BounceX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -411,6 +423,7 @@ class BounceYMod extends BounceModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "BounceY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -439,6 +452,7 @@ class BounceZMod extends BounceModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "BounceZ";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -468,6 +482,7 @@ class BounceSpeedMod extends BounceModBase
   {
     super(name);
     modPriority = 397;
+    displayName = "BounceSpeed";
   }
 
   override function speedMath(lane:Int, curPos:Float, strumLine, isHoldNote = false):Float
@@ -488,6 +503,7 @@ class BounceAngleMod extends BounceModBase
   {
     super(name);
     invertForDad = true;
+    displayName = "BounceAngle";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -516,6 +532,7 @@ class BounceAngleXMod extends BounceModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "BounceAngleX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -544,6 +561,7 @@ class BounceAngleYMod extends BounceModBase
   {
     super(name);
     invertForDad = true;
+    displayName = "BounceAngleY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -571,6 +589,7 @@ class BounceScaleMod extends BounceModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "BounceScale";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -603,6 +622,7 @@ class BounceScaleXMod extends BounceModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "BounceScaleX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -630,6 +650,7 @@ class BounceScaleYMod extends BounceModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "BounceScaleY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -658,6 +679,7 @@ class BounceSkewXMod extends BounceModBase
   {
     super(name);
     invertForDad = true;
+    displayName = "BounceSkewX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -686,6 +708,7 @@ class BounceSkewYMod extends BounceModBase
   {
     super(name);
     invertForDad = true;
+    displayName = "BounceSkewY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -714,6 +737,7 @@ class TanBounceXMod extends BounceModBase
   {
     super(name);
     invertForDad = true;
+    displayName = "TanBounceX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -742,6 +766,7 @@ class TanBounceYMod extends BounceModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "TanBounceY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void

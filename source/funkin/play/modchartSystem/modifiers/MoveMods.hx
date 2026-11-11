@@ -20,6 +20,7 @@ class MoveXMod extends Modifier
     super(name, 0);
     unknown = false;
     strumsMod = true;
+    displayName = "MoveX";
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -35,6 +36,7 @@ class MoveYMod extends Modifier
     super(name, 0);
     unknown = false;
     strumsMod = true;
+    displayName = "MoveY";
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -49,6 +51,7 @@ class MoveYDMod extends Modifier
   {
     super(name, 0);
     unknown = false;
+    displayName = "MoveYD";
     strumsMod = true;
   }
 
@@ -65,6 +68,7 @@ class MoveZMod extends Modifier
     super(name, 0);
     unknown = false;
     strumsMod = true;
+    displayName = "MoveZ";
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -84,6 +88,7 @@ class MoveXMod_true extends Modifier
     strumsMod = true;
     modPriority = -9999;
     notPercentage = true;
+    displayName = "X";
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -102,6 +107,7 @@ class MoveYMod_true extends Modifier
     strumsMod = true;
     notPercentage = true;
     modPriority = -9999;
+    displayName = "Y";
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -120,6 +126,7 @@ class MoveYDMod_true extends Modifier
     strumsMod = true;
     notPercentage = true;
     modPriority = -9999;
+    displayName = "YD";
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -138,6 +145,7 @@ class MoveZMod_true extends Modifier
     strumsMod = true;
     modPriority = -9999;
     notPercentage = true;
+    displayName = "Z";
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -157,6 +165,7 @@ class CenteredXMod extends Modifier
   {
     super(name, 0);
     modPriority = -199;
+    displayName = "CenteredX";
     unknown = false;
     strumsMod = true;
     shouldAlwaysReCalculate = createSubMod("always_calculate", 0.0, ["alwayscalculate", "always_recalculate", "alwaysrecalculate", "recalculate"]);
@@ -191,6 +200,7 @@ class CenteredMod extends Modifier
     super(name, 0);
     modPriority = 200;
     unknown = false;
+    displayName = "Centered";
     strumsMod = true;
   }
 
@@ -226,6 +236,7 @@ class AlwaysCenterMod extends Modifier
   public function new(name:String)
   {
     super(name, 0);
+    displayName = "CenteredAlways";
     modPriority = 51;
     useOldMath = createSubMod("oldmath", 0.0, ["method", "old", "legacy"]);
     shouldAlwaysReCalculate = createSubMod("always_calculate", 0.0, ["alwayscalculate", "always_recalculate", "alwaysrecalculate", "recalculate"]);
@@ -271,6 +282,7 @@ class CenteredNotesMod extends Modifier
   {
     super(name, 0);
     modPriority = 50;
+    displayName = "CenteredNotes";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -290,6 +302,7 @@ class JumpMod extends Modifier
   {
     super(name, 0);
     modPriority = 97;
+    displayName = "Jump";
     unknown = false;
     strumsMod = true;
 
@@ -327,12 +340,16 @@ class JumpMod extends Modifier
   }
 }
 
+/**
+ * A modifier that applies the same math as the notes but in the opposite direction. Used to create driven drop / freeze effects.
+ */
 class DriveMod extends Modifier
 {
   public function new(name:String)
   {
     super(name, 0);
     modPriority = 97;
+    displayName = "Drive";
     unknown = false;
     strumsMod = true;
     notPercentage = true;
@@ -355,12 +372,16 @@ class DriveMod extends Modifier
   }
 }
 
+/**
+ * Drive modifier that makes the strums follow the arrowpath.
+ */
 class Drive2Mod extends Modifier
 {
   public function new(name:String)
   {
     super(name, 0);
     modPriority = 0;
+    displayName = "Drive2";
     unknown = false;
     notPercentage = true;
     specialMod = true;

@@ -52,6 +52,7 @@ class HourGlassX extends HourGlassModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "Hourglass";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -66,6 +67,7 @@ class HourGlassY extends HourGlassModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "HourglassY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -80,6 +82,7 @@ class HourGlassZ extends HourGlassModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "HourglassZ";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -94,6 +97,7 @@ class HourGlassAngleZ extends HourGlassModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "HourglassAngle";
   }
 
   var strumResult:Array<Float> = [0, 0, 0, 0];
@@ -124,6 +128,7 @@ class HourGlassAngleX extends HourGlassModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "HourglassAngleX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -139,6 +144,7 @@ class HourGlassAngleY extends HourGlassModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "HourglassAngleY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -154,6 +160,7 @@ class HourGlassSkewX extends HourGlassModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "HourglassSkewX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -169,6 +176,7 @@ class HourGlassSkewY extends HourGlassModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "HourglassSkewY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -184,6 +192,7 @@ class HourGlassScaleX extends HourGlassModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "HourglassScaleX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -198,6 +207,7 @@ class HourGlassScaleY extends HourGlassModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "HourglassScaleY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -212,6 +222,7 @@ class HourGlassScale extends HourGlassModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "HourglassScale";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void

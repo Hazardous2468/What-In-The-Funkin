@@ -83,6 +83,7 @@ class SpiralXMod extends SpiralModBase
   {
     super(name);
     invertForDad = true;
+    displayName = (isCos ? "Cos" : "") + "SpiralX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -97,6 +98,7 @@ class SpiralYMod extends SpiralModBase
   public function new(name:String, isCos:Bool = false)
   {
     super(name);
+    displayName = (isCos ? "Cos" : "") + "SpiralY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -111,6 +113,7 @@ class SpiralZMod extends SpiralModBase
   public function new(name:String, isCos:Bool = false)
   {
     super(name);
+    displayName = (isCos ? "Cos" : "") + "SpiralZ";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -128,6 +131,7 @@ class SpiralAngleZMod extends SpiralModBase
     holdsMod = false;
     pathMod = false;
     invertForDad = true;
+    displayName = (isCos ? "Cos" : "") + "SpiralAngle";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -145,6 +149,7 @@ class SpiralAngleYMod extends SpiralModBase
     holdsMod = false;
     pathMod = false;
     invertForDad = true;
+    displayName = (isCos ? "Cos" : "") + "SpiralAngleY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -161,6 +166,7 @@ class SpiralAngleXMod extends SpiralModBase
     super(name, isCos);
     holdsMod = false;
     pathMod = false;
+    displayName = (isCos ? "Cos" : "") + "SpiralAngleX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -177,6 +183,7 @@ class SpiralSkewXMod extends SpiralModBase
     super(name, isCos);
     holdsMod = false;
     pathMod = false;
+    displayName = (isCos ? "Cos" : "") + "SpiralSkewX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -193,6 +200,7 @@ class SpiralSkewYMod extends SpiralModBase
     super(name, isCos);
     holdsMod = false;
     pathMod = false;
+    displayName = (isCos ? "Cos" : "") + "SpiralSkewY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -208,6 +216,7 @@ class SpiralScaleMod extends SpiralModBase
   {
     super(name, isCos);
     pathMod = false;
+    displayName = (isCos ? "Cos" : "") + "SpiralScale";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -226,6 +235,7 @@ class SpiralScaleXMod extends SpiralModBase
   {
     super(name, isCos);
     pathMod = false;
+    displayName = (isCos ? "Cos" : "") + "SpiralScaleX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -242,6 +252,7 @@ class SpiralScaleYMod extends SpiralModBase
   {
     super(name, isCos);
     pathMod = false;
+    displayName = (isCos ? "Cos" : "") + "SpiralScaleY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -262,6 +273,7 @@ class SpiralSpeedMod extends SpiralModBase
     notesMod = false;
     holdsMod = false;
     pathMod = false;
+    displayName = (isCos ? "Cos" : "") + "SpiralSpeed";
   }
 
   override function speedMath(lane:Int, curPos:Float, strumLine, isHoldNote = false):Float

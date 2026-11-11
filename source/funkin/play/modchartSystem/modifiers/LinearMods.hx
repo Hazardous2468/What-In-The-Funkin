@@ -37,6 +37,7 @@ class LinearXMod extends LinearModifierBase
   {
     super(name);
     invertForDad = true;
+    displayName = "LinearX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -62,6 +63,12 @@ class LinearXMod extends LinearModifierBase
 
 class LinearYMod extends LinearModifierBase
 {
+  public function new(name:String)
+  {
+    super(name);
+    displayName = "LinearY";
+  }
+
   public var flipForDownscroll:Bool = true;
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -91,6 +98,12 @@ class LinearYMod extends LinearModifierBase
 
 class LinearZMod extends LinearModifierBase
 {
+  public function new(name:String)
+  {
+    super(name);
+    displayName = "LinearZ";
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0 || data.noteType == "receptor") return;
@@ -118,6 +131,7 @@ class LinearAngleMod extends LinearModifierBase
   {
     super(name);
     invertForDad = true;
+    displayName = "LinearAngle";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -147,6 +161,7 @@ class LinearAngleYMod extends LinearModifierBase
   {
     super(name);
     invertForDad = true;
+    displayName = "LinearAngleY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -171,6 +186,12 @@ class LinearAngleYMod extends LinearModifierBase
 
 class LinearAngleXMod extends LinearModifierBase
 {
+  public function new(name:String)
+  {
+    super(name);
+    displayName = "LinearAngleX";
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
@@ -193,6 +214,12 @@ class LinearAngleXMod extends LinearModifierBase
 
 class LinearScaleMod extends LinearModifierBase
 {
+  public function new(name:String)
+  {
+    super(name);
+    displayName = "LinearScale";
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
@@ -220,6 +247,12 @@ class LinearScaleMod extends LinearModifierBase
 
 class LinearScaleXMod extends LinearModifierBase
 {
+  public function new(name:String)
+  {
+    super(name);
+    displayName = "LinearScaleX";
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
@@ -242,6 +275,12 @@ class LinearScaleXMod extends LinearModifierBase
 
 class LinearScaleYMod extends LinearModifierBase
 {
+  public function new(name:String)
+  {
+    super(name);
+    displayName = "LinearScaleY";
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
@@ -268,6 +307,7 @@ class LinearSkewXMod extends LinearModifierBase
   {
     super(name);
     invertForDad = true;
+    displayName = "LinearSkewX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -296,6 +336,7 @@ class LinearSkewYMod extends LinearModifierBase
   {
     super(name);
     invertForDad = true;
+    displayName = "LinearSkewY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -325,6 +366,7 @@ class LinearSpeedMod extends Modifier
     super(name);
     modPriority = 395;
     offset = createSubMod("offset", 0.0);
+    displayName = "LinearSpeed";
   }
 
   var offset:ModifierSubValue;
@@ -343,6 +385,7 @@ class ScaleLinearLegacyMod extends Modifier
   public function new(name:String)
   {
     super(name);
+    displayName = "OldLinearScale";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void

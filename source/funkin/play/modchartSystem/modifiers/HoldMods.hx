@@ -15,6 +15,7 @@ class Old3DHoldsMod extends Modifier
     unknown = false;
     holdsMod = true;
     utility = true;
+    displayName = "Old 3D holds";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -31,6 +32,7 @@ class HoldTypeMod extends Modifier
     unknown = false;
     holdsMod = true;
     utility = true;
+    displayName = "HoldType";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -48,6 +50,7 @@ class HoldGrainMod extends Modifier
     holdsMod = true;
     notPercentage = true;
     utility = true;
+    displayName = "HoldGrain";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -63,6 +66,7 @@ class LongHoldsMod extends Modifier
     super(name, 0);
     unknown = false;
     holdsMod = true;
+    displayName = "LongHolds";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -78,6 +82,7 @@ class StraightHoldsMod extends Modifier
     super(name, 0);
     unknown = false;
     holdsMod = true;
+    displayName = "StraightHolds";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void

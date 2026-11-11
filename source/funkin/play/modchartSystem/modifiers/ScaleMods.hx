@@ -6,7 +6,7 @@ import funkin.play.modchartSystem.modifiers.BaseModifier;
 import flixel.math.FlxMath;
 import funkin.play.modchartSystem.modifiers.RotateMods; // for scaleFrom modifier
 
-// Contains all the mods related to scale!
+// Contains all the mods related to scale / size!
 
 class ScaleModifier extends Modifier
 {
@@ -14,6 +14,7 @@ class ScaleModifier extends Modifier
   {
     super(name, 0);
     modPriority += 3; // apply before tiny
+    displayName = "Scale";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -39,6 +40,7 @@ class ScaleXModifier extends Modifier
   {
     super(name, 0);
     modPriority += 3; // apply before tiny
+    displayName = "ScaleX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -60,6 +62,7 @@ class ScaleYModifier extends Modifier
   {
     super(name, 0);
     modPriority += 3; // apply before tiny
+    displayName = "ScaleY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -81,6 +84,7 @@ class ScaleZModifier extends Modifier
   {
     super(name, 0);
     modPriority += 3; // apply before tiny
+    displayName = "ScaleZ";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -102,6 +106,7 @@ class ScaleStrumsModifier extends Modifier
   {
     super(name, 0);
     modPriority += 3; // apply before tiny
+    displayName = "ScaleStrums";
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -119,6 +124,7 @@ class ScaleXStrumsModifier extends Modifier
   {
     super(name, 0);
     modPriority += 3; // apply before tiny
+    displayName = "ScaleStrumsX";
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -134,6 +140,7 @@ class ScaleYStrumsModifier extends Modifier
   {
     super(name, 0);
     modPriority += 3; // apply before tiny
+    displayName = "ScaleStrumsY";
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -143,12 +150,29 @@ class ScaleYStrumsModifier extends Modifier
   }
 }
 
+class ScaleZStrumsModifier extends Modifier
+{
+  public function new(name:String)
+  {
+    super(name, 0);
+    displayName = "ScaleStrumsZ";
+    modPriority += 3; // apply before tiny
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (currentValue == 0 || data.inOrientPass) return;
+    data.scaleZ += currentValue;
+  }
+}
+
 class ScaleNotesModifier extends Modifier
 {
   public function new(name:String)
   {
     super(name, 0);
     modPriority += 3; // apply before tiny
+    displayName = "ScaleNotes";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -166,6 +190,7 @@ class ScaleXNotesModifier extends Modifier
   {
     super(name, 0);
     modPriority += 3; // apply before tiny
+    displayName = "ScaleNotesX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -181,6 +206,7 @@ class ScaleYNotesModifier extends Modifier
   {
     super(name, 0);
     modPriority += 3; // apply before tiny
+    displayName = "ScaleNotesY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -190,12 +216,29 @@ class ScaleYNotesModifier extends Modifier
   }
 }
 
+class ScaleZNotesModifier extends Modifier
+{
+  public function new(name:String)
+  {
+    super(name, 0);
+    modPriority += 3; // apply before tiny
+    displayName = "ScaleNotesZ";
+  }
+
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
+  {
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return;
+    data.scaleZ += currentValue;
+  }
+}
+
 class ScaleHoldsModifier extends Modifier
 {
   public function new(name:String)
   {
     super(name, 0);
     modPriority += 3; // apply before tiny
+    displayName = "ScaleHolds";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -218,6 +261,7 @@ class MiniModifier extends Modifier
   {
     super(name, 0);
     modPriority -= 5; // apply a bit later(after column stuff)
+    displayName = "Mini";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -255,6 +299,7 @@ class TinyModifier extends Modifier
   {
     super(name, 0);
     modPriority += 1; // apply before tiny
+    displayName = "Tiny";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -279,6 +324,7 @@ class TinyXModifier extends Modifier
   public function new(name:String)
   {
     super(name, 0);
+    displayName = "TinyX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -299,6 +345,7 @@ class TinyYModifier extends Modifier
   public function new(name:String)
   {
     super(name, 0);
+    displayName = "TinyY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -319,6 +366,7 @@ class TinyZModifier extends Modifier
   public function new(name:String)
   {
     super(name, 0);
+    displayName = "TinyZ";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -339,6 +387,7 @@ class TinyHoldsModifier extends Modifier
   public function new(name:String)
   {
     super(name, 0);
+    displayName = "TinyHolds";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -358,6 +407,7 @@ class TinyStrumModifier extends Modifier
   public function new(name:String)
   {
     super(name, 0);
+    displayName = "TinyStrums";
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -374,6 +424,7 @@ class TinyStrumXModifier extends Modifier
   public function new(name:String)
   {
     super(name, 0);
+    displayName = "TinyStrumsX";
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -388,6 +439,7 @@ class TinyStrumYModifier extends Modifier
   public function new(name:String)
   {
     super(name, 0);
+    displayName = "TinyStrumsY";
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -402,6 +454,7 @@ class TinyStrumZModifier extends Modifier
   public function new(name:String)
   {
     super(name, 0);
+    displayName = "TinyStrumsZ";
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -416,6 +469,7 @@ class TinyNotesModifier extends Modifier
   public function new(name:String)
   {
     super(name, 0);
+    displayName = "TinyNotes";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -432,6 +486,7 @@ class TinyNotesXModifier extends Modifier
   public function new(name:String)
   {
     super(name, 0);
+    displayName = "TinyNotesX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -446,6 +501,7 @@ class TinyNotesYModifier extends Modifier
   public function new(name:String)
   {
     super(name, 0);
+    displayName = "TinyNotesY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -460,6 +516,7 @@ class TinyNotesZModifier extends Modifier
   public function new(name:String)
   {
     super(name, 0);
+    displayName = "TinyNotesZ";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -481,6 +538,7 @@ class ZoomModifier extends RotateModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "Zoom";
     // Apply AFTER pixel move mods to avoid breaking
     modPriority = -9999;
     modPriority -= 10;
@@ -587,6 +645,7 @@ class ZoomXModifier extends ZoomModifier
   {
     super(name);
     this.doY = false;
+    displayName = "ZoomX";
   }
 }
 
@@ -596,5 +655,6 @@ class ZoomYModifier extends ZoomModifier
   {
     super(name);
     this.doX = false;
+    displayName = "ZoomY";
   }
 }

@@ -75,6 +75,7 @@ class DrunkXMod extends DrunkModBase
   {
     super(name);
     invertForDad = true;
+    displayName = "Drunk";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -103,6 +104,7 @@ class DrunkYMod extends DrunkModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "DrunkY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -131,6 +133,7 @@ class DrunkZMod extends DrunkModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "DrunkZ";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -160,6 +163,7 @@ class DrunkAngleMod extends DrunkModBase
   {
     super(name);
     invertForDad = true;
+    displayName = "DrunkAngle";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -189,6 +193,7 @@ class DrunkAngleYMod extends DrunkModBase
   {
     super(name);
     invertForDad = true;
+    displayName = "DrunkAngleY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -216,6 +221,7 @@ class DrunkAngleXMod extends DrunkModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "DrunkAngleX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -243,6 +249,7 @@ class DrunkScaleMod extends DrunkModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "DrunkScale";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -266,6 +273,7 @@ class DrunkScaleXMod extends DrunkModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "DrunkScaleX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -286,6 +294,7 @@ class DrunkScaleYMod extends DrunkModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "DrunkScaleY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -307,6 +316,7 @@ class DrunkSkewXMod extends DrunkModBase
   {
     super(name);
     invertForDad = true;
+    displayName = "DrunkSkewX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -328,6 +338,7 @@ class DrunkSkewYMod extends DrunkModBase
   {
     super(name);
     invertForDad = true;
+    displayName = "DrunkSkewY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -349,6 +360,7 @@ class DrunkSpeedMod extends DrunkModBase
   {
     super(name);
     modPriority = 397;
+    displayName = "DrunkSpeed";
   }
 
   override function speedMath(lane:Int, curPos:Float, strumLine, isHoldNote = false):Float
@@ -365,6 +377,7 @@ class TanDrunkXMod extends DrunkModBase
   {
     super(name);
     invertForDad = true;
+    displayName = "TanDrunk";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -386,6 +399,7 @@ class TanDrunkYMod extends DrunkModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "TanDrunkY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -407,6 +421,7 @@ class TanDrunkZMod extends DrunkModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "TanDrunkZ";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -429,6 +444,7 @@ class TanDrunkAngleMod extends DrunkModBase
   {
     super(name);
     invertForDad = true;
+    displayName = "TanDrunkAngle";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -445,11 +461,56 @@ class TanDrunkAngleMod extends DrunkModBase
   }
 }
 
+class TanDrunkAngleXMod extends DrunkModBase
+{
+  public function new(name:String)
+  {
+    super(name);
+    invertForDad = true;
+    displayName = "TanDrunkAngleX";
+  }
+
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
+  {
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return; // skip math if mod is 0
+    data.angleX += tanDrunkMath(data.direction, data.curPos); // re apply but now with notePos
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (currentValue == 0 || data.inOrientPass) return; // skip math if mod is 0
+    data.angleX += tanDrunkMath(data.direction, data.curPos);
+  }
+}
+
+class TanDrunkAngleYMod extends DrunkModBase
+{
+  public function new(name:String)
+  {
+    super(name);
+    invertForDad = true;
+    displayName = "TanDrunkAngleY";
+  }
+
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
+  {
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return; // skip math if mod is 0
+    data.angleY += tanDrunkMath(data.direction, data.curPos); // re apply but now with notePos
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (currentValue == 0 || data.inOrientPass) return; // skip math if mod is 0
+    data.angleY += tanDrunkMath(data.direction, data.curPos);
+  }
+}
+
 class TanDrunkScaleMod extends DrunkModBase
 {
   public function new(name:String)
   {
     super(name);
+    displayName = "TanDrunkScale";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -465,5 +526,47 @@ class TanDrunkScaleMod extends DrunkModBase
     data.scaleX += s * 0.01;
     data.scaleZ += s * 0.01;
     data.scaleY += s * 0.01;
+  }
+}
+
+class TanDrunkScaleYMod extends DrunkModBase
+{
+  public function new(name:String)
+  {
+    super(name);
+    displayName = "TanDrunkScaleY";
+  }
+
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
+  {
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return; // skip math if mod is 0
+    strumMath(data, strumLine);
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (currentValue == 0 || data.inOrientPass) return; // skip math if mod is 0
+    data.scaleY += tanDrunkMath(data.direction, data.curPos) * 0.01;
+  }
+}
+
+class TanDrunkScaleXMod extends DrunkModBase
+{
+  public function new(name:String)
+  {
+    super(name);
+    displayName = "TanDrunkScaleX";
+  }
+
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
+  {
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return; // skip math if mod is 0
+    strumMath(data, strumLine);
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (currentValue == 0 || data.inOrientPass) return; // skip math if mod is 0
+    data.scaleX += tanDrunkMath(data.direction, data.curPos) * 0.01;
   }
 }

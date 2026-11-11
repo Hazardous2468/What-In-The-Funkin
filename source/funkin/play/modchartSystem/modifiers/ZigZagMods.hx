@@ -58,11 +58,12 @@ class ZigZagXMod extends ZigZagBaseMod
   {
     super(name);
     invertForDad = true;
+    displayName = "Zigzag";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.noteType == "receptor") return;
     data.x -= strumResult[data.direction];
     data.x += ziggyMath(data.curPos) * currentValue;
   }
@@ -86,11 +87,12 @@ class ZigZagYMod extends ZigZagBaseMod
   public function new(name:String)
   {
     super(name);
+    displayName = "ZigzagY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.noteType == "receptor") return;
     data.y -= strumResult[data.direction];
     data.y += ziggyMath(data.curPos) * currentValue;
   }
@@ -114,11 +116,12 @@ class ZigZagZMod extends ZigZagBaseMod
   public function new(name:String)
   {
     super(name);
+    displayName = "ZigzagZ";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (currentValue == 0 || data.noteType == "receptor") return;
     data.z -= strumResult[data.direction];
     data.z += ziggyMath(data.curPos) * currentValue;
   }
@@ -143,11 +146,12 @@ class ZigZagAngleMod extends ZigZagBaseMod
   {
     super(name);
     invertForDad = true;
+    displayName = "ZigzagAngle";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return;
+    if (data.inOrientPass || currentValue == 0 || data.noteType == "receptor") return;
     data.angleZ -= strumResult[data.direction];
     data.angleZ += ziggyMath(data.curPos) * currentValue;
   }
@@ -171,11 +175,12 @@ class ZigZagAngleXMod extends ZigZagBaseMod
   public function new(name:String)
   {
     super(name);
+    displayName = "ZigzagAngleX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return;
+    if (data.inOrientPass || currentValue == 0 || data.noteType == "receptor") return;
     data.angleX += ziggyMath(data.curPos) * currentValue;
   }
 
@@ -198,11 +203,12 @@ class ZigZagAngleYMod extends ZigZagBaseMod
   public function new(name:String)
   {
     super(name);
+    displayName = "ZigzagAngleY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return;
+    if (data.inOrientPass || currentValue == 0 || data.noteType == "receptor") return;
     data.angleY += ziggyMath(data.curPos) * currentValue;
   }
 
@@ -225,11 +231,12 @@ class ZigZagScaleMod extends ZigZagBaseMod
   public function new(name:String)
   {
     super(name);
+    displayName = "ZigzagScale";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return;
+    if (data.inOrientPass || currentValue == 0 || data.noteType == "receptor") return;
     final r:Float = ziggyMath(data.curPos) * currentValue * 0.01;
     data.scaleX += r;
     data.scaleY += r;
@@ -257,11 +264,12 @@ class ZigZagScaleXMod extends ZigZagBaseMod
   public function new(name:String)
   {
     super(name);
+    displayName = "ZigzagScaleX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (data.inOrientPass || currentValue == 0 || data.noteType == "receptor") return;
     data.scaleX += ziggyMath(data.curPos) * currentValue * 0.01;
   }
 
@@ -284,11 +292,12 @@ class ZigZagScaleYMod extends ZigZagBaseMod
   public function new(name:String)
   {
     super(name);
+    displayName = "ZigzagScaleY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return; // skip math if mod is 0
+    if (data.inOrientPass || currentValue == 0 || data.noteType == "receptor") return;
     data.scaleY += ziggyMath(data.curPos) * currentValue * 0.01;
   }
 
@@ -312,11 +321,12 @@ class ZigZagSkewXMod extends ZigZagBaseMod
   {
     super(name);
     invertForDad = true;
+    displayName = "ZigzagSkewX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return;
+    if (data.inOrientPass || currentValue == 0 || data.noteType == "receptor") return;
     data.skewX += ziggyMath(data.curPos) * currentValue;
   }
 
@@ -340,11 +350,12 @@ class ZigZagSkewYMod extends ZigZagBaseMod
   {
     super(name);
     invertForDad = true;
+    displayName = "ZigzagSkewY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
-    if (currentValue == 0) return;
+    if (data.inOrientPass || currentValue == 0 || data.noteType == "receptor") return;
     data.skewY += ziggyMath(data.curPos) * currentValue;
   }
 
@@ -368,9 +379,10 @@ class ZigZagSpeedMod extends ZigZagBaseMod
   {
     super(name);
     modPriority = 401;
+    displayName = "ZigzagSpeed";
   }
 
-  override function speedMath(lane:Int, curPos:Float, strumLine, isHoldNote = false):Float
+  override function speedMath(lane:Int, curPos:Float, strumLine:Strumline, isHoldNote = false):Float
   {
     if (currentValue == 0) return 1; // skip math if mod is 0
     return (ziggyMath(curPos) * currentValue * 0.005) + 1;

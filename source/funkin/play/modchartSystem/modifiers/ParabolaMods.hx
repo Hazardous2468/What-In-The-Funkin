@@ -38,6 +38,7 @@ class ParabolaXMod extends ParabolaModBase
   {
     super(name);
     invertForDad = true;
+    displayName = "ParabolaX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -66,6 +67,7 @@ class ParabolaYMod extends ParabolaModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "ParabolaY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -94,6 +96,7 @@ class ParabolaZMod extends ParabolaModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "ParabolaZ";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -128,6 +131,7 @@ class ParabolaAngleZMod extends ParabolaModBase
     pathMod = false;
     strumsMod = true;
     invertForDad = true;
+    displayName = "ParabolaAngle";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -161,6 +165,7 @@ class ParabolaAngleYMod extends ParabolaModBase
     holdsMod = true;
     pathMod = false;
     strumsMod = true;
+    displayName = "ParabolaAngleY";
     invertForDad = true;
   }
 
@@ -194,6 +199,7 @@ class ParabolaAngleXMod extends ParabolaModBase
     holdsMod = true;
     pathMod = false;
     strumsMod = true;
+    displayName = "ParabolaAngleX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -227,6 +233,7 @@ class ParabolaSkewXMod extends ParabolaModBase
     pathMod = false;
     strumsMod = true;
     invertForDad = true;
+    displayName = "ParabolaSkewX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -260,6 +267,7 @@ class ParabolaSkewYMod extends ParabolaModBase
     pathMod = false;
     strumsMod = true;
     invertForDad = true;
+    displayName = "ParabolaSkewY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -292,6 +300,7 @@ class ParabolaScaleXMod extends ParabolaModBase
     holdsMod = true;
     pathMod = false;
     strumsMod = true;
+    displayName = "ParabolaScaleX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -324,6 +333,7 @@ class ParabolaScaleYMod extends ParabolaModBase
     holdsMod = true;
     pathMod = false;
     strumsMod = true;
+    displayName = "ParabolaScaleY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -356,6 +366,7 @@ class ParabolaScaleMod extends ParabolaModBase
     holdsMod = true;
     pathMod = false;
     strumsMod = true;
+    displayName = "ParabolaScale";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void

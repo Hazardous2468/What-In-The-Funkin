@@ -48,6 +48,12 @@ class AttenuateModBase extends Modifier
 
 class AttenuateXMod extends AttenuateModBase
 {
+  public function new(name:String)
+  {
+    super(name);
+    displayName = "Attenuate";
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     data.x -= strumResult[data.direction];
@@ -63,6 +69,12 @@ class AttenuateXMod extends AttenuateModBase
 
 class AttenuateYMod extends AttenuateModBase
 {
+  public function new(name:String)
+  {
+    super(name);
+    displayName = "AttenuateY";
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     data.y -= strumResult[data.direction];
@@ -78,6 +90,12 @@ class AttenuateYMod extends AttenuateModBase
 
 class AttenuateZMod extends AttenuateModBase
 {
+  public function new(name:String)
+  {
+    super(name);
+    displayName = "AttenuateZ";
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     data.z -= strumResult[data.direction];
@@ -93,6 +111,12 @@ class AttenuateZMod extends AttenuateModBase
 
 class AttenuateAngleMod extends AttenuateModBase
 {
+  public function new(name:String)
+  {
+    super(name);
+    displayName = "AttenuateAngle";
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (data.inOrientPass) return;
@@ -110,6 +134,12 @@ class AttenuateAngleMod extends AttenuateModBase
 
 class AttenuateAngleXMod extends AttenuateModBase
 {
+  public function new(name:String)
+  {
+    super(name);
+    displayName = "AttenuateAngleX";
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (data.inOrientPass) return;
@@ -126,6 +156,12 @@ class AttenuateAngleXMod extends AttenuateModBase
 
 class AttenuateAngleYMod extends AttenuateModBase
 {
+  public function new(name:String)
+  {
+    super(name);
+    displayName = "AttenuateAngleY";
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (data.inOrientPass) return;
@@ -142,6 +178,12 @@ class AttenuateAngleYMod extends AttenuateModBase
 
 class AttenuateSkewXMod extends AttenuateModBase
 {
+  public function new(name:String)
+  {
+    super(name);
+    displayName = "AttenuateSkewX";
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (data.inOrientPass) return;
@@ -158,6 +200,12 @@ class AttenuateSkewXMod extends AttenuateModBase
 
 class AttenuateSkewYMod extends AttenuateModBase
 {
+  public function new(name:String)
+  {
+    super(name);
+    displayName = "AttenuateSkewY";
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (data.inOrientPass) return;
@@ -174,6 +222,12 @@ class AttenuateSkewYMod extends AttenuateModBase
 
 class AttenuateScaleMod extends AttenuateModBase
 {
+  public function new(name:String)
+  {
+    super(name);
+    displayName = "AttenuateScale";
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (data.inOrientPass) return;
@@ -195,6 +249,12 @@ class AttenuateScaleMod extends AttenuateModBase
 
 class AttenuateScaleXMod extends AttenuateModBase
 {
+  public function new(name:String)
+  {
+    super(name);
+    displayName = "AttenuateScaleX";
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (data.inOrientPass) return;
@@ -211,6 +271,12 @@ class AttenuateScaleXMod extends AttenuateModBase
 
 class AttenuateScaleYMod extends AttenuateModBase
 {
+  public function new(name:String)
+  {
+    super(name);
+    displayName = "AttenuateScaleY";
+  }
+
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
     if (data.inOrientPass) return;

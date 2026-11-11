@@ -17,6 +17,7 @@ class FlipMod extends Modifier
     super(name, 0);
     unknown = false;
     strumsMod = true;
+    displayName = "Flip";
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -38,6 +39,7 @@ class InvertMod extends Modifier
     super(name, 0);
     unknown = false;
     strumsMod = true;
+    displayName = "Invert";
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -56,6 +58,7 @@ class VideoGamesMod extends Modifier
     super(name, 0);
     unknown = false;
     strumsMod = true;
+    displayName = "Videogames";
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -89,11 +92,11 @@ class BlackSphereInvertMod extends Modifier
     unknown = false;
     strumsMod = true;
     speedMod = true;
+    displayName = "Blacksphere";
   }
 
   override function speedMath(lane:Int, curPos:Float, strumLine:Strumline, isHoldNote:Bool = false):Float
   {
-    currentValue = currentValue % 360;
     if (currentValue == 0) return 1; // skip math if mod is 0
     // current value is in degrees!
 
@@ -168,11 +171,11 @@ class BlackSphereFlipMod extends Modifier
     unknown = false;
     strumsMod = true;
     speedMod = true;
+    displayName = "BlacksphereFlip";
   }
 
   override function speedMath(lane:Int, curPos:Float, strumLine:Strumline, isHoldNote:Bool = false):Float
   {
-    currentValue = currentValue % 360;
     if (currentValue == 0) return 1; // skip math if mod is 0
     // current value is in degrees!
 

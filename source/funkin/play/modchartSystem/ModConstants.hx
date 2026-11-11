@@ -89,7 +89,7 @@ import funkin.play.modchartSystem.modifiers.*; // if only you worked ;_;
 class ModConstants
 {
   public static var orientTimeOffset:Float = -2.0; // in ms
-  public static final MODCHART_VERSION:String = "v1.1.2";
+  public static final MODCHART_VERSION:String = "v1.1.3";
   public static final defaultHoldGrain = 75;
   public static final defaultPathGrain = defaultHoldGrain;
   public static var tooCloseToCameraFix:Float = 0.975; // dumb fix for preventing freak out on z math or something
@@ -1249,9 +1249,13 @@ class ModConstants
         newMod = new ScaleXStrumsModifier(tag);
       case "scalestrumy":
         newMod = new ScaleYStrumsModifier(tag);
+      case "scalestrumz":
+        newMod = new ScaleZStrumsModifier(tag);
 
       case "scalenote":
         newMod = new ScaleNotesModifier(tag);
+      case "scalenoteZ":
+        newMod = new ScaleZNotesModifier(tag);
       case "scalenotex":
         newMod = new ScaleXNotesModifier(tag);
       case "scalenotey":
@@ -1440,8 +1444,16 @@ class ModConstants
         newMod = new TanDrunkYMod(tag);
       case "tandrunkz":
         newMod = new TanDrunkZMod(tag);
+      case "tandrunkanglex":
+        newMod = new TanDrunkAngleXMod(tag);
+      case "tandrunkangley":
+        newMod = new TanDrunkAngleYMod(tag);
       case "tandrunkangle":
         newMod = new TanDrunkAngleMod(tag);
+      case "tandrunkscalex":
+        newMod = new TanDrunkScaleXMod(tag);
+      case "tandrunkscaley":
+        newMod = new TanDrunkScaleYMod(tag);
       case "tandrunkscale":
         newMod = new TanDrunkScaleMod(tag);
 
@@ -1475,6 +1487,10 @@ class ModConstants
         newMod = new TanTipsyYMod(tag);
       case "tantipsyz":
         newMod = new TanTipsyZMod(tag);
+      case "tantipsyangley":
+        newMod = new TanTipsyAngleYMod(tag);
+      case "tantipsyanglex":
+        newMod = new TanTipsyAngleXMod(tag);
       case "tantipsyangle":
         newMod = new TanTipsyAngleMod(tag);
       case "tantipsyscale":
@@ -1589,6 +1605,10 @@ class ModConstants
         newMod = new TornadoYMod(tag);
       case "tornadoz":
         newMod = new TornadoZMod(tag);
+      case "tornadoanglex":
+        newMod = new TornadoAngleXMod(tag);
+      case "tornadoangley":
+        newMod = new TornadoAngleYMod(tag);
       case "tornadoangle":
         newMod = new TornadoAngleMod(tag);
       case "tornadoscale":
@@ -1863,6 +1883,10 @@ class ModConstants
         newMod = new TanBumpyYMod(tag);
       case "tanbumpy":
         newMod = new TanBumpyZMod(tag);
+      case "tanbumpyanglex":
+        newMod = new TanBumpyAngleXMod(tag);
+      case "tanbumpyangley":
+        newMod = new TanBumpyAngleYMod(tag);
       case "tanbumpyangle":
         newMod = new TanBumpyAngleMod(tag);
       case "tanbumpyscale":
@@ -2079,6 +2103,15 @@ class ModConstants
         newMod = new TanWaveyZMod(tag);
       case "tanwaveyangle":
         newMod = new TanWaveyAngleMod(tag);
+      case "tanwaveyangley":
+        newMod = new TanWaveyAngleYMod(tag);
+      case "tanwaveyanglex":
+        newMod = new TanWaveyAngleXMod(tag);
+
+      case "tanwaveyscaley":
+        newMod = new TanWaveyScaleYMod(tag);
+      case "tanwaveyscalex":
+        newMod = new TanWaveyScaleXMod(tag);
       case "tanwaveyscale":
         newMod = new TanWaveyScaleMod(tag);
       case "tanwaveyskewx":

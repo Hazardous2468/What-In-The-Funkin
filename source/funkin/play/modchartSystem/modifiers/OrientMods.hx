@@ -193,6 +193,7 @@ class OrientMod extends OrientModBase
   public function new(name:String)
   {
     super(name, 0 + 3);
+    displayName = "Orient";
   }
 }
 
@@ -201,6 +202,7 @@ class OrientXMod extends OrientModBase
   public function new(name:String)
   {
     super(name, 1 + 3);
+    displayName = "OrientX";
   }
 }
 
@@ -209,6 +211,7 @@ class OrientYMod extends OrientModBase
   public function new(name:String)
   {
     super(name, 2 + 3);
+    displayName = "OrientY";
   }
 }
 
@@ -219,6 +222,7 @@ class Orient2Mod extends OrientModBase
   public function new(name:String)
   {
     super(name, 3 - 3);
+    displayName = "Orient2";
   }
 }
 
@@ -227,6 +231,7 @@ class OrientX2Mod extends OrientModBase
   public function new(name:String)
   {
     super(name, 4 - 3);
+    displayName = "OrientX2";
   }
 }
 
@@ -235,5 +240,6 @@ class OrientY2Mod extends OrientModBase
   public function new(name:String)
   {
     super(name, 5 - 3);
+    displayName = "OrientY2";
   }
 }

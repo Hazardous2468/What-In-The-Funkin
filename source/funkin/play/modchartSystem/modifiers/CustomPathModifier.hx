@@ -311,6 +311,7 @@ class CustomPathMod extends Modifier
   public function new(name:String)
   {
     super(name, 0);
+    displayName = "CustomPath";
     unknown = false;
     notesMod = true;
     holdsMod = true;
@@ -604,6 +605,7 @@ class OldCustomPathMod extends Modifier
   public function new(name:String)
   {
     super(name, 0);
+    displayName = "OldCustomPath";
     // modPriority = 119;
     modPriority = 119;
     unknown = false;

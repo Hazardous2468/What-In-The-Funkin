@@ -14,6 +14,7 @@ class AngleZOffsetMod extends Modifier
     super(name, 0);
     notPercentage = true;
     invertForDad = true;
+    displayName = "Angle";
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -30,6 +31,7 @@ class AngleXOffsetMod extends Modifier
   {
     super(name, 0);
     notPercentage = true;
+    displayName = "AngleX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -52,6 +54,7 @@ class AngleYOffsetMod extends Modifier
   {
     super(name, 0);
     notPercentage = true;
+    displayName = "AngleY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -75,6 +78,7 @@ class NotesAngleZOffsetMod extends Modifier
     super(name, 0);
     notPercentage = true;
     invertForDad = true;
+    displayName = "NotesAngle";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -92,6 +96,7 @@ class NotesAngleXOffsetMod extends Modifier
   {
     super(name, 0);
     notPercentage = true;
+    displayName = "NotesAngleX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -109,6 +114,7 @@ class NotesAngleYOffsetMod extends Modifier
   {
     super(name, 0);
     notPercentage = true;
+    displayName = "NotesAngleY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -126,6 +132,7 @@ class HoldsAngleZOffsetMod extends Modifier
   {
     super(name, 0);
     notPercentage = true;
+    displayName = "HoldsAngle";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -142,6 +149,7 @@ class HoldsAngleXOffsetMod extends Modifier
   {
     super(name, 0);
     notPercentage = true;
+    displayName = "HoldsAngleX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -158,6 +166,7 @@ class HoldsAngleYOffsetMod extends Modifier
   {
     super(name, 0);
     notPercentage = true;
+    displayName = "HoldsAngleY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void

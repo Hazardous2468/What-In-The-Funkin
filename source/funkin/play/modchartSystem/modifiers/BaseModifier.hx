@@ -278,6 +278,17 @@ class Modifier
   public var tag:String = "mod";
 
   /**
+   * The string used to display this modifier when shown (i.e. the strum mods debugText).
+   * If empty, then it will instead display it's tag instead.
+   */
+  public var displayName:String = "";
+
+  /**
+   * If true, this modifier is hidden (in the strum mods debug text) if the currentValue is the same as baseValue.
+   */
+  public var hideIfBaseValue:Bool = true;
+
+  /**
    * The base / starting value of this modifier.
    * 'currentValue' will reset back to this value when a reset is triggered.
    */

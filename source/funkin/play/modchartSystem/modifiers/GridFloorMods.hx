@@ -33,6 +33,7 @@ class GridXYZModifier extends GridModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "Grid";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -57,6 +58,7 @@ class GridXModifier extends GridModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "GridX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -77,6 +79,7 @@ class GridYModifier extends GridModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "GridY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -97,6 +100,7 @@ class GridZModifier extends GridModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "GridZ";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -133,6 +137,7 @@ class GridAngleModifier extends GridModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "GridAngle";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -154,6 +159,7 @@ class GridStrumXYZModifier extends GridModBase
   {
     super(name);
     modPriority = modPriority - 3;
+    displayName = "GridStrum";
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -171,6 +177,7 @@ class GridStrumXModifier extends GridModBase
   {
     super(name);
     modPriority = modPriority - 3;
+    displayName = "GridStrumX";
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -186,6 +193,7 @@ class GridStrumYModifier extends GridModBase
   {
     super(name);
     modPriority = modPriority - 3;
+    displayName = "GridStrumY";
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -201,6 +209,7 @@ class GridStrumZModifier extends GridModBase
   {
     super(name);
     modPriority = modPriority - 3;
+    displayName = "GridStrumZ";
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void

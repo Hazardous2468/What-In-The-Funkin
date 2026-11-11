@@ -40,6 +40,7 @@ class CubicXMod extends CubicModBase
   {
     super(name);
     invertForDad = true;
+    displayName = "CubicX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -68,6 +69,7 @@ class CubicYMod extends CubicModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "CubicY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -96,6 +98,7 @@ class CubicZMod extends CubicModBase
   public function new(name:String)
   {
     super(name);
+    displayName = "CubicZ";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -130,6 +133,7 @@ class CubicAngleZMod extends CubicModBase
     pathMod = false;
     strumsMod = true;
     invertForDad = true;
+    displayName = "CubicAngle";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -163,6 +167,7 @@ class CubicAngleXMod extends CubicModBase
     holdsMod = true;
     pathMod = false;
     strumsMod = true;
+    displayName = "CubicAngleX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -196,6 +201,7 @@ class CubicAngleYMod extends CubicModBase
     pathMod = false;
     strumsMod = true;
     invertForDad = true;
+    displayName = "CubicAngleY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -228,6 +234,7 @@ class CubicScaleXMod extends CubicModBase
     holdsMod = true;
     pathMod = false;
     strumsMod = true;
+    displayName = "CubicScaleX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -260,6 +267,7 @@ class CubicScaleYMod extends CubicModBase
     holdsMod = true;
     pathMod = false;
     strumsMod = true;
+    displayName = "CubicScaleY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -292,6 +300,7 @@ class CubicScaleMod extends CubicModBase
     holdsMod = true;
     pathMod = false;
     strumsMod = true;
+    displayName = "CubicScale";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -330,6 +339,7 @@ class CubicSkewXMod extends CubicModBase
     pathMod = false;
     strumsMod = true;
     invertForDad = true;
+    displayName = "CubicSkewX";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -363,6 +373,7 @@ class CubicSkewYMod extends CubicModBase
     pathMod = false;
     strumsMod = true;
     invertForDad = true;
+    displayName = "CubicSkewY";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void

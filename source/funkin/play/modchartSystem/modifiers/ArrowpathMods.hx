@@ -17,6 +17,7 @@ class ArrowpathMod extends Modifier
     unknown = false;
     pathMod = true;
     specialMod = true;
+    displayName = "Arrowpath";
   }
 
   override function specialMath(lane:Int, strumLine:Strumline):Void
@@ -39,6 +40,7 @@ class SpiralPathsMod extends Modifier
     unknown = false;
     utility = true;
     pathMod = true;
+    displayName = "SpiralPaths";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -55,6 +57,7 @@ class NotITG_ArrowPathMod extends Modifier
     unknown = false;
     specialMod = true;
     utility = true;
+    displayName = "LinePath";
   }
 
   override function specialMath(lane:Int, strumLine:Strumline):Void
@@ -71,6 +74,7 @@ class ArrowpathWidthMod extends Modifier
     unknown = false;
     utility = true;
     pathMod = true;
+    displayName = "PathWidth";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -91,6 +95,7 @@ class ArrowpathRedMod extends Modifier
     unknown = false;
     pathMod = true;
     utility = true;
+    displayName = "PathRed";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -109,6 +114,7 @@ class ArrowpathGreenMod extends Modifier
     super(name, 0);
     unknown = false;
     pathMod = true;
+    displayName = "PathGreen";
     utility = true;
   }
 
@@ -128,6 +134,7 @@ class ArrowpathBlueMod extends Modifier
     super(name, 0);
     unknown = false;
     pathMod = true;
+    displayName = "PathBlue";
     utility = true;
   }
 
@@ -149,6 +156,7 @@ class ArrowpathBackLengthMod extends Modifier
     specialMod = true;
     notPercentage = true;
     utility = true;
+    displayName = "PathBackLength";
   }
 
   override function specialMath(lane:Int, strumLine:Strumline):Void
@@ -167,6 +175,7 @@ class ArrowpathFrontLengthMod extends Modifier
     specialMod = true;
     notPercentage = true;
     utility = true;
+    displayName = "PathLength";
   }
 
   override function specialMath(lane:Int, strumLine:Strumline):Void
@@ -183,6 +192,7 @@ class ArrowpathStraightHoldMod extends Modifier
     super(name, 0);
     unknown = false;
     pathMod = true;
+    displayName = "StraightPaths";
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -199,6 +209,7 @@ class ArrowpathGrainMod extends Modifier
     unknown = false;
     notPercentage = true;
     pathMod = true;
+    displayName = "PathGrain";
     utility = true;
   }
 
