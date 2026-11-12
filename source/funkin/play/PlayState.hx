@@ -2878,6 +2878,7 @@ class PlayState extends MusicBeatSubState
     newStrummer.cameras = playerStrumline.cameras;
 
     newStrummer.mods.customTweenerName = "plr" + Std.string(allStrumLines.length + 1);
+    newStrummer.playerID = allStrumLines.length + 1;
 
     customStrumLines.push(newStrummer);
     allStrumLines.push(newStrummer);
@@ -2943,10 +2944,13 @@ class PlayState extends MusicBeatSubState
     opponentStrumline.zIndex = 1000;
     opponentStrumline.cameras = [camHUD];
 
+    playerStrumline.playerID = 1;
+    opponentStrumline.playerID = 2;
+
     if (isModchartSong)
     {
-      opponentStrumline.mods.customTweenerName = "opponent";
       playerStrumline.mods.customTweenerName = "player";
+      opponentStrumline.mods.customTweenerName = "opponent";
       playerStrumline.cameras = [camNotes];
       opponentStrumline.cameras = [camNotes];
 

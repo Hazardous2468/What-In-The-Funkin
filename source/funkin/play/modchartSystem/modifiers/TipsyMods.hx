@@ -438,6 +438,58 @@ class TanTipsyScaleMod extends TipsyModBase
   }
 }
 
+class TanTipsyScaleXMod extends TipsyModBase
+{
+  public function new(name:String)
+  {
+    super(name);
+    unknown = false;
+    notesMod = true;
+    holdsMod = true;
+    pathMod = false;
+    strumsMod = true;
+    displayName = "TanTipsyScaleX";
+  }
+
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
+  {
+    strumMath(data, strumLine);
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (currentValue == 0 || data.inOrientPass) return;
+    final s:Float = tanTipsyMath(data.direction, data.curPos);
+    data.scaleX += s * 0.01;
+  }
+}
+
+class TanTipsyScaleYMod extends TipsyModBase
+{
+  public function new(name:String)
+  {
+    super(name);
+    unknown = false;
+    notesMod = true;
+    holdsMod = true;
+    pathMod = false;
+    strumsMod = true;
+    displayName = "TanTipsyScaleX";
+  }
+
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
+  {
+    strumMath(data, strumLine);
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (currentValue == 0 || data.inOrientPass) return;
+    final s:Float = tanTipsyMath(data.direction, data.curPos);
+    data.scaleY += s * 0.01;
+  }
+}
+
 class TanTipsySkewXMod extends TipsyModBase
 {
   public function new(name:String)

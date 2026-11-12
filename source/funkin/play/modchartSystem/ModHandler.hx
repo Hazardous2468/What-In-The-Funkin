@@ -297,6 +297,11 @@ class ModHandler
     var mod = ModConstants.createNewMod(nameOfMod);
     if (mod == null)
     {
+      if (PlayState.instance != null) PlayState.instance.modDebugNotif(
+        "Could not add '" + nameOfMod + "' mod for '" + customTweenerName + "'",
+        FlxColor.ORANGE
+      );
+      trace(nameOfMod + " mod is unknown");
       mod = new Modifier(nameOfMod); // to prevent everything from going to shit when an unknown mod gets used
     }
 

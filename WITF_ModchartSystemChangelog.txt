@@ -2,13 +2,16 @@ v1.1.3:
 
 Added a new modchart tutorial week for WITF.
 Removed Mirin Template song.
-Added TornadoAngleX, TornadoAngleY, TanBumpyAngleY, TanBumpyAngleX, TanDrunkScaleX, TanDrunkScaleY, TanDrunkAngleX, TanDrunkAngleY, TanTipsyAngleX, TanTipsyAngleY.
+Added TornadoAngleX, TornadoAngleY, TanBumpyAngleY, TanBumpyAngleX, TanDrunkScaleX, TanDrunkScaleY, TanDrunkAngleX, TanDrunkAngleY, TanTipsyAngleX, TanTipsyAngleY, TanTipsyScaleX, TanTipsyScaleY, TanDrunkSkewX, TanDrunkSkewY.
 Added 'displayName' variable and 'hideIfBaseValue' variable to all modifiers. This also means some modifiers will now be properly hidden when at their default values such as Speed or Zoom modifiers.
 Fixed TipsyAngleY and TipsyAngleX.
 '3D' modifier now made a utility mod (no longer shows up by default in debug).
 Minor modifier tweaks (Asymptote, Zigzag, Wavey).
 Circ modifier now uses 'invertForDad' correctly.
 Fixed color tint modifiers not working (notesRed, strumsBlue, etc modifiers).
+Added repeat(ease, times), elastic(damp, count), slice(ease, from, to), back(overshoot) ease modifiers from Kade's modchart engine.
+Eases are now no longer case sensitive.
+Added an 'aux' function to lua that allows you to create an auxiliary modifier that controls other modifiers.
 
 
 

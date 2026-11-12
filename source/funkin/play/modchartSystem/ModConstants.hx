@@ -525,6 +525,12 @@ class ModConstants
     // AttenuateX
     modName = StringTools.replace(modName, "attenuatex", "attenuate");
 
+    // Digital
+    modName = StringTools.replace(modName, "digitalx", "digital");
+
+    // Grid / snap
+    modName = StringTools.replace(modName, "grid", "snap");
+
     // 3D
     modName = StringTools.replace(modName, "threed", "3d");
     modName = StringTools.replace(modName, "3drenderer", "3d");
@@ -630,57 +636,12 @@ class ModConstants
     return arr;
   }
 
-  // Input an ease and this function will return the same ease but flipped horizontally (meaning it'll start at 100% instead of 0%)
-
-  public static function easeFlip(ease:Float->Float):Float->Float
-  {
-    return function(t):Float
-    {
-      return 1.0 - ease(t);
-    }
-  }
-
-  // Input two eases and this function will return the result of having the first ease be the first halve, and the second ease be the second halve.
-
-  public static function easeMerge(firstEase:Float->Float, secondEase:Float->Float):Float->Float
-  {
-    return function(t):Float
-    {
-      return (t < 0.5 ? firstEase(t * 2) * 0.5 : secondEase(t * 2 - 1) * 0.5 + 0.5);
-    }
-  }
-
-  // Input two eases and this function will return the result of the two eases lerped together using t (%) as the ratio
-
-  public static function easeLerp(firstEase:Float->Float, secondEase:Float->Float):Float->Float
-  {
-    return function(t):Float
-    {
-      return FlxMath.lerp(firstEase(t), secondEase(t), t);
-    }
-  }
-
-  // the default mixfactor math to use for the easeBlend function
-
-  public static function easeBlendMixFactor(x:Float):Float
-  {
-    return 3 * Math.pow(x, 2) - 2 * (Math.pow(x, 3));
-  }
-
-  // Uses the same math Mirin Template uses for it's blendease function.
-  // Can also input a custom mixFactor method (optional)
-
-  public static function easeBlend(firstEase:Float->Float, secondEase:Float->Float, mixFactorFunc:Null<Float->Float> = null):Float->Float
-  {
-    return function(x:Float):Float
-    {
-      var mixFactor:Float = mixFactorFunc == null ? easeBlendMixFactor(x) : mixFactorFunc(x); // if mixFactorFunc is null, use the default method
-      return (1 - mixFactor) * firstEase(x) + mixFactor * secondEase(x);
-    }
-  }
-
-  // a function that returns [inputStr] but removes the first occurance of [whatToRemove]
-
+  /**
+   * A function that returns [inputStr] but removes the first occurance of [whatToRemove]
+   * @param inputStr The input string.
+   * @param whatToRemove Will remove this from the inputStr at the first occurance.
+   * @return The modified inputStr.
+   */
   public static function stringRemoveFirst(inputStr:String, whatToRemove:String):String
   {
     var iStart = inputStr.indexOf(whatToRemove);
@@ -700,12 +661,17 @@ class ModConstants
     return result;
   }
 
-  // A function that converts a string to an ease function.
-
+  /**
+   * A function that converts a string to an ease function.
+   * @param str The input string.
+   * @return The ease function.
+   */
   public static function getEaseFromString(str:String = "linear"):Null<Float->Float>
   {
-    // v0.9a
-    // Checking to see if the ease we are inputting needs to be modified in any way (like flip(inSine) or easeBlend(inBack, outQuad))
+    // Remove all spaces.
+    str = StringTools.replace(str, " ", "");
+
+    // Checking to see if the ease we are inputting needs to be modified in any way (like flip(inSine) or easeBlend(inBack, outQuad)). Added in v0.9.0a
     if (StringTools.contains(str, "flip("))
     {
       var str = stringRemoveFirst(str, "flip(");
@@ -713,11 +679,11 @@ class ModConstants
       var ease = getEaseFromString(str);
       if (ease == null)
       {
-        PlayState.instance.modDebugNotif("'" + str + "' ease not valid! Defaulting to linear.", FlxColor.ORANGE);
-        return return FlxEase.linear;
+        PlayState.instance.modDebugNotif("'" + str + "' ease not valid for flip()! Defaulting to linear.", FlxColor.ORANGE);
+        ease = FlxEase.linear;
       }
 
-      return easeFlip(ease);
+      return HazardEase.easeFlip(ease);
     }
 
     if (StringTools.contains(str, "blend("))
@@ -729,7 +695,7 @@ class ModConstants
       strSplit = str.split(',');
       var ease1 = getEaseFromString(strSplit[0]);
       var ease2 = getEaseFromString(strSplit[1]);
-      return easeBlend(ease1, ease2);
+      return HazardEase.easeBlend(ease1, ease2);
     }
 
     if (StringTools.contains(str, "lerp("))
@@ -741,7 +707,7 @@ class ModConstants
       strSplit = str.split(',');
       var ease1 = getEaseFromString(strSplit[0]);
       var ease2 = getEaseFromString(strSplit[1]);
-      return easeLerp(ease1, ease2);
+      return HazardEase.easeLerp(ease1, ease2);
     }
 
     if (StringTools.contains(str, "merge("))
@@ -753,10 +719,54 @@ class ModConstants
       strSplit = str.split(',');
       var ease1 = getEaseFromString(strSplit[0]);
       var ease2 = getEaseFromString(strSplit[1]);
-      return easeMerge(ease1, ease2);
+      return HazardEase.easeMerge(ease1, ease2);
     }
 
-    //
+    // Kade's modchart engine constructors. Added in v1.1.3
+    if (StringTools.contains(str, "elastic("))
+    {
+      var strSplit = str.split('elastic(');
+      str = strSplit[1];
+      strSplit = str.split(')');
+      str = strSplit[0];
+      strSplit = str.split(',');
+      var damp = Std.parseFloat(strSplit[0]);
+      var count = Std.parseFloat(strSplit[1]);
+      return HazardEase.elastic(damp, count);
+    }
+
+    if (StringTools.contains(str, "repeat("))
+    {
+      var strSplit = str.split('repeat(');
+      str = strSplit[1];
+      strSplit = str.split(')');
+      str = strSplit[0];
+      strSplit = str.split(',');
+      var ease = getEaseFromString(strSplit[0]);
+      var count = Std.parseFloat(strSplit[1]);
+      return HazardEase.repeat(ease, count);
+    }
+
+    if (StringTools.contains(str, "back("))
+    {
+      var str = stringRemoveFirst(str, "back(");
+      str = stringRemoveFirst(str, ")");
+      var overshoot = Std.parseFloat(str);
+      return HazardEase.back(overshoot);
+    }
+
+    if (StringTools.contains(str, "slice("))
+    {
+      var strSplit = str.split('slice(');
+      str = strSplit[1];
+      strSplit = str.split(')');
+      str = strSplit[0];
+      strSplit = str.split(',');
+      var ease = getEaseFromString(strSplit[0]);
+      var start = Std.parseFloat(strSplit[1]);
+      var end = Std.parseFloat(strSplit[2]);
+      return HazardEase.slice(ease, start, end);
+    }
 
     // Custom eases stored in event handler
     // check for custom ease:
@@ -772,6 +782,9 @@ class ModConstants
     // dumb fix for reflect not seeing the default flxease stuff in the new hazardease class
     switch (str)
     {
+      case "arc": // alias for bounce ease
+        return HazardEase.bounce;
+
       case "linear":
         return FlxEase.linear;
 
@@ -1518,6 +1531,10 @@ class ModConstants
         newMod = new TanDrunkScaleYMod(tag);
       case "tandrunkscale":
         newMod = new TanDrunkScaleMod(tag);
+      case "tandrunkskewx":
+        newMod = new TanDrunkSkewXMod(tag);
+      case "tandrunkskewy":
+        newMod = new TanDrunkSkewYMod(tag);
 
       // tipsy mods
       case "tipsyx":
@@ -1532,14 +1549,14 @@ class ModConstants
         newMod = new TipsyAngleYMod(tag);
       case "tipsyangle":
         newMod = new TipsyAngleMod(tag);
-      case "tipsyskewx":
-        newMod = new TipsySkewXMod(tag);
       case "tipsyscale":
         newMod = new TipsyScaleMod(tag);
       case "tipsyscaley":
         newMod = new TipsyScaleYMod(tag);
       case "tipsyscalex":
         newMod = new TipsyScaleXMod(tag);
+      case "tipsyskewx":
+        newMod = new TipsySkewXMod(tag);
       case "tipsyskewy":
         newMod = new TipsySkewYMod(tag);
 
@@ -1557,6 +1574,10 @@ class ModConstants
         newMod = new TanTipsyAngleMod(tag);
       case "tantipsyscale":
         newMod = new TanTipsyScaleMod(tag);
+      case "tantipsyscalex":
+        newMod = new TanTipsyScaleXMod(tag);
+      case "tantipsyscaley":
+        newMod = new TanTipsyScaleYMod(tag);
       case "tantipsyskewx":
         newMod = new TanTipsySkewXMod(tag);
       case "tantipsyskewy":
@@ -1797,7 +1818,7 @@ class ModConstants
         newMod = new SquareAngleYMod(tag);
 
       // digital mods
-      case "digital" | "digitalx":
+      case "digital":
         newMod = new DigitalXMod(tag);
       case "digitaly":
         newMod = new DigitalYMod(tag);
@@ -1954,9 +1975,9 @@ class ModConstants
       case "tanbumpyscale":
         newMod = new TanBumpyScaleMod(tag);
       case "tanbumpyscalex":
-        newMod = new TanBumpyScaleMod(tag);
+        newMod = new TanBumpyScaleXMod(tag);
       case "tanbumpyscaley":
-        newMod = new TanBumpyScaleMod(tag);
+        newMod = new TanBumpyScaleYMod(tag);
       case "tanbumpyskewx":
         newMod = new TanBumpySkewXMod(tag);
       case "tanbumpyskewy":
@@ -2169,7 +2190,6 @@ class ModConstants
         newMod = new TanWaveyAngleYMod(tag);
       case "tanwaveyanglex":
         newMod = new TanWaveyAngleXMod(tag);
-
       case "tanwaveyscaley":
         newMod = new TanWaveyScaleYMod(tag);
       case "tanwaveyscalex":

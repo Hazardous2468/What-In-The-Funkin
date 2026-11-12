@@ -46,6 +46,11 @@ import funkin.mobile.ui.FunkinHitbox.FunkinHitboxControlSchemes;
 class Strumline extends FlxSpriteGroup
 {
   /**
+   * The ID of this strumLine. 1 is BF, 2 is opponent, above is custom playfields.
+   */
+  public var playerID:Int = 0;
+
+  /**
    * The directions of the notes on the strumline, in order.
    */
   public static final DIRECTIONS:Array<NoteDirection> = [NoteDirection.LEFT, NoteDirection.DOWN, NoteDirection.UP, NoteDirection.RIGHT];

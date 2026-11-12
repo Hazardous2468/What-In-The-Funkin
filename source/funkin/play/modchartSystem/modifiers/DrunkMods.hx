@@ -636,3 +636,59 @@ class TanDrunkScaleXMod extends DrunkModBase
     }
   }
 }
+
+class TanDrunkSkewXMod extends DrunkModBase
+{
+  public function new(name:String)
+  {
+    super(name);
+    displayName = "TanDrunkSkewX";
+  }
+
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
+  {
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return; // skip math if mod is 0
+    data.skewX += tanDrunkMath(data.direction, data.curPos);
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (currentValue == 0 || data.inOrientPass)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = tanDrunkMath(data.direction, data.curPos);
+      data.skewX += strumResult[data.direction];
+    }
+  }
+}
+
+class TanDrunkSkewYMod extends DrunkModBase
+{
+  public function new(name:String)
+  {
+    super(name);
+    displayName = "TanDrunkSkewY";
+  }
+
+  override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
+  {
+    if (currentValue == 0 || data.noteType == "receptor" || data.inOrientPass) return; // skip math if mod is 0
+    data.skewY += tanDrunkMath(data.direction, data.curPos);
+  }
+
+  override function strumMath(data:NoteData, strumLine:Strumline):Void
+  {
+    if (currentValue == 0 || data.inOrientPass)
+    {
+      strumResult[data.direction] = 0;
+    }
+    else
+    {
+      strumResult[data.direction] = tanDrunkMath(data.direction, data.curPos);
+      data.skewY += strumResult[data.direction];
+    }
+  }
+}

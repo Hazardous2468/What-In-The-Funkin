@@ -4,6 +4,7 @@ import llua.Lua;
 import llua.LuaL;
 import llua.State;
 import llua.Convert;
+import llua.LuaCallback;
 import flixel.FlxG;
 import flixel.util.FlxColor;
 import flixel.FlxSprite;
@@ -307,6 +308,122 @@ class HazardModLuaTest
     {
       return 'lerp(${ease1},${ease2})';
     });
+
+    Lua_helper.add_callback(lua, "back", function(overshoot:String):String
+    {
+      return 'back(${overshoot})';
+    });
+
+    Lua_helper.add_callback(lua, "elastic", function(damp:String, count:String):String
+    {
+      return 'elastic(${damp},${count})';
+    });
+
+    Lua_helper.add_callback(lua, "repeat", function(ease:String, count:String):String
+    {
+      return 'repeat(${ease},${count})';
+    });
+
+    Lua_helper.add_callback(lua, "easeBack", function(overshoot:String):String
+    {
+      return 'back(${overshoot})';
+    });
+
+    Lua_helper.add_callback(lua, "easeElastic", function(damp:String, count:String):String
+    {
+      return 'elastic(${damp},${count})';
+    });
+
+    Lua_helper.add_callback(lua, "easeRepeat", function(ease:String, count:String):String
+    {
+      return 'repeat(${ease},${count})';
+    });
+
+    Lua_helper.add_callback(lua, "slice", function(ease:String, from:String, to:String):String
+    {
+      return 'slice(${ease},${from},${to})';
+    });
+
+    Lua_helper.add_callback(lua, "easeSlice", function(ease:String, from:String, to:String):String
+    {
+      return 'slice(${ease},${from},${to})';
+    });
+
+    Lua_helper.add_callback(lua, "doAt", function(beat:Float, func:Dynamic, persist:Bool = false)
+    {
+      if (func == null) return;
+
+      var cb:LuaCallback = Std.isOfType(func, LuaCallback) ? cast func : null;
+      if (cb == null)
+      {
+        luaTrace("doAt: expected a Lua function", false, false, FlxColor.RED);
+        return;
+      }
+
+      var wrapper:Void->Void = function()
+      {
+        try
+        {
+          cb.call([]);
+        }
+        catch (e:Dynamic)
+        {
+          PlayState.instance.modDebugNotif("doAt error: " + e, FlxColor.RED);
+        }
+      };
+
+      PlayState.instance.modchartEventHandler.funcModEvent(ModConstants.grabStrumModTarget("bf"), beat, wrapper, null, persist);
+    });
+
+    // aux lua setup: aux(modName:String, function(modValue:Float, curBeat:Float, player:Int), playerTarget:Null<String> )
+    Lua_helper.add_callback(lua, "aux", function(modName:String, func:Dynamic, ?constant:Bool = false)
+    {
+      for (strummer in PlayState.instance.allStrumLines)
+      {
+        var aux = ModConstants.createNewCustomMod(modName, 0);
+        if (aux == null)
+        {
+          luaTrace("Could not create aux mod '" + modName + "'!", FlxColor.RED);
+        }
+        aux.unknown = false;
+        aux.strumsMod = false;
+        aux.notesMod = false;
+        aux.holdsMod = false;
+        aux.pathMod = false;
+        aux.specialMod = false;
+        aux.speedMod = false;
+        strummer.mods.addCustomMod(aux);
+        strummer.mods.resortMods();
+        var cb:LuaCallback = Std.isOfType(func, LuaCallback) ? cast func : null;
+        if (cb == null)
+        {
+          luaTrace("aux: expected a Lua function", false, false, FlxColor.RED);
+          return;
+        }
+        var previousValue:Float = aux.currentValue;
+        var f = function(elapsed:Float)
+        {
+          if (aux != null)
+          {
+            if (previousValue != aux.currentValue || constant)
+            {
+              #if FEATURE_WITF_USE_TIME_DELTA
+              var b:Float = ModConstants.getBeatPositionWithDelta();
+              #else
+              var b:Float = Conductor.instance?.currentBeatTime ?? 0.0;
+              #end
+
+              cb.call([aux.currentValue, b, strummer.playerID, previousValue]);
+              // func(aux.currentValue, b);
+              previousValue = aux.currentValue;
+            }
+          }
+        };
+        PlayState.instance.perframeFunctions.push(f);
+      }
+    });
+
+    Lua_helper.add_callback(lua, "setNow", setNowFunc_parser);
 
     Lua_helper.add_callback(lua, "tween", tweenFunc_parser);
     Lua_helper.add_callback(lua, "ease", tweenFunc_parser);
@@ -1402,6 +1519,65 @@ class HazardModLuaTest
       for (i in 0...modNames.length)
       {
         setDefaultFunc(modValues[i], modNames[i], t);
+      }
+    }
+  }
+
+  function setNowFunc_parser(modValue:Any, modName:Any, _playerTarget:Any = "all"):Void
+  {
+    var targets_raw:Any = _playerTarget;
+
+    var modArray:Bool = false;
+    if (Std.isOfType(modValue, Array))
+    {
+      // modName becomes playerTarget and _playerTarget is unused.
+      modArray = true;
+      targets_raw = modName;
+    }
+
+    var targets:Array<String> = formaterTargets(targets_raw);
+
+    var modValues:Array<Float> = [];
+    var modNames:Array<String> = [];
+    if (!modArray)
+    {
+      modValues = [modValue];
+      modNames = [modName];
+    }
+    else
+    {
+      var isName:Bool = false;
+      var modsInputArray:Array<String> = cast modValue;
+      for (i in modsInputArray)
+      {
+        if (isName) modNames.push(i);
+        else
+          modValues.push(Std.parseFloat(i));
+        isName = !isName;
+      }
+    }
+
+    for (t in targets)
+    {
+      for (i in 0...modNames.length)
+      {
+        var modName = ModConstants.modAliasCheck(modNames[i]);
+
+        if (t == "everyone" || t == "both" || t == "all")
+        {
+          for (strummer in PlayState.instance.allStrumLines)
+          {
+            if (!allTargetExlusions.contains(strummer))
+            {
+              PlayState.instance.modchartEventHandler.setModVal(strummer.mods, modName, modValues[i]);
+            }
+          }
+        }
+        else
+        {
+          var modsTarget = ModConstants.grabStrumModTarget(t);
+          PlayState.instance.modchartEventHandler.setModVal(modsTarget, modName, modValues[i]);
+        }
       }
     }
   }
