@@ -290,10 +290,10 @@ class SustainTrail extends ZSprite
       }
     }
 
-    flipY = Preferences.downscroll #if mobile || (
-      Preferences.controlsScheme == FunkinHitboxControlSchemes.Arrows
-      && !funkin.mobile.input.ControlsHandler.hasExternalInputDevice
-    ) #end;
+    flipY = Preferences.downscroll
+    #if mobile
+    || (Preferences.controlsScheme == FunkinHitboxControlSchemes.Arrows && !funkin.mobile.input.ControlsHandler.hasExternalInputDevice)
+    #end;
 
     // alpha = 0.6;
     alpha = 1.0;
@@ -1024,6 +1024,10 @@ class SustainTrail extends ZSprite
       this.hsvShader.stealthGlowBlue = fakeNote.stealthGlowBlue;
       this.hsvShader.stealthGlowGreen = fakeNote.stealthGlowGreen;
       this.hsvShader.stealthGlowRed = fakeNote.stealthGlowRed;
+
+      this.hsvShader.redMult = fakeNote.redMult;
+      this.hsvShader.blueMult = fakeNote.blueMult;
+      this.hsvShader.greenMult = fakeNote.greenMult;
     }
 
     // Top right

@@ -47,6 +47,9 @@ class ZSprite extends FunkinSkewedSprite
   // the white glow of stealth's BLUE color value
   public var stealthGlowBlue:Float;
   public var hueShift:Float;
+  public var redMult:Float = 1;
+  public var greenMult:Float = 1;
+  public var blueMult:Float = 1;
 
   public function new(?x:Float = 0, ?y:Float = 0, ?simpleGraphic:FlxGraphicAsset)
   {
@@ -57,6 +60,9 @@ class ZSprite extends FunkinSkewedSprite
     stealthGlowRed = 1.0;
     stealthGlowGreen = 1.0;
     stealthGlowBlue = 1.0;
+    redMult = 1.0;
+    greenMult = 1.0;
+    blueMult = 1.0;
   }
 
   // Offset the perspective math center by this amount!
@@ -164,9 +170,13 @@ class ZSprite extends FunkinSkewedSprite
     this.skew.x = data.skewX;
     this.skew.y = data.skewY;
 
-    this.color.redFloat = data.red;
-    this.color.greenFloat = data.green;
-    this.color.blueFloat = data.blue;
+    this.redMult = data.red;
+    this.greenMult = data.green;
+    this.blueMult = data.blue;
+
+    // this.color.redFloat = data.red;
+    // this.color.greenFloat = data.green;
+    // this.color.blueFloat = data.blue;
 
     this.hueShift = data.hueShift;
 

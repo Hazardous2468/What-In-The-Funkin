@@ -831,17 +831,25 @@ class Strumline extends FlxSpriteGroup
       // if (modVal == 0 && hideZeroValueMods && !debugShowALL) continue;
       // if (mod.currentValue == mod.baseValue && hideZeroValueMods && !debugShowALL) continue;
 
-      if (mod.hideIfBaseValue && modVal == mod.baseValue && hideZeroValueMods && !debugShowALL) continue;
+      if (mod.hideIfBaseValue && modVal == mod.defaultBaseValue && hideZeroValueMods && !debugShowALL) continue;
 
       if (usePercentage) modVal *= 100;
 
       if (mod.utility && debugHideUtil && !debugShowALL) continue;
-      if (StringTools.contains(mod.tag, "--") && debugHideLane && !debugShowALL) continue;
+      var isLaneMod:Bool = StringTools.contains(mod.tag, "--");
+      if (isLaneMod && debugHideLane && !debugShowALL) continue;
 
       var displayName:String = mod.displayName;
       if (displayName == "")
       {
         displayName = mod.tag;
+      }
+      else
+      {
+        if (isLaneMod)
+        {
+          displayName += "--" + mod.targetLane;
+        }
       }
 
       newString += "\n";

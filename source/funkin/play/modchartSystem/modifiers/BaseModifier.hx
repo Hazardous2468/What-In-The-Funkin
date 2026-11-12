@@ -284,9 +284,16 @@ class Modifier
   public var displayName:String = "";
 
   /**
-   * If true, this modifier is hidden (in the strum mods debug text) if the currentValue is the same as baseValue.
+   * If true, this modifier is hidden (in the strum mods debug text) if the currentValue is the same as defaultBaseValue.
    */
   public var hideIfBaseValue:Bool = true;
+
+  /**
+   * The base / starting value of this modifier.
+   * Unlike the 'baseValue', this one is used to determine when a modifier should be hidden or not.
+   * In simple terms: It isn't affected by setDefault.
+   */
+  public var defaultBaseValue:Float = 0;
 
   /**
    * The base / starting value of this modifier.
@@ -370,8 +377,11 @@ class Modifier
     }
   }
 
-  // easy helper function for setting subValues. Kind of obsolete now.
-
+  /**
+   * Easy helper function for setting subValues. Kind of obsolete now.
+   * @param name  The name/ID of the subModifier.
+   * @param newValue  The value the subModifier should be set to.
+   */
   public function setSubVal(name:String, newval:Float):Void
   {
     if (name == "priority")
@@ -393,11 +403,20 @@ class Modifier
     }
   }
 
+  /**
+   * Sets the 'currentValue' variable. kinda useless with the custom setter for currentValue
+   * @param newValue  The value the variable should be set to.
+   */
   public function setVal(newValue:Float):Void
   {
     currentValue = newValue;
   }
 
+  /**
+   * Sets the 'currentValue' variable. kinda useless with the custom setter for currentValue
+   * @param name  The name/ID of the subModifier.
+   * @param newValue  The value the 'baseValue' should be set to.
+   */
   public function setDefaultSubVal(name:String, newValue:Float):Void
   {
     if (name == "priority")
@@ -417,9 +436,31 @@ class Modifier
     }
   }
 
-  public function setDefaultVal(newValue:Float):Void
+  /**
+   * Sets the default 'baseValue' variable.
+   * @param newValue  The value the variable should be set to.
+   * @param overrideDefault  If true, will also change the 'defaultBaseValue'. Set to false for stuff like setDefault from lua.
+   * @return The new value of baseValue.
+   */
+  public function setBaseValue(newValue:Float, overrideDefault:Bool = true):Float
   {
     baseValue = newValue;
+    if (overrideDefault)
+    {
+      defaultBaseValue = newValue;
+    }
+    return baseValue;
+  }
+
+  /**
+   * Alias for setBaseValue for legacy support
+   * @param newValue  The value the variable should be set to.
+   * @param overrideDefault  If true, will also change the 'defaultBaseValue'. Set to false for stuff like setDefault from lua.
+   * @return The new value of baseValue.
+   */
+  public function setDefaultVal(newValue:Float, overrideDefault:Bool = false):Void
+  {
+    setBaseValue(newValue, overrideDefault);
   }
 
   /**

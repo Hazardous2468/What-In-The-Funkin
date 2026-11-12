@@ -476,6 +476,27 @@ class ModConstants
     // Blacksphere
     modName = StringTools.replace(modName, "blacksphere_flip", "blacksphereflip");
 
+    // Tint modifiers
+    modName = StringTools.replace(modName, "tintstrumred", "strumred");
+    modName = StringTools.replace(modName, "tintstrumgreen", "strumgreen");
+    modName = StringTools.replace(modName, "tintstrumblue", "strumblue");
+    modName = StringTools.replace(modName, "tintstrumsred", "strumred");
+    modName = StringTools.replace(modName, "tintstrumsgreen", "strumgreen");
+    modName = StringTools.replace(modName, "tintstrumsblue", "strumblue");
+    modName = StringTools.replace(modName, "strumsred", "strumred");
+    modName = StringTools.replace(modName, "strumsgreen", "strumgreen");
+    modName = StringTools.replace(modName, "strumsblue", "strumblue");
+
+    modName = StringTools.replace(modName, "tintnotered", "notered");
+    modName = StringTools.replace(modName, "tintnotegreen", "notegreen");
+    modName = StringTools.replace(modName, "tintnoteblue", "noteblue");
+    modName = StringTools.replace(modName, "tintnotesred", "notered");
+    modName = StringTools.replace(modName, "tintnotesgreen", "notegreen");
+    modName = StringTools.replace(modName, "tintnotesblue", "noteblue");
+    modName = StringTools.replace(modName, "notesred", "notered");
+    modName = StringTools.replace(modName, "notesgreen", "notegreen");
+    modName = StringTools.replace(modName, "notesblue", "noteblue");
+
     // Alpha
     modName = StringTools.replace(modName, "alphanotes", "alphanote");
     modName = StringTools.replace(modName, "alphaholds", "alphahold");

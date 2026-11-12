@@ -11,6 +11,8 @@ class RedNotesColMod extends Modifier
     super(name);
     modPriority = -2;
     displayName = "TintNotesRed";
+    this.setBaseValue(1, true);
+    this.currentValue = 1;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -30,6 +32,8 @@ class GreenNotesColMod extends Modifier
     super(name);
     modPriority = -3;
     displayName = "TintNotesGreen";
+    this.setBaseValue(1, true);
+    this.currentValue = 1;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -48,6 +52,8 @@ class BlueNotesColMod extends Modifier
   {
     super(name);
     modPriority = -4;
+    this.setBaseValue(1, true);
+    this.currentValue = 1;
     displayName = "TintNotesBlue";
   }
 
@@ -70,6 +76,8 @@ class RedStrumColMod extends Modifier
     unknown = false;
     strumsMod = true;
     displayName = "TintStrumsRed";
+    this.setBaseValue(1, true);
+    this.currentValue = 1;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -88,6 +96,8 @@ class GreenStrumColMod extends Modifier
     modPriority = -3;
     unknown = false;
     strumsMod = true;
+    this.setBaseValue(1, true);
+    this.currentValue = 1;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -106,6 +116,8 @@ class BlueStrumColMod extends Modifier
     modPriority = -4;
     unknown = false;
     strumsMod = true;
+    this.setBaseValue(1, true);
+    this.currentValue = 1;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void

@@ -19,7 +19,7 @@ class SpeedMod extends Modifier
     unknown = false;
     speedMod = true;
 
-    this.baseValue = 1;
+    this.setBaseValue(1, true);
     this.currentValue = 1;
     displayName = "SpeedMultiplier";
   }

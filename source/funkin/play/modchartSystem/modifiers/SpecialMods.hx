@@ -17,7 +17,8 @@ class SinClip extends Modifier
     unknown = false;
     specialMod = true;
     modPriority = 500;
-    baseValue = 1;
+    this.setBaseValue(1, true);
+    this.currentValue = 1;
     displayName = "SinClip";
   }
 
@@ -35,7 +36,8 @@ class CosClip extends Modifier
     unknown = false;
     specialMod = true;
     modPriority = 500;
-    baseValue = 1;
+    this.setBaseValue(1, true);
+    this.currentValue = 1;
     displayName = "CosClip";
   }
 

@@ -26,7 +26,6 @@ class NoteSprite extends ZSpriteProjected
 
   // The Hue, Saturation, Value Shader attached to this note sprites. Mainly used for quant coloured note styles
   public var hsvShader:HSVNotesShader;
-
   // Multiplies the hitWindow size by this amount. Unused if FEATURE_WITF_INPUTS is enabled.
   public var hitWindowMultiplier:Float = 1;
 
@@ -228,11 +227,7 @@ class NoteSprite extends ZSpriteProjected
     noteStyleName = noteStyle.id;
 
     this.shader = hsvShader;
-    stealthGlow = 0.0;
-    stealthGlowBlue = 1.0;
-    stealthGlowGreen = 1.0;
-    stealthGlowRed = 1.0;
-    updateStealthGlow();
+    resetStealthGlow(false);
 
     targetScale = this.scale.x;
 
@@ -324,22 +319,30 @@ class NoteSprite extends ZSpriteProjected
   }
 
   // call this to reset stealthGlow back to default values
+
   public function resetStealthGlow(skipUpdate:Bool = false):Void
   {
     this.stealthGlow = 0.0;
     this.stealthGlowBlue = 1.0;
     this.stealthGlowGreen = 1.0;
     this.stealthGlowRed = 1.0;
+    this.redMult = 1.0;
+    this.greenMult = 1.0;
+    this.blueMult = 1.0;
     if (!skipUpdate) updateStealthGlow();
   }
 
   // call this to update the stealthglow on the hsv shader
+
   public function updateStealthGlow():Void
   {
     this.hsvShader.stealthGlow = stealthGlow;
     this.hsvShader.stealthGlowBlue = stealthGlowBlue;
     this.hsvShader.stealthGlowGreen = stealthGlowGreen;
     this.hsvShader.stealthGlowRed = stealthGlowRed;
+    this.hsvShader.redMult = redMult;
+    this.hsvShader.blueMult = blueMult;
+    this.hsvShader.greenMult = greenMult;
   }
 
   override public function kill():Void

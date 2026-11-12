@@ -542,7 +542,7 @@ class ZoomModifier extends RotateModBase
     // Apply AFTER pixel move mods to avoid breaking
     modPriority = -9999;
     modPriority -= 10;
-    this.baseValue = 1;
+    this.setBaseValue(1, true);
     this.currentValue = 1;
     notPercentage = false;
     typeSubmod = createSubMod("type", 1.0, ["variant", "mode", "scale2"]);

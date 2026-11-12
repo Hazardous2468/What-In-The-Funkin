@@ -79,6 +79,9 @@ class StrumlineNote extends ZSpriteProjected
 
     this.direction = direction;
 
+    this.hsvShader = new HSVNotesShader();
+    this.shader = hsvShader;
+
     noteStyleName = noteStyle.id;
     setup(noteStyle);
 
@@ -90,10 +93,6 @@ class StrumlineNote extends ZSpriteProjected
 
     noteModData = new NoteData();
     strumExtraModData = new StrumExtraData(this);
-
-    this.hsvShader = new HSVNotesShader();
-    this.shader = hsvShader;
-    updateStealthGlow();
 
     this.applyAngularVelocityOffset = true;
   }
@@ -115,22 +114,30 @@ class StrumlineNote extends ZSpriteProjected
   }
 
   // call this to reset stealthGlow back to default values
+
   public function resetStealthGlow(skipUpdate:Bool = false):Void
   {
     this.stealthGlow = 0.0;
     this.stealthGlowBlue = 1.0;
     this.stealthGlowGreen = 1.0;
     this.stealthGlowRed = 1.0;
+    this.redMult = 1.0;
+    this.greenMult = 1.0;
+    this.blueMult = 1.0;
     if (!skipUpdate) updateStealthGlow();
   }
 
   // call this to update the stealthglow on the hsv shader
+
   public function updateStealthGlow():Void
   {
     this.hsvShader.stealthGlow = stealthGlow;
     this.hsvShader.stealthGlowBlue = stealthGlowBlue;
     this.hsvShader.stealthGlowGreen = stealthGlowGreen;
     this.hsvShader.stealthGlowRed = stealthGlowRed;
+    this.hsvShader.redMult = redMult;
+    this.hsvShader.blueMult = blueMult;
+    this.hsvShader.greenMult = greenMult;
   }
 
   function onAnimationFrame(name:String, frameNumber:Int, frameIndex:Int):Void
@@ -188,6 +195,7 @@ class StrumlineNote extends ZSpriteProjected
 
     this.playStatic();
     targetScale = this.scale.x;
+    resetStealthGlow();
   }
 
   public function playAnimation(name:String = 'static', force:Bool = false, reversed:Bool = false, startFrame:Int = 0):Void

@@ -2,6 +2,33 @@ package funkin.graphics.shaders;
 
 class HSVNotesShader extends HSVShader
 {
+  public var redMult(default, set):Float = 1;
+
+  function set_redMult(value:Float):Float
+  {
+    this.setFloat('_redMult', value);
+    this.redMult = value;
+    return this.redMult;
+  }
+
+  public var greenMult(default, set):Float = 1;
+
+  function set_greenMult(value:Float):Float
+  {
+    this.setFloat('_greenMult', value);
+    this.greenMult = value;
+    return this.greenMult;
+  }
+
+  public var blueMult(default, set):Float = 1;
+
+  function set_blueMult(value:Float):Float
+  {
+    this.setFloat('_blueMult', value);
+    this.blueMult = value;
+    return this.blueMult;
+  }
+
   public var stealthGlow(default, set):Float;
   public var stealthGlowRed(default, set):Float;
   public var stealthGlowGreen(default, set):Float;
@@ -45,6 +72,10 @@ class HSVNotesShader extends HSVShader
     hue2 = 0;
     saturation2 = 1;
     value2 = 1;
+
+    redMult = 1;
+    greenMult = 1;
+    blueMult = 1;
 
     stealthGlow = g;
 
