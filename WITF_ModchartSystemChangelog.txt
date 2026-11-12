@@ -8,6 +8,7 @@ Fixed TipsyAngleY and TipsyAngleX.
 '3D' modifier now made a utility mod (no longer shows up by default in debug).
 Minor modifier tweaks (Asymptote, Zigzag, Wavey).
 Circ modifier now uses 'invertForDad' correctly.
+Fixed color tint modifiers not working (notesRed, strumsBlue, etc modifiers).
 
 
 
