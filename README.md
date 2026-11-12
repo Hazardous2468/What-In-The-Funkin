@@ -16,7 +16,7 @@ Do note that the aim of this fork is strictly focused on modcharting, it doesn't
 
 # What does it have?
 
-Z Axis (3D) stuff, Arrowpath stuff, fancy holds, errr
+Z Axis (3D) stuff, Arrowpath stuff, fancy holds, and more
 
 ![](https://github.com/Hazardous2468/Funkin_Hazard-Modcharting-Fork/blob/main/docs/example1.gif)
 
@@ -44,8 +44,4 @@ Useful debugging stuff to aid in modchart creation
 
 
 
-
-
-
-Note: If you're trying to compile the code yourself, you might need to grab the arrowpath image from a stable release to put into the assets folder (cuz idk how to modify assets folder here lol)
 
