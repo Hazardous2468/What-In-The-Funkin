@@ -544,7 +544,7 @@ class Strumline extends FlxSpriteGroup
 
     if (this.txtActiveMods == null)
     {
-      this.txtActiveMods = new FlxBitmapText(this.x, this.y, 'wtf', Paths.getFlxBitmapFontFromAngelCode("fonts/vcr", "preload"));
+      this.txtActiveMods = new FlxBitmapText(this.x, this.y, '???', Paths.getFlxBitmapFontFromAngelCode("fonts/vcr", "preload"));
       this.txtActiveMods.borderStyle = FlxTextBorderStyle.OUTLINE;
       this.txtActiveMods.borderColor = FlxColor.BLACK;
       this.txtActiveMods.alignment = FlxTextAlign.CENTER;
@@ -720,14 +720,17 @@ class Strumline extends FlxSpriteGroup
       note.y = ModConstants.holdNoteJankY;
 
       note.visible = drawArrowPaths;
-      // note.alpha = arrowPathAlpha[note.noteDirection];
       var whichStrumNote:StrumlineNote = getByIndex(note.noteDirection);
       note.alpha = whichStrumNote?.strumExtraModData?.arrowPathAlpha ?? 0;
-      // ay -= whichStrumNote.strumExtraModData.alphaHoldCoverMod;
       var length:Float = (whichStrumNote.strumExtraModData.arrowpathLength + whichStrumNote.strumExtraModData.arrowpathBackwardsLength) / (pathPieces);
       note.fullSustainLength = note.sustainLength = length;
 
-      note.strumTime = ModConstants.getSongPosition();
+      #if FEATURE_WITF_USE_TIME_DELTA
+      note.strumTime = conductorInUse?.getTimeWithDelta() ?? 0;
+      #else
+      note.strumTime = conductorInUse?.songPosition ?? 0;
+      #end
+
       note.strumTime -= whichStrumNote?.strumExtraModData?.arrowpathBackwardsLength ?? 0;
       note.strumTime += length * note.piece;
       if (!doUpdateClipsInDraw)

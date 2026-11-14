@@ -53,9 +53,20 @@ import flixel.math.FlxMath;
  */
 class HazardEase extends FlxEase
 {
+  /**
+   * A function that converts a string to an ease function.
+   * @param str The input string.
+   * @return The ease function.
+   */
+  public static function getEaseFromString(str:String = "linear"):Null<Float->Float>
+  {
+    return ModConstants.getEaseFromString(str);
+  }
+
   // EASE MODIFIERS
   // Uses the same math Mirin Template uses for it's blendease function.
   // Can also input a custom mixFactor method (optional)
+
   public static function easeBlend(firstEase:Float->Float, secondEase:Float->Float, mixFactorFunc:Null<Float->Float> = null):Float->Float
   {
     return function(x:Float):Float

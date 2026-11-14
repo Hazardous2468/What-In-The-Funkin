@@ -6,6 +6,8 @@ import llua.LuaL;
 import llua.Macro.*;
 import haxe.DynamicAccess;
 
+// Modified version that fixes a silly bug on line 182 to make lua callbacks work properly.
+
 class Convert
 {
   /**
