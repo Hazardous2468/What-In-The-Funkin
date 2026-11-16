@@ -64,9 +64,11 @@ class HazardEase extends FlxEase
   }
 
   // EASE MODIFIERS
-  // Uses the same math Mirin Template uses for it's blendease function.
-  // Can also input a custom mixFactor method (optional)
 
+  /**
+   * Uses the same math Mirin Template uses for it's blendease function.
+   * Can also input a custom mixFactor method (optional)
+   */
   public static function easeBlend(firstEase:Float->Float, secondEase:Float->Float, mixFactorFunc:Null<Float->Float> = null):Float->Float
   {
     return function(x:Float):Float
@@ -76,15 +78,17 @@ class HazardEase extends FlxEase
     }
   }
 
-  // the default mixfactor math to use for the easeBlend function
-
+  /**
+   * the default mixfactor math to use for the easeBlend function
+   */
   public static function easeBlendMixFactor(x:Float):Float
   {
     return 3 * Math.pow(x, 2) - 2 * (Math.pow(x, 3));
   }
 
-  // Input two eases and this function will return the result of the two eases lerped together using t (%) as the ratio
-
+  /**
+   * Input two eases and this function will return the result of the two eases lerped together using t (%) as the ratio
+   */
   public static function easeLerp(firstEase:Float->Float, secondEase:Float->Float):Float->Float
   {
     return function(t):Float
@@ -93,8 +97,9 @@ class HazardEase extends FlxEase
     }
   }
 
-  // Input two eases and this function will return the result of having the first ease be the first halve, and the second ease be the second halve.
-
+  /**
+   * Input two eases and this function will return the result of having the first ease be the first halve, and the second ease be the second halve.
+   */
   public static function easeMerge(firstEase:Float->Float, secondEase:Float->Float):Float->Float
   {
     return function(t):Float
@@ -103,8 +108,9 @@ class HazardEase extends FlxEase
     }
   }
 
-  // Input an ease and this function will return the same ease but flipped horizontally (meaning it'll start at 100% instead of 0%)
-
+  /**
+   * Input an ease and this function will return the same ease but flipped horizontally (meaning it'll start at 100% instead of 0%)
+   */
   public static function easeFlip(ease:Float->Float):Float->Float
   {
     return function(t):Float
@@ -113,9 +119,38 @@ class HazardEase extends FlxEase
     }
   }
 
+  /**
+   * Takes in two eases. The second ease modifies the time value for the first ease.
+   */
+  public static function easeWarp(easeA:Float->Float, easeB:Float->Float):Float->Float
+  {
+    return function(t):Float
+    {
+      return easeA(easeB(t));
+    }
+  }
+
+  /**
+   * Will make the ease reverse backwards to it's starting point once it is finished.
+   */
+  public static function easeReturn(ease:Float->Float):Float->Float
+  {
+    return function(t):Float
+    {
+      if (t >= 0.5)
+      {
+        return ease(1.0 - ((t - 0.5) * 2));
+      }
+      else
+      {
+        return ease(t * 2);
+      }
+    }
+  }
+
   // From Kade's Modchart Engine ease modifiers / constructors
 
-  public static function back(overshoot:Float):Float->Float
+  public static function easeBack(overshoot:Float):Float->Float
   {
     return function(t:Float)
     {
@@ -124,7 +159,7 @@ class HazardEase extends FlxEase
     };
   }
 
-  public static function elastic(damp:Float, count:Float):Float->Float
+  public static function easeElastic(damp:Float, count:Float):Float->Float
   {
     return function(t:Float)
     {
@@ -140,7 +175,7 @@ class HazardEase extends FlxEase
     };
   }
 
-  public static function slice(c:Float->Float, from:Float, to:Float):Float->Float
+  public static function easeSlice(c:Float->Float, from:Float, to:Float):Float->Float
   {
     return function(t:Float)
     {
@@ -148,7 +183,7 @@ class HazardEase extends FlxEase
     };
   }
 
-  public static function repeat(c:Float->Float, times:Float):Float->Float
+  public static function easeRepeat(c:Float->Float, times:Float):Float->Float
   {
     return function(t:Float)
     {

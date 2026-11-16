@@ -32,6 +32,7 @@ class LevelRegistry extends BaseRegistry<Level, LevelData, LevelEntryParams> imp
     // because the auto-generated method spits out values in alphabetical order.
     return [
       'tutorial',
+      'witf_tutorial',
       'week1',
       'week2',
       'week3',

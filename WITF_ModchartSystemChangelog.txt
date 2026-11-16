@@ -9,9 +9,10 @@ Fixed TipsyAngleY and TipsyAngleX.
 Minor modifier tweaks (Asymptote, Zigzag, Wavey).
 Circ modifier now uses 'invertForDad' correctly.
 Fixed color tint modifiers not working (notesRed, strumsBlue, etc modifiers).
-Added repeat(ease, times), elastic(damp, count), slice(ease, from, to), back(overshoot) ease modifiers from Kade's modchart engine.
+Added 'warp(easeA, easeB)' and 'return(ease)' ease modifiers. Also ported 'repeat(ease, times)', 'elastic(damp, count)', 'slice(ease, from, to)', and 'back(overshoot)' ease modifiers from Kade's modchart engine.
 Eases are now no longer case sensitive.
 Added an 'aux' function to lua that allows you to create an auxiliary modifier that controls other modifiers.
+Updated albumRolls for some songs.
 
 
 

@@ -661,13 +661,24 @@ class ModConstants
     return result;
   }
 
+  private static function displayWarning(txt:String)
+  {
+    trace(txt);
+    if (PlayState.instance != null)
+    {
+      PlayState.instance.modDebugNotif(txt, FlxColor.ORANGE);
+    }
+  }
+
   /**
    * A function that converts a string to an ease function.
    * @param str The input string.
    * @return The ease function.
    */
-  public static function getEaseFromString(str:String = "linear"):Null<Float->Float>
+  public static function getEaseFromString(str_raw:String = "linear"):Null<Float->Float>
   {
+    var str:String = str_raw;
+    str = str.toLowerCase();
     // Remove all spaces.
     str = StringTools.replace(str, " ", "");
 
@@ -679,7 +690,7 @@ class ModConstants
       var ease = getEaseFromString(str);
       if (ease == null)
       {
-        PlayState.instance.modDebugNotif("'" + str + "' ease not valid for flip()! Defaulting to linear.", FlxColor.ORANGE);
+        displayWarning("'" + str + "' ease not valid for flip()! Defaulting to linear.");
         ease = FlxEase.linear;
       }
 
@@ -695,6 +706,16 @@ class ModConstants
       strSplit = str.split(',');
       var ease1 = getEaseFromString(strSplit[0]);
       var ease2 = getEaseFromString(strSplit[1]);
+      if (ease1 == null)
+      {
+        displayWarning("'" + str + "' ease1 not valid for blend()! Defaulting to linear.");
+        ease1 = FlxEase.linear;
+      }
+      if (ease2 == null)
+      {
+        displayWarning("'" + str + "' ease2 not valid for blend()! Defaulting to linear.");
+        ease2 = FlxEase.linear;
+      }
       return HazardEase.easeBlend(ease1, ease2);
     }
 
@@ -707,6 +728,16 @@ class ModConstants
       strSplit = str.split(',');
       var ease1 = getEaseFromString(strSplit[0]);
       var ease2 = getEaseFromString(strSplit[1]);
+      if (ease1 == null)
+      {
+        displayWarning("'" + str + "' ease1 not valid for lerp()! Defaulting to linear.");
+        ease1 = FlxEase.linear;
+      }
+      if (ease2 == null)
+      {
+        displayWarning("'" + str + "' ease2 not valid for lerp()! Defaulting to linear.");
+        ease2 = FlxEase.linear;
+      }
       return HazardEase.easeLerp(ease1, ease2);
     }
 
@@ -719,7 +750,54 @@ class ModConstants
       strSplit = str.split(',');
       var ease1 = getEaseFromString(strSplit[0]);
       var ease2 = getEaseFromString(strSplit[1]);
+      if (ease1 == null)
+      {
+        displayWarning("'" + str + "' ease1 not valid for merge()! Defaulting to linear.");
+        ease1 = FlxEase.linear;
+      }
+      if (ease2 == null)
+      {
+        displayWarning("'" + str + "' ease2 not valid for merge()! Defaulting to linear.");
+        ease2 = FlxEase.linear;
+      }
       return HazardEase.easeMerge(ease1, ease2);
+    }
+
+    // warp and return added in v1.1.3
+    if (StringTools.contains(str, "warp("))
+    {
+      var strSplit = str.split('warp(');
+      str = strSplit[1];
+      strSplit = str.split(')');
+      str = strSplit[0];
+      strSplit = str.split(',');
+      var ease1 = getEaseFromString(strSplit[0]);
+      var ease2 = getEaseFromString(strSplit[1]);
+      if (ease1 == null)
+      {
+        displayWarning("'" + str + "' ease1 not valid for warp()! Defaulting to linear.");
+        ease1 = FlxEase.linear;
+      }
+      if (ease2 == null)
+      {
+        displayWarning("'" + str + "' ease2 not valid for warp()! Defaulting to linear.");
+        ease2 = FlxEase.linear;
+      }
+      return HazardEase.easeWarp(ease1, ease2);
+    }
+
+    if (StringTools.contains(str, "return("))
+    {
+      var str = stringRemoveFirst(str, "return(");
+      str = stringRemoveFirst(str, ")");
+      var ease = getEaseFromString(str);
+      if (ease == null)
+      {
+        displayWarning("'" + str + "' ease not valid for return()! Defaulting to linear.");
+        ease = FlxEase.linear;
+      }
+
+      return HazardEase.easeReturn(ease);
     }
 
     // Kade's modchart engine constructors. Added in v1.1.3
@@ -732,7 +810,7 @@ class ModConstants
       strSplit = str.split(',');
       var damp = Std.parseFloat(strSplit[0]);
       var count = Std.parseFloat(strSplit[1]);
-      return HazardEase.elastic(damp, count);
+      return HazardEase.easeElastic(damp, count);
     }
 
     if (StringTools.contains(str, "repeat("))
@@ -743,8 +821,13 @@ class ModConstants
       str = strSplit[0];
       strSplit = str.split(',');
       var ease = getEaseFromString(strSplit[0]);
+      if (ease == null)
+      {
+        displayWarning("'" + str + "' ease not valid for repeat()! Defaulting to linear.");
+        ease = FlxEase.linear;
+      }
       var count = Std.parseFloat(strSplit[1]);
-      return HazardEase.repeat(ease, count);
+      return HazardEase.easeRepeat(ease, count);
     }
 
     if (StringTools.contains(str, "back("))
@@ -752,7 +835,7 @@ class ModConstants
       var str = stringRemoveFirst(str, "back(");
       str = stringRemoveFirst(str, ")");
       var overshoot = Std.parseFloat(str);
-      return HazardEase.back(overshoot);
+      return HazardEase.easeBack(overshoot);
     }
 
     if (StringTools.contains(str, "slice("))
@@ -763,19 +846,24 @@ class ModConstants
       str = strSplit[0];
       strSplit = str.split(',');
       var ease = getEaseFromString(strSplit[0]);
+      if (ease == null)
+      {
+        displayWarning("'" + str + "' ease not valid for slice()! Defaulting to linear.");
+        ease = FlxEase.linear;
+      }
       var start = Std.parseFloat(strSplit[1]);
       var end = Std.parseFloat(strSplit[2]);
-      return HazardEase.slice(ease, start, end);
+      return HazardEase.easeSlice(ease, start, end);
     }
 
-    // Custom eases stored in event handler
-    // check for custom ease:
+    // Custom eases are stored in event handler (not here so they remain local to the song, not globally)
+    // check for custom ease. Note these will remain case-sensitive!
     if (PlayState.instance?.modchartEventHandler != null)
     {
       // if found, return that ease func, otherwise continue
-      if (PlayState.instance.modchartEventHandler.customEases.exists(str))
+      if (PlayState.instance.modchartEventHandler.customEases.exists(str_raw))
       {
-        return PlayState.instance.modchartEventHandler.customEases.get(str);
+        return PlayState.instance.modchartEventHandler.customEases.get(str_raw);
       }
     }
 
@@ -788,39 +876,39 @@ class ModConstants
       case "linear":
         return FlxEase.linear;
 
-      case "sineIn":
+      case "sinein":
         return FlxEase.sineIn;
-      case "sineOut":
+      case "sineout":
         return FlxEase.sineOut;
-      case "sineInOut":
+      case "sineinout":
         return FlxEase.sineInOut;
 
-      case "circOut":
+      case "circout":
         return FlxEase.circOut;
-      case "circIn":
+      case "circin":
         return FlxEase.circIn;
-      case "circInOut":
+      case "circinout":
         return FlxEase.circInOut;
 
-      case "quadInOut":
+      case "quadinout":
         return FlxEase.quadInOut;
-      case "quadIn":
+      case "quadin":
         return FlxEase.quadIn;
-      case "quadOut":
+      case "quadout":
         return FlxEase.quadOut;
 
-      case "cubeIn":
+      case "cubein":
         return FlxEase.cubeIn;
-      case "cubeOut":
+      case "cubeout":
         return FlxEase.cubeOut;
-      case "cubeInOut":
+      case "cubeinout":
         return FlxEase.cubeInOut;
 
-      case "quintInOut":
+      case "quintinout":
         return FlxEase.quintInOut;
-      case "quintIn":
+      case "quintin":
         return FlxEase.quintIn;
-      case "quintOut":
+      case "quintout":
         return FlxEase.quintOut;
 
       // v0.9.0a -> No longer use the default expo eases as the math they use don't end on the intended target value, resulting in values ending on something like 0.975 instead of 1
@@ -831,54 +919,92 @@ class ModConstants
       // case "expoInOut":
       //  return FlxEase.expoInOut;
 
-      case "backOut":
+      case "backout":
         return FlxEase.backOut;
-      case "backIn":
+      case "backin":
         return FlxEase.backIn;
-      case "backInOut":
+      case "backinout":
         return FlxEase.backInOut;
 
-      case "bounceOut":
+      case "bounceout":
         return FlxEase.bounceOut;
-      case "bounceIn":
+      case "bouncein":
         return FlxEase.bounceIn;
-      case "bounceInOut":
+      case "bounceinout":
         return FlxEase.bounceInOut;
 
       // case "elasticOut":
       //  return FlxEase.elasticOut;
-      case "elasticIn":
+      case "elasticin":
         return FlxEase.elasticIn;
-      case "elasticInOut":
+      case "elasticinout":
         return FlxEase.elasticInOut;
 
-      case "quartIn":
+      case "quartin":
         return FlxEase.quartIn;
-      case "quartInOut":
+      case "quartinout":
         return FlxEase.quartInOut;
-      case "quartOut":
+      case "quartout":
         return FlxEase.quartOut;
 
-      case "smootherStepOut":
+      case "outsmootherstep":
         return FlxEase.smootherStepOut;
-      case "smootherStepIn":
+      case "insmootherstep":
         return FlxEase.smootherStepIn;
-      case "smootherStepInOut":
+      case "inoutsmootherstep":
         return FlxEase.smootherStepInOut;
+      case "outinsmootherstep":
+        return HazardEase.smootherStepOutIn;
+      case "smootherstepout":
+        return FlxEase.smootherStepOut;
+      case "smootherstepin":
+        return FlxEase.smootherStepIn;
+      case "smootherstepinout":
+        return FlxEase.smootherStepInOut;
+      case "smootherstepoutin":
+        return HazardEase.smootherStepOutIn;
 
-      case "smoothStepIn":
+      case "smoothstepin":
         return FlxEase.smoothStepIn;
-      case "smoothStepOut":
+      case "smoothstepout":
         return FlxEase.smoothStepOut;
-      case "smoothStepInOut":
+      case "smoothstepinout":
         return FlxEase.smoothStepInOut;
+      case "smoothstepoutin":
+        return HazardEase.smoothStepOutIn;
+      case "insmoothstep":
+        return FlxEase.smoothStepIn;
+      case "outsmoothstep":
+        return FlxEase.smoothStepOut;
+      case "inoutsmoothstep":
+        return FlxEase.smoothStepInOut;
+      case "outinsmoothstop":
+        return HazardEase.smoothStepOutIn;
+
       default:
-        var a:Null<Float->Float> = Reflect.field(HazardEase, str);
-        if (a == null)
+        var found:Null<Float->Float> = Reflect.field(HazardEase, str); // case-sensitive reflect.
+        if (found == null)
         {
-          PlayState.instance.modDebugNotif("ease '" + str + "' not valid. Defaulting to linear.", FlxColor.ORANGE);
+          // Try again, this time case-insensitive.
+          for (field in Type.getClassFields(HazardEase))
+          {
+            if (field.toLowerCase() == str)
+            {
+              var f = Reflect.field(HazardEase, field);
+              if (Reflect.isFunction(f))
+              {
+                found = f;
+                break;
+              }
+            }
+          }
+          if (found == null)
+          {
+            displayWarning("ease '" + str + "' not valid. Defaulting to linear.");
+            return FlxEase.linear;
+          }
         }
-        return Reflect.field(HazardEase, str);
+        return found;
     }
   }
 
