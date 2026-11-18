@@ -1793,7 +1793,8 @@ class Strumline extends FlxSpriteGroup
   }
 
   var holdCoverSkew:Bool = false; // makes hold covers skew if true
-  var holdCoverRotate:Bool = true; // requires the origin to be properly set to the center
+  var holdCoverRotate:Bool = true; // If true, the holdCover will rotate to face the hold note. Requires the origin to be properly set to the center
+  var holdCoverAngleOffset:Float = 0;
 
   function noteCoverSetPos(cover:NoteHoldCover):Void
   {
@@ -1848,6 +1849,7 @@ class Strumline extends FlxSpriteGroup
         {
           if (cover.holdNote != null) daAngle = cover.holdNote.baseAngle;
         }
+        daAngle += holdCoverAngleOffset;
 
         cover.x += offsetX;
         cover.y += offsetY;
@@ -1951,6 +1953,7 @@ class Strumline extends FlxSpriteGroup
     {
       cover.glow.angle = 0;
     }
+    cover.glow.angle += holdCoverAngleOffset;
 
     cover.glow.perspectiveCenterOffset = whichStrumNote.noteModData.perspectiveOffset;
   }

@@ -349,6 +349,42 @@ class HazardModLuaTest
       return 'slice(${ease},${from},${to})';
     });
 
+    Lua_helper.add_callback(lua, "cloneMod", function(modName:String, newModName:String, _playerTarget:Any = "all")
+    {
+      var targets_raw:Any = _playerTarget;
+      var targets:Array<String> = formaterTargets(targets_raw);
+      for (t in targets)
+      {
+        if (t == "everyone" || t == "both" || t == "all")
+        {
+          for (strummer in PlayState.instance.allStrumLines)
+          {
+            if (!allTargetExlusions.contains(strummer))
+            {
+              var newMod = ModConstants.createNewMod(modName);
+              if (newMod != null)
+              {
+                newMod.tag = newModName.toLowerCase();
+              }
+
+              strummer.mods.addCustomMod(newMod);
+            }
+          }
+        }
+        else
+        {
+          var modsTarget = ModConstants.grabStrumModTarget(t);
+          var newMod = ModConstants.createNewMod(modName);
+          if (newMod != null)
+          {
+            newMod.tag = newModName.toLowerCase();
+          }
+
+          modsTarget.addCustomMod(newMod);
+        }
+      }
+    });
+
     Lua_helper.add_callback(lua, "doAt", function(beat:Float, func:Dynamic, persist:Bool = false)
     {
       if (func == null) return;
@@ -373,6 +409,26 @@ class HazardModLuaTest
       };
 
       PlayState.instance.modchartEventHandler.funcModEvent(ModConstants.grabStrumModTarget("bf"), beat, wrapper, null, persist);
+    });
+
+    Lua_helper.add_callback(lua, "perFrame", function(func:Dynamic)
+    {
+      var cb:LuaCallback = Std.isOfType(func, LuaCallback) ? cast func : null;
+      if (cb == null)
+      {
+        luaTrace("perframe: expected a Lua function", false, false, FlxColor.RED);
+        return;
+      }
+      var f = function(elapsed:Float)
+      {
+        #if FEATURE_WITF_USE_TIME_DELTA
+        var beat:Float = ModConstants.getBeatPositionWithDelta();
+        #else
+        var beat:Float = Conductor.instance?.currentBeatTime ?? 0.0;
+        #end
+        cb.call([beat, elapsed]);
+      };
+      PlayState.instance.perframeFunctions.push(f);
     });
 
     // aux lua setup: aux(modName:String, function(modValue:Float, curBeat:Float, player:Int), playerTarget:Null<String> )
