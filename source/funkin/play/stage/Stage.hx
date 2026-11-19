@@ -979,6 +979,10 @@ class Stage extends FlxSpriteGroup implements IPlayStateScriptedClass implements
   {
   }
 
+  public function onModchartPreTimeline(event:ScriptEvent):Void
+  {
+  }
+
   public function onModchartNotification(event:ScriptEvent):Void
   {
   }

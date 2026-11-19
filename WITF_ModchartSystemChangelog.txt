@@ -17,6 +17,10 @@ Also added 'doAt' and 'perFrame' functions to Lua.
 Updated albumRolls for some songs.
 Updated Matoi to no longer use the deprecated ZProjectSprite class.
 Added 'holdCoverAngleOffset' variable to strumLine.hx.
+Added 'skipIfBaseValue' to modifiers to allow them to be skipped if they are at their base value.
+Made Modifier class scriptable so you can make your own hxScript modifiers by extending it or whatever. Though I recommend using runHaxeCode in lua for performance.
+Added 'onModchartPreTimeline' event that is fired before LUA so that you have a chance to add custom mods before lua.
+Fixed sustain culling being inverted for upscroll.
 
 
 

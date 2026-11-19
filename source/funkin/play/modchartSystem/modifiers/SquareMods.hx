@@ -20,6 +20,7 @@ class SquareModBase extends Modifier
   public function new(name:String)
   {
     super(name, 0);
+    this.skipIfBaseValue = true;
     offsetX = createSubMod("offset_x", 0.0, ["offsetx", "xoffset", "x_offset"]);
     offsetY = createSubMod("offset_y", 0.0, ["offsety", "yoffset", "y_offset", "offset"]);
     multSubmod = createSubMod("mult", 1.0, ["period", "size"]);

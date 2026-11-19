@@ -1,6 +1,8 @@
 Note: Some reported problems are old and may have been already resolved.
 
-Fork specific issues (V1.1.2):
+Fork specific issues (V1.1.3):
+
+- Custom Mods are very laggy. Try to avoid using too many and opt for aux mods instead. Also use 'skipIfBaseValue' to skip the mod entirely when inactive.
 
 - Inputs are broken / very inconsistent on Mobile with modcharts.
 

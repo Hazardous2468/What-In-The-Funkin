@@ -773,12 +773,14 @@ class ModHandler
 
     for (mod in this.mods_speed)
     {
+      if (mod.skipIfBaseValue && mod.currentValue == mod.defaultBaseValue) continue;
       if (mod.targetLane != -1 && note.noteModData.direction != mod.targetLane) continue;
       note.noteModData.speedMod *= mod.speedMath(note.noteModData.direction, note.noteModData.curPos_unscaled, strum, false);
     }
 
     for (mod in note.noteModData.noteMods)
     {
+      if (mod.skipIfBaseValue && mod.currentValue == mod.defaultBaseValue) continue;
       if (mod.targetLane != -1 && note.noteModData.direction != mod.targetLane) continue;
       note.noteModData.speedMod *= mod.speedMath(note.noteModData.direction, note.noteModData.curPos_unscaled, strum, false);
     }
@@ -807,12 +809,14 @@ class ModHandler
     {
       for (mod in this.mods_notes)
       {
+        if (mod.skipIfBaseValue && mod.currentValue == mod.defaultBaseValue) continue;
         if (mod.targetLane != -1 && note.noteModData.direction != mod.targetLane) continue;
         mod.noteMath(note.noteModData, strum);
       }
 
       for (mod in note.noteModData.noteMods)
       {
+        if (mod.skipIfBaseValue && mod.currentValue == mod.defaultBaseValue) continue;
         if (mod.targetLane != -1 && note.noteModData.direction != mod.targetLane) continue;
         mod.noteMath(note.noteModData, strum);
       }
@@ -864,6 +868,7 @@ class ModHandler
     {
       for (mod in this.mods_special)
       {
+        if (mod.skipIfBaseValue && mod.currentValue == mod.defaultBaseValue) continue;
         if (mod.targetLane != -1 && lane != mod.targetLane) continue;
         try
         {
@@ -978,12 +983,14 @@ class ModHandler
       note.noteModData.curPos_unscaled = strum.calculateNoteYPos(note.noteModData.strumTime) * -1;
       for (mod in this.mods_speed)
       {
+        if (mod.skipIfBaseValue && mod.currentValue == mod.defaultBaseValue) continue;
         if (mod.targetLane != -1 && note.direction != mod.targetLane) continue;
         note.noteModData.speedMod *= mod.speedMath(note.noteModData.direction, note.noteModData.curPos_unscaled, strum, false);
       }
       note.noteModData.curPos = strum.calculateNoteYPos(note.noteModData.strumTime) * note.noteModData.speedMod * -1;
       for (mod in this.mods_strums)
       {
+        if (mod.skipIfBaseValue && mod.currentValue == mod.defaultBaseValue) continue;
         if (mod.targetLane != -1 && note.noteModData.direction != mod.targetLane) continue;
         mod.strumMath(note.noteModData, strum);
       }
@@ -996,6 +1003,7 @@ class ModHandler
       {
         for (mod in this.mods_notes)
         {
+          if (mod.skipIfBaseValue && mod.currentValue == mod.defaultBaseValue) continue;
           if (mod.targetLane != -1 && note.noteModData.direction != mod.targetLane) continue;
           mod.noteMath(note.noteModData, strum, false);
         }
@@ -1008,6 +1016,7 @@ class ModHandler
     {
       for (mod in this.mods_strums)
       {
+        if (mod.skipIfBaseValue && mod.currentValue == mod.defaultBaseValue) continue;
         if (mod.targetLane != -1 && note.noteModData.direction != mod.targetLane) continue;
         mod.strumMath(note.noteModData, strum);
       }

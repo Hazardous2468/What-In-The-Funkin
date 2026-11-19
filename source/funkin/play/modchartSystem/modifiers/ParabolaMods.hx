@@ -22,6 +22,7 @@ class ParabolaModBase extends Modifier
     super(name);
     offset = createSubMod("offset", 0.0);
     altCurposSubmod = createSubMod("altcurpos", 0.0, ["use_unscaled", "alt_curpos", "type"]);
+    this.skipIfBaseValue = true;
   }
 
   function daMath(pos:Float):Float

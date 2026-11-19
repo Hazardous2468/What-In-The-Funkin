@@ -76,6 +76,7 @@ class NoteOffsetXMod extends Modifier
     modPriority = -670;
     notPercentage = true;
     displayName = "OffsetNotesX";
+    this.skipIfBaseValue = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -92,6 +93,7 @@ class NoteOffsetYMod extends Modifier
     modPriority = -670;
     notPercentage = true;
     displayName = "OffsetNotesY";
+    this.skipIfBaseValue = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -107,6 +109,7 @@ class NoteOffsetZMod extends Modifier
     super(name, 0);
     modPriority = -670;
     displayName = "OffsetNotesZ";
+    this.skipIfBaseValue = true;
     notPercentage = true;
   }
 
@@ -124,6 +127,7 @@ class HoldOffsetXMod extends Modifier
     modPriority = -670;
     notPercentage = true;
     displayName = "OffsetHoldsX";
+    this.skipIfBaseValue = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -140,6 +144,7 @@ class HoldOffsetYMod extends Modifier
     modPriority = -670;
     notPercentage = true;
     displayName = "OffsetHoldsY";
+    this.skipIfBaseValue = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -156,6 +161,7 @@ class HoldOffsetZMod extends Modifier
     modPriority = -670;
     notPercentage = true;
     displayName = "OffsetHoldsZ";
+    this.skipIfBaseValue = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -172,6 +178,7 @@ class StrumOffsetXMod extends Modifier
     modPriority = -670;
     notPercentage = true;
     displayName = "OffsetStrumsX";
+    this.skipIfBaseValue = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -192,6 +199,7 @@ class StrumOffsetYMod extends Modifier
     super(name, 0);
     modPriority = -670;
     notPercentage = true;
+    this.skipIfBaseValue = true;
     displayName = "OffsetStrumsY";
   }
 
@@ -214,6 +222,7 @@ class StrumOffsetZMod extends Modifier
     modPriority = -670;
     notPercentage = true;
     displayName = "OffsetStrumsZ";
+    this.skipIfBaseValue = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -235,6 +244,7 @@ class ArrowPathOffsetXMod extends Modifier
     modPriority = -670;
     notPercentage = true;
     displayName = "OffsetPathX";
+    this.skipIfBaseValue = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -250,6 +260,7 @@ class ArrowPathOffsetYMod extends Modifier
     super(name, 0);
     modPriority = -670;
     notPercentage = true;
+    this.skipIfBaseValue = true;
     displayName = "OffsetPathY";
   }
 
@@ -267,6 +278,7 @@ class ArrowPathOffsetZMod extends Modifier
     modPriority = -670;
     notPercentage = true;
     displayName = "OffsetPathZ";
+    this.skipIfBaseValue = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void

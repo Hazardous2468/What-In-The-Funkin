@@ -25,6 +25,7 @@ class SpiralModBase extends Modifier
     offsetSubmod = createSubMod("offset", 0.0);
     multSubmod = createSubMod("mult", 0.05, ["period", "size"]);
     if (!forceUseCos) useCosSubmod = createSubMod("cos", 0.0);
+    this.skipIfBaseValue = true;
   }
 
   // Cos is handled this stupid way for compatibility with using cos Submod from older versions of WITF

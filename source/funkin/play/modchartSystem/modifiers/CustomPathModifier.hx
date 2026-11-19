@@ -317,6 +317,7 @@ class CustomPathMod extends Modifier
     holdsMod = true;
     strumsMod = true;
     pathMod = true;
+    this.skipIfBaseValue = true;
 
     posTypeSubMod = createSubMod("postype", 0.0, [
       "pos",

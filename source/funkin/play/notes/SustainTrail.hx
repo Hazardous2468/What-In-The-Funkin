@@ -290,10 +290,10 @@ class SustainTrail extends ZSprite
       }
     }
 
-    flipY = Preferences.downscroll
-    #if mobile
-    || (Preferences.controlsScheme == FunkinHitboxControlSchemes.Arrows && !funkin.mobile.input.ControlsHandler.hasExternalInputDevice)
-    #end;
+    flipY = Preferences.downscroll #if mobile || (
+      Preferences.controlsScheme == FunkinHitboxControlSchemes.Arrows
+      && !funkin.mobile.input.ControlsHandler.hasExternalInputDevice
+    ) #end;
 
     // alpha = 0.6;
     alpha = 1.0;
@@ -605,11 +605,13 @@ class SustainTrail extends ZSprite
     var scrollMult:Float = 1.0;
     for (mod in parentStrumline.mods.mods_speed)
     {
+      if (mod.skipIfBaseValue && mod.currentValue == mod.defaultBaseValue) continue;
       if (mod.targetLane != -1 && noteModData.direction != mod.targetLane) continue;
       scrollMult *= mod.speedMath(noteModData.direction, noteModData.curPos_unscaled, parentStrumline, true);
     }
     for (mod in noteModData.noteMods)
     {
+      if (mod.skipIfBaseValue && mod.currentValue == mod.defaultBaseValue) continue;
       if (mod.targetLane != -1 && noteModData.direction != mod.targetLane) continue;
       scrollMult *= mod.speedMath(noteModData.direction, noteModData.curPos_unscaled, parentStrumline, true);
     }
@@ -647,12 +649,14 @@ class SustainTrail extends ZSprite
 
     for (mod in (isArrowPath ? parentStrumline.mods.mods_arrowpath : parentStrumline.mods.mods_notes))
     {
+      if (mod.skipIfBaseValue && mod.currentValue == mod.defaultBaseValue) continue;
       if (mod.targetLane != -1 && noteModData.direction != mod.targetLane) continue;
       mod.noteMath(noteModData, parentStrumline, true, isArrowPath);
     }
 
     for (mod in noteModData.noteMods)
     {
+      if (mod.skipIfBaseValue && mod.currentValue == mod.defaultBaseValue) continue;
       if (mod.targetLane != -1 && noteModData.direction != mod.targetLane) continue;
       mod.noteMath(noteModData, parentStrumline, true, isArrowPath);
     }

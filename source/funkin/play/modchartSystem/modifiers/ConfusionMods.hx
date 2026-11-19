@@ -15,6 +15,7 @@ class DizzyMod extends Modifier
     super(name, 0);
     invertForDad = true;
     displayName = "Dizzy";
+    this.skipIfBaseValue = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -33,6 +34,7 @@ class Dizzy2Mod extends Modifier
     super(name, 0);
     invertForDad = true;
     displayName = "Dizzy2";
+    this.skipIfBaseValue = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -50,6 +52,7 @@ class RollMod extends Modifier
   {
     super(name, 0);
     displayName = "Roll";
+    this.skipIfBaseValue = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -67,6 +70,7 @@ class Roll2Mod extends Modifier
   {
     super(name, 0);
     displayName = "Roll2";
+    this.skipIfBaseValue = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -84,6 +88,7 @@ class TwirlMod extends Modifier
   {
     super(name, 0);
     invertForDad = true;
+    this.skipIfBaseValue = true;
     displayName = "Twirl";
   }
 
@@ -102,6 +107,7 @@ class Twirl2Mod extends Modifier
   {
     super(name, 0);
     displayName = "Twirl2";
+    this.skipIfBaseValue = true;
     invertForDad = true;
   }
 
@@ -141,6 +147,7 @@ class ConfusionZOffsetMod extends Modifier
     super(name, 0);
     invertForDad = true;
     displayName = "ConfusionZOffset";
+    this.skipIfBaseValue = true;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -158,6 +165,7 @@ class ConfusionXOffsetMod extends Modifier
   {
     super(name, 0);
     displayName = "ConfusionXOffset";
+    this.skipIfBaseValue = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -183,6 +191,7 @@ class ConfusionYOffsetMod extends Modifier
     super(name, 0);
     invertForDad = true;
     displayName = "ConfusionYOffset";
+    this.skipIfBaseValue = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -208,6 +217,7 @@ class NotesConfusionZOffsetMod extends Modifier
     super(name, 0);
     invertForDad = true;
     displayName = "NotesConfusionZOffset";
+    this.skipIfBaseValue = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -225,6 +235,7 @@ class NotesConfusionXOffsetMod extends Modifier
   {
     super(name, 0);
     displayName = "NotesConfusionXOffset";
+    this.skipIfBaseValue = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -243,6 +254,7 @@ class NotesConfusionYOffsetMod extends Modifier
     super(name, 0);
     invertForDad = true;
     displayName = "NotesConfusionYOffset";
+    this.skipIfBaseValue = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void

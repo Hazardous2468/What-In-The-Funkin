@@ -23,6 +23,7 @@ class DigitalModBase extends Modifier
     mult = createSubMod("mult", 1.0, ["period", "size"]);
     steps = createSubMod("steps", 4.0);
     offset = createSubMod("offset", 0.0);
+    this.skipIfBaseValue = true;
   }
 
   function digitalMath(curPos:Float):Float

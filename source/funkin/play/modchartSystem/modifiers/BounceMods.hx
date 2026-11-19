@@ -28,6 +28,7 @@ class BounceModBase extends Modifier
     mult = createSubMod("mult", 1.0, ["period", "size"]);
     offset = createSubMod("offset", 0.0);
     altCurposSubmod = createSubMod("altcurpos", 0.0, ["use_unscaled", "alt_curpos", "type"]);
+    this.skipIfBaseValue = true;
   }
 
   function getOffset():Float

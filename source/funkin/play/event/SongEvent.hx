@@ -198,6 +198,10 @@ class SongEvent implements IPlayStateScriptedClass
   {
   }
 
+  public function onModchartPreTimeline(event:ScriptEvent)
+  {
+  }
+
   public function onModchartReset(event:ScriptEvent)
   {
   }

@@ -111,6 +111,7 @@ class DarkMod extends Modifier
     strumsMod = true;
     unknown = false;
     displayName = "Dark";
+    this.skipIfBaseValue = true;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -132,6 +133,7 @@ class StrumStealthMod extends Modifier
     strumsMod = true;
     unknown = false;
     displayName = "StrumStealth";
+    this.skipIfBaseValue = true;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -166,6 +168,7 @@ class StealthMod extends Modifier
     strumsMod = false;
     pathMod = false;
     displayName = "Stealth";
+    this.skipIfBaseValue = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -590,6 +593,7 @@ class AlphaModifier extends Modifier
   {
     super(name, 0);
     displayName = "Alpha";
+    this.skipIfBaseValue = true;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -614,6 +618,7 @@ class AlphaNotesModifier extends Modifier
   {
     super(name, 0);
     displayName = "AlphaNotes";
+    this.skipIfBaseValue = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -629,6 +634,7 @@ class AlphaHoldsModifier extends Modifier
   {
     super(name, 0);
     displayName = "AlphaHolds";
+    this.skipIfBaseValue = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -643,6 +649,7 @@ class AlphaStrumModifier extends Modifier
   public function new(name:String)
   {
     super(name, 0);
+    this.skipIfBaseValue = true;
     displayName = "AlphaStrums";
   }
 
@@ -661,6 +668,7 @@ class AlphaNoteSplashModifier extends Modifier
     unknown = false;
     specialMod = true;
     displayName = "AlphaNoteSplashes";
+    this.skipIfBaseValue = true;
   }
 
   override function specialMath(lane:Int, strumLine:Strumline):Void
@@ -677,6 +685,7 @@ class AlphaHoldCoverModifier extends Modifier
   {
     super(name, 0);
     unknown = false;
+    this.skipIfBaseValue = true;
     specialMod = true;
     displayName = "AlphaHoldCovers";
   }

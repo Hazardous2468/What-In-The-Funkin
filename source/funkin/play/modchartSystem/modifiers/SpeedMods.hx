@@ -110,6 +110,7 @@ class SlowDownMod extends Modifier
     unknown = false;
     speedMod = true;
     displayName = "Slowdown";
+    this.skipIfBaseValue = true;
   }
 
   override function speedMath(lane:Int, curPos:Float, strumLine:Strumline, isHoldNote:Bool = false):Float
@@ -131,6 +132,7 @@ class BrakeMod extends Modifier
     unknown = false;
     speedMod = true;
     displayName = "Brake";
+    this.skipIfBaseValue = true;
   }
 
   override function speedMath(lane:Int, curPos:Float, strumLine:Strumline, isHoldNote:Bool = false):Float
@@ -159,6 +161,7 @@ class BoostMod extends Modifier
     super(name, 0);
     unknown = false;
     speedMod = true;
+    this.skipIfBaseValue = true;
     displayName = "Boost";
     startSubmod = createSubMod("start", 900, ["begin", "trigger", "threshold"]);
   }
@@ -229,6 +232,7 @@ class WaveMod extends Modifier
     super(name, 0);
     unknown = false;
     speedMod = true;
+    this.skipIfBaseValue = true;
     displayName = "Wave";
     multSubmod = createSubMod("mult", 1, ["period", "size"]);
     offsetSubmod = createSubMod("offset", 0);
@@ -285,6 +289,7 @@ class Expand extends Modifier
     super(name, 0);
     displayName = "Expand";
     unknown = false;
+    this.skipIfBaseValue = true;
     speedMod = true;
     speedSubmod = createSubMod("speed", 1.0, ["period", "size", "mult"]);
   }

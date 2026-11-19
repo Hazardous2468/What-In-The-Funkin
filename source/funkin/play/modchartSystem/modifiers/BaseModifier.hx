@@ -289,6 +289,11 @@ class Modifier
   public var hideIfBaseValue:Bool = true;
 
   /**
+   * If true, this modifier is skipped entirely in the modMath, but only if the currentValue is the same as defaultBaseValue (NOT regular baseValue)!
+   */
+  public var skipIfBaseValue:Bool = false;
+
+  /**
    * The base / starting value of this modifier.
    * Unlike the 'baseValue', this one is used to determine when a modifier should be hidden or not.
    * In simple terms: It isn't affected by setDefault.
@@ -515,20 +520,20 @@ class Modifier
     }
   }
 
-  public dynamic function speedMath(lane:Int, curPos:Float, strumLine:Strumline, isHoldNote:Bool = false):Float
+  public function speedMath(lane:Int, curPos:Float, strumLine:Strumline, isHoldNote:Bool = false):Float
   {
     return 1.0;
   }
 
-  public dynamic function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
+  public function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
   }
 
-  public dynamic function specialMath(lane:Int, strumLine:Strumline):Void
+  public function specialMath(lane:Int, strumLine:Strumline):Void
   {
   }
 
-  public dynamic function strumMath(data:NoteData, strumLine:Strumline):Void
+  public function strumMath(data:NoteData, strumLine:Strumline):Void
   {
   }
 
@@ -552,5 +557,10 @@ class Modifier
     newShit.utility = this.utility;
 
     return newShit;
+  }
+
+  public function toString():String
+  {
+    return 'Modifier($tag,$currentValue)';
   }
 }

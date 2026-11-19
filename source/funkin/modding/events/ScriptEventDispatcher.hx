@@ -161,6 +161,9 @@ class ScriptEventDispatcher
         case MODCHART_TIMELINE:
           t.onModchartTimeline(cast event);
           return;
+        case MODCHART_PRETIMELINE:
+          t.onModchartPreTimeline(cast event);
+          return;
         case MODCHART_RESET:
           t.onModchartReset(cast event);
           return;
@@ -210,6 +213,7 @@ class ScriptEventDispatcher
       if ([
         ScriptEventType.MODCHART_SETUP,
         ScriptEventType.MODCHART_TIMELINE,
+        ScriptEventType.MODCHART_PRETIMELINE,
         ScriptEventType.MODCHART_RESET,
         ScriptEventType.MODCHART_NOTIFICATION,
 

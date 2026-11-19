@@ -20,6 +20,7 @@ class ZigZagBaseMod extends Modifier
     super(name, 0);
     mult = createSubMod("mult", 1.0, ["period", "size"]);
     offset = createSubMod("offset", 0.0);
+    this.skipIfBaseValue = true;
   }
 
   function ziggyMath(curPos:Float):Float

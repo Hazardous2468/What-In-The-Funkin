@@ -37,6 +37,7 @@ class BeatModBase extends Modifier
     fAccelTimeSubmod = createSubMod("accel", 0.2);
     fTotalTimeSubmod = createSubMod("total", 0.5);
     altCurposSubmod = createSubMod("altcurpos", 0.0, ["use_unscaled", "alt_curpos", "type"]);
+    this.skipIfBaseValue = true;
   }
 
   // Control the acceleration and modifier timings:

@@ -27,7 +27,7 @@ class CosecantModifierBase extends Modifier
   public function new(name:String)
   {
     super(name, 0);
-
+    this.skipIfBaseValue = true;
     speed = createSubMod("speed", 1.0, ["frequency"]);
     mult = createSubMod("mult", 1.0, ["period", "size"]);
     desync = createSubMod("desync", 0.2, ["spacing"]);

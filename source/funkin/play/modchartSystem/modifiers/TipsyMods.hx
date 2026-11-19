@@ -26,6 +26,7 @@ class TipsyModBase extends Modifier
 
     unknown = false;
     strumsMod = true;
+    this.skipIfBaseValue = true;
   }
 
   function tanTipsyMath(lane:Int, curPos:Float = 0):Float

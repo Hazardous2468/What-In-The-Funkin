@@ -26,6 +26,14 @@ enum abstract ScriptEventType(String) from String to String
   var MODCHART_TIMELINE = "MODCHART_TIMELINE";
 
   /**
+   * Same as MODCHART_TIMELINE but get called before lua's modchartTimeline function.
+   * Used to add custom mods for lua to use.
+   *
+   * This event is not cancelable.
+   */
+  var MODCHART_PRETIMELINE = "MODCHART_PRETIMELINE";
+
+  /**
    * Called when going back in time to reset all mods back to their default starting values.
    *
    * This event is not cancelable.

@@ -26,28 +26,28 @@ class CullAllModifier extends Modifier
     if (currentValue > 2)
     {
       data.whichStrumNote.strumExtraModData.cullMode = "always_negative";
-      data.whichStrumNote.strumExtraModData.cullModeSustain = "always_negative";
+      data.whichStrumNote.strumExtraModData.cullModeSustain = Preferences.downscroll ? "always_negative" : "always_positive";
       data.whichStrumNote.strumExtraModData.cullModeNotes = "always_negative";
       return;
     }
     else if (currentValue < -2)
     {
       data.whichStrumNote.strumExtraModData.cullMode = "always_positive";
-      data.whichStrumNote.strumExtraModData.cullModeSustain = "always_positive";
+      data.whichStrumNote.strumExtraModData.cullModeSustain = Preferences.downscroll ? "always_positive" : "always_negative";
       data.whichStrumNote.strumExtraModData.cullModeNotes = "always_positive";
       return;
     }
     else if (currentValue > 0)
     {
       data.whichStrumNote.strumExtraModData.cullMode = "negative";
-      data.whichStrumNote.strumExtraModData.cullModeSustain = "negative";
+      data.whichStrumNote.strumExtraModData.cullModeSustain = Preferences.downscroll ? "negative" : "positive";
       data.whichStrumNote.strumExtraModData.cullModeNotes = "negative";
       return;
     }
     else if (currentValue < 0)
     {
       data.whichStrumNote.strumExtraModData.cullMode = "positive";
-      data.whichStrumNote.strumExtraModData.cullModeSustain = "positive";
+      data.whichStrumNote.strumExtraModData.cullModeSustain = Preferences.downscroll ? "positive" : "negative";
       data.whichStrumNote.strumExtraModData.cullModeNotes = "positive";
       return;
     }
@@ -117,22 +117,22 @@ class CullSustainModifier extends Modifier
   {
     if (currentValue > 2)
     {
-      data.whichStrumNote.strumExtraModData.cullModeSustain = "always_negative";
+      data.whichStrumNote.strumExtraModData.cullModeSustain = Preferences.downscroll ? "always_negative" : "always_positive";
       return;
     }
     else if (currentValue < -2)
     {
-      data.whichStrumNote.strumExtraModData.cullModeSustain = "always_positive";
+      data.whichStrumNote.strumExtraModData.cullModeSustain = Preferences.downscroll ? "always_positive" : "always_negative";
       return;
     }
     else if (currentValue > 0)
     {
-      data.whichStrumNote.strumExtraModData.cullModeSustain = "negative";
+      data.whichStrumNote.strumExtraModData.cullModeSustain = Preferences.downscroll ? "negative" : "positive";
       return;
     }
     else if (currentValue < 0)
     {
-      data.whichStrumNote.strumExtraModData.cullModeSustain = "positive";
+      data.whichStrumNote.strumExtraModData.cullModeSustain = Preferences.downscroll ? "positive" : "negative";
       return;
     }
     else

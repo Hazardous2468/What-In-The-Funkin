@@ -39,6 +39,7 @@ class AsymptoteModBase extends Modifier
     ]);
     magnitude = createSubMod("magnitude", 1.0, ["speed", "mult", "period", "size"]);
     altCurposSubmod = createSubMod("altcurpos", 0.0, ["use_unscaled", "alt_curpos", "type"]);
+    this.skipIfBaseValue = true;
   }
 
   // Warning, too many zeros and we end up crashing while trying to do the math!

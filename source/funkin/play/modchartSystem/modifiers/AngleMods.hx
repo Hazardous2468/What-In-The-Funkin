@@ -15,6 +15,7 @@ class AngleZOffsetMod extends Modifier
     notPercentage = true;
     invertForDad = true;
     displayName = "Angle";
+    this.skipIfBaseValue = true;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -33,6 +34,7 @@ class AngleXOffsetMod extends Modifier
     super(name, 0);
     notPercentage = true;
     displayName = "AngleX";
+    this.skipIfBaseValue = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -56,6 +58,7 @@ class AngleYOffsetMod extends Modifier
     super(name, 0);
     notPercentage = true;
     displayName = "AngleY";
+    this.skipIfBaseValue = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -79,6 +82,7 @@ class NotesAngleZOffsetMod extends Modifier
     super(name, 0);
     notPercentage = true;
     invertForDad = true;
+    this.skipIfBaseValue = true;
     displayName = "NotesAngle";
   }
 
@@ -98,6 +102,7 @@ class NotesAngleXOffsetMod extends Modifier
     super(name, 0);
     notPercentage = true;
     displayName = "NotesAngleX";
+    this.skipIfBaseValue = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -115,6 +120,7 @@ class NotesAngleYOffsetMod extends Modifier
   {
     super(name, 0);
     notPercentage = true;
+    this.skipIfBaseValue = true;
     displayName = "NotesAngleY";
   }
 
@@ -133,6 +139,7 @@ class HoldsAngleZOffsetMod extends Modifier
   {
     super(name, 0);
     notPercentage = true;
+    this.skipIfBaseValue = true;
     displayName = "HoldsAngle";
   }
 
@@ -150,6 +157,7 @@ class HoldsAngleXOffsetMod extends Modifier
   {
     super(name, 0);
     notPercentage = true;
+    this.skipIfBaseValue = true;
     displayName = "HoldsAngleX";
   }
 
@@ -167,6 +175,7 @@ class HoldsAngleYOffsetMod extends Modifier
   {
     super(name, 0);
     notPercentage = true;
+    this.skipIfBaseValue = true;
     displayName = "HoldsAngleY";
   }
 

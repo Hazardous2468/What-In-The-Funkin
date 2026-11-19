@@ -19,6 +19,7 @@ class PlayFieldSkewXMod extends Modifier
     pathMod = true;
     notPercentage = true;
     displayName = "SkewX";
+    this.skipIfBaseValue = true;
   }
 
   var strumSkew:Float = 0;
@@ -77,6 +78,7 @@ class PlayFieldSkewYMod extends Modifier
     notPercentage = true;
     invertForDad = true;
     displayName = "SkewY";
+    this.skipIfBaseValue = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -103,6 +105,7 @@ class PlayFieldSkewZMod extends Modifier
     pathMod = true;
     notPercentage = true;
     displayName = "SkewZ";
+    this.skipIfBaseValue = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -130,6 +133,7 @@ class NotesSkewXMod extends Modifier
     notPercentage = true;
     invertForDad = true;
     displayName = "NotesSkewX";
+    this.skipIfBaseValue = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -158,6 +162,7 @@ class NotesSkewYMod extends Modifier
     notPercentage = true;
     invertForDad = true;
     displayName = "NotesSkewY";
+    this.skipIfBaseValue = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -185,6 +190,7 @@ class NotesSkewZMod extends Modifier
     pathMod = true;
     notPercentage = true;
     displayName = "NotesSkewZ";
+    this.skipIfBaseValue = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -211,6 +217,7 @@ class HoldsSkewYMod extends Modifier
     notPercentage = true;
     invertForDad = true;
     displayName = "HoldsSkew";
+    this.skipIfBaseValue = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -229,6 +236,7 @@ class StrumSkewXMod extends Modifier
     notPercentage = true;
     invertForDad = true;
     displayName = "StrumSkewX";
+    this.skipIfBaseValue = true;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -247,6 +255,7 @@ class StrumSkewYMod extends Modifier
     strumsMod = true;
     notPercentage = true;
     displayName = "StrumSkewY";
+    this.skipIfBaseValue = true;
     invertForDad = true;
   }
 
@@ -266,6 +275,7 @@ class StrumSkewZMod extends Modifier
     displayName = "StrumSkewZ";
     strumsMod = true;
     notPercentage = true;
+    this.skipIfBaseValue = true;
     invertForDad = true;
   }
 

@@ -21,6 +21,7 @@ class MoveXMod extends Modifier
     unknown = false;
     strumsMod = true;
     displayName = "MoveX";
+    this.skipIfBaseValue = true;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -37,6 +38,7 @@ class MoveYMod extends Modifier
     unknown = false;
     strumsMod = true;
     displayName = "MoveY";
+    this.skipIfBaseValue = true;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -53,6 +55,7 @@ class MoveYDMod extends Modifier
     unknown = false;
     displayName = "MoveYD";
     strumsMod = true;
+    this.skipIfBaseValue = true;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -69,6 +72,7 @@ class MoveZMod extends Modifier
     unknown = false;
     strumsMod = true;
     displayName = "MoveZ";
+    this.skipIfBaseValue = true;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -89,6 +93,7 @@ class MoveXMod_true extends Modifier
     modPriority = -9999;
     notPercentage = true;
     displayName = "X";
+    this.skipIfBaseValue = true;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -108,6 +113,7 @@ class MoveYMod_true extends Modifier
     notPercentage = true;
     modPriority = -9999;
     displayName = "Y";
+    this.skipIfBaseValue = true;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -126,6 +132,7 @@ class MoveYDMod_true extends Modifier
     strumsMod = true;
     notPercentage = true;
     modPriority = -9999;
+    this.skipIfBaseValue = true;
     displayName = "YD";
   }
 
@@ -145,6 +152,7 @@ class MoveZMod_true extends Modifier
     strumsMod = true;
     modPriority = -9999;
     notPercentage = true;
+    this.skipIfBaseValue = true;
     displayName = "Z";
   }
 
@@ -166,6 +174,7 @@ class CenteredXMod extends Modifier
     super(name, 0);
     modPriority = -199;
     displayName = "CenteredX";
+    this.skipIfBaseValue = true;
     unknown = false;
     strumsMod = true;
     shouldAlwaysReCalculate = createSubMod("always_calculate", 0.0, ["alwayscalculate", "always_recalculate", "alwaysrecalculate", "recalculate"]);
@@ -202,6 +211,7 @@ class CenteredMod extends Modifier
     unknown = false;
     displayName = "Centered";
     strumsMod = true;
+    this.skipIfBaseValue = true;
   }
 
   var dif:Null<Float> = null;
@@ -283,6 +293,7 @@ class CenteredNotesMod extends Modifier
     super(name, 0);
     modPriority = 50;
     displayName = "CenteredNotes";
+    this.skipIfBaseValue = true;
   }
 
   override function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
@@ -315,6 +326,7 @@ class JumpMod extends Modifier
       "reverseaffected",
       "reverse_affect"
     ]);
+    this.skipIfBaseValue = true;
   }
 
   var everyBeat:ModifierSubValue;
@@ -354,6 +366,7 @@ class DriveMod extends Modifier
     strumsMod = true;
     notPercentage = true;
     reverseAffect = createSubMod("reverse_affect", 1.0, ["reverse", "reverseaffect"]);
+    this.skipIfBaseValue = true;
   }
 
   var reverseAffect:ModifierSubValue;
@@ -385,6 +398,7 @@ class Drive2Mod extends Modifier
     unknown = false;
     notPercentage = true;
     specialMod = true;
+    this.skipIfBaseValue = true;
   }
 
   override function specialMath(lane:Int, strumLine:Strumline):Void

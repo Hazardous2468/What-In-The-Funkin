@@ -12,6 +12,7 @@ class LinearModifierBase extends Modifier
     super(name);
     offset = createSubMod("offset", 0.0);
     altCurposSubmod = createSubMod("altcurpos", 1.0, ["use_unscaled", "alt_curpos", "type"]);
+    this.skipIfBaseValue = true;
   }
 
   var altCurposSubmod:ModifierSubValue;

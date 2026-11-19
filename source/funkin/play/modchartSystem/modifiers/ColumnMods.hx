@@ -18,6 +18,7 @@ class FlipMod extends Modifier
     unknown = false;
     strumsMod = true;
     displayName = "Flip";
+    this.skipIfBaseValue = true;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -40,6 +41,7 @@ class InvertMod extends Modifier
     unknown = false;
     strumsMod = true;
     displayName = "Invert";
+    this.skipIfBaseValue = true;
   }
 
   override function strumMath(data:NoteData, strumLine:Strumline):Void
@@ -58,6 +60,7 @@ class VideoGamesMod extends Modifier
     super(name, 0);
     unknown = false;
     strumsMod = true;
+    this.skipIfBaseValue = true;
     displayName = "Videogames";
   }
 
@@ -92,6 +95,7 @@ class BlackSphereInvertMod extends Modifier
     unknown = false;
     strumsMod = true;
     speedMod = true;
+    this.skipIfBaseValue = true;
     displayName = "Blacksphere";
   }
 
@@ -167,6 +171,7 @@ class BlackSphereFlipMod extends Modifier
     speedaffect = createSubMod("speedaffect", 1.0, ["reverse", "speedeffect"]);
     modPriority = 130;
     notPercentage = true;
+    this.skipIfBaseValue = true;
 
     unknown = false;
     strumsMod = true;

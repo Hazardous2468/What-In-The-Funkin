@@ -20,6 +20,7 @@ class TornadoModBase extends Modifier
     super(name, 0);
     speed = createSubMod("speed", 3.0, ["mult", "period", "size"]);
     offset = createSubMod("offset", 0.0);
+    this.skipIfBaseValue = true;
   }
 
   // An array which represents each arrow direction. Used to undo the strum movement for the notes for the offset submod to function

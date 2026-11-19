@@ -2794,6 +2794,9 @@ class PlayState extends MusicBeatSubState
       // }
 
       modchartEventHandler.clearEvents();
+
+      dispatchEvent(new ScriptEvent(MODCHART_PRETIMELINE, false));
+
       for (lua in luaArray)
       {
         lua.call('modsTimeline', []);
@@ -3226,6 +3229,7 @@ class PlayState extends MusicBeatSubState
     // Moved from initStrums to here so that the strums have their noteData set for getNoteBeats to work
     if (modchartEventHandler != null)
     {
+      dispatchEvent(new ScriptEvent(MODCHART_PRETIMELINE, false));
       for (lua in luaArray)
       {
         lua.call('modsTimeline', []);

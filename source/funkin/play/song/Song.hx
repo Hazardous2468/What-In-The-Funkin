@@ -735,6 +735,10 @@ class Song implements IPlayStateScriptedClass implements IRegistryEntry<SongMeta
   {
   };
 
+  public function onModchartPreTimeline(event:ScriptEvent):Void
+  {
+  };
+
   static function _fetchData(id:String):Null<SongMetadata>
   {
     var version:Null<thx.semver.Version> = SongRegistry.instance.fetchEntryMetadataVersion(id);

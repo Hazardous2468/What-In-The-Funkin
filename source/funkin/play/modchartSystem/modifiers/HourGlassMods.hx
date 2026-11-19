@@ -25,6 +25,7 @@ class HourGlassModBase extends Modifier
     start = createSubMod("start", 420.0);
     end = createSubMod("end", 135.0);
     offset = createSubMod("offset", 0.0);
+    this.skipIfBaseValue = true;
   }
 
   // Basically just a copy of Sudden math with an extra step (b and c)

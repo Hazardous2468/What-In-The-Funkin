@@ -319,6 +319,14 @@ class Module implements IPlayStateScriptedClass implements IStateChangingScripte
   }
 
   /**
+   * Called when the modchart timeline is being constructed (once during song load, and again if hot reloading midsong).
+   * Done BEFORE lua
+   */
+  public function onModchartPreTimeline(event:ScriptEvent)
+  {
+  }
+
+  /**
    * Called when the modchart requests a reset (whether restarting a song, going backwards, or hot reloading midsong)
    */
   public function onModchartReset(event:ScriptEvent)

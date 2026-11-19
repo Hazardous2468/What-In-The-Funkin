@@ -29,6 +29,7 @@ class DrunkModBase extends Modifier
     time_add = createSubMod("time_add", 0.0, ["offset", "timeadd", "time_offset", "timeoffset"]);
     sine = createSubMod("sine", 0.0, ["usesine", "sin"]);
     timertype = createSubMod("timertype", 0.0, ["timetype", "timer"]);
+    this.skipIfBaseValue = true;
   }
 
   function tanDrunkMath(noteDir:Int, curPos:Float):Float
@@ -40,7 +41,6 @@ class DrunkModBase extends Modifier
     final returnValue:Float = currentValue * (tan(
       (time) + (noteDir * desync.value) + (curPos * 0.45) * (10.0 / FlxG.height) * mult.value * 1.75
     )) * (ModConstants.strumSize * 0.5);
-
     return returnValue;
   }
 
