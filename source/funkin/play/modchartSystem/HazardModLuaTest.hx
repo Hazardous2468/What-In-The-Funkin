@@ -365,6 +365,7 @@ class HazardModLuaTest
               if (newMod != null)
               {
                 newMod.tag = newModName.toLowerCase();
+                newMod.displayName = newModName;
               }
 
               strummer.mods.addCustomMod(newMod);
@@ -477,6 +478,44 @@ class HazardModLuaTest
         };
         PlayState.instance.perframeFunctions.push(f);
       }
+    });
+
+    Lua_helper.add_callback(lua, "getModValue", function(tagToUse:String, target:String = "bf"):Float
+    {
+      tagToUse = tagToUse.toLowerCase();
+
+      if (target == "everyone" || target == "both" || target == "all")
+      {
+        luaTrace("getModValue must target a specific player!", FlxColor.RED);
+        return 0.0;
+      }
+      var modsTarget = ModConstants.grabStrumModTarget(target);
+      if (modsTarget == null)
+      {
+        luaTrace("'" + target + "' is not a valid player target for 'getModValue'", FlxColor.RED);
+        return 0.0;
+      }
+      var isSub:Bool = false;
+      var subModArr = null;
+      if (ModConstants.isTagSub(tagToUse))
+      {
+        isSub = true;
+        subModArr = tagToUse.split('__');
+        if (modsTarget.modifiers.exists(subModArr[0]))
+        {
+          final mod:Modifier = modsTarget.modifiers.get(subModArr[0]);
+          final subModName:String = mod.subModAliasConvert(subModArr[1]);
+          return mod.getSubVal(subModName);
+        }
+      }
+      else
+      {
+        if (modsTarget.modifiers.exists(tagToUse))
+        {
+          return modsTarget.modifiers.get(tagToUse).currentValue;
+        }
+      }
+      return 0.0;
     });
 
     Lua_helper.add_callback(lua, "setNow", setNowFunc_parser);

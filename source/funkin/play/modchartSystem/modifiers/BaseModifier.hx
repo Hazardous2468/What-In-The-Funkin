@@ -366,7 +366,7 @@ class Modifier
     for (subMod in subValues) subMod.value = subMod.baseValue;
   }
 
-  public function getSubVal(name):Float
+  public function getSubVal(name:String):Float
   {
     final sub = subValues.get(name);
     if (sub != null) return sub.value;
