@@ -520,20 +520,20 @@ class Modifier
     }
   }
 
-  public function speedMath(lane:Int, curPos:Float, strumLine:Strumline, isHoldNote:Bool = false):Float
+  public dynamic function speedMath(lane:Int, curPos:Float, strumLine:Strumline, isHoldNote:Bool = false):Float
   {
     return 1.0;
   }
 
-  public function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
+  public dynamic function noteMath(data:NoteData, strumLine:Strumline, ?isHoldNote = false, ?isArrowPath:Bool = false):Void
   {
   }
 
-  public function specialMath(lane:Int, strumLine:Strumline):Void
+  public dynamic function specialMath(lane:Int, strumLine:Strumline):Void
   {
   }
 
-  public function strumMath(data:NoteData, strumLine:Strumline):Void
+  public dynamic function strumMath(data:NoteData, strumLine:Strumline):Void
   {
   }
 
