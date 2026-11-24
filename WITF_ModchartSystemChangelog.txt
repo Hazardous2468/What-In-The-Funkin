@@ -11,16 +11,17 @@ Circ modifier now uses 'invertForDad' correctly.
 Fixed color tint modifiers not working (notesRed, strumsBlue, etc modifiers).
 Added 'warp(easeA, easeB)' and 'return(ease)' ease modifiers. Also ported 'repeat(ease, times)', 'elastic(damp, count)', 'slice(ease, from, to)', and 'back(overshoot)' ease modifiers from Kade's modchart engine.
 Eases are now no longer case sensitive.
-Added 'cloneMod'function to lua. It creates a mod and adds it to a player with a custom name. This way, you can have multiple copies of 1 mod easily like drunk1 or drunk2.
+Added 'cloneMod' function to lua. It creates a mod and adds it to a player with a custom name. This way, you can have multiple copies of 1 mod easily like drunk1 or drunk2.
 Added an 'aux' function to lua that allows you to create an auxiliary modifier that controls other modifiers. Also added 'setNow' for Lua that allows you to set a mods value instantly (meant to be used with Aux mods to control other mods).
 Also added 'doAt' and 'perFrame' functions to Lua.
 Updated albumRolls for some songs.
 Updated Matoi to no longer use the deprecated ZProjectSprite class.
 Added 'holdCoverAngleOffset' variable to strumLine.hx.
 Added 'skipIfBaseValue' to modifiers to allow them to be skipped if they are at their base value.
-Made Modifier class scriptable so you can make your own hxScript modifiers by extending it or whatever. Though I recommend using runHaxeCode in lua for performance.
 Added 'onModchartPreTimeline' event that is fired before LUA so that you have a chance to add custom mods before lua.
 Fixed sustain culling being inverted for upscroll.
+Updated modifiers to now use the strumLine's scrollSpeed and not the chart's scroll speed (so scroll speed events affect modifiers). This applies to: jump, drive, drive2, bounce, bumpy.
+Added a 'forceDisableDrive2' variable to ModHandler.hx to help combat any weirdness drive2 may cause.
 
 
 

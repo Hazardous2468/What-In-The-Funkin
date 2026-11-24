@@ -968,15 +968,21 @@ class ModHandler
     note.strumExtraModData.playfieldZ = 0;
   }
 
+  public var forceDisableDrive2:Bool = false;
+
   /**
    * This function applies the modifier math onto the strumline note!
+   * If strumDistance, timeOffset, or is in orientPass, then it'll also apply note mods!
    * Assumes the strumline note is already at the base default position.
    */
   function applyStrumModifierMath(note:StrumlineNote, timeOffset:Float = 0):Void
   {
+    note.strumExtraModData.inDrive2Pass = false;
+    note.noteModData.noteType = "receptor";
     // Move the strum notes like regular notes.
-    if (note.strumDistance != 0 || timeOffset != 0 || note.noteModData.inOrientPass)
+    if (!forceDisableDrive2 && (note.strumDistance != 0 || timeOffset != 0 || note.noteModData.inOrientPass))
     {
+      note.strumExtraModData.inDrive2Pass = true;
       note.noteModData.strumTime = ModConstants.getSongPosition();
       note.noteModData.strumTime += note.noteModData.strumPosition + timeOffset;
 
@@ -1014,6 +1020,7 @@ class ModHandler
     }
     else
     {
+      note.strumExtraModData.inDrive2Pass = false;
       for (mod in this.mods_strums)
       {
         if (mod.skipIfBaseValue && mod.currentValue == mod.defaultBaseValue) continue;
@@ -1021,6 +1028,7 @@ class ModHandler
         mod.strumMath(note.noteModData, strum);
       }
     }
+    note.strumExtraModData.inDrive2Pass = false;
 
     final rememberMeX:Float = note.scale.x;
     final rememberMeY:Float = note.scale.y;

@@ -84,7 +84,7 @@ class BangarangMod extends Modifier
 
     var yOffset:Float = 0;
 
-    final speed = PlayState.instance?.currentChart?.scrollSpeed ?? 1.0;
+    final speed = scrollSpeed;
 
     final curpos:Float = data.curPos;
 

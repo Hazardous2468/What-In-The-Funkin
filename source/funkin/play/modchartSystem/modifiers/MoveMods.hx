@@ -347,7 +347,6 @@ class JumpMod extends Modifier
     var reverseMult:Float = FlxMath.remapToRange(reverseModAmount, 0, 1, 1, -1);
     reverseMult = FlxMath.lerp(1, reverseMult, reverseAffect.value);
 
-    final scrollSpeed = PlayState.instance.currentChart.scrollSpeed;
     data.y += Constants.PIXELS_PER_MS * scrollSpeed * (Preferences.downscroll ? -1 : 1) * val * currentValue * reverseMult;
   }
 }
@@ -380,7 +379,6 @@ class DriveMod extends Modifier
     var reverseMult:Float = FlxMath.remapToRange(reverseModAmount, 0, 1, 1, -1);
     reverseMult = FlxMath.lerp(1, reverseMult, reverseAffect.value);
 
-    final scrollSpeed = PlayState.instance.currentChart.scrollSpeed;
     data.y += Constants.PIXELS_PER_MS * scrollSpeed * (Preferences.downscroll ? -1 : 1) * currentValue * reverseMult;
   }
 }
@@ -398,13 +396,10 @@ class Drive2Mod extends Modifier
     unknown = false;
     notPercentage = true;
     specialMod = true;
-    this.skipIfBaseValue = true;
   }
 
   override function specialMath(lane:Int, strumLine:Strumline):Void
   {
-    if (currentValue == 0) return;
-    final scrollSpeed:Float = PlayState.instance.currentChart.scrollSpeed;
     final funny:Float = scrollSpeed * -1 * currentValue;
     final whichStrum:StrumlineNote = strumLine.getByIndex(lane);
     whichStrum.strumExtraModData.strumPos = funny;

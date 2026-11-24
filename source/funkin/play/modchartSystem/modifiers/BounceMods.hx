@@ -44,7 +44,6 @@ class BounceModBase extends Modifier
     if (currentValue == 0) return 0;
     curPos += getOffset();
     final speed:Float = mult.value;
-    // final scrollSpeed = PlayState.instance?.currentChart?.scrollSpeed ?? 1.0;
     return currentValue * ModConstants.strumSize * Math.abs(sin(curPos * 0.005 * (speed * 2)));
   }
 
@@ -53,7 +52,6 @@ class BounceModBase extends Modifier
     if (currentValue == 0) return 0;
     curPos += getOffset();
     final speed:Float = mult.value;
-    // final scrollSpeed = PlayState.instance?.currentChart?.scrollSpeed ?? 1.0;
     return currentValue * ModConstants.strumSize * Math.abs(cos(curPos * 0.005 * (speed * 2)));
   }
 
@@ -62,7 +60,6 @@ class BounceModBase extends Modifier
     if (currentValue == 0) return 0;
     curPos += getOffset();
     final speed:Float = mult.value;
-    // final scrollSpeed = PlayState.instance?.currentChart?.scrollSpeed ?? 1.0;
     return currentValue * ModConstants.strumSize * Math.abs(tan(curPos * 0.005 * (speed * 2)));
   }
 }
@@ -490,7 +487,6 @@ class BounceSpeedMod extends BounceModBase
   {
     if (currentValue == 0) return 1; // skip math if mod is 0
     final bumpyx_Mult:Float = mult.value;
-    final scrollSpeed = PlayState.instance?.currentChart?.scrollSpeed ?? 1.0;
     final modWouldBe:Float = currentValue * 0.025 * sin(
       curPos / (Strumline.STRUMLINE_SIZE / 3.0) / scrollSpeed * bumpyx_Mult
     ) * (Strumline.STRUMLINE_SIZE / 2.0);

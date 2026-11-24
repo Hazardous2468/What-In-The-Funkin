@@ -199,7 +199,20 @@ class Modifier
   function get_songTime():Float
   {
     return ModConstants.getSongPosition();
-    // return Conductor.instance?.songPosition ?? 0.0;
+  }
+
+  var scrollSpeed(get, never):Float;
+
+  function get_scrollSpeed():Float
+  {
+    if (strumOwner != null)
+    {
+      return strumOwner.scrollSpeed;
+    }
+    else
+    {
+      return PlayState.instance?.currentChart?.scrollSpeed ?? 1.0;
+    }
   }
 
   function sin(r:Float):Float
